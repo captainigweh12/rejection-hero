@@ -49,16 +49,11 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 - Discover nearby quest opportunities (coming soon)
 
 **Navigation & Menu**
-- Hamburger menu with comprehensive navigation options
-- Quick access to Profile, Quest Stats, Settings
-- Quest Labs for experimental features
-- Help & Support center
-- Referral system
-- Trends & Analytics dashboard
-- Quest History tracking
-- Community access
-- Wellness & Rest Mode
-- Third-party Integrations hub
+- Redesigned hamburger menu with organized sections
+- **PROFILE**: Profile & Settings, Help & Support, Invite Warriors
+- **ADVENTURE**: Quest Calendar, Past Quests, Leaderboard, Growth & Achievements
+- **COMMUNITY**: Groups, Manage Categories, Explore World
+- Log out and version display
 
 **Live Streaming** ✨ NEW!
 - Real-time live streaming powered by Daily.co

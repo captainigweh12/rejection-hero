@@ -24,16 +24,13 @@ import {
   Settings,
   HelpCircle,
   UserPlus,
-  TrendingUp,
+  Calendar,
   FileText,
-  Utensils,
-  Activity,
-  Sparkles,
+  TrendingUp,
   Users,
-  Compass,
-  Moon,
-  Heart,
-  Plug
+  FolderOpen,
+  Globe,
+  LogOut
 } from "lucide-react-native";
 import type { BottomTabScreenProps } from "@/navigation/types";
 import { api } from "@/lib/api";
@@ -416,7 +413,14 @@ export default function HomeScreen({ navigation }: Props) {
 
                 {/* Menu Items */}
                 <View style={{ paddingVertical: 8 }}>
-                  {/* My Profile */}
+                  {/* PROFILE Section */}
+                  <View style={{ paddingHorizontal: 24, paddingTop: 16, paddingBottom: 8 }}>
+                    <Text style={{ fontSize: 12, fontWeight: "600", color: "#999", letterSpacing: 1 }}>
+                      PROFILE
+                    </Text>
+                  </View>
+
+                  {/* Profile & Settings */}
                   <Pressable
                     onPress={() => {
                       setShowMenu(false);
@@ -432,74 +436,7 @@ export default function HomeScreen({ navigation }: Props) {
                   >
                     <User size={24} color="#0A0A0F" />
                     <Text style={{ fontSize: 16, color: "#0A0A0F", fontWeight: "500" }}>
-                      My Profile
-                    </Text>
-                  </Pressable>
-
-                  {/* My Quest Stats */}
-                  <Pressable
-                    onPress={() => {
-                      setShowMenu(false);
-                      navigation.navigate("ProfileTab");
-                    }}
-                    style={{
-                      paddingHorizontal: 24,
-                      paddingVertical: 16,
-                      flexDirection: "row",
-                      alignItems: "center",
-                      gap: 16,
-                    }}
-                  >
-                    <Trophy size={24} color="#0A0A0F" />
-                    <Text style={{ fontSize: 16, color: "#0A0A0F", fontWeight: "500" }}>
-                      My Quest Stats
-                    </Text>
-                  </Pressable>
-
-                  {/* Settings */}
-                  <Pressable
-                    onPress={() => {
-                      setShowMenu(false);
-                      navigation.navigate("ProfileTab");
-                    }}
-                    style={{
-                      paddingHorizontal: 24,
-                      paddingVertical: 16,
-                      flexDirection: "row",
-                      alignItems: "center",
-                      gap: 16,
-                    }}
-                  >
-                    <Settings size={24} color="#0A0A0F" />
-                    <Text style={{ fontSize: 16, color: "#0A0A0F", fontWeight: "500" }}>
-                      Settings
-                    </Text>
-                  </Pressable>
-
-                  {/* Divider */}
-                  <View
-                    style={{
-                      height: 1,
-                      backgroundColor: "#E8E9ED",
-                      marginVertical: 8,
-                      marginHorizontal: 24,
-                    }}
-                  />
-
-                  {/* Quest Labs */}
-                  <Pressable
-                    onPress={() => setShowMenu(false)}
-                    style={{
-                      paddingHorizontal: 24,
-                      paddingVertical: 16,
-                      flexDirection: "row",
-                      alignItems: "center",
-                      gap: 16,
-                    }}
-                  >
-                    <Sparkles size={24} color="#0A0A0F" />
-                    <Text style={{ fontSize: 16, color: "#0A0A0F", fontWeight: "500" }}>
-                      Quest Labs
+                      Profile & Settings
                     </Text>
                   </Pressable>
 
@@ -520,7 +457,7 @@ export default function HomeScreen({ navigation }: Props) {
                     </Text>
                   </Pressable>
 
-                  {/* Refer a Friend */}
+                  {/* Invite Warriors */}
                   <Pressable
                     onPress={() => setShowMenu(false)}
                     style={{
@@ -533,21 +470,18 @@ export default function HomeScreen({ navigation }: Props) {
                   >
                     <UserPlus size={24} color="#0A0A0F" />
                     <Text style={{ fontSize: 16, color: "#0A0A0F", fontWeight: "500" }}>
-                      Refer a Friend
+                      Invite Warriors
                     </Text>
                   </Pressable>
 
-                  {/* Divider */}
-                  <View
-                    style={{
-                      height: 1,
-                      backgroundColor: "#E8E9ED",
-                      marginVertical: 8,
-                      marginHorizontal: 24,
-                    }}
-                  />
+                  {/* ADVENTURE Section */}
+                  <View style={{ paddingHorizontal: 24, paddingTop: 24, paddingBottom: 8 }}>
+                    <Text style={{ fontSize: 12, fontWeight: "600", color: "#999", letterSpacing: 1 }}>
+                      ADVENTURE
+                    </Text>
+                  </View>
 
-                  {/* Trends & Analytics */}
+                  {/* Quest Calendar */}
                   <Pressable
                     onPress={() => setShowMenu(false)}
                     style={{
@@ -558,13 +492,13 @@ export default function HomeScreen({ navigation }: Props) {
                       gap: 16,
                     }}
                   >
-                    <TrendingUp size={24} color="#0A0A0F" />
+                    <Calendar size={24} color="#0A0A0F" />
                     <Text style={{ fontSize: 16, color: "#0A0A0F", fontWeight: "500" }}>
-                      Trends & Analytics
+                      Quest Calendar
                     </Text>
                   </Pressable>
 
-                  {/* Reports */}
+                  {/* Past Quests */}
                   <Pressable
                     onPress={() => setShowMenu(false)}
                     style={{
@@ -577,11 +511,11 @@ export default function HomeScreen({ navigation }: Props) {
                   >
                     <FileText size={24} color="#0A0A0F" />
                     <Text style={{ fontSize: 16, color: "#0A0A0F", fontWeight: "500" }}>
-                      Reports
+                      Past Quests
                     </Text>
                   </Pressable>
 
-                  {/* Quest History */}
+                  {/* Leaderboard */}
                   <Pressable
                     onPress={() => setShowMenu(false)}
                     style={{
@@ -592,23 +526,37 @@ export default function HomeScreen({ navigation }: Props) {
                       gap: 16,
                     }}
                   >
-                    <Activity size={24} color="#0A0A0F" />
+                    <Trophy size={24} color="#0A0A0F" />
                     <Text style={{ fontSize: 16, color: "#0A0A0F", fontWeight: "500" }}>
-                      Quest History
+                      Leaderboard
                     </Text>
                   </Pressable>
 
-                  {/* Divider */}
-                  <View
+                  {/* Growth & Achievements */}
+                  <Pressable
+                    onPress={() => setShowMenu(false)}
                     style={{
-                      height: 1,
-                      backgroundColor: "#E8E9ED",
-                      marginVertical: 8,
-                      marginHorizontal: 24,
+                      paddingHorizontal: 24,
+                      paddingVertical: 16,
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 16,
                     }}
-                  />
+                  >
+                    <TrendingUp size={24} color="#0A0A0F" />
+                    <Text style={{ fontSize: 16, color: "#0A0A0F", fontWeight: "500" }}>
+                      Growth & Achievements
+                    </Text>
+                  </Pressable>
 
-                  {/* Community */}
+                  {/* COMMUNITY Section */}
+                  <View style={{ paddingHorizontal: 24, paddingTop: 24, paddingBottom: 8 }}>
+                    <Text style={{ fontSize: 12, fontWeight: "600", color: "#999", letterSpacing: 1 }}>
+                      COMMUNITY
+                    </Text>
+                  </View>
+
+                  {/* Groups */}
                   <Pressable
                     onPress={() => {
                       setShowMenu(false);
@@ -624,11 +572,11 @@ export default function HomeScreen({ navigation }: Props) {
                   >
                     <Users size={24} color="#0A0A0F" />
                     <Text style={{ fontSize: 16, color: "#0A0A0F", fontWeight: "500" }}>
-                      Community
+                      Groups
                     </Text>
                   </Pressable>
 
-                  {/* Explore */}
+                  {/* Manage Categories */}
                   <Pressable
                     onPress={() => setShowMenu(false)}
                     style={{
@@ -639,13 +587,13 @@ export default function HomeScreen({ navigation }: Props) {
                       gap: 16,
                     }}
                   >
-                    <Compass size={24} color="#0A0A0F" />
+                    <FolderOpen size={24} color="#0A0A0F" />
                     <Text style={{ fontSize: 16, color: "#0A0A0F", fontWeight: "500" }}>
-                      Explore
+                      Manage Categories
                     </Text>
                   </Pressable>
 
-                  {/* Wellness */}
+                  {/* Explore World */}
                   <Pressable
                     onPress={() => setShowMenu(false)}
                     style={{
@@ -656,28 +604,39 @@ export default function HomeScreen({ navigation }: Props) {
                       gap: 16,
                     }}
                   >
-                    <Heart size={24} color="#0A0A0F" />
+                    <Globe size={24} color="#0A0A0F" />
                     <Text style={{ fontSize: 16, color: "#0A0A0F", fontWeight: "500" }}>
-                      Wellness & Rest Mode
+                      Explore World
                     </Text>
                   </Pressable>
 
-                  {/* Integrations */}
+                  {/* Log out */}
                   <Pressable
-                    onPress={() => setShowMenu(false)}
+                    onPress={() => {
+                      setShowMenu(false);
+                      // TODO: Implement logout
+                    }}
                     style={{
                       paddingHorizontal: 24,
                       paddingVertical: 16,
                       flexDirection: "row",
                       alignItems: "center",
                       gap: 16,
+                      marginTop: 24,
                     }}
                   >
-                    <Plug size={24} color="#0A0A0F" />
-                    <Text style={{ fontSize: 16, color: "#0A0A0F", fontWeight: "500" }}>
-                      Integrations
+                    <LogOut size={24} color="#FF3B30" />
+                    <Text style={{ fontSize: 16, color: "#FF3B30", fontWeight: "500" }}>
+                      Log out
                     </Text>
                   </Pressable>
+
+                  {/* Version */}
+                  <View style={{ paddingHorizontal: 24, paddingVertical: 16, alignItems: "center" }}>
+                    <Text style={{ fontSize: 12, color: "#999" }}>
+                      Version 1.0.0
+                    </Text>
+                  </View>
                 </View>
               </ScrollView>
             </SafeAreaView>
