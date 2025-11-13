@@ -6,6 +6,7 @@ import {
   Pressable,
   ActivityIndicator,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { useQuery } from "@tanstack/react-query";
 import { Flame, Trophy, Diamond, Bell, Menu, Plus, Zap } from "lucide-react-native";
@@ -96,8 +97,10 @@ export default function HomeScreen({ navigation }: Props) {
   }
 
   return (
-    <LinearGradient colors={["#0A0A0F", "#1A1A24", "#2A1A34"]} className="flex-1">
-      <ScrollView className="flex-1" contentContainerClassName="pb-24">
+    <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
+      <LinearGradient colors={["#0A0A0F", "#1A1A24", "#2A1A34"]} style={{ flex: 1 }}>
+        <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
+          <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 96 }}>
         {/* Header */}
         <View className="pt-4 pb-2 px-6 flex-row justify-between items-center">
           <Text className="text-white text-2xl font-bold">Go for No</Text>
@@ -294,6 +297,8 @@ export default function HomeScreen({ navigation }: Props) {
       >
         <Plus size={32} color="#fff" strokeWidth={3} />
       </Pressable>
-    </LinearGradient>
+        </SafeAreaView>
+      </LinearGradient>
+    </View>
   );
 }
