@@ -172,6 +172,7 @@ model UserQuest {
   completedAt DateTime?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  LiveStreams LiveStream[]
 
   @@unique([userId, questId])
   @@map("user_quest")
@@ -184,6 +185,7 @@ model LiveStream {
   roomUrl       String   @unique // Daily.co room URL
   roomName      String   @unique // Daily.co room name
   userQuestId   String?  // Optional linked quest
+  userQuest     UserQuest? @relation(fields: [userQuestId], references: [id], onDelete: SetNull)
   isActive      Boolean  @default(true)
   viewerCount   Int      @default(0)
   startedAt     DateTime @default(now())
