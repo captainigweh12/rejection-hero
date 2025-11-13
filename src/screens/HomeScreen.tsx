@@ -95,16 +95,6 @@ export default function HomeScreen({ navigation }: Props) {
     );
   }
 
-  if (questsLoading) {
-    return (
-      <LinearGradient colors={["#0A0A0F", "#1A1A24", "#2A1A34"]} className="flex-1">
-        <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#7E3FE4" />
-        </View>
-      </LinearGradient>
-    );
-  }
-
   return (
     <LinearGradient colors={["#0A0A0F", "#1A1A24", "#2A1A34"]} className="flex-1">
       <ScrollView className="flex-1" contentContainerClassName="pb-24">
@@ -139,7 +129,12 @@ export default function HomeScreen({ navigation }: Props) {
 
         {/* Active Quests */}
         <View className="px-6 py-4">
-          {activeQuests.length === 0 ? (
+          {questsLoading ? (
+            <View className="items-center py-8">
+              <ActivityIndicator size="large" color="#FF6B35" />
+              <Text className="text-white/70 mt-4">Loading quests...</Text>
+            </View>
+          ) : activeQuests.length === 0 ? (
             <View
               className="p-8 rounded-3xl items-center"
               style={{
