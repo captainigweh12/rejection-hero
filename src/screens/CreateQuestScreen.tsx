@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, Pressable, ActivityIndicator, TextInput, ScrollView, Alert } from "react-native";
+import { View, Text, Pressable, ActivityIndicator, TextInput, ScrollView, Alert, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -307,7 +307,11 @@ export default function CreateQuestScreen({ navigation }: Props) {
 
   // AI Form Screen
   return (
-    <View style={{ flex: 1, backgroundColor: "#F5F5F7" }}>
+    <KeyboardAvoidingView
+      style={{ flex: 1, backgroundColor: "#F5F5F7" }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={0}
+    >
       <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
         {/* Header */}
         <View
@@ -338,7 +342,12 @@ export default function CreateQuestScreen({ navigation }: Props) {
           </Text>
         </View>
 
-        <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 24, paddingBottom: 120 }}>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <ScrollView
+            style={{ flex: 1 }}
+            contentContainerStyle={{ padding: 24, paddingBottom: 120 }}
+            keyboardShouldPersistTaps="handled"
+          >
           {/* AI Icon */}
           <View style={{ alignItems: "center", marginVertical: 24 }}>
             <View
@@ -479,6 +488,7 @@ export default function CreateQuestScreen({ navigation }: Props) {
             </Text>
           </View>
         </ScrollView>
+        </TouchableWithoutFeedback>
 
         {/* Create Button */}
         <View
@@ -522,6 +532,6 @@ export default function CreateQuestScreen({ navigation }: Props) {
           </Pressable>
         </View>
       </SafeAreaView>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
