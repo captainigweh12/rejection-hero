@@ -48,6 +48,18 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 - Create location-based quests
 - Discover nearby quest opportunities (coming soon)
 
+**Navigation & Menu**
+- Hamburger menu with comprehensive navigation options
+- Quick access to Profile, Quest Stats, Settings
+- Quest Labs for experimental features
+- Help & Support center
+- Referral system
+- Trends & Analytics dashboard
+- Quest History tracking
+- Community access
+- Wellness & Rest Mode
+- Third-party Integrations hub
+
 ### Coming Soon
 - 🎥 **Live Streaming**: Real-time verification using VideoSDK/Agora
 - 📍 **Quest Markers**: Show active quests on map with color-coded categories
