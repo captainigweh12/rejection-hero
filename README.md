@@ -41,9 +41,16 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 - Google OAuth sign-in (Web, Android, iOS)
 - Auto-prompt for login on app startup
 
+**Map & Location Features**
+- Google Maps integration with real-time location tracking
+- Location permission handling
+- Recenter map to current location
+- Create location-based quests
+- Discover nearby quest opportunities (coming soon)
+
 ### Coming Soon
 - 🎥 **Live Streaming**: Real-time verification using VideoSDK/Agora
-- 🗺️ **Map View**: Location-based quest suggestions
+- 📍 **Quest Markers**: Show active quests on map with color-coded categories
 - 💬 **Messaging**: Chat with your matches
 - 👥 **Groups**: Join communities for specific challenges
 
@@ -55,6 +62,8 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 - **Nativewind**: TailwindCSS for React Native styling
 - **React Native Reanimated 3**: Smooth animations
 - **React Native Gesture Handler**: Swipe gestures
+- **React Native Maps**: Google Maps integration with location tracking
+- **Expo Location**: Real-time user location services
 - **TanStack Query**: Data fetching and caching
 - **Lucide React Native**: Beautiful icons
 
