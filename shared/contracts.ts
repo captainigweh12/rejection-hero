@@ -133,3 +133,99 @@ export const getMatchesResponseSchema = z.object({
   ),
 });
 export type GetMatchesResponse = z.infer<typeof getMatchesResponseSchema>;
+
+// ==========================================
+// Quest Routes
+// ==========================================
+
+// GET /api/quests - Get user's quests
+export const getUserQuestsResponseSchema = z.object({
+  activeQuests: z.array(
+    z.object({
+      id: z.string(),
+      quest: z.object({
+        id: z.string(),
+        title: z.string(),
+        description: z.string(),
+        category: z.string(),
+        difficulty: z.string(),
+        goalType: z.string(),
+        goalCount: z.number(),
+        xpReward: z.number(),
+        pointReward: z.number(),
+      }),
+      noCount: z.number(),
+      yesCount: z.number(),
+      status: z.string(),
+      startedAt: z.string().nullable(),
+    })
+  ),
+  queuedQuests: z.array(
+    z.object({
+      id: z.string(),
+      quest: z.object({
+        id: z.string(),
+        title: z.string(),
+        description: z.string(),
+        category: z.string(),
+        difficulty: z.string(),
+      }),
+    })
+  ),
+});
+export type GetUserQuestsResponse = z.infer<typeof getUserQuestsResponseSchema>;
+
+// POST /api/quests/generate - Generate AI quest
+export const generateQuestRequestSchema = z.object({
+  category: z.string().optional(),
+  difficulty: z.string().optional(),
+  customPrompt: z.string().optional(),
+});
+export type GenerateQuestRequest = z.infer<typeof generateQuestRequestSchema>;
+export const generateQuestResponseSchema = z.object({
+  success: z.boolean(),
+  userQuestId: z.string(),
+  quest: z.object({
+    id: z.string(),
+    title: z.string(),
+    description: z.string(),
+    category: z.string(),
+    difficulty: z.string(),
+    goalType: z.string(),
+    goalCount: z.number(),
+    xpReward: z.number(),
+    pointReward: z.number(),
+  }),
+});
+export type GenerateQuestResponse = z.infer<typeof generateQuestResponseSchema>;
+
+// POST /api/quests/:id/start - Start a quest
+export const startQuestResponseSchema = z.object({
+  success: z.boolean(),
+  userQuestId: z.string(),
+});
+export type StartQuestResponse = z.infer<typeof startQuestResponseSchema>;
+
+// POST /api/quests/:id/record - Record NO or YES
+export const recordQuestActionRequestSchema = z.object({
+  action: z.enum(["NO", "YES"]),
+});
+export type RecordQuestActionRequest = z.infer<typeof recordQuestActionRequestSchema>;
+export const recordQuestActionResponseSchema = z.object({
+  success: z.boolean(),
+  completed: z.boolean(),
+  noCount: z.number(),
+  yesCount: z.number(),
+});
+export type RecordQuestActionResponse = z.infer<typeof recordQuestActionResponseSchema>;
+
+// GET /api/stats - Get user stats
+export const getUserStatsResponseSchema = z.object({
+  currentStreak: z.number(),
+  longestStreak: z.number(),
+  totalXP: z.number(),
+  totalPoints: z.number(),
+  trophies: z.number(),
+  diamonds: z.number(),
+});
+export type GetUserStatsResponse = z.infer<typeof getUserStatsResponseSchema>;

@@ -3,9 +3,10 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { BlurView } from "expo-blur";
 import * as Haptics from "expo-haptics";
-import { Heart, Users, Video, Map, User } from "lucide-react-native";
+import { Home, Heart, Users, Video, Map, User } from "lucide-react-native";
 
 import type { BottomTabParamList, RootStackParamList } from "@/navigation/types";
+import HomeScreen from "@/screens/HomeScreen";
 import SwipeScreen from "@/screens/SwipeScreen";
 import MatchesScreen from "@/screens/MatchesScreen";
 import LiveScreen from "@/screens/LiveScreen";
@@ -13,6 +14,7 @@ import MapScreen from "@/screens/MapScreen";
 import ProfileScreen from "@/screens/ProfileScreen";
 import LoginModalScreen from "@/screens/LoginModalScreen";
 import EditProfileScreen from "@/screens/EditProfileScreen";
+import QuestDetailScreen from "@/screens/QuestDetailScreen";
 
 /**
  * RootStackNavigator
@@ -37,6 +39,11 @@ const RootNavigator = () => {
         component={EditProfileScreen}
         options={{ title: "Edit Profile", headerShown: true }}
       />
+      <RootStack.Screen
+        name="QuestDetail"
+        component={QuestDetailScreen}
+        options={{ title: "Quest", headerShown: true }}
+      />
     </RootStack.Navigator>
   );
 };
@@ -49,7 +56,7 @@ const BottomTab = createBottomTabNavigator<BottomTabParamList>();
 const BottomTabNavigator = () => {
   return (
     <BottomTab.Navigator
-      initialRouteName="SwipeTab"
+      initialRouteName="HomeTab"
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
@@ -58,7 +65,7 @@ const BottomTabNavigator = () => {
           borderTopWidth: 1,
           borderTopColor: "rgba(126, 63, 228, 0.2)",
         },
-        tabBarActiveTintColor: "#7E3FE4",
+        tabBarActiveTintColor: "#FF6B35",
         tabBarInactiveTintColor: "rgba(255, 255, 255, 0.5)",
         tabBarBackground: () => (
           <BlurView tint="dark" intensity={100} style={StyleSheet.absoluteFill} />
@@ -71,18 +78,18 @@ const BottomTabNavigator = () => {
       })}
     >
       <BottomTab.Screen
-        name="SwipeTab"
-        component={SwipeScreen}
+        name="HomeTab"
+        component={HomeScreen}
         options={{
-          title: "Swipe",
-          tabBarIcon: ({ color, size }) => <Heart size={size} color={color} />,
+          title: "Home",
+          tabBarIcon: ({ color, size }) => <Home size={size} color={color} />,
         }}
       />
       <BottomTab.Screen
-        name="MatchesTab"
-        component={MatchesScreen}
+        name="SwipeTab"
+        component={SwipeScreen}
         options={{
-          title: "Matches",
+          title: "Community",
           tabBarIcon: ({ color, size }) => <Users size={size} color={color} />,
         }}
       />

@@ -1,22 +1,49 @@
-# Go for No - Mobile App
+# Go for No - Rejection Challenge App
 
-A unique social verification mobile app where rejection is the goal! Swipe through profiles with an inverted Tinder-style interface (RIGHT = No, LEFT = Yes), featuring live streaming verification and location-based discovery.
+A revolutionary mobile app that helps users overcome fear of rejection through AI-powered "No Quests" - action-based challenges designed to build confidence and resilience. Complete quests, track progress, level up, and connect with a community of fellow challengers!
 
 ## Features
 
-### Core Features (v1)
-- **Swipe Interface**: Tinder-style card swiping with inverted logic
-  - Swipe RIGHT for No ❌
-  - Swipe LEFT for Yes ✅
-- **Profile Management**: Create and edit user profiles with photos, bio, age, and location
-- **Match System**: Get matched when both users swipe left (yes) on each other
-- **Matches View**: See all your connections in one place
-- **Authentication**: Secure email/password login with Better Auth
+### 🎯 No Quest System (MAIN FEATURE)
+
+**AI-Generated Challenges**
+- Create custom rejection quests using OpenAI
+- 6 Categories: Sales, Social, Entrepreneurship, Dating, Confidence, Career
+- 4 Difficulty Levels: Easy, Medium, Hard, Expert
+- Real-time progress tracking (NOs and YESes collected)
+- Rewards: Earn XP and points based on difficulty
+- Max 2 active quests (extras go to queue)
+
+**Quest Examples:**
+- Ask 5 coffee shops for an item that's not on their menu
+- Ask 5 strangers for their phone numbers
+- Pitch your idea to 10 people
+- Request ridiculous discounts at stores
+- Follow up with prospects who previously declined
+
+**Gamification**
+- 🔥 Streak tracking (current and longest)
+- 📊 XP and Points system
+- 🏆 Trophies
+- 💎 Diamonds
+- Beautiful stats dashboard
+
+### 👥 Community Features
+
+**Swipe Interface**
+- Tinder-style card swiping (RIGHT = No, LEFT = Yes)
+- Profile management with photos, bio, age, location
+- Match system when both users swipe left (yes)
+- View all your connections
+
+**Authentication**
+- Secure email/password login with Better Auth
 
 ### Coming Soon
-- **Live Streaming**: Real-time video verification using VideoSDK/Agora
-- **Map View**: Location-based user discovery with Google Maps
-- **Messaging**: Chat with your matches
+- 🎥 **Live Streaming**: Real-time verification using VideoSDK/Agora
+- 🗺️ **Map View**: Location-based quest suggestions
+- 💬 **Messaging**: Chat with your matches
+- 👥 **Groups**: Join communities for specific challenges
 
 ## Tech Stack
 
@@ -24,8 +51,8 @@ A unique social verification mobile app where rejection is the goal! Swipe throu
 - **Expo SDK 53** with React Native 0.76.7
 - **React Navigation 7**: Native stack and tab navigation
 - **Nativewind**: TailwindCSS for React Native styling
-- **React Native Reanimated 3**: Smooth card swipe animations
-- **React Native Gesture Handler**: Swipe gesture detection
+- **React Native Reanimated 3**: Smooth animations
+- **React Native Gesture Handler**: Swipe gestures
 - **TanStack Query**: Data fetching and caching
 - **Lucide React Native**: Beautiful icons
 
@@ -33,25 +60,32 @@ A unique social verification mobile app where rejection is the goal! Swipe throu
 - **Bun + Hono**: Fast TypeScript backend server
 - **Prisma ORM**: Type-safe database access
 - **SQLite**: Local database (migrating to Supabase)
-- **Better Auth**: Authentication with email/password
+- **Better Auth**: Authentication
+- **OpenAI API**: AI quest generation
 
 ### Database Schema
 - **User**: Authentication and user data
 - **Profile**: Display name, bio, photos, location, live status
-- **Swipe**: Track user swipes (left/right)
+- **Quest**: Challenge templates (AI-generated or predefined)
+- **UserQuest**: User's quest progress and completion
+- **UserStats**: Streaks, XP, points, trophies, diamonds
+- **Swipe**: Track user swipes
 - **Match**: Store mutual matches
 
 ## Design
 
 ### Color Palette
-- Deep purples: `#7B3FE4`, `#5E1FA8`
-- Electric blue: `#00D9FF`, `#0099FF`
-- Dark backgrounds: `#0A0A0F`, `#1A1A24`, `#2A1A34`
+- 🟠 Orange/Coral: `#FF6B35` (primary action)
+- 🟣 Deep purples: `#7B3FE4`, `#5E1FA8`
+- 🔵 Electric blue: `#00D9FF`, `#0099FF`
+- ⚫ Dark backgrounds: `#0A0A0F`, `#1A1A24`, `#2A1A34`
+- 🟢 Green (success): `#4CAF50`
+- 🟡 Gold (rewards): `#FFD700`
 
 ### Style
 - Modern glassmorphism with blur effects
 - Smooth spring animations
-- Glowing neon accents
+- Category-based color coding
 - Dark theme optimized
 
 ## Project Structure
@@ -60,81 +94,106 @@ A unique social verification mobile app where rejection is the goal! Swipe throu
 /home/user/workspace/
 ├── src/
 │   ├── screens/
-│   │   ├── SwipeScreen.tsx          # Main swipe interface
-│   │   ├── MatchesScreen.tsx        # View all matches
-│   │   ├── ProfileScreen.tsx        # User profile view
-│   │   ├── EditProfileScreen.tsx    # Edit profile form
-│   │   ├── LiveScreen.tsx           # Live streaming (placeholder)
-│   │   ├── MapScreen.tsx            # Map view (placeholder)
-│   │   └── LoginModalScreen.tsx     # Authentication modal
+│   │   ├── HomeScreen.tsx           # Quest dashboard (NEW!)
+│   │   ├── QuestDetailScreen.tsx    # Quest tracking (NEW!)
+│   │   ├── SwipeScreen.tsx          # Community swipe
+│   │   ├── MatchesScreen.tsx        # View matches
+│   │   ├── ProfileScreen.tsx        # User profile
+│   │   ├── EditProfileScreen.tsx    # Edit profile
+│   │   ├── LiveScreen.tsx           # Live (placeholder)
+│   │   ├── MapScreen.tsx            # Map (placeholder)
+│   │   └── LoginModalScreen.tsx     # Auth modal
 │   ├── components/
-│   │   ├── SwipeCard.tsx            # Animated swipe card component
+│   │   ├── SwipeCard.tsx
 │   │   ├── LoginWithEmailPassword.tsx
 │   │   └── LoginButton.tsx
 │   ├── navigation/
-│   │   ├── RootNavigator.tsx        # App navigation setup
-│   │   └── types.ts                 # Navigation types
+│   │   ├── RootNavigator.tsx
+│   │   └── types.ts
 │   ├── lib/
-│   │   ├── api.ts                   # API client
-│   │   ├── authClient.ts            # Auth client
-│   │   ├── useSession.tsx           # Session hook
-│   │   └── queryClient.ts           # TanStack Query setup
+│   │   ├── api.ts
+│   │   ├── authClient.ts
+│   │   ├── useSession.tsx
+│   │   └── queryClient.ts
 │   └── shared/
-│       └── contracts.ts             # Shared types between frontend/backend
+│       └── contracts.ts
 ├── backend/
 │   ├── src/
-│   │   ├── index.ts                 # Server entry point
+│   │   ├── index.ts
 │   │   ├── routes/
-│   │   │   ├── profile.ts           # Profile CRUD
-│   │   │   ├── discover.ts          # Get profiles to swipe
-│   │   │   ├── swipe.ts             # Create swipes
-│   │   │   └── matches.ts           # Get user matches
-│   │   ├── auth.ts                  # Better Auth config
-│   │   └── db.ts                    # Prisma client
+│   │   │   ├── profile.ts
+│   │   │   ├── discover.ts
+│   │   │   ├── swipe.ts
+│   │   │   ├── matches.ts
+│   │   │   ├── quests.ts    # NEW!
+│   │   │   └── stats.ts     # NEW!
+│   │   ├── auth.ts
+│   │   └── db.ts
 │   └── prisma/
-│       ├── schema.prisma            # Database schema
-│       └── dev.db                   # SQLite database
-└── App.tsx                          # App entry point
+│       ├── schema.prisma
+│       └── dev.db
+└── App.tsx
 ```
 
 ## API Endpoints
+
+### Quests (NEW!)
+- `GET /api/quests` - Get user's active and queued quests
+- `POST /api/quests/generate` - Generate AI-powered quest
+- `POST /api/quests/:id/start` - Start a quest (max 2 active)
+- `POST /api/quests/:id/record` - Record NO or YES attempt
+
+### Stats (NEW!)
+- `GET /api/stats` - Get user statistics
 
 ### Profile
 - `GET /api/profile` - Get current user's profile
 - `POST /api/profile` - Create/update profile
 
-### Discovery
-- `GET /api/discover` - Get profiles to swipe on (excludes already swiped)
-
-### Swipes
-- `POST /api/swipe` - Create a swipe (left/right)
-  - Returns match status if matched
-
-### Matches
-- `GET /api/matches` - Get all user matches
+### Discovery & Community
+- `GET /api/discover` - Get profiles to swipe on
+- `POST /api/swipe` - Create a swipe
+- `GET /api/matches` - Get all matches
 
 ### Auth
-- `/api/auth/*` - Authentication endpoints (Better Auth)
+- `/api/auth/*` - Authentication endpoints
 
 ## Development
 
-The app is running automatically on:
+Running automatically:
 - **Frontend**: Port 8081 (Expo)
 - **Backend**: Port 3000 (Hono)
-- **Database Studio**: Port 3001 (Prisma Studio - accessible via CLOUD tab)
+- **Database Studio**: Port 3001 (Prisma Studio - CLOUD tab)
+
+## Setup
+
+1. **OpenAI API (Optional but Recommended)**
+   - Add `OPENAI_API_KEY` via ENV tab in Vibecode app
+   - Enables AI-powered quest generation
+   - Falls back to predefined quests if not set
+
+2. **Test the App**
+   - Create an account
+   - Tap the orange Create button (+) to generate a quest
+   - Start a quest and track your progress
+   - Collect NOs and YESes to complete challenges
 
 ## Next Steps
 
-1. **Supabase Integration**: Migrate from SQLite to Supabase for production
-2. **Live Streaming**: Integrate VideoSDK or Agora for real-time verification
-3. **Google Maps**: Add location-based discovery
-4. **Photo Upload**: Allow users to upload profile photos
-5. **Messaging**: Real-time chat between matches
-6. **Push Notifications**: Match notifications
+1. ✅ **Quest System** - COMPLETED!
+2. 🎥 **Live Streaming**: Integrate VideoSDK/Agora
+3. 🗺️ **Map with Quests**: Show nearby quest locations
+4. 📸 **Photo Upload**: Quest completion photos
+5. 💬 **Messaging**: Chat with matches
+6. 🔔 **Push Notifications**: Quest reminders
+7. 🌐 **Supabase**: Migrate to production database
 
 ## Notes
 
-- Swipe logic is inverted: RIGHT = No, LEFT = Yes
-- All styling uses Nativewind (TailwindCSS)
-- Backend and frontend share types via `/shared/contracts.ts`
-- Database updates require Prisma migrations
+- **Max Active Quests**: 2 at a time, extras go to queue
+- **AI Generation**: Requires `OPENAI_API_KEY` (optional)
+- **Rewards Formula**: XP = (goalCount × 10 × difficulty) + 50
+- **Swipe Logic**: RIGHT = No, LEFT = Yes (inverted)
+- **Styling**: Nativewind (TailwindCSS)
+- **Type Safety**: Shared contracts via `/shared/contracts.ts`
+- **Database**: Prisma migrations required for schema changes

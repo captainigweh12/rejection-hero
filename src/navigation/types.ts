@@ -14,9 +14,11 @@ export type RootStackParamList = {
   InsideScreen: undefined;
   LoginModalScreen: undefined;
   EditProfile: undefined;
+  QuestDetail: { userQuestId: string };
 };
 
 export type BottomTabParamList = {
+  HomeTab: undefined;
   SwipeTab: undefined;
   MatchesTab: undefined;
   LiveTab: undefined;

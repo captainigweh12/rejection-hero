@@ -12,6 +12,8 @@ import { profileRouter } from "./routes/profile";
 import { discoverRouter } from "./routes/discover";
 import { swipeRouter } from "./routes/swipe";
 import { matchesRouter } from "./routes/matches";
+import { questsRouter } from "./routes/quests";
+import { statsRouter } from "./routes/stats";
 import { type AppType } from "./types";
 
 // AppType context adds user and session to the context, will be null if the user or session is null
@@ -61,6 +63,12 @@ app.route("/api/swipe", swipeRouter);
 console.log("💕 Mounting matches routes at /api/matches");
 app.route("/api/matches", matchesRouter);
 
+console.log("🎯 Mounting quests routes at /api/quests");
+app.route("/api/quests", questsRouter);
+
+console.log("📊 Mounting stats routes at /api/stats");
+app.route("/api/stats", statsRouter);
+
 // Health check endpoint
 // Used by load balancers and monitoring tools to verify service is running
 app.get("/health", (c) => {
@@ -84,6 +92,8 @@ serve({ fetch: app.fetch, port: Number(env.PORT) }, () => {
   console.log("  🔍 Discover: GET /api/discover");
   console.log("  👆 Swipe:    POST /api/swipe");
   console.log("  💕 Matches:  GET /api/matches");
+  console.log("  🎯 Quests:   GET/POST /api/quests");
+  console.log("  📊 Stats:    GET /api/stats");
   console.log("  💚 Health:   GET /health");
   console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
 });

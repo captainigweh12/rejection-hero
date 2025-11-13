@@ -23,10 +23,12 @@ model User {
   accounts      Account[]
 
   Profile         Profile?
-  SwipesGiven     Swipe[]  @relation("SwipesGiven")
-  SwipesReceived  Swipe[]  @relation("SwipesReceived")
-  MatchesAsUser1  Match[]  @relation("MatchUser1")
-  MatchesAsUser2  Match[]  @relation("MatchUser2")
+  SwipesGiven     Swipe[]      @relation("SwipesGiven")
+  SwipesReceived  Swipe[]      @relation("SwipesReceived")
+  MatchesAsUser1  Match[]      @relation("MatchUser1")
+  MatchesAsUser2  Match[]      @relation("MatchUser2")
+  UserQuests      UserQuest[]
+  UserStats       UserStats?
 
   @@map("user")
 }
@@ -118,4 +120,57 @@ model Match {
 
   @@unique([user1Id, user2Id])
   @@map("match")
+}
+
+model UserStats {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  currentStreak Int      @default(0)
+  longestStreak Int      @default(0)
+  totalXP       Int      @default(0)
+  totalPoints   Int      @default(0)
+  trophies      Int      @default(0)
+  diamonds      Int      @default(0)
+  lastActiveAt  DateTime @default(now())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("user_stats")
+}
+
+model Quest {
+  id          String      @id @default(cuid())
+  title       String
+  description String
+  category    String      // "SALES", "SOCIAL", "ENTREPRENEURSHIP", "DATING", "CONFIDENCE", "CAREER"
+  difficulty  String      // "EASY", "MEDIUM", "HARD", "EXPERT"
+  goalType    String      // "COLLECT_NOS", "COLLECT_YES", "COMPLETE_ACTION"
+  goalCount   Int         @default(1)
+  xpReward    Int
+  pointReward Int
+  isAIGenerated Boolean   @default(false)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  UserQuests  UserQuest[]
+
+  @@map("quest")
+}
+
+model UserQuest {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  questId     String
+  quest       Quest    @relation(fields: [questId], references: [id], onDelete: Cascade)
+  status      String   // "ACTIVE", "COMPLETED", "QUEUED"
+  noCount     Int      @default(0)
+  yesCount    Int      @default(0)
+  startedAt   DateTime?
+  completedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([userId, questId])
+  @@map("user_quest")
 }
