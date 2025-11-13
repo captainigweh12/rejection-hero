@@ -54,46 +54,73 @@ live.post("/start", async (c) => {
       console.log(`[Live] Auto-ended existing stream ${existingStream.id} for user ${user.id}`);
     }
 
-    // Generate Daily.co room (in production, you'd call Daily.co API)
-    // For now, we'll create a mock room
+    // Generate Daily.co room
     const roomName = `quest-live-${user.id}-${Date.now()}`;
-    const roomUrl = `https://vibecode.daily.co/${roomName}`;
+    const DAILY_API_KEY = process.env.DAILY_API_KEY;
 
-    // In production, you would create a room via Daily.co API:
-    // const DAILY_API_KEY = process.env.DAILY_API_KEY;
-    // const response = await fetch("https://api.daily.co/v1/rooms", {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //     "Authorization": `Bearer ${DAILY_API_KEY}`
-    //   },
-    //   body: JSON.stringify({
-    //     name: roomName,
-    //     privacy: "public",
-    //     properties: {
-    //       max_participants: 100,
-    //       enable_chat: true,
-    //       enable_screenshare: false,
-    //     }
-    //   })
-    // });
-    // const roomData = await response.json();
+    let roomUrl = `https://vibecode.daily.co/${roomName}`;
+    let token = "mock-token";
 
-    // Create meeting token for the host (in production)
-    // const tokenResponse = await fetch("https://api.daily.co/v1/meeting-tokens", {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //     "Authorization": `Bearer ${DAILY_API_KEY}`
-    //   },
-    //   body: JSON.stringify({
-    //     properties: {
-    //       room_name: roomName,
-    //       is_owner: true,
-    //     }
-    //   })
-    // });
-    // const { token } = await tokenResponse.json();
+    if (DAILY_API_KEY) {
+      try {
+        // Create room via Daily.co API
+        const roomResponse = await fetch("https://api.daily.co/v1/rooms", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${DAILY_API_KEY}`,
+          },
+          body: JSON.stringify({
+            name: roomName,
+            privacy: "public",
+            properties: {
+              max_participants: 100,
+              enable_chat: true,
+              enable_screenshare: false,
+              start_video_off: false,
+              start_audio_off: false,
+            },
+          }),
+        });
+
+        if (!roomResponse.ok) {
+          throw new Error(`Daily.co room creation failed: ${roomResponse.statusText}`);
+        }
+
+        const roomData = await roomResponse.json();
+        roomUrl = roomData.url;
+
+        // Create meeting token for the host
+        const tokenResponse = await fetch("https://api.daily.co/v1/meeting-tokens", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${DAILY_API_KEY}`,
+          },
+          body: JSON.stringify({
+            properties: {
+              room_name: roomName,
+              is_owner: true,
+            },
+          }),
+        });
+
+        if (!tokenResponse.ok) {
+          throw new Error(`Daily.co token creation failed: ${tokenResponse.statusText}`);
+        }
+
+        const tokenData = await tokenResponse.json();
+        token = tokenData.token;
+
+        console.log(`[Live] Created Daily.co room: ${roomUrl}`);
+      } catch (error) {
+        console.error("[Live] Daily.co API error:", error);
+        // Fall back to mock room if API fails
+        console.log("[Live] Falling back to mock room");
+      }
+    } else {
+      console.log("[Live] No DAILY_API_KEY found, using mock room");
+    }
 
     // Create live stream in database
     const liveStream = await db.liveStream.create({
@@ -171,13 +198,21 @@ live.post("/:id/end", async (c) => {
       },
     });
 
-    // In production, delete the Daily.co room:
-    // await fetch(`https://api.daily.co/v1/rooms/${liveStream.roomName}`, {
-    //   method: "DELETE",
-    //   headers: {
-    //     "Authorization": `Bearer ${DAILY_API_KEY}`
-    //   }
-    // });
+    // Delete the Daily.co room
+    const DAILY_API_KEY = process.env.DAILY_API_KEY;
+    if (DAILY_API_KEY) {
+      try {
+        await fetch(`https://api.daily.co/v1/rooms/${liveStream.roomName}`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${DAILY_API_KEY}`,
+          },
+        });
+        console.log(`[Live] Deleted Daily.co room: ${liveStream.roomName}`);
+      } catch (error) {
+        console.error("[Live] Failed to delete Daily.co room:", error);
+      }
+    }
 
     const response: endLiveStreamResponseSchema._type = {
       success: true,
