@@ -73,14 +73,6 @@ function AuthWrapper() {
     }
   }, [sessionData, isPending, hasChecked, navigation]);
 
-  if (isPending) {
-    return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#0A0A0F" }}>
-        <ActivityIndicator size="large" color="#FF6B35" />
-      </View>
-    );
-  }
-
   return null;
 }
 
