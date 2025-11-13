@@ -20,6 +20,8 @@ type Props = BottomTabScreenProps<"HomeTab">;
 export default function HomeScreen({ navigation }: Props) {
   const { data: sessionData } = useSession();
 
+  console.log("[HomeScreen] Rendering - User logged in:", !!sessionData?.user);
+
   const { data: questsData, isLoading: questsLoading, error: questsError } = useQuery<GetUserQuestsResponse>({
     queryKey: ["quests"],
     queryFn: async () => {
@@ -102,9 +104,9 @@ export default function HomeScreen({ navigation }: Props) {
         <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
           <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 96 }}>
         {/* Header */}
-        <View className="pt-4 pb-2 px-6 flex-row justify-between items-center">
-          <Text className="text-white text-2xl font-bold">Go for No</Text>
-          <View className="flex-row items-center gap-4">
+        <View style={{ paddingTop: 16, paddingBottom: 8, paddingHorizontal: 24, flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+          <Text style={{ color: "white", fontSize: 24, fontWeight: "bold" }}>Go for No</Text>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 16 }}>
             <Pressable>
               <Bell size={24} color="#fff" />
             </Pressable>
@@ -115,49 +117,58 @@ export default function HomeScreen({ navigation }: Props) {
         </View>
 
         {/* Stats Bar */}
-        <View className="px-6 py-4 flex-row justify-between items-center">
-          <View className="flex-row items-center gap-2">
+        <View style={{ paddingHorizontal: 24, paddingVertical: 16, flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
             <Flame size={20} color="#FF6B35" />
-            <Text className="text-white text-lg font-bold">{statsData?.currentStreak || 0}</Text>
+            <Text style={{ color: "white", fontSize: 18, fontWeight: "bold" }}>{statsData?.currentStreak || 0}</Text>
           </View>
-          <View className="flex-row items-center gap-2">
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
             <Trophy size={20} color="#FFD700" />
-            <Text className="text-white text-lg font-bold">{statsData?.trophies || 0}</Text>
+            <Text style={{ color: "white", fontSize: 18, fontWeight: "bold" }}>{statsData?.trophies || 0}</Text>
           </View>
-          <View className="flex-row items-center gap-2">
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
             <Diamond size={20} color="#00D9FF" />
-            <Text className="text-white text-lg font-bold">{statsData?.diamonds || 0}</Text>
+            <Text style={{ color: "white", fontSize: 18, fontWeight: "bold" }}>{statsData?.diamonds || 0}</Text>
           </View>
         </View>
 
         {/* Active Quests */}
-        <View className="px-6 py-4">
+        <View style={{ paddingHorizontal: 24, paddingVertical: 16 }}>
           {questsLoading ? (
-            <View className="items-center py-8">
+            <View style={{ alignItems: "center", paddingVertical: 32 }}>
               <ActivityIndicator size="large" color="#FF6B35" />
-              <Text className="text-white/70 mt-4">Loading quests...</Text>
+              <Text style={{ color: "rgba(255, 255, 255, 0.7)", marginTop: 16 }}>Loading quests...</Text>
             </View>
           ) : activeQuests.length === 0 ? (
             <View
-              className="p-8 rounded-3xl items-center"
               style={{
+                padding: 32,
+                borderRadius: 24,
+                alignItems: "center",
                 backgroundColor: "rgba(255, 255, 255, 0.05)",
                 borderWidth: 1,
                 borderColor: "rgba(126, 63, 228, 0.3)",
               }}
             >
-              <Text className="text-white text-xl font-bold mb-2">No Active Quests</Text>
-              <Text className="text-white/70 text-center mb-6">
+              <Text style={{ color: "white", fontSize: 20, fontWeight: "bold", marginBottom: 8 }}>No Active Quests</Text>
+              <Text style={{ color: "rgba(255, 255, 255, 0.7)", textAlign: "center", marginBottom: 24 }}>
                 Start your rejection challenge journey! Tap the Create button to generate a quest
                 with AI.
               </Text>
               <Pressable
                 onPress={() => navigation.navigate("CreateQuest")}
-                className="px-6 py-3 rounded-full flex-row items-center gap-2"
-                style={{ backgroundColor: "#FF6B35" }}
+                style={{
+                  paddingHorizontal: 24,
+                  paddingVertical: 12,
+                  borderRadius: 999,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 8,
+                  backgroundColor: "#FF6B35",
+                }}
               >
                 <Plus size={20} color="#fff" />
-                <Text className="text-white font-bold">Create Quest</Text>
+                <Text style={{ color: "white", fontWeight: "bold" }}>Create Quest</Text>
               </Pressable>
             </View>
           ) : (
