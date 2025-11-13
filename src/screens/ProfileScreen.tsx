@@ -1,20 +1,25 @@
-import React from "react";
-import { View, Text, Pressable, ActivityIndicator, Image, ScrollView } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
+import React, { useState } from "react";
+import { View, Text, Pressable, ActivityIndicator, ScrollView, TextInput, Switch, Alert } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useQuery } from "@tanstack/react-query";
-import { Edit, LogOut } from "lucide-react-native";
+import { Settings, Shield, Zap, Video, Bell, Globe, Sun, ChevronRight } from "lucide-react-native";
 import type { BottomTabScreenProps } from "@/navigation/types";
 import { api } from "@/lib/api";
 import { useSession } from "@/lib/useSession";
 import { authClient } from "@/lib/authClient";
-import type { GetProfileResponse } from "@/shared/contracts";
+import type { GetProfileResponse, GetUserStatsResponse } from "@/shared/contracts";
 
 type Props = BottomTabScreenProps<"ProfileTab">;
 
 export default function ProfileScreen({ navigation }: Props) {
   const { data: sessionData } = useSession();
+  const [selectedTab, setSelectedTab] = useState<"quests" | "journals" | "about">("quests");
+  const [showSettings, setShowSettings] = useState(false);
+  const [darkMode, setDarkMode] = useState(true);
+  const [questReminders, setQuestReminders] = useState(false);
+  const [youtubeUrl, setYoutubeUrl] = useState("");
 
-  const { data, isLoading, error } = useQuery<GetProfileResponse>({
+  const { data: profileData, isLoading: profileLoading } = useQuery<GetProfileResponse>({
     queryKey: ["profile"],
     queryFn: async () => {
       return api.get<GetProfileResponse>("/api/profile");
@@ -22,140 +27,382 @@ export default function ProfileScreen({ navigation }: Props) {
     enabled: !!sessionData?.user,
   });
 
+  const { data: statsData } = useQuery<GetUserStatsResponse>({
+    queryKey: ["stats"],
+    queryFn: async () => {
+      return api.get<GetUserStatsResponse>("/api/stats");
+    },
+    enabled: !!sessionData?.user,
+  });
+
   const handleLogout = async () => {
-    await authClient.signOut();
+    Alert.alert(
+      "Sign Out",
+      "Are you sure you want to sign out?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Sign Out",
+          style: "destructive",
+          onPress: async () => {
+            await authClient.signOut();
+          },
+        },
+      ]
+    );
+  };
+
+  const handleConnectYouTube = () => {
+    if (!youtubeUrl.trim()) {
+      Alert.alert("Missing URL", "Please enter your YouTube channel URL");
+      return;
+    }
+    Alert.alert("Success", "YouTube channel connected! You can now go live.");
+    setYoutubeUrl("");
   };
 
   if (!sessionData?.user) {
     return (
-      <LinearGradient colors={["#0A0A0F", "#1A1A24", "#2A1A34"]} className="flex-1">
-        <View className="flex-1 items-center justify-center px-8">
-          <Text className="text-white text-2xl font-bold mb-4">Not logged in</Text>
-          <Text className="text-white/70 text-center mb-6">
-            Please log in to view your profile
-          </Text>
-          <Pressable
-            onPress={() => navigation.navigate("LoginModalScreen")}
-            className="bg-purple-600 px-8 py-4 rounded-full"
-          >
-            <Text className="text-white font-bold text-lg">Log In</Text>
-          </Pressable>
-        </View>
-      </LinearGradient>
+      <View style={{ flex: 1, backgroundColor: "#E8E9ED" }}>
+        <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
+          <View style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 32 }}>
+            <Shield size={64} color="#FF6B35" />
+            <Text style={{ fontSize: 28, fontWeight: "bold", marginTop: 24, marginBottom: 16, textAlign: "center" }}>
+              Your Profile
+            </Text>
+            <Text style={{ color: "#666", fontSize: 16, textAlign: "center", marginBottom: 32 }}>
+              Sign in to view your profile, track your progress, and manage your account.
+            </Text>
+            <Pressable
+              onPress={() => navigation.navigate("LoginModalScreen")}
+              style={{
+                backgroundColor: "#FF6B35",
+                paddingHorizontal: 48,
+                paddingVertical: 16,
+                borderRadius: 999,
+              }}
+            >
+              <Text style={{ color: "white", fontWeight: "bold", fontSize: 18 }}>Get Started</Text>
+            </Pressable>
+          </View>
+        </SafeAreaView>
+      </View>
     );
   }
 
-  if (isLoading) {
+  if (profileLoading) {
     return (
-      <LinearGradient colors={["#0A0A0F", "#1A1A24", "#2A1A34"]} className="flex-1">
-        <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#7E3FE4" />
-        </View>
-      </LinearGradient>
+      <View style={{ flex: 1, backgroundColor: "#E8E9ED" }}>
+        <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
+          <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+            <ActivityIndicator size="large" color="#FF6B35" />
+          </View>
+        </SafeAreaView>
+      </View>
     );
   }
 
-  if (error || !data) {
-    return (
-      <LinearGradient colors={["#0A0A0F", "#1A1A24", "#2A1A34"]} className="flex-1">
-        <View className="flex-1 items-center justify-center px-8">
-          <Text className="text-white text-xl font-bold mb-4">No profile found</Text>
-          <Text className="text-white/70 text-center mb-6">
-            Create your profile to start using the app
-          </Text>
-          <Pressable
-            onPress={() => navigation.navigate("EditProfile")}
-            className="bg-purple-600 px-8 py-4 rounded-full"
-          >
-            <Text className="text-white font-bold text-lg">Create Profile</Text>
-          </Pressable>
-        </View>
-      </LinearGradient>
-    );
-  }
-
-  const imageUrl = data.photos[0] || "https://via.placeholder.com/200/5E1FA8/ffffff?text=No+Photo";
+  const username = sessionData.user.email?.split("@")[0] || "User";
+  const level = Math.floor((statsData?.totalXP || 0) / 100) + 1;
 
   return (
-    <LinearGradient colors={["#0A0A0F", "#1A1A24", "#2A1A34"]} className="flex-1">
-      <ScrollView className="flex-1" contentContainerClassName="pb-24">
+    <View style={{ flex: 1, backgroundColor: "#E8E9ED" }}>
+      <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
         {/* Header */}
-        <View className="pt-4 pb-2 px-6 flex-row justify-between items-center">
-          <Text className="text-white text-3xl font-bold">Profile</Text>
-          <Pressable onPress={handleLogout} className="p-2">
-            <LogOut size={24} color="#fff" />
-          </Pressable>
+        <View style={{ backgroundColor: "white", paddingVertical: 16, paddingHorizontal: 20, borderBottomWidth: 1, borderBottomColor: "#E0E0E0" }}>
+          <Text style={{ fontSize: 20, fontWeight: "bold", textAlign: "center" }}>Profile</Text>
         </View>
 
-        {/* Profile Image */}
-        <View className="items-center mt-8">
-          <View
-            className="relative"
-            style={{
-              width: 160,
-              height: 160,
-              borderRadius: 80,
-              overflow: "hidden",
-              borderWidth: 4,
-              borderColor: "#7E3FE4",
-            }}
-          >
-            <Image source={{ uri: imageUrl }} style={{ width: "100%", height: "100%" }} />
+        <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 100 }}>
+          {/* Profile Header */}
+          <View style={{ backgroundColor: "white", paddingVertical: 32, paddingHorizontal: 20 }}>
+            {/* Online Status & Settings */}
+            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: "#4CAF50" }} />
+                <Text style={{ color: "#666", fontSize: 14 }}>Online</Text>
+              </View>
+              <Pressable onPress={() => setShowSettings(true)}>
+                <Settings size={24} color="#333" />
+              </Pressable>
+            </View>
+
+            {/* Avatar & Badges */}
+            <View style={{ alignItems: "center", marginBottom: 16 }}>
+              <View style={{ position: "relative" }}>
+                {/* Admin Badge */}
+                <View style={{ position: "absolute", top: 0, left: -90, backgroundColor: "#7E3FE4", paddingHorizontal: 16, paddingVertical: 6, borderRadius: 999, flexDirection: "row", alignItems: "center", gap: 6 }}>
+                  <Shield size={16} color="white" />
+                  <Text style={{ color: "white", fontWeight: "bold", fontSize: 12 }}>Admin</Text>
+                </View>
+
+                {/* Avatar */}
+                <View style={{ width: 120, height: 120, borderRadius: 60, backgroundColor: "#DDD", alignItems: "center", justifyContent: "center" }}>
+                  <Text style={{ fontSize: 48, fontWeight: "bold", color: "#333" }}>
+                    {username.charAt(0).toUpperCase()}
+                  </Text>
+                </View>
+
+                {/* Level Badge */}
+                <View style={{ position: "absolute", top: 0, right: -90, backgroundColor: "#FF9500", paddingHorizontal: 16, paddingVertical: 6, borderRadius: 999 }}>
+                  <Text style={{ color: "white", fontWeight: "bold", fontSize: 14 }}>LV. {level}</Text>
+                </View>
+              </View>
+
+              {/* Username */}
+              <Text style={{ fontSize: 28, fontWeight: "bold", marginTop: 16, textTransform: "uppercase" }}>
+                {username}
+              </Text>
+            </View>
+
+            {/* Stats */}
+            <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: 16 }}>
+              <View style={{ alignItems: "center" }}>
+                <Text style={{ fontSize: 32, fontWeight: "bold", color: "#FF6B35" }}>
+                  {statsData?.totalPoints || 0}
+                </Text>
+                <Text style={{ color: "#666", fontSize: 14, marginTop: 4 }}>Quests</Text>
+              </View>
+              <View style={{ alignItems: "center" }}>
+                <Text style={{ fontSize: 32, fontWeight: "bold", color: "#FF6B35" }}>{level}</Text>
+                <Text style={{ color: "#666", fontSize: 14, marginTop: 4 }}>Level</Text>
+              </View>
+              <View style={{ alignItems: "center" }}>
+                <Text style={{ fontSize: 32, fontWeight: "bold", color: "#FF6B35" }}>
+                  {statsData?.currentStreak || 0}
+                </Text>
+                <Text style={{ color: "#666", fontSize: 14, marginTop: 4 }}>Streak</Text>
+              </View>
+            </View>
           </View>
-        </View>
 
-        {/* Profile Info */}
-        <View className="mt-8 px-6">
-          <View className="flex-row items-center justify-center gap-2">
-            <Text className="text-white text-4xl font-bold">{data.displayName}</Text>
-            {data.age && <Text className="text-white/90 text-3xl">{data.age}</Text>}
+          {/* Tabs */}
+          <View style={{ flexDirection: "row", backgroundColor: "white", marginTop: 8, borderBottomWidth: 2, borderBottomColor: "#E0E0E0" }}>
+            <Pressable
+              onPress={() => setSelectedTab("quests")}
+              style={{ flex: 1, paddingVertical: 16, borderBottomWidth: 3, borderBottomColor: selectedTab === "quests" ? "#FF6B35" : "transparent" }}
+            >
+              <Text style={{ textAlign: "center", fontWeight: "600", color: selectedTab === "quests" ? "#FF6B35" : "#666" }}>
+                Quests
+              </Text>
+            </Pressable>
+            <Pressable
+              onPress={() => setSelectedTab("journals")}
+              style={{ flex: 1, paddingVertical: 16, borderBottomWidth: 3, borderBottomColor: selectedTab === "journals" ? "#FF6B35" : "transparent" }}
+            >
+              <Text style={{ textAlign: "center", fontWeight: "600", color: selectedTab === "journals" ? "#FF6B35" : "#666" }}>
+                Journals
+              </Text>
+            </Pressable>
+            <Pressable
+              onPress={() => setSelectedTab("about")}
+              style={{ flex: 1, paddingVertical: 16, borderBottomWidth: 3, borderBottomColor: selectedTab === "about" ? "#FF6B35" : "transparent" }}
+            >
+              <Text style={{ textAlign: "center", fontWeight: "600", color: selectedTab === "about" ? "#FF6B35" : "#666" }}>
+                About
+              </Text>
+            </Pressable>
           </View>
 
-          {data.bio && (
-            <Text className="text-white/90 text-lg text-center mt-4">{data.bio}</Text>
-          )}
+          {/* Tab Content */}
+          {selectedTab === "quests" && (
+            <View style={{ marginTop: 16, paddingHorizontal: 20 }}>
+              {/* Featured Quests */}
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 12 }}>
+                <Zap size={20} color="#333" />
+                <Text style={{ fontSize: 18, fontWeight: "bold" }}>Featured Quests</Text>
+              </View>
 
-          {data.location && (
-            <Text className="text-white/70 text-center mt-4">📍 {data.location}</Text>
-          )}
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 24 }}>
+                {[1, 2, 3].map((i) => (
+                  <View
+                    key={i}
+                    style={{
+                      width: 220,
+                      marginRight: 12,
+                      borderRadius: 16,
+                      overflow: "hidden",
+                      borderWidth: 2,
+                      borderColor: "#FF6B35",
+                    }}
+                  >
+                    <View style={{ height: 140, backgroundColor: "#333" }} />
+                    <View style={{ padding: 12, backgroundColor: "white" }}>
+                      <Text style={{ fontWeight: "bold", fontSize: 14 }}>
+                        {i === 1 ? "Share Your Account" : i === 2 ? "Start Conversation" : "Speak Up in Class"}
+                      </Text>
+                    </View>
+                  </View>
+                ))}
+              </ScrollView>
 
-          {/* Edit Button */}
-          <Pressable
-            onPress={() => navigation.navigate("EditProfile")}
-            className="mt-8 mx-auto px-8 py-4 rounded-full flex-row items-center gap-3"
-            style={{
-              backgroundColor: "rgba(126, 63, 228, 0.2)",
-              borderWidth: 2,
-              borderColor: "#7E3FE4",
-            }}
-          >
-            <Edit size={20} color="#7E3FE4" />
-            <Text className="text-white font-bold text-lg">Edit Profile</Text>
-          </Pressable>
-        </View>
-
-        {/* Photos Grid */}
-        {data.photos.length > 1 && (
-          <View className="mt-8 px-6">
-            <Text className="text-white text-xl font-bold mb-4">Photos</Text>
-            <View className="flex-row flex-wrap gap-2">
-              {data.photos.map((photo, index) => (
-                <View
-                  key={index}
+              {/* YouTube Live Section */}
+              <View style={{ backgroundColor: "white", borderRadius: 16, padding: 20, marginBottom: 16 }}>
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                  <Video size={24} color="#FF0000" />
+                  <Text style={{ fontSize: 18, fontWeight: "bold" }}>YouTube Live</Text>
+                </View>
+                <Text style={{ color: "#666", fontSize: 14, marginBottom: 16 }}>
+                  Paste your YouTube channel URL to link your account. Make sure to open YouTube Studio for going live.
+                </Text>
+                <TextInput
+                  value={youtubeUrl}
+                  onChangeText={setYoutubeUrl}
+                  placeholder="https://www.youtube.com/@your_channel"
+                  placeholderTextColor="#999"
                   style={{
-                    width: "48%",
-                    aspectRatio: 3 / 4,
-                    borderRadius: 16,
-                    overflow: "hidden",
+                    borderWidth: 1,
+                    borderColor: "#E0E0E0",
+                    borderRadius: 8,
+                    padding: 12,
+                    marginBottom: 12,
+                    fontSize: 14,
+                  }}
+                />
+                <Pressable
+                  onPress={handleConnectYouTube}
+                  style={{
+                    backgroundColor: "#FF0000",
+                    paddingVertical: 14,
+                    borderRadius: 8,
+                    alignItems: "center",
                   }}
                 >
-                  <Image source={{ uri: photo }} style={{ width: "100%", height: "100%" }} />
+                  <Text style={{ color: "white", fontWeight: "bold", fontSize: 16 }}>Connect YouTube</Text>
+                </Pressable>
+              </View>
+            </View>
+          )}
+
+          {selectedTab === "journals" && (
+            <View style={{ marginTop: 16, paddingHorizontal: 20 }}>
+              <View style={{ backgroundColor: "white", borderRadius: 16, padding: 32, alignItems: "center" }}>
+                <Text style={{ fontSize: 18, fontWeight: "bold", marginBottom: 8 }}>No Journals Yet</Text>
+                <Text style={{ color: "#666", textAlign: "center" }}>
+                  Complete quests and write about your experiences to build your rejection journal.
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {selectedTab === "about" && (
+            <View style={{ marginTop: 16, paddingHorizontal: 20 }}>
+              <View style={{ backgroundColor: "white", borderRadius: 16, padding: 20 }}>
+                <Text style={{ fontSize: 16, fontWeight: "600", marginBottom: 8 }}>Email</Text>
+                <Text style={{ color: "#666", marginBottom: 16 }}>{sessionData.user.email}</Text>
+
+                <Text style={{ fontSize: 16, fontWeight: "600", marginBottom: 8 }}>Member Since</Text>
+                <Text style={{ color: "#666", marginBottom: 16 }}>
+                  {new Date(sessionData.user.createdAt || Date.now()).toLocaleDateString()}
+                </Text>
+
+                <Text style={{ fontSize: 16, fontWeight: "600", marginBottom: 8 }}>Total XP</Text>
+                <Text style={{ color: "#666", marginBottom: 24 }}>{statsData?.totalXP || 0}</Text>
+
+                <Pressable
+                  onPress={handleLogout}
+                  style={{
+                    backgroundColor: "#FF3B30",
+                    paddingVertical: 14,
+                    borderRadius: 8,
+                    alignItems: "center",
+                  }}
+                >
+                  <Text style={{ color: "white", fontWeight: "bold", fontSize: 16 }}>Sign Out</Text>
+                </Pressable>
+              </View>
+            </View>
+          )}
+        </ScrollView>
+
+        {/* Settings Modal */}
+        {showSettings && (
+          <View style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(0,0,0,0.5)" }}>
+            <Pressable style={{ flex: 1 }} onPress={() => setShowSettings(false)} />
+            <View style={{ backgroundColor: "#E8E9ED", borderTopLeftRadius: 20, borderTopRightRadius: 20, paddingTop: 20, maxHeight: "80%" }}>
+              <View style={{ backgroundColor: "white", paddingVertical: 16, paddingHorizontal: 20, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+                <Text style={{ fontSize: 20, fontWeight: "bold" }}>Settings</Text>
+                <Pressable onPress={() => setShowSettings(false)}>
+                  <Text style={{ fontSize: 24 }}>×</Text>
+                </Pressable>
+              </View>
+
+              <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 32 }}>
+                {/* Appearance */}
+                <View style={{ paddingHorizontal: 20, paddingTop: 24 }}>
+                  <Text style={{ fontSize: 18, fontWeight: "bold", marginBottom: 12 }}>Appearance</Text>
+                  <View style={{ backgroundColor: "white", borderRadius: 12, padding: 16, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+                    <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+                      <Sun size={24} color="#333" />
+                      <View>
+                        <Text style={{ fontWeight: "600", fontSize: 16 }}>Theme</Text>
+                        <Text style={{ color: "#666", fontSize: 14 }}>Light Mode</Text>
+                      </View>
+                    </View>
+                    <Switch value={darkMode} onValueChange={setDarkMode} />
+                  </View>
                 </View>
-              ))}
+
+                {/* Preferences */}
+                <View style={{ paddingHorizontal: 20, paddingTop: 24 }}>
+                  <Text style={{ fontSize: 18, fontWeight: "bold", marginBottom: 12 }}>Preferences</Text>
+                  <Pressable style={{ backgroundColor: "white", borderRadius: 12, padding: 16, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+                    <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+                      <Globe size={24} color="#333" />
+                      <View>
+                        <Text style={{ fontWeight: "600", fontSize: 16 }}>Language</Text>
+                        <Text style={{ color: "#666", fontSize: 14 }}>English</Text>
+                      </View>
+                    </View>
+                    <ChevronRight size={20} color="#999" />
+                  </Pressable>
+                </View>
+
+                {/* Notifications */}
+                <View style={{ paddingHorizontal: 20, paddingTop: 24 }}>
+                  <Text style={{ fontSize: 18, fontWeight: "bold", marginBottom: 12 }}>Notifications</Text>
+                  <View style={{ backgroundColor: "white", borderRadius: 12, padding: 16, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+                    <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+                      <Bell size={24} color="#333" />
+                      <View>
+                        <Text style={{ fontWeight: "600", fontSize: 16 }}>Quest Reminders</Text>
+                        <Text style={{ color: "#666", fontSize: 14 }}>Get notified to complete daily quests</Text>
+                      </View>
+                    </View>
+                    <Switch value={questReminders} onValueChange={setQuestReminders} />
+                  </View>
+                </View>
+
+                {/* Live Features */}
+                <View style={{ paddingHorizontal: 20, paddingTop: 24 }}>
+                  <Text style={{ fontSize: 18, fontWeight: "bold", marginBottom: 12 }}>Live Features</Text>
+                  <View style={{ backgroundColor: "white", borderRadius: 12, padding: 16 }}>
+                    <View style={{ flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 12 }}>
+                      <Video size={24} color="#333" />
+                      <View style={{ flex: 1 }}>
+                        <Text style={{ fontWeight: "600", fontSize: 16 }}>Enable Live</Text>
+                        <Text style={{ color: "#666", fontSize: 14 }}>
+                          Configure backend and unlock livestreaming features
+                        </Text>
+                      </View>
+                    </View>
+                    <Pressable
+                      style={{
+                        backgroundColor: "#FF6B35",
+                        paddingVertical: 12,
+                        borderRadius: 8,
+                        alignItems: "center",
+                      }}
+                    >
+                      <Text style={{ color: "white", fontWeight: "bold" }}>Enable</Text>
+                    </Pressable>
+                  </View>
+                </View>
+              </ScrollView>
             </View>
           </View>
         )}
-      </ScrollView>
-    </LinearGradient>
+      </SafeAreaView>
+    </View>
   );
 }
