@@ -1,0 +1,117 @@
+import { StyleSheet } from "react-native";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { BlurView } from "expo-blur";
+import * as Haptics from "expo-haptics";
+import { Heart, Users, Video, Map, User } from "lucide-react-native";
+
+import type { BottomTabParamList, RootStackParamList } from "@/navigation/types";
+import SwipeScreen from "@/screens/SwipeScreen";
+import MatchesScreen from "@/screens/MatchesScreen";
+import LiveScreen from "@/screens/LiveScreen";
+import MapScreen from "@/screens/MapScreen";
+import ProfileScreen from "@/screens/ProfileScreen";
+import LoginModalScreen from "@/screens/LoginModalScreen";
+import EditProfileScreen from "@/screens/EditProfileScreen";
+
+/**
+ * RootStackNavigator
+ * The root navigator for the app, which contains the bottom tab navigator and all the screens inside it
+ */
+const RootStack = createNativeStackNavigator<RootStackParamList>();
+const RootNavigator = () => {
+  return (
+    <RootStack.Navigator>
+      <RootStack.Screen
+        name="Tabs"
+        component={BottomTabNavigator}
+        options={{ headerShown: false }}
+      />
+      <RootStack.Screen
+        name="LoginModalScreen"
+        component={LoginModalScreen}
+        options={{ presentation: "modal", title: "Login" }}
+      />
+      <RootStack.Screen
+        name="EditProfile"
+        component={EditProfileScreen}
+        options={{ title: "Edit Profile", headerShown: true }}
+      />
+    </RootStack.Navigator>
+  );
+};
+
+/**
+ * BottomTabNavigator
+ * The bottom tab navigator for the app
+ */
+const BottomTab = createBottomTabNavigator<BottomTabParamList>();
+const BottomTabNavigator = () => {
+  return (
+    <BottomTab.Navigator
+      initialRouteName="SwipeTab"
+      screenOptions={{
+        headerShown: false,
+        tabBarStyle: {
+          position: "absolute",
+          backgroundColor: "rgba(10, 10, 15, 0.95)",
+          borderTopWidth: 1,
+          borderTopColor: "rgba(126, 63, 228, 0.2)",
+        },
+        tabBarActiveTintColor: "#7E3FE4",
+        tabBarInactiveTintColor: "rgba(255, 255, 255, 0.5)",
+        tabBarBackground: () => (
+          <BlurView tint="dark" intensity={100} style={StyleSheet.absoluteFill} />
+        ),
+      }}
+      screenListeners={() => ({
+        transitionStart: () => {
+          Haptics.selectionAsync();
+        },
+      })}
+    >
+      <BottomTab.Screen
+        name="SwipeTab"
+        component={SwipeScreen}
+        options={{
+          title: "Swipe",
+          tabBarIcon: ({ color, size }) => <Heart size={size} color={color} />,
+        }}
+      />
+      <BottomTab.Screen
+        name="MatchesTab"
+        component={MatchesScreen}
+        options={{
+          title: "Matches",
+          tabBarIcon: ({ color, size }) => <Users size={size} color={color} />,
+        }}
+      />
+      <BottomTab.Screen
+        name="LiveTab"
+        component={LiveScreen}
+        options={{
+          title: "Live",
+          tabBarIcon: ({ color, size }) => <Video size={size} color={color} />,
+        }}
+      />
+      <BottomTab.Screen
+        name="MapTab"
+        component={MapScreen}
+        options={{
+          title: "Map",
+          tabBarIcon: ({ color, size }) => <Map size={size} color={color} />,
+        }}
+      />
+      <BottomTab.Screen
+        name="ProfileTab"
+        component={ProfileScreen}
+        options={{
+          title: "Profile",
+          tabBarIcon: ({ color, size }) => <User size={size} color={color} />,
+        }}
+      />
+    </BottomTab.Navigator>
+  );
+};
+
+export default RootNavigator;
