@@ -2,22 +2,49 @@ import React from "react";
 import { View, Text, ScrollView, Image, Pressable, ActivityIndicator } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useQuery } from "@tanstack/react-query";
-import { MessageCircle, Video, Users } from "lucide-react-native";
+import { MessageCircle, Video, Users, Heart } from "lucide-react-native";
 import type { BottomTabScreenProps } from "@/navigation/types";
 import { api } from "@/lib/api";
+import { useSession } from "@/lib/useSession";
 import type { GetMatchesResponse } from "@/shared/contracts";
 
 type Props = BottomTabScreenProps<"MatchesTab">;
 
 export default function MatchesScreen({ navigation }: Props) {
+  const { data: sessionData } = useSession();
+
   const { data, isLoading, error } = useQuery<GetMatchesResponse>({
     queryKey: ["matches"],
     queryFn: async () => {
       return api.get<GetMatchesResponse>("/api/matches");
     },
+    enabled: !!sessionData?.user,
   });
 
   const matches = data?.matches || [];
+
+  if (!sessionData?.user) {
+    return (
+      <LinearGradient colors={["#0A0A0F", "#1A1A24", "#2A1A34"]} className="flex-1">
+        <View className="flex-1 items-center justify-center px-8">
+          <Heart size={64} color="#FF6B35" />
+          <Text className="text-white text-3xl font-bold mb-4 text-center mt-6">
+            Find Your Matches
+          </Text>
+          <Text className="text-white/70 text-lg text-center mb-8">
+            Log in to see your connections and start building meaningful relationships.
+          </Text>
+          <Pressable
+            onPress={() => navigation.navigate("LoginModalScreen")}
+            style={{ backgroundColor: "#FF6B35" }}
+            className="px-8 py-4 rounded-full"
+          >
+            <Text className="text-white font-bold text-xl">Get Started</Text>
+          </Pressable>
+        </View>
+      </LinearGradient>
+    );
+  }
 
   if (isLoading) {
     return (

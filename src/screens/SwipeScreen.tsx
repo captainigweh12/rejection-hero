@@ -2,10 +2,11 @@ import React, { useState } from "react";
 import { View, Text, ActivityIndicator, Pressable } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { X, Check, RotateCcw } from "lucide-react-native";
+import { X, Check, RotateCcw, Users } from "lucide-react-native";
 import type { BottomTabScreenProps } from "@/navigation/types";
 import { SwipeCard } from "@/components/SwipeCard";
 import { api } from "@/lib/api";
+import { useSession } from "@/lib/useSession";
 import type { GetDiscoverResponse, CreateSwipeRequest, CreateSwipeResponse } from "@/shared/contracts";
 
 type Props = BottomTabScreenProps<"SwipeTab">;
@@ -13,6 +14,7 @@ type Props = BottomTabScreenProps<"SwipeTab">;
 export default function SwipeScreen({ navigation }: Props) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const queryClient = useQueryClient();
+  const { data: sessionData } = useSession();
 
   // Fetch profiles
   const { data, isLoading, error, refetch } = useQuery<GetDiscoverResponse>({
@@ -20,6 +22,7 @@ export default function SwipeScreen({ navigation }: Props) {
     queryFn: async () => {
       return api.get<GetDiscoverResponse>("/api/discover");
     },
+    enabled: !!sessionData?.user,
   });
 
   // Create swipe mutation
@@ -55,6 +58,29 @@ export default function SwipeScreen({ navigation }: Props) {
     setCurrentIndex(0);
     refetch();
   };
+
+  if (!sessionData?.user) {
+    return (
+      <LinearGradient colors={["#0A0A0F", "#1A1A24", "#2A1A34"]} className="flex-1">
+        <View className="flex-1 items-center justify-center px-8">
+          <Users size={64} color="#FF6B35" />
+          <Text className="text-white text-3xl font-bold mb-4 text-center mt-6">
+            Join the Community
+          </Text>
+          <Text className="text-white/70 text-lg text-center mb-8">
+            Log in to connect with others, swipe to find matches, and build your network.
+          </Text>
+          <Pressable
+            onPress={() => navigation.navigate("LoginModalScreen")}
+            style={{ backgroundColor: "#FF6B35" }}
+            className="px-8 py-4 rounded-full"
+          >
+            <Text className="text-white font-bold text-xl">Get Started</Text>
+          </Pressable>
+        </View>
+      </LinearGradient>
+    );
+  }
 
   if (isLoading) {
     return (
