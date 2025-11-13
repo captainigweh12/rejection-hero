@@ -70,11 +70,7 @@ export default function HomeScreen({ navigation }: Props) {
       <ScrollView className="flex-1" contentContainerClassName="pb-24">
         {/* Header */}
         <View className="pt-4 pb-2 px-6 flex-row justify-between items-center">
-          <Image
-            source={require("@/assets/icon.png")}
-            style={{ width: 80, height: 40 }}
-            resizeMode="contain"
-          />
+          <Text className="text-white text-2xl font-bold">Go for No</Text>
           <View className="flex-row items-center gap-4">
             <Pressable>
               <Bell size={24} color="#fff" />
