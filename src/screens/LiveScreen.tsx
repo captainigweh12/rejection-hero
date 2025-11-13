@@ -37,6 +37,7 @@ export default function LiveScreen({ navigation }: Props) {
   const [commentText, setCommentText] = useState("");
   const [currentStreamId, setCurrentStreamId] = useState<string | null>(null);
   const [selectedQuestId, setSelectedQuestId] = useState<string | null>(null);
+  const [viewingStreamId, setViewingStreamId] = useState<string | null>(null);
 
   // Fetch active quests for the user to select from
   const { data: questsData } = useQuery<GetUserQuestsResponse>({
@@ -162,6 +163,181 @@ export default function LiveScreen({ navigation }: Props) {
   };
 
   const activeQuest = questsData?.activeQuests.find((uq) => uq.id === selectedQuestId);
+
+  // Find the stream being viewed
+  const viewingStream = streamsData?.streams.find((s) => s.id === viewingStreamId);
+
+  // If viewing someone else's stream, show viewer interface
+  if (viewingStreamId && viewingStream) {
+    return (
+      <View style={{ flex: 1, backgroundColor: "#1A1A1A" }}>
+        {/* Camera View Placeholder */}
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: "#2A2A2A",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Video size={80} color="#666" />
+          <Text style={{ color: "#666", marginTop: 16, fontSize: 16 }}>
+            Viewing {viewingStream.user.name}&apos;s stream
+          </Text>
+          <Text style={{ color: "#999", marginTop: 8, fontSize: 12 }}>
+            Daily.co integration ready
+          </Text>
+        </View>
+
+        {/* LIVE Badge */}
+        <View
+          style={{
+            position: "absolute",
+            top: 60,
+            left: 20,
+            flexDirection: "row",
+            alignItems: "center",
+            backgroundColor: "#FF0000",
+            paddingHorizontal: 12,
+            paddingVertical: 6,
+            borderRadius: 6,
+          }}
+        >
+          <Radio size={12} color="white" style={{ marginRight: 6 }} />
+          <Text style={{ color: "white", fontWeight: "bold", fontSize: 14 }}>LIVE</Text>
+        </View>
+
+        {/* Close Button */}
+        <Pressable
+          onPress={() => setViewingStreamId(null)}
+          style={{
+            position: "absolute",
+            top: 60,
+            right: 20,
+            width: 40,
+            height: 40,
+            borderRadius: 20,
+            backgroundColor: "rgba(0, 0, 0, 0.6)",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <X size={24} color="white" />
+        </Pressable>
+
+        {/* Viewer Count */}
+        <View
+          style={{
+            position: "absolute",
+            top: 120,
+            right: 20,
+            flexDirection: "row",
+            alignItems: "center",
+            backgroundColor: "rgba(0, 0, 0, 0.6)",
+            paddingHorizontal: 12,
+            paddingVertical: 8,
+            borderRadius: 20,
+            gap: 6,
+          }}
+        >
+          <Users size={16} color="white" />
+          <Text style={{ color: "white", fontWeight: "bold", fontSize: 14 }}>
+            {viewingStream.viewerCount}
+          </Text>
+        </View>
+
+        {/* Quest Card Overlay */}
+        {viewingStream.userQuest && (
+          <View
+            style={{
+              position: "absolute",
+              bottom: 120,
+              left: 20,
+              right: 20,
+              backgroundColor: "white",
+              borderRadius: 16,
+              padding: 16,
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.3,
+              shadowRadius: 8,
+              elevation: 8,
+            }}
+          >
+            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start" }}>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 12, fontWeight: "bold", color: "#666", marginBottom: 4 }}>Quest</Text>
+                <Text style={{ fontSize: 16, fontWeight: "bold", color: "#000", marginBottom: 8 }}>
+                  {viewingStream.userQuest.quest.title}
+                </Text>
+                <Text style={{ fontSize: 14, color: "#666", marginBottom: 12 }} numberOfLines={2}>
+                  {viewingStream.userQuest.quest.description}
+                </Text>
+              </View>
+              <Pressable
+                style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: 16,
+                  backgroundColor: "#F0F0F0",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <X size={18} color="#666" />
+              </Pressable>
+            </View>
+          </View>
+        )}
+
+        {/* Comment Section */}
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={{
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            backgroundColor: "rgba(0, 0, 0, 0.8)",
+            paddingHorizontal: 16,
+            paddingTop: 12,
+            paddingBottom: 32,
+          }}
+        >
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+            <TextInput
+              value={commentText}
+              onChangeText={setCommentText}
+              placeholder="Comment"
+              placeholderTextColor="#999"
+              style={{
+                flex: 1,
+                backgroundColor: "rgba(255, 255, 255, 0.1)",
+                borderRadius: 24,
+                paddingHorizontal: 16,
+                paddingVertical: 12,
+                color: "white",
+                fontSize: 14,
+              }}
+            />
+            <Pressable
+              onPress={handleSendComment}
+              style={{
+                width: 48,
+                height: 48,
+                borderRadius: 24,
+                backgroundColor: "#FF6B35",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Send size={20} color="white" />
+            </Pressable>
+          </View>
+        </KeyboardAvoidingView>
+      </View>
+    );
+  }
 
   if (!sessionData?.user) {
     return (
@@ -492,6 +668,7 @@ export default function LiveScreen({ navigation }: Props) {
             streamsData.streams.map((stream) => (
               <Pressable
                 key={stream.id}
+                onPress={() => setViewingStreamId(stream.id)}
                 style={{
                   backgroundColor: "rgba(255, 255, 255, 0.05)",
                   borderRadius: 16,

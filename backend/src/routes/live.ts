@@ -134,10 +134,16 @@ live.post("/start", async (c) => {
       },
     });
 
-    // Update profile to mark user as live
-    await db.profile.update({
+    // Update profile to mark user as live (or create if doesn't exist)
+    await db.profile.upsert({
       where: { userId: user.id },
-      data: {
+      update: {
+        isLive: true,
+        liveViewers: 0,
+      },
+      create: {
+        userId: user.id,
+        displayName: user.name || user.email || "User",
         isLive: true,
         liveViewers: 0,
       },
@@ -190,9 +196,15 @@ live.post("/:id/end", async (c) => {
     });
 
     // Update profile to mark user as not live
-    await db.profile.update({
+    await db.profile.upsert({
       where: { userId: user.id },
-      data: {
+      update: {
+        isLive: false,
+        liveViewers: 0,
+      },
+      create: {
+        userId: user.id,
+        displayName: user.name || user.email || "User",
         isLive: false,
         liveViewers: 0,
       },
