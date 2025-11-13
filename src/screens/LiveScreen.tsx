@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { View, Text, Pressable, TextInput, ScrollView, KeyboardAvoidingView, Platform, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { CameraView, useCameraPermissions } from "expo-camera";
 import {
   Video,
   X,
@@ -38,6 +39,8 @@ export default function LiveScreen({ navigation }: Props) {
   const [currentStreamId, setCurrentStreamId] = useState<string | null>(null);
   const [selectedQuestId, setSelectedQuestId] = useState<string | null>(null);
   const [viewingStreamId, setViewingStreamId] = useState<string | null>(null);
+  const [facing, setFacing] = useState<"front" | "back">("front");
+  const [permission, requestPermission] = useCameraPermissions();
 
   // Fetch active quests for the user to select from
   const { data: questsData } = useQuery<GetUserQuestsResponse>({
@@ -384,25 +387,63 @@ export default function LiveScreen({ navigation }: Props) {
 
   // If user is streaming, show streaming interface
   if (isStreaming && currentStreamId) {
+    // Check camera permissions
+    if (!permission) {
+      return (
+        <View style={{ flex: 1, backgroundColor: "#1A1A1A", alignItems: "center", justifyContent: "center" }}>
+          <Text style={{ color: "white" }}>Loading camera...</Text>
+        </View>
+      );
+    }
+
+    if (!permission.granted) {
+      return (
+        <View style={{ flex: 1, backgroundColor: "#1A1A1A", alignItems: "center", justifyContent: "center", paddingHorizontal: 32 }}>
+          <Video size={64} color="#FF6B35" style={{ marginBottom: 24 }} />
+          <Text style={{ color: "white", fontSize: 20, fontWeight: "bold", marginBottom: 12, textAlign: "center" }}>
+            Camera Permission Required
+          </Text>
+          <Text style={{ color: "#999", fontSize: 16, textAlign: "center", marginBottom: 32 }}>
+            We need access to your camera to start the live stream
+          </Text>
+          <Pressable
+            onPress={requestPermission}
+            style={{
+              backgroundColor: "#FF6B35",
+              paddingHorizontal: 32,
+              paddingVertical: 16,
+              borderRadius: 999,
+            }}
+          >
+            <Text style={{ color: "white", fontWeight: "bold", fontSize: 16 }}>Grant Permission</Text>
+          </Pressable>
+        </View>
+      );
+    }
+
     return (
       <View style={{ flex: 1, backgroundColor: "#1A1A1A" }}>
-        {/* Camera View Placeholder */}
-        <View
-          style={{
-            flex: 1,
-            backgroundColor: "#2A2A2A",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Video size={80} color="#666" />
-          <Text style={{ color: "#666", marginTop: 16, fontSize: 16 }}>
-            Camera feed will appear here
-          </Text>
-          <Text style={{ color: "#999", marginTop: 8, fontSize: 12 }}>
-            Daily.co integration ready
-          </Text>
-        </View>
+        {/* Camera View */}
+        {!isVideoOff ? (
+          <CameraView
+            style={{ flex: 1 }}
+            facing={facing}
+          />
+        ) : (
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: "#2A2A2A",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <VideoOff size={80} color="#666" />
+            <Text style={{ color: "#666", marginTop: 16, fontSize: 16 }}>
+              Camera is off
+            </Text>
+          </View>
+        )}
 
         {/* LIVE Badge */}
         <View
@@ -451,6 +492,7 @@ export default function LiveScreen({ navigation }: Props) {
         >
           {/* Flip Camera */}
           <Pressable
+            onPress={() => setFacing(facing === "front" ? "back" : "front")}
             style={{
               width: 48,
               height: 48,
