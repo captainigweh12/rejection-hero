@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { View, Text, Pressable, ActivityIndicator, TextInput, ScrollView, Alert } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Sparkles, X } from "lucide-react-native";
+import { Sparkles, X, ChevronLeft } from "lucide-react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "@/navigation/types";
 import { api } from "@/lib/api";
@@ -14,9 +15,16 @@ const CATEGORIES = ["SALES", "SOCIAL", "ENTREPRENEURSHIP", "DATING", "CONFIDENCE
 const DIFFICULTIES = ["EASY", "MEDIUM", "HARD", "EXPERT"];
 
 export default function CreateQuestScreen({ navigation }: Props) {
+  const [showAIForm, setShowAIForm] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedDifficulty, setSelectedDifficulty] = useState<string | null>(null);
   const [customPrompt, setCustomPrompt] = useState("");
+
+  // Custom quest form
+  const [questAction, setQuestAction] = useState("");
+  const [questDescription, setQuestDescription] = useState("");
+  const [minNOs, setMinNOs] = useState("3");
+
   const queryClient = useQueryClient();
 
   const generateMutation = useMutation({
@@ -37,7 +45,7 @@ export default function CreateQuestScreen({ navigation }: Props) {
     },
   });
 
-  const handleCreate = () => {
+  const handleCreateWithAI = () => {
     if (!selectedCategory || !selectedDifficulty) {
       Alert.alert("Missing Info", "Please select a category and difficulty level");
       return;
@@ -72,153 +80,448 @@ export default function CreateQuestScreen({ navigation }: Props) {
     return colors[difficulty] || "#FFD700";
   };
 
-  return (
-    <LinearGradient colors={["#0A0A0F", "#1A1A24", "#2A1A34"]} className="flex-1">
-      <ScrollView className="flex-1" contentContainerClassName="pb-8">
-        {/* Header */}
-        <View className="pt-4 pb-2 px-6 flex-row justify-between items-center">
-          <Text className="text-white text-2xl font-bold">Create Quest</Text>
-          <Pressable onPress={() => navigation.goBack()}>
-            <X size={28} color="#fff" />
-          </Pressable>
-        </View>
-
-        {/* AI Icon */}
-        <View className="items-center my-6">
+  // Main selection screen
+  if (!showAIForm) {
+    return (
+      <View style={{ flex: 1, backgroundColor: "#F5F5F7" }}>
+        <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
+          {/* Header */}
           <View
-            className="w-20 h-20 rounded-full items-center justify-center"
             style={{
-              backgroundColor: "rgba(255, 107, 53, 0.2)",
-              borderWidth: 3,
-              borderColor: "#FF6B35",
+              backgroundColor: "white",
+              paddingHorizontal: 20,
+              paddingVertical: 16,
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+              borderBottomLeftRadius: 20,
+              borderBottomRightRadius: 20,
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.1,
+              shadowRadius: 4,
+              elevation: 3,
             }}
           >
-            <Sparkles size={40} color="#FF6B35" />
+            <Pressable
+              onPress={() => navigation.goBack()}
+              style={{ position: "absolute", left: 20 }}
+            >
+              <ChevronLeft size={28} color="#1C1C1E" />
+            </Pressable>
+            <Text style={{ fontSize: 20, fontWeight: "bold", color: "#1C1C1E" }}>
+              Create Quest
+            </Text>
           </View>
-          <Text className="text-white text-lg font-bold mt-4">AI Quest Generator</Text>
-          <Text className="text-white/60 text-sm text-center mt-2 px-8">
-            Let AI create a personalized rejection challenge for you
-          </Text>
-        </View>
 
-        {/* Category Selection */}
-        <View className="px-6 mb-6">
-          <Text className="text-white text-lg font-bold mb-3">Select Category</Text>
-          <View className="flex-row flex-wrap gap-3">
-            {CATEGORIES.map((category) => (
+          <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 40 }}>
+            {/* Title Section */}
+            <View style={{ paddingHorizontal: 24, paddingTop: 32, paddingBottom: 16 }}>
+              <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+                <Text style={{ fontSize: 32, fontWeight: "bold", color: "#1C1C1E" }}>
+                  Add New Quest
+                </Text>
+                <Pressable onPress={() => navigation.goBack()}>
+                  <X size={28} color="#666" />
+                </Pressable>
+              </View>
+              <Text style={{ fontSize: 16, color: "#666", marginTop: 8 }}>
+                Choose how to create your quest
+              </Text>
+            </View>
+
+            {/* Generate with AI Card */}
+            <View style={{ paddingHorizontal: 24, marginBottom: 32 }}>
               <Pressable
-                key={category}
-                onPress={() => setSelectedCategory(category)}
-                className="px-4 py-3 rounded-full"
+                onPress={() => setShowAIForm(true)}
                 style={{
-                  backgroundColor:
-                    selectedCategory === category
-                      ? getCategoryColor(category)
-                      : "rgba(255, 255, 255, 0.1)",
-                  borderWidth: 2,
-                  borderColor:
-                    selectedCategory === category ? getCategoryColor(category) : "transparent",
+                  borderRadius: 20,
+                  padding: 24,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 20,
+                  shadowColor: "#000",
+                  shadowOffset: { width: 0, height: 4 },
+                  shadowOpacity: 0.15,
+                  shadowRadius: 12,
+                  elevation: 6,
                 }}
               >
-                <Text
-                  className="font-bold text-sm"
+                <LinearGradient
+                  colors={["#FF6B35", "#C45FD4", "#5B8DEF"]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
                   style={{
-                    color: selectedCategory === category ? "#fff" : "#999",
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    borderRadius: 20,
+                  }}
+                />
+                <View
+                  style={{
+                    width: 60,
+                    height: 60,
+                    borderRadius: 30,
+                    backgroundColor: "rgba(255, 255, 255, 0.3)",
+                    alignItems: "center",
+                    justifyContent: "center",
                   }}
                 >
-                  {category}
-                </Text>
+                  <Sparkles size={32} color="white" />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontSize: 24, fontWeight: "bold", color: "white", marginBottom: 4 }}>
+                    Generate with AI
+                  </Text>
+                  <Text style={{ fontSize: 14, color: "rgba(255, 255, 255, 0.9)" }}>
+                    Let Ben create an action quest for you
+                  </Text>
+                </View>
               </Pressable>
-            ))}
-          </View>
-        </View>
+            </View>
 
-        {/* Difficulty Selection */}
-        <View className="px-6 mb-6">
-          <Text className="text-white text-lg font-bold mb-3">Select Difficulty</Text>
-          <View className="flex-row flex-wrap gap-3">
-            {DIFFICULTIES.map((difficulty) => (
-              <Pressable
-                key={difficulty}
-                onPress={() => setSelectedDifficulty(difficulty)}
-                className="px-6 py-3 rounded-full"
+            {/* Create Custom Quest Card */}
+            <View style={{ paddingHorizontal: 24 }}>
+              <View
                 style={{
-                  backgroundColor:
-                    selectedDifficulty === difficulty
-                      ? getDifficultyColor(difficulty)
-                      : "rgba(255, 255, 255, 0.1)",
-                  borderWidth: 2,
-                  borderColor:
-                    selectedDifficulty === difficulty
-                      ? getDifficultyColor(difficulty)
-                      : "transparent",
+                  backgroundColor: "white",
+                  borderRadius: 20,
+                  padding: 24,
+                  shadowColor: "#000",
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.1,
+                  shadowRadius: 8,
+                  elevation: 4,
                 }}
               >
-                <Text
-                  className="font-bold text-sm"
+                <Text style={{ fontSize: 24, fontWeight: "bold", color: "#1C1C1E", marginBottom: 8 }}>
+                  Create Custom Quest
+                </Text>
+                <Text style={{ fontSize: 14, color: "#666", marginBottom: 24 }}>
+                  Design your own challenge
+                </Text>
+
+                {/* Quest Action */}
+                <View style={{ marginBottom: 20 }}>
+                  <Text style={{ fontSize: 16, fontWeight: "600", color: "#1C1C1E", marginBottom: 8 }}>
+                    Quest Action <Text style={{ color: "#FF3B30" }}>*</Text>
+                  </Text>
+                  <TextInput
+                    value={questAction}
+                    onChangeText={setQuestAction}
+                    placeholder="Ask 10 strangers for directions"
+                    placeholderTextColor="#999"
+                    style={{
+                      backgroundColor: "#F5F5F7",
+                      borderRadius: 12,
+                      paddingHorizontal: 16,
+                      paddingVertical: 14,
+                      fontSize: 16,
+                      color: "#1C1C1E",
+                      borderWidth: 1,
+                      borderColor: "#E5E5EA",
+                    }}
+                  />
+                  <Text style={{ fontSize: 12, color: "#999", marginTop: 6 }}>
+                    Make it a simple action statement
+                  </Text>
+                </View>
+
+                {/* Description */}
+                <View style={{ marginBottom: 20 }}>
+                  <Text style={{ fontSize: 16, fontWeight: "600", color: "#1C1C1E", marginBottom: 8 }}>
+                    Description (optional)
+                  </Text>
+                  <TextInput
+                    value={questDescription}
+                    onChangeText={setQuestDescription}
+                    placeholder="Additional details about the quest..."
+                    placeholderTextColor="#999"
+                    multiline
+                    numberOfLines={4}
+                    style={{
+                      backgroundColor: "#F5F5F7",
+                      borderRadius: 12,
+                      paddingHorizontal: 16,
+                      paddingVertical: 14,
+                      fontSize: 16,
+                      color: "#1C1C1E",
+                      borderWidth: 1,
+                      borderColor: "#E5E5EA",
+                      textAlignVertical: "top",
+                      minHeight: 100,
+                    }}
+                  />
+                </View>
+
+                {/* Minimum NOs Required */}
+                <View style={{ marginBottom: 24 }}>
+                  <Text style={{ fontSize: 16, fontWeight: "600", color: "#1C1C1E", marginBottom: 8 }}>
+                    Minimum NOs Required
+                  </Text>
+                  <TextInput
+                    value={minNOs}
+                    onChangeText={setMinNOs}
+                    placeholder="3"
+                    placeholderTextColor="#999"
+                    keyboardType="number-pad"
+                    style={{
+                      backgroundColor: "#F5F5F7",
+                      borderRadius: 12,
+                      paddingHorizontal: 16,
+                      paddingVertical: 14,
+                      fontSize: 16,
+                      color: "#1C1C1E",
+                      borderWidth: 1,
+                      borderColor: "#E5E5EA",
+                    }}
+                  />
+                </View>
+
+                {/* Create Button */}
+                <Pressable
+                  onPress={() => {
+                    Alert.alert("Coming Soon", "Custom quest creation will be available soon!");
+                  }}
                   style={{
-                    color: selectedDifficulty === difficulty ? "#fff" : "#999",
+                    backgroundColor: "#007AFF",
+                    borderRadius: 12,
+                    paddingVertical: 16,
+                    alignItems: "center",
                   }}
                 >
-                  {difficulty}
-                </Text>
-              </Pressable>
-            ))}
-          </View>
-        </View>
+                  <Text style={{ color: "white", fontSize: 16, fontWeight: "600" }}>
+                    Create Quest
+                  </Text>
+                </Pressable>
+              </View>
+            </View>
+          </ScrollView>
+        </SafeAreaView>
+      </View>
+    );
+  }
 
-        {/* Custom Prompt (Optional) */}
-        <View className="px-6 mb-8">
-          <Text className="text-white text-lg font-bold mb-3">
-            Custom Prompt <Text className="text-white/50 text-sm">(Optional)</Text>
-          </Text>
-          <TextInput
-            value={customPrompt}
-            onChangeText={setCustomPrompt}
-            placeholder="Describe your ideal rejection challenge..."
-            placeholderTextColor="#666"
-            multiline
-            numberOfLines={4}
-            className="p-4 rounded-2xl text-white"
-            style={{
-              backgroundColor: "rgba(255, 255, 255, 0.1)",
-              borderWidth: 1,
-              borderColor: "rgba(255, 255, 255, 0.2)",
-              textAlignVertical: "top",
-              minHeight: 100,
-            }}
-          />
-          <Text className="text-white/40 text-xs mt-2">
-            Example: &ldquo;Ask local business owners for advice on starting a company&rdquo;
-          </Text>
-        </View>
-      </ScrollView>
-
-      {/* Create Button */}
-      <View className="px-6 pb-8">
-        <Pressable
-          onPress={handleCreate}
-          disabled={generateMutation.isPending || !selectedCategory || !selectedDifficulty}
-          className="py-4 rounded-full items-center"
+  // AI Form Screen
+  return (
+    <View style={{ flex: 1, backgroundColor: "#F5F5F7" }}>
+      <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
+        {/* Header */}
+        <View
           style={{
-            backgroundColor:
-              !selectedCategory || !selectedDifficulty
-                ? "#666"
-                : generateMutation.isPending
-                ? "#999"
-                : "#FF6B35",
+            backgroundColor: "white",
+            paddingHorizontal: 20,
+            paddingVertical: 16,
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+            borderBottomLeftRadius: 20,
+            borderBottomRightRadius: 20,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.1,
+            shadowRadius: 4,
+            elevation: 3,
           }}
         >
-          {generateMutation.isPending ? (
-            <View className="flex-row items-center gap-2">
-              <ActivityIndicator size="small" color="#fff" />
-              <Text className="text-white font-bold text-lg">Generating...</Text>
+          <Pressable
+            onPress={() => setShowAIForm(false)}
+            style={{ position: "absolute", left: 20 }}
+          >
+            <ChevronLeft size={28} color="#1C1C1E" />
+          </Pressable>
+          <Text style={{ fontSize: 20, fontWeight: "bold", color: "#1C1C1E" }}>
+            Generate with AI
+          </Text>
+        </View>
+
+        <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 24, paddingBottom: 120 }}>
+          {/* AI Icon */}
+          <View style={{ alignItems: "center", marginVertical: 24 }}>
+            <View
+              style={{
+                width: 80,
+                height: 80,
+                borderRadius: 40,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <LinearGradient
+                colors={["#FF6B35", "#C45FD4", "#5B8DEF"]}
+                style={{
+                  width: 80,
+                  height: 80,
+                  borderRadius: 40,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Sparkles size={40} color="white" />
+              </LinearGradient>
             </View>
-          ) : (
-            <Text className="text-white font-bold text-lg">Create Quest with AI</Text>
-          )}
-        </Pressable>
-      </View>
-    </LinearGradient>
+            <Text style={{ fontSize: 18, fontWeight: "bold", color: "#1C1C1E", marginTop: 16 }}>
+              AI Quest Generator
+            </Text>
+            <Text style={{ fontSize: 14, color: "#666", textAlign: "center", marginTop: 8 }}>
+              Let AI create a personalized rejection challenge for you
+            </Text>
+          </View>
+
+          {/* Category Selection */}
+          <View style={{ marginBottom: 24 }}>
+            <Text style={{ fontSize: 18, fontWeight: "bold", color: "#1C1C1E", marginBottom: 12 }}>
+              Select Category
+            </Text>
+            <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>
+              {CATEGORIES.map((category) => (
+                <Pressable
+                  key={category}
+                  onPress={() => setSelectedCategory(category)}
+                  style={{
+                    paddingHorizontal: 16,
+                    paddingVertical: 10,
+                    borderRadius: 20,
+                    backgroundColor:
+                      selectedCategory === category ? getCategoryColor(category) : "white",
+                    borderWidth: 2,
+                    borderColor:
+                      selectedCategory === category ? getCategoryColor(category) : "#E5E5EA",
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontWeight: "600",
+                      fontSize: 14,
+                      color: selectedCategory === category ? "white" : "#666",
+                    }}
+                  >
+                    {category}
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
+          </View>
+
+          {/* Difficulty Selection */}
+          <View style={{ marginBottom: 24 }}>
+            <Text style={{ fontSize: 18, fontWeight: "bold", color: "#1C1C1E", marginBottom: 12 }}>
+              Select Difficulty
+            </Text>
+            <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>
+              {DIFFICULTIES.map((difficulty) => (
+                <Pressable
+                  key={difficulty}
+                  onPress={() => setSelectedDifficulty(difficulty)}
+                  style={{
+                    paddingHorizontal: 20,
+                    paddingVertical: 10,
+                    borderRadius: 20,
+                    backgroundColor:
+                      selectedDifficulty === difficulty
+                        ? getDifficultyColor(difficulty)
+                        : "white",
+                    borderWidth: 2,
+                    borderColor:
+                      selectedDifficulty === difficulty
+                        ? getDifficultyColor(difficulty)
+                        : "#E5E5EA",
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontWeight: "600",
+                      fontSize: 14,
+                      color: selectedDifficulty === difficulty ? "white" : "#666",
+                    }}
+                  >
+                    {difficulty}
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
+          </View>
+
+          {/* Custom Prompt */}
+          <View>
+            <Text style={{ fontSize: 18, fontWeight: "bold", color: "#1C1C1E", marginBottom: 4 }}>
+              Custom Prompt{" "}
+              <Text style={{ fontSize: 14, fontWeight: "normal", color: "#999" }}>
+                (Optional)
+              </Text>
+            </Text>
+            <TextInput
+              value={customPrompt}
+              onChangeText={setCustomPrompt}
+              placeholder="Describe your ideal rejection challenge..."
+              placeholderTextColor="#999"
+              multiline
+              numberOfLines={4}
+              style={{
+                backgroundColor: "white",
+                borderRadius: 12,
+                paddingHorizontal: 16,
+                paddingVertical: 14,
+                fontSize: 16,
+                color: "#1C1C1E",
+                borderWidth: 1,
+                borderColor: "#E5E5EA",
+                textAlignVertical: "top",
+                minHeight: 100,
+                marginTop: 12,
+              }}
+            />
+            <Text style={{ fontSize: 12, color: "#999", marginTop: 8 }}>
+              Example: &quot;Ask local business owners for advice on starting a company&quot;
+            </Text>
+          </View>
+        </ScrollView>
+
+        {/* Create Button */}
+        <View
+          style={{
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            paddingHorizontal: 24,
+            paddingVertical: 20,
+            backgroundColor: "#F5F5F7",
+          }}
+        >
+          <Pressable
+            onPress={handleCreateWithAI}
+            disabled={generateMutation.isPending || !selectedCategory || !selectedDifficulty}
+            style={{
+              paddingVertical: 16,
+              borderRadius: 12,
+              alignItems: "center",
+              backgroundColor:
+                !selectedCategory || !selectedDifficulty
+                  ? "#999"
+                  : generateMutation.isPending
+                  ? "#999"
+                  : "#FF6B35",
+            }}
+          >
+            {generateMutation.isPending ? (
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                <ActivityIndicator size="small" color="white" />
+                <Text style={{ color: "white", fontWeight: "bold", fontSize: 18 }}>
+                  Generating...
+                </Text>
+              </View>
+            ) : (
+              <Text style={{ color: "white", fontWeight: "bold", fontSize: 18 }}>
+                Create Quest with AI
+              </Text>
+            )}
+          </Pressable>
+        </View>
+      </SafeAreaView>
+    </View>
   );
 }

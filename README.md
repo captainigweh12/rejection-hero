@@ -7,7 +7,11 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 ### 🎯 No Quest System (MAIN FEATURE)
 
 **AI-Generated Challenges**
-- Create custom rejection quests using OpenAI
+- Modern, light-themed Create Quest interface
+- Two creation options: Generate with AI or Create Custom Quest
+- Beautiful gradient "Generate with AI" card
+- Custom quest form with action, description, and minimum NOs fields
+- AI generation with category and difficulty selection
 - 6 Categories: Sales, Social, Entrepreneurship, Dating, Confidence, Career
 - 4 Difficulty Levels: Easy, Medium, Hard, Expert
 - Real-time progress tracking (NOs and YESes collected)
