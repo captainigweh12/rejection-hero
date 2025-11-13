@@ -198,9 +198,12 @@ See `ENV_SETUP.md` for complete environment variable setup guide.
 ### Test the App
 
 1. Create an account with email/password OR sign in with Google
-2. Tap the orange Create button (+) to generate a quest
-3. Start a quest and track your progress
-4. Collect NOs and YESes to complete challenges
+2. Tap the orange floating Create button (+) or the "Create Quest" button
+3. Select a category (Sales, Social, Dating, etc.) and difficulty level
+4. Optionally add a custom prompt to personalize your quest
+5. Tap "Create Quest with AI" to generate your challenge
+6. Start the quest and track your progress
+7. Collect NOs and YESes to complete challenges
 
 ## Next Steps
 

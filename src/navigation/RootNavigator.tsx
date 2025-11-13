@@ -18,6 +18,7 @@ import ProfileScreen from "@/screens/ProfileScreen";
 import LoginModalScreen from "@/screens/LoginModalScreen";
 import EditProfileScreen from "@/screens/EditProfileScreen";
 import QuestDetailScreen from "@/screens/QuestDetailScreen";
+import CreateQuestScreen from "@/screens/CreateQuestScreen";
 import { useSession } from "@/lib/useSession";
 
 /**
@@ -49,6 +50,11 @@ const RootNavigator = () => {
           name="QuestDetail"
           component={QuestDetailScreen}
           options={{ title: "Quest", headerShown: true }}
+        />
+        <RootStack.Screen
+          name="CreateQuest"
+          component={CreateQuestScreen}
+          options={{ presentation: "modal", headerShown: false }}
         />
       </RootStack.Navigator>
     </>

@@ -15,6 +15,7 @@ export type RootStackParamList = {
   LoginModalScreen: undefined;
   EditProfile: undefined;
   QuestDetail: { userQuestId: string };
+  CreateQuest: undefined;
 };
 
 export type BottomTabParamList = {

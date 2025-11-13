@@ -154,9 +154,7 @@ export default function HomeScreen({ navigation }: Props) {
                 with AI.
               </Text>
               <Pressable
-                onPress={() => {
-                  /* Navigate to create quest */
-                }}
+                onPress={() => navigation.navigate("CreateQuest")}
                 className="px-6 py-3 rounded-full flex-row items-center gap-2"
                 style={{ backgroundColor: "#FF6B35" }}
               >
@@ -288,9 +286,7 @@ export default function HomeScreen({ navigation }: Props) {
 
       {/* Floating Create Button */}
       <Pressable
-        onPress={() => {
-          /* Navigate to create modal */
-        }}
+        onPress={() => navigation.navigate("CreateQuest")}
         className="absolute bottom-24 right-6 w-16 h-16 rounded-full items-center justify-center"
         style={{
           backgroundColor: "#FF6B35",
