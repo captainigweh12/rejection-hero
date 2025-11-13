@@ -130,7 +130,7 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 ├── src/
 │   ├── screens/
 │   │   ├── HomeScreen.tsx           # Quest dashboard (NEW!)
-│   │   ├── QuestDetailScreen.tsx    # Quest tracking (NEW!)
+│   │   ├── QuestDetailScreen.tsx    # Quest tracking with clean card UI
 │   │   ├── SwipeScreen.tsx          # Community swipe
 │   │   ├── MatchesScreen.tsx        # View matches
 │   │   ├── ProfileScreen.tsx        # User profile
