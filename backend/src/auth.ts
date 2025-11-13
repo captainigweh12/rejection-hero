@@ -3,6 +3,7 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { env } from "./env";
 import { db } from "./db";
+
 // ============================================
 // Better Auth Configuration
 // ============================================
@@ -14,30 +15,41 @@ import { db } from "./db";
 //   - POST /api/auth/sign-in/email       - Sign in with email/password
 //   - POST /api/auth/sign-out            - Sign out current session
 //   - GET  /api/auth/session             - Get current session
+//   - GET  /api/auth/callback/google     - Google OAuth callback
 //   - And many more... (see Better Auth docs)
 //
 // This configuration includes:
-//   - Prisma adapter for SQLite database
+//   - Prisma adapter for database (SQLite/PostgreSQL)
 //   - Expo plugin for React Native support
 //   - Email/password authentication
+//   - Google OAuth authentication
 //   - Trusted origins for CORS
 console.log("🔐 [Auth] Initializing Better Auth...");
 export const auth = betterAuth({
   database: prismaAdapter(db, {
-    provider: "sqlite",
+    provider: env.DATABASE_PROVIDER || "sqlite",
   }),
   secret: env.BETTER_AUTH_SECRET,
   baseURL: env.BACKEND_URL,
   plugins: [expo()],
   trustedOrigins: [
-    "vibecode://", // Expo app scheme (IMPORTANT: Update if you change app.json scheme)
+    "vibecode://", // Expo app scheme
     "http://localhost:3000",
+    "http://localhost:8081",
     env.BACKEND_URL,
   ],
   emailAndPassword: {
     enabled: true,
   },
+  socialProviders: {
+    google: {
+      clientId: env.GOOGLE_CLIENT_ID,
+      clientSecret: env.GOOGLE_CLIENT_SECRET,
+      redirectURI: `${env.BACKEND_URL}/api/auth/callback/google`,
+    },
+  },
 });
 console.log("✅ [Auth] Better Auth initialized");
 console.log(`🔗 [Auth] Base URL: ${env.BACKEND_URL}`);
 console.log(`🌐 [Auth] Trusted origins: ${auth.options.trustedOrigins?.join(", ")}`);
+console.log(`🔑 [Auth] Google OAuth: ${env.GOOGLE_CLIENT_ID ? "Enabled" : "Disabled"}`);

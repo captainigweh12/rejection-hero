@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { Alert, Pressable, Text, TextInput, View } from "react-native";
+import { Alert, Pressable, Text, TextInput, View, ActivityIndicator } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
+import * as WebBrowser from "expo-web-browser";
 
 import { authClient } from "@/lib/authClient";
 import { useSession } from "@/lib/useSession";
@@ -82,6 +83,30 @@ export default function LoginWithEmailPassword() {
     }
   };
 
+  const handleGoogleSignIn = async () => {
+    setIsLoading(true);
+    try {
+      const backendUrl = process.env.EXPO_PUBLIC_VIBECODE_BACKEND_URL;
+      const googleAuthUrl = `${backendUrl}/api/auth/google`;
+
+      const result = await WebBrowser.openAuthSessionAsync(
+        googleAuthUrl,
+        "vibecode://auth/callback"
+      );
+
+      if (result.type === "success") {
+        Alert.alert("Success", "Signed in with Google successfully!");
+      } else if (result.type === "cancel") {
+        Alert.alert("Cancelled", "Google sign-in was cancelled");
+      }
+    } catch (error) {
+      Alert.alert("Error", "Failed to sign in with Google");
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // If user is already logged in, show sign out button
   if (session) {
     return (
@@ -157,6 +182,34 @@ export default function LoginWithEmailPassword() {
           <Text className="text-white font-semibold text-base">
             {isLoading ? "Loading..." : isSignUp ? "Sign Up" : "Sign In"}
           </Text>
+        </Pressable>
+
+        <View className="flex-row items-center gap-4 my-4">
+          <View className="flex-1 h-px bg-gray-300" />
+          <Text className="text-gray-500 text-sm">OR</Text>
+          <View className="flex-1 h-px bg-gray-300" />
+        </View>
+
+        <Pressable
+          onPress={handleGoogleSignIn}
+          disabled={isLoading}
+          className="p-4 rounded-lg items-center flex-row justify-center gap-3"
+          style={{
+            backgroundColor: "#fff",
+            borderWidth: 1,
+            borderColor: "#E5E7EB",
+          }}
+        >
+          {isLoading ? (
+            <ActivityIndicator size="small" color="#FF6B35" />
+          ) : (
+            <>
+              <Text className="text-2xl">🔍</Text>
+              <Text className="text-gray-700 font-semibold text-base">
+                Continue with Google
+              </Text>
+            </>
+          )}
         </Pressable>
 
         <Pressable

@@ -10,17 +10,32 @@ const envSchema = z.object({
   NODE_ENV: z.string().optional(),
 
   // Database Configuration
-  DATABASE_URL: z.string().min(1, "DATABASE_URL is required").default("file:dev.db"),
+  DATABASE_URL: z.string().min(1, "DATABASE_URL is required").default("file:./prisma/dev.db"),
+  DATABASE_PROVIDER: z.enum(["sqlite", "postgresql"]).optional().default("sqlite"),
 
   // Better Auth Configuration
   BETTER_AUTH_SECRET: z.string().min(32, "BETTER_AUTH_SECRET must be at least 32 characters"),
 
   // Used for Better Auth and for Expo client access
-  BACKEND_URL: z.url("BACKEND_URL must be a valid URL").default("http://localhost:3000"), // Set via the Vibecode enviroment at run-time
+  BACKEND_URL: z.url("BACKEND_URL must be a valid URL").default("http://localhost:3000"),
 
   // Google OAuth Configuration
-  // GOOGLE_CLIENT_ID: z.string().min(1, "GOOGLE_CLIENT_ID is required"),
-  // GOOGLE_CLIENT_SECRET: z.string().min(1, "GOOGLE_CLIENT_SECRET is required"),
+  GOOGLE_CLIENT_ID: z.string().optional(),
+  GOOGLE_CLIENT_SECRET: z.string().optional(),
+  GOOGLE_ANDROID_CLIENT_ID: z.string().optional(),
+  GOOGLE_IOS_CLIENT_ID: z.string().optional(),
+
+  // OpenAI Configuration (for quest generation)
+  OPENAI_API_KEY: z.string().optional(),
+
+  // Resend Configuration (for email)
+  RESEND_API_KEY: z.string().optional(),
+
+  // Google Maps Configuration
+  GOOGLE_MAPS_API_KEY: z.string().optional(),
+
+  // Perplexity AI Configuration
+  PERPLEXITY_API_KEY: z.string().optional(),
 });
 
 /**

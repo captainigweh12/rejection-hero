@@ -38,6 +38,7 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 
 **Authentication**
 - Secure email/password login with Better Auth
+- Google OAuth sign-in (Web, Android, iOS)
 
 ### Coming Soon
 - 🎥 **Live Streaming**: Real-time verification using VideoSDK/Agora
@@ -60,8 +61,11 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 - **Bun + Hono**: Fast TypeScript backend server
 - **Prisma ORM**: Type-safe database access
 - **SQLite**: Local database (migrating to Supabase)
-- **Better Auth**: Authentication
+- **Better Auth**: Authentication with email/password and Google OAuth
 - **OpenAI API**: AI quest generation
+- **Resend API**: Email functionality
+- **Google Maps API**: Location services
+- **Perplexity AI**: Optional AI features
 
 ### Database Schema
 - **User**: Authentication and user data
@@ -167,16 +171,35 @@ Running automatically:
 
 ## Setup
 
-1. **OpenAI API (Optional but Recommended)**
+See `ENV_SETUP.md` for complete environment variable setup guide.
+
+### Required APIs
+
+1. **Google OAuth (Authentication)**
+   - Add via ENV tab: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`
+   - Frontend: `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID`, `EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID`, `EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID`
+
+2. **Google Maps API**
+   - Add via ENV tab: `GOOGLE_MAPS_API_KEY`
+   - Frontend: `EXPO_PUBLIC_GOOGLE_MAPS_API_KEY`
+
+3. **OpenAI API (Optional but Recommended)**
    - Add `OPENAI_API_KEY` via ENV tab in Vibecode app
    - Enables AI-powered quest generation
    - Falls back to predefined quests if not set
 
-2. **Test the App**
-   - Create an account
-   - Tap the orange Create button (+) to generate a quest
-   - Start a quest and track your progress
-   - Collect NOs and YESes to complete challenges
+4. **Resend (Email)**
+   - Add via ENV tab: `RESEND_API_KEY`
+
+5. **Perplexity AI (Optional)**
+   - Add via ENV tab: `PERPLEXITY_API_KEY`
+
+### Test the App
+
+1. Create an account with email/password OR sign in with Google
+2. Tap the orange Create button (+) to generate a quest
+3. Start a quest and track your progress
+4. Collect NOs and YESes to complete challenges
 
 ## Next Steps
 
