@@ -229,3 +229,92 @@ export const getUserStatsResponseSchema = z.object({
   diamonds: z.number(),
 });
 export type GetUserStatsResponse = z.infer<typeof getUserStatsResponseSchema>;
+
+// ==========================================
+// Live Stream Routes
+// ==========================================
+
+// POST /api/live/start - Start a live stream
+export const startLiveStreamRequestSchema = z.object({
+  userQuestId: z.string().optional(),
+});
+export type StartLiveStreamRequest = z.infer<typeof startLiveStreamRequestSchema>;
+export const startLiveStreamResponseSchema = z.object({
+  success: z.boolean(),
+  liveStreamId: z.string(),
+  roomUrl: z.string(),
+  roomName: z.string(),
+  token: z.string(),
+});
+export type StartLiveStreamResponse = z.infer<typeof startLiveStreamResponseSchema>;
+
+// POST /api/live/:id/end - End a live stream
+export const endLiveStreamResponseSchema = z.object({
+  success: z.boolean(),
+});
+export type EndLiveStreamResponse = z.infer<typeof endLiveStreamResponseSchema>;
+
+// GET /api/live/active - Get active live streams
+export const getActiveLiveStreamsResponseSchema = z.object({
+  streams: z.array(
+    z.object({
+      id: z.string(),
+      roomUrl: z.string(),
+      roomName: z.string(),
+      viewerCount: z.number(),
+      startedAt: z.string(),
+      user: z.object({
+        id: z.string(),
+        name: z.string().nullable(),
+        image: z.string().nullable(),
+      }),
+      userQuest: z
+        .object({
+          id: z.string(),
+          quest: z.object({
+            title: z.string(),
+            description: z.string(),
+            category: z.string(),
+          }),
+        })
+        .nullable(),
+    })
+  ),
+});
+export type GetActiveLiveStreamsResponse = z.infer<typeof getActiveLiveStreamsResponseSchema>;
+
+// POST /api/live/:id/comment - Add a comment to live stream
+export const addLiveCommentRequestSchema = z.object({
+  message: z.string().min(1).max(500),
+});
+export type AddLiveCommentRequest = z.infer<typeof addLiveCommentRequestSchema>;
+export const addLiveCommentResponseSchema = z.object({
+  success: z.boolean(),
+  comment: z.object({
+    id: z.string(),
+    message: z.string(),
+    createdAt: z.string(),
+    user: z.object({
+      id: z.string(),
+      name: z.string().nullable(),
+    }),
+  }),
+});
+export type AddLiveCommentResponse = z.infer<typeof addLiveCommentResponseSchema>;
+
+// GET /api/live/:id/comments - Get comments for a live stream
+export const getLiveCommentsResponseSchema = z.object({
+  comments: z.array(
+    z.object({
+      id: z.string(),
+      message: z.string(),
+      createdAt: z.string(),
+      user: z.object({
+        id: z.string(),
+        name: z.string().nullable(),
+      }),
+    })
+  ),
+});
+export type GetLiveCommentsResponse = z.infer<typeof getLiveCommentsResponseSchema>;
+

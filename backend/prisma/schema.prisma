@@ -29,6 +29,8 @@ model User {
   MatchesAsUser2  Match[]      @relation("MatchUser2")
   UserQuests      UserQuest[]
   UserStats       UserStats?
+  LiveStreams     LiveStream[]
+  LiveStreamComments LiveStreamComment[]
 
   @@map("user")
 }
@@ -173,4 +175,34 @@ model UserQuest {
 
   @@unique([userId, questId])
   @@map("user_quest")
+}
+
+model LiveStream {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  roomUrl       String   @unique // Daily.co room URL
+  roomName      String   @unique // Daily.co room name
+  userQuestId   String?  // Optional linked quest
+  isActive      Boolean  @default(true)
+  viewerCount   Int      @default(0)
+  startedAt     DateTime @default(now())
+  endedAt       DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  comments      LiveStreamComment[]
+
+  @@map("live_stream")
+}
+
+model LiveStreamComment {
+  id            String     @id @default(cuid())
+  liveStreamId  String
+  liveStream    LiveStream @relation(fields: [liveStreamId], references: [id], onDelete: Cascade)
+  userId        String
+  user          User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  message       String
+  createdAt     DateTime   @default(now())
+
+  @@map("live_stream_comment")
 }

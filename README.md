@@ -60,11 +60,21 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 - Wellness & Rest Mode
 - Third-party Integrations hub
 
+**Live Streaming** ✨ NEW!
+- Real-time live streaming powered by Daily.co
+- Stream your quest challenges to the community
+- Link active quests to your live streams
+- Live comments and viewer count
+- Stream controls (mic, video, flip camera)
+- Quest card overlay during streams
+- View and join active community streams
+- "Go Live" button from Profile page
+
 ### Coming Soon
-- 🎥 **Live Streaming**: Real-time verification using VideoSDK/Agora
 - 📍 **Quest Markers**: Show active quests on map with color-coded categories
 - 💬 **Messaging**: Chat with your matches
 - 👥 **Groups**: Join communities for specific challenges
+- 🎥 **WebRTC Integration**: Full Daily.co camera/audio integration
 
 ## Tech Stack
 
@@ -76,6 +86,7 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 - **React Native Gesture Handler**: Swipe gestures
 - **React Native Maps**: Google Maps integration with location tracking
 - **Expo Location**: Real-time user location services
+- **Daily.co React Native SDK**: Live streaming and WebRTC
 - **TanStack Query**: Data fetching and caching
 - **Lucide React Native**: Beautiful icons
 
@@ -87,6 +98,7 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 - **OpenAI API**: AI quest generation
 - **Resend API**: Email functionality
 - **Google Maps API**: Location services
+- **Daily.co API**: Live streaming infrastructure (optional)
 - **Perplexity AI**: Optional AI features
 
 ### Database Schema
@@ -97,6 +109,8 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 - **UserStats**: Streaks, XP, points, trophies, diamonds
 - **Swipe**: Track user swipes
 - **Match**: Store mutual matches
+- **LiveStream**: Live streaming sessions with room URLs
+- **LiveStreamComment**: Comments on live streams
 
 ## Design
 
@@ -152,7 +166,8 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 │   │   │   ├── swipe.ts
 │   │   │   ├── matches.ts
 │   │   │   ├── quests.ts    # NEW!
-│   │   │   └── stats.ts     # NEW!
+│   │   │   ├── stats.ts     # NEW!
+│   │   │   └── live.ts      # NEW!
 │   │   ├── auth.ts
 │   │   └── db.ts
 │   └── prisma/
@@ -163,14 +178,21 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 
 ## API Endpoints
 
-### Quests (NEW!)
+### Quests
 - `GET /api/quests` - Get user's active and queued quests
 - `POST /api/quests/generate` - Generate AI-powered quest
 - `POST /api/quests/:id/start` - Start a quest (max 2 active)
 - `POST /api/quests/:id/record` - Record NO or YES attempt
 
-### Stats (NEW!)
+### Stats
 - `GET /api/stats` - Get user statistics
+
+### Live Streaming ✨ NEW!
+- `POST /api/live/start` - Start a live stream
+- `POST /api/live/:id/end` - End a live stream
+- `GET /api/live/active` - Get all active live streams
+- `POST /api/live/:id/comment` - Add comment to stream
+- `GET /api/live/:id/comments` - Get stream comments
 
 ### Profile
 - `GET /api/profile` - Get current user's profile
@@ -210,10 +232,16 @@ See `ENV_SETUP.md` for complete environment variable setup guide.
    - Enables AI-powered quest generation
    - Falls back to predefined quests if not set
 
-4. **Resend (Email)**
+4. **Daily.co API (Optional - for Production Live Streaming)**
+   - Sign up at https://daily.co for free account
+   - Add `DAILY_API_KEY` via ENV tab
+   - Currently uses mock rooms in development
+   - Required for production live streaming with real WebRTC
+
+5. **Resend (Email)**
    - Add via ENV tab: `RESEND_API_KEY`
 
-5. **Perplexity AI (Optional)**
+6. **Perplexity AI (Optional)**
    - Add via ENV tab: `PERPLEXITY_API_KEY`
 
 ### Test the App

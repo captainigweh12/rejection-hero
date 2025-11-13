@@ -236,40 +236,30 @@ export default function ProfileScreen({ navigation }: Props) {
                 ))}
               </ScrollView>
 
-              {/* YouTube Live Section */}
+              {/* Live Streaming Section */}
               <View style={{ backgroundColor: "white", borderRadius: 16, padding: 20, marginBottom: 16 }}>
                 <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 8 }}>
                   <Video size={24} color="#FF0000" />
-                  <Text style={{ fontSize: 18, fontWeight: "bold" }}>YouTube Live</Text>
+                  <Text style={{ fontSize: 18, fontWeight: "bold" }}>Live Streaming</Text>
                 </View>
                 <Text style={{ color: "#666", fontSize: 14, marginBottom: 16 }}>
-                  Paste your YouTube channel URL to link your account. Make sure to open YouTube Studio for going live.
+                  Stream your quest journey live and share your rejection challenges with the community in real-time!
                 </Text>
-                <TextInput
-                  value={youtubeUrl}
-                  onChangeText={setYoutubeUrl}
-                  placeholder="https://www.youtube.com/@your_channel"
-                  placeholderTextColor="#999"
-                  style={{
-                    borderWidth: 1,
-                    borderColor: "#E0E0E0",
-                    borderRadius: 8,
-                    padding: 12,
-                    marginBottom: 12,
-                    fontSize: 14,
-                  }}
-                />
                 <Pressable
-                  onPress={handleConnectYouTube}
+                  onPress={() => navigation.navigate("LiveTab")}
                   style={{
                     backgroundColor: "#FF0000",
                     paddingVertical: 14,
                     borderRadius: 8,
                     alignItems: "center",
+                    marginBottom: 12,
                   }}
                 >
-                  <Text style={{ color: "white", fontWeight: "bold", fontSize: 16 }}>Connect YouTube</Text>
+                  <Text style={{ color: "white", fontWeight: "bold", fontSize: 16 }}>Go Live Now</Text>
                 </Pressable>
+                <Text style={{ color: "#999", fontSize: 12, textAlign: "center" }}>
+                  Powered by Daily.co • Connect quests to your streams
+                </Text>
               </View>
             </View>
           )}
