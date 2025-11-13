@@ -27,28 +27,31 @@ import { useSession } from "@/lib/useSession";
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 const RootNavigator = () => {
   return (
-    <RootStack.Navigator>
-      <RootStack.Screen
-        name="Tabs"
-        component={BottomTabNavigator}
-        options={{ headerShown: false }}
-      />
-      <RootStack.Screen
-        name="LoginModalScreen"
-        component={LoginModalScreen}
-        options={{ presentation: "modal", title: "Login" }}
-      />
-      <RootStack.Screen
-        name="EditProfile"
-        component={EditProfileScreen}
-        options={{ title: "Edit Profile", headerShown: true }}
-      />
-      <RootStack.Screen
-        name="QuestDetail"
-        component={QuestDetailScreen}
-        options={{ title: "Quest", headerShown: true }}
-      />
-    </RootStack.Navigator>
+    <>
+      <AuthWrapper />
+      <RootStack.Navigator>
+        <RootStack.Screen
+          name="Tabs"
+          component={BottomTabNavigator}
+          options={{ headerShown: false }}
+        />
+        <RootStack.Screen
+          name="LoginModalScreen"
+          component={LoginModalScreen}
+          options={{ presentation: "modal", title: "Login" }}
+        />
+        <RootStack.Screen
+          name="EditProfile"
+          component={EditProfileScreen}
+          options={{ title: "Edit Profile", headerShown: true }}
+        />
+        <RootStack.Screen
+          name="QuestDetail"
+          component={QuestDetailScreen}
+          options={{ title: "Quest", headerShown: true }}
+        />
+      </RootStack.Navigator>
+    </>
   );
 };
 
@@ -83,9 +86,7 @@ function AuthWrapper() {
 const BottomTab = createBottomTabNavigator<BottomTabParamList>();
 const BottomTabNavigator = () => {
   return (
-    <>
-      <AuthWrapper />
-      <BottomTab.Navigator
+    <BottomTab.Navigator
       initialRouteName="HomeTab"
       screenOptions={{
         headerShown: false,
@@ -148,7 +149,6 @@ const BottomTabNavigator = () => {
         }}
       />
     </BottomTab.Navigator>
-    </>
   );
 };
 
