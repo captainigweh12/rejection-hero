@@ -5,23 +5,26 @@ import {
   ScrollView,
   Pressable,
   ActivityIndicator,
-  Image,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useQuery } from "@tanstack/react-query";
-import { Flame, Trophy, Diamond, Bell, Menu, Plus } from "lucide-react-native";
+import { Flame, Trophy, Diamond, Bell, Menu, Plus, Zap } from "lucide-react-native";
 import type { BottomTabScreenProps } from "@/navigation/types";
 import { api } from "@/lib/api";
+import { useSession } from "@/lib/useSession";
 import type { GetUserQuestsResponse, GetUserStatsResponse } from "@/shared/contracts";
 
 type Props = BottomTabScreenProps<"HomeTab">;
 
 export default function HomeScreen({ navigation }: Props) {
-  const { data: questsData, isLoading: questsLoading } = useQuery<GetUserQuestsResponse>({
+  const { data: sessionData } = useSession();
+
+  const { data: questsData, isLoading: questsLoading, error: questsError } = useQuery<GetUserQuestsResponse>({
     queryKey: ["quests"],
     queryFn: async () => {
       return api.get<GetUserQuestsResponse>("/api/quests");
     },
+    enabled: !!sessionData?.user,
   });
 
   const { data: statsData } = useQuery<GetUserStatsResponse>({
@@ -29,6 +32,7 @@ export default function HomeScreen({ navigation }: Props) {
     queryFn: async () => {
       return api.get<GetUserStatsResponse>("/api/stats");
     },
+    enabled: !!sessionData?.user,
   });
 
   const activeQuests = questsData?.activeQuests || [];
@@ -54,6 +58,42 @@ export default function HomeScreen({ navigation }: Props) {
     };
     return colors[difficulty] || "#FFD700";
   };
+
+  if (!sessionData?.user) {
+    return (
+      <LinearGradient colors={["#0A0A0F", "#1A1A24", "#2A1A34"]} className="flex-1">
+        <View className="flex-1 items-center justify-center px-8">
+          <View
+            className="w-24 h-24 rounded-full items-center justify-center mb-6"
+            style={{
+              backgroundColor: "rgba(255, 107, 53, 0.2)",
+              borderWidth: 3,
+              borderColor: "#FF6B35",
+            }}
+          >
+            <Zap size={48} color="#FF6B35" fill="#FF6B35" />
+          </View>
+          <Text className="text-white text-3xl font-bold mb-4 text-center">
+            Welcome to Go for No!
+          </Text>
+          <Text className="text-white/70 text-lg text-center mb-8">
+            Transform rejection into growth. Start your journey to overcome fear and build
+            unstoppable confidence.
+          </Text>
+          <Pressable
+            onPress={() => navigation.navigate("LoginModalScreen")}
+            className="px-12 py-5 rounded-full"
+            style={{ backgroundColor: "#FF6B35" }}
+          >
+            <Text className="text-white font-bold text-xl">Get Started</Text>
+          </Pressable>
+          <Pressable onPress={() => navigation.navigate("LoginModalScreen")} className="mt-4">
+            <Text className="text-white/50 text-base">Already have an account? Log in</Text>
+          </Pressable>
+        </View>
+      </LinearGradient>
+    );
+  }
 
   if (questsLoading) {
     return (
