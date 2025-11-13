@@ -39,6 +39,7 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 **Authentication**
 - Secure email/password login with Better Auth
 - Google OAuth sign-in (Web, Android, iOS)
+- Auto-prompt for login on app startup
 
 ### Coming Soon
 - 🎥 **Live Streaming**: Real-time verification using VideoSDK/Agora

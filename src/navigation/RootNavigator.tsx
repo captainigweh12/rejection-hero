@@ -1,9 +1,12 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, View, ActivityIndicator } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { BlurView } from "expo-blur";
 import * as Haptics from "expo-haptics";
 import { Home, Heart, Users, Video, Map, User } from "lucide-react-native";
+import { useEffect, useState } from "react";
+import { useNavigation } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import type { BottomTabParamList, RootStackParamList } from "@/navigation/types";
 import HomeScreen from "@/screens/HomeScreen";
@@ -15,6 +18,7 @@ import ProfileScreen from "@/screens/ProfileScreen";
 import LoginModalScreen from "@/screens/LoginModalScreen";
 import EditProfileScreen from "@/screens/EditProfileScreen";
 import QuestDetailScreen from "@/screens/QuestDetailScreen";
+import { useSession } from "@/lib/useSession";
 
 /**
  * RootStackNavigator
@@ -49,13 +53,47 @@ const RootNavigator = () => {
 };
 
 /**
+ * AuthWrapper
+ * Checks if user is logged in on app startup and opens login modal if not
+ */
+function AuthWrapper() {
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const { data: sessionData, isPending } = useSession();
+  const [hasChecked, setHasChecked] = useState(false);
+
+  useEffect(() => {
+    if (!isPending && !hasChecked) {
+      setHasChecked(true);
+      if (!sessionData?.user) {
+        // Open login modal on first launch if not authenticated
+        setTimeout(() => {
+          navigation.navigate("LoginModalScreen");
+        }, 100);
+      }
+    }
+  }, [sessionData, isPending, hasChecked, navigation]);
+
+  if (isPending) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#0A0A0F" }}>
+        <ActivityIndicator size="large" color="#FF6B35" />
+      </View>
+    );
+  }
+
+  return null;
+}
+
+/**
  * BottomTabNavigator
  * The bottom tab navigator for the app
  */
 const BottomTab = createBottomTabNavigator<BottomTabParamList>();
 const BottomTabNavigator = () => {
   return (
-    <BottomTab.Navigator
+    <>
+      <AuthWrapper />
+      <BottomTab.Navigator
       initialRouteName="HomeTab"
       screenOptions={{
         headerShown: false,
@@ -118,6 +156,7 @@ const BottomTabNavigator = () => {
         }}
       />
     </BottomTab.Navigator>
+    </>
   );
 };
 
