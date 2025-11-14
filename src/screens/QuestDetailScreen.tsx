@@ -146,21 +146,29 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
         setIsGeneratingNext(false);
         setTimeRemaining(300); // Reset timer
       } catch (error: any) {
-        console.error("Failed to start next quest:", error);
+        // This is an expected error when user has 2 active quests, not a breaking error
+        console.log("Info: Could not auto-start next quest:", error);
         setIsGeneratingNext(false);
 
         // Check if it's the "Maximum 2 active quests" error
         const errorMessage = error?.message || error?.toString() || "";
         if (errorMessage.includes("Maximum 2 active quests")) {
           Alert.alert(
-            "Quest Limit Reached",
-            "You already have 2 active quests. The new quest has been added to your queue. Please complete an active quest first."
+            "Quest Added to Queue",
+            "Great job completing your quest! Your next quest has been added to your queue. Complete one of your active quests to start it.",
+            [{ text: "Got it", style: "default" }]
           );
+          // Navigate back to home to see the queued quest
+          setShowCompletion(false);
+          navigation.goBack();
         } else {
           Alert.alert(
-            "Unable to Start Quest",
-            "The new quest was created but couldn't be started automatically. Please check your active quests and try starting it manually from the main screen."
+            "Quest Created",
+            "Your next quest was created and added to your queue. You can start it from the home screen.",
+            [{ text: "OK", style: "default" }]
           );
+          setShowCompletion(false);
+          navigation.goBack();
         }
       }
     },
