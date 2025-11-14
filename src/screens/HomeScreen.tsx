@@ -451,6 +451,26 @@ export default function HomeScreen({ navigation }: Props) {
                   <Pressable
                     onPress={() => {
                       setShowMenu(false);
+                      navigation.navigate("ProfileTab");
+                    }}
+                    style={{
+                      paddingHorizontal: 24,
+                      paddingVertical: 16,
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 16,
+                    }}
+                  >
+                    <User size={24} color="#0A0A0F" />
+                    <Text style={{ fontSize: 16, color: "#0A0A0F", fontWeight: "500" }}>
+                      Profile & Settings
+                    </Text>
+                  </Pressable>
+
+                  {/* Settings */}
+                  <Pressable
+                    onPress={() => {
+                      setShowMenu(false);
                       setShowSettings(true);
                     }}
                     style={{
@@ -463,7 +483,7 @@ export default function HomeScreen({ navigation }: Props) {
                   >
                     <Settings size={24} color="#0A0A0F" />
                     <Text style={{ fontSize: 16, color: "#0A0A0F", fontWeight: "500" }}>
-                      Profile & Settings
+                      Settings
                     </Text>
                   </Pressable>
 

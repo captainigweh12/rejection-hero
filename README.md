@@ -56,7 +56,7 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 
 **Navigation & Menu**
 - Redesigned hamburger menu with organized sections
-- **PROFILE**: Profile & Settings opens comprehensive settings modal
+- **PROFILE**: Profile & Settings (navigates to profile), Settings (opens modal), Help & Support, Invite Warriors
 - **ADVENTURE**: Quest Calendar, Past Quests, Leaderboard, Growth & Achievements
 - **COMMUNITY**: Groups, Manage Categories, Explore World
 - Log out and version display
@@ -70,7 +70,7 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 - **Notifications**: Quest reminders toggle
 - **Legal**: Safety Guidelines access
 - **Account Actions**: Sign out option
-- Settings can be accessed from the three-line menu on the Home screen
+- Settings accessible via dedicated "Settings" menu item in the three-line menu
 
 **Live Streaming** ✨ NEW!
 - Real-time live streaming powered by Daily.co
