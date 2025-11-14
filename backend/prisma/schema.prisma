@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/prisma"
@@ -12,25 +9,24 @@ datasource db {
 }
 
 model User {
-  id            String    @id
-  email         String    @unique
-  name          String?
-  emailVerified Boolean   @default(false)
-  image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @default(now()) @updatedAt
-  sessions      Session[]
-  accounts      Account[]
-
-  Profile         Profile?
-  SwipesGiven     Swipe[]      @relation("SwipesGiven")
-  SwipesReceived  Swipe[]      @relation("SwipesReceived")
-  MatchesAsUser1  Match[]      @relation("MatchUser1")
-  MatchesAsUser2  Match[]      @relation("MatchUser2")
-  UserQuests      UserQuest[]
-  UserStats       UserStats?
-  LiveStreams     LiveStream[]
+  id                 String              @id
+  email              String              @unique
+  name               String?
+  emailVerified      Boolean             @default(false)
+  image              String?
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @default(now()) @updatedAt
+  accounts           Account[]
+  LiveStreams        LiveStream[]
   LiveStreamComments LiveStreamComment[]
+  MatchesAsUser2     Match[]             @relation("MatchUser2")
+  MatchesAsUser1     Match[]             @relation("MatchUser1")
+  Profile            Profile?
+  sessions           Session[]
+  SwipesReceived     Swipe[]             @relation("SwipesReceived")
+  SwipesGiven        Swipe[]             @relation("SwipesGiven")
+  UserQuests         UserQuest[]
+  UserStats          UserStats?
 
   @@map("user")
 }
@@ -38,7 +34,7 @@ model User {
 model Session {
   id        String   @id
   expiresAt DateTime
-  token     String
+  token     String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   ipAddress String?
@@ -46,7 +42,6 @@ model Session {
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([token])
   @@map("session")
 }
 
@@ -55,7 +50,6 @@ model Account {
   accountId             String
   providerId            String
   userId                String
-  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   accessToken           String?
   refreshToken          String?
   idToken               String?
@@ -65,6 +59,7 @@ model Account {
   password              String?
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("account")
 }
@@ -81,20 +76,20 @@ model Verification {
 }
 
 model Profile {
-  id           String   @id @default(cuid())
-  userId       String   @unique
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  displayName  String
-  bio          String?
-  age          Int?
-  photos       String?  // JSON array of photo URLs
-  location     String?
-  latitude     Float?
-  longitude    Float?
-  isLive       Boolean  @default(false)
-  liveViewers  Int      @default(0)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  displayName String
+  bio         String?
+  age         Int?
+  photos      String?
+  location    String?
+  latitude    Float?
+  longitude   Float?
+  isLive      Boolean  @default(false)
+  liveViewers Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("profile")
 }
@@ -102,11 +97,11 @@ model Profile {
 model Swipe {
   id        String   @id @default(cuid())
   swiperId  String
-  swiper    User     @relation("SwipesGiven", fields: [swiperId], references: [id], onDelete: Cascade)
   swipedId  String
-  swiped    User     @relation("SwipesReceived", fields: [swipedId], references: [id], onDelete: Cascade)
-  direction String   // "left" (yes) or "right" (no)
+  direction String
   createdAt DateTime @default(now())
+  swiped    User     @relation("SwipesReceived", fields: [swipedId], references: [id], onDelete: Cascade)
+  swiper    User     @relation("SwipesGiven", fields: [swiperId], references: [id], onDelete: Cascade)
 
   @@unique([swiperId, swipedId])
   @@map("swipe")
@@ -116,9 +111,9 @@ model Match {
   id        String   @id @default(cuid())
   user1Id   String
   user2Id   String
-  user1     User     @relation("MatchUser1", fields: [user1Id], references: [id], onDelete: Cascade)
-  user2     User     @relation("MatchUser2", fields: [user2Id], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
+  user2     User     @relation("MatchUser2", fields: [user2Id], references: [id], onDelete: Cascade)
+  user1     User     @relation("MatchUser1", fields: [user1Id], references: [id], onDelete: Cascade)
 
   @@unique([user1Id, user2Id])
   @@map("match")
@@ -127,7 +122,6 @@ model Match {
 model UserStats {
   id            String   @id @default(cuid())
   userId        String   @unique
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   currentStreak Int      @default(0)
   longestStreak Int      @default(0)
   totalXP       Int      @default(0)
@@ -137,79 +131,80 @@ model UserStats {
   lastActiveAt  DateTime @default(now())
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("user_stats")
 }
 
 model Quest {
-  id          String      @id @default(cuid())
-  title       String
-  description String
-  category    String      // "SALES", "SOCIAL", "ENTREPRENEURSHIP", "DATING", "CONFIDENCE", "CAREER"
-  difficulty  String      // "EASY", "MEDIUM", "HARD", "EXPERT"
-  goalType    String      // "COLLECT_NOS", "COLLECT_YES", "COMPLETE_ACTION"
-  goalCount   Int         @default(1)
-  xpReward    Int
-  pointReward Int
-  isAIGenerated Boolean   @default(false)
-  location    String?     // Human-readable location name
-  latitude    Float?      // GPS latitude
-  longitude   Float?      // GPS longitude
-  timeContext String?     // Time of day context (morning, afternoon, evening)
-  dateContext String?     // Date context (weekday, weekend, holiday, special event)
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  UserQuests  UserQuest[]
+  id            String      @id @default(cuid())
+  title         String
+  description   String
+  category      String
+  difficulty    String
+  goalType      String
+  goalCount     Int         @default(1)
+  xpReward      Int
+  pointReward   Int
+  isAIGenerated Boolean     @default(false)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  dateContext   String?
+  latitude      Float?
+  location      String?
+  longitude     Float?
+  timeContext   String?
+  UserQuests    UserQuest[]
 
   @@map("quest")
 }
 
 model UserQuest {
-  id          String   @id @default(cuid())
+  id          String       @id @default(cuid())
   userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   questId     String
-  quest       Quest    @relation(fields: [questId], references: [id], onDelete: Cascade)
-  status      String   // "ACTIVE", "COMPLETED", "QUEUED"
-  noCount     Int      @default(0)
-  yesCount    Int      @default(0)
+  status      String
+  noCount     Int          @default(0)
+  yesCount    Int          @default(0)
   startedAt   DateTime?
   completedAt DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
   LiveStreams LiveStream[]
+  quest       Quest        @relation(fields: [questId], references: [id], onDelete: Cascade)
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, questId])
   @@map("user_quest")
 }
 
 model LiveStream {
-  id            String   @id @default(cuid())
-  userId        String
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  roomUrl       String   @unique // Daily.co room URL
-  roomName      String   @unique // Daily.co room name
-  userQuestId   String?  // Optional linked quest
-  userQuest     UserQuest? @relation(fields: [userQuestId], references: [id], onDelete: SetNull)
-  isActive      Boolean  @default(true)
-  viewerCount   Int      @default(0)
-  startedAt     DateTime @default(now())
-  endedAt       DateTime?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  comments      LiveStreamComment[]
+  id          String              @id @default(cuid())
+  userId      String
+  roomUrl     String              @unique
+  roomName    String              @unique
+  userQuestId String?
+  isActive    Boolean             @default(true)
+  viewerCount Int                 @default(0)
+  startedAt   DateTime            @default(now())
+  endedAt     DateTime?
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  userQuest   UserQuest?          @relation(fields: [userQuestId], references: [id])
+  user        User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comments    LiveStreamComment[]
 
   @@map("live_stream")
 }
 
 model LiveStreamComment {
-  id            String     @id @default(cuid())
-  liveStreamId  String
-  liveStream    LiveStream @relation(fields: [liveStreamId], references: [id], onDelete: Cascade)
-  userId        String
-  user          User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  message       String
-  createdAt     DateTime   @default(now())
+  id           String     @id @default(cuid())
+  liveStreamId String
+  userId       String
+  message      String
+  createdAt    DateTime   @default(now())
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  liveStream   LiveStream @relation(fields: [liveStreamId], references: [id], onDelete: Cascade)
 
   @@map("live_stream_comment")
 }
