@@ -24,23 +24,38 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 
 **Quest Detail Experience** ✨ NEW!
 - Clean, modern UI with reduced clutter (Duolingo-inspired design)
-- Countdown timer (5 minutes) with visual indicator
+- **Smart countdown timer**: Adjusts based on difficulty
+  - EASY: 10 minutes
+  - MEDIUM: 15 minutes
+  - HARD: 20 minutes
+  - EXPERT: 30 minutes
 - Progress bar showing completion percentage
 - Single focused quest card with category badge
 - Large, easy-to-tap NO (green) and YES (red) buttons
 
 **Quest Completion Flow** ✨ NEW!
-- Beautiful achievement modal with animated trophy
+- **Loading screen**: 2-second loading animation with pulsing trophy
 - **Accomplishments display**: Shows XP/Points earned and total stats
 - **Leaderboard position**: See your rank among all warriors
 - Shows current daily streak with fire icon
 - Displays number of NOs collected
-- **Auto-generation**: Automatically creates next harder quest after 3 seconds
+- **Auto-generation**: Automatically creates next harder quest after 5 seconds
 - "Next Quest" button for manual generation
 - Progressive difficulty: EASY → MEDIUM → HARD → EXPERT
 - Stay in quest flow or return to home
 - Smooth animations and spring physics
 - Visual feedback while generating next quest
+
+**AI Quest Generation** ✨ ENHANCED!
+- **3-word titles**: All quests have concise 3-word action titles (e.g., "Ask Coffee Shops", "Request Business Cards")
+- **Unique challenges**: AI tracks your last 20 quests and ensures no duplicates
+- **Higher creativity**: Temperature set to 0.9 for more variety
+- **Difficulty-based goals**:
+  - EASY: 3-5 NOs
+  - MEDIUM: 5-8 NOs
+  - HARD: 8-12 NOs
+  - EXPERT: 12-15 NOs
+- Specific, actionable descriptions with clear instructions
 
 **Quest Examples:**
 - Ask 5 coffee shops for an item that's not on their menu

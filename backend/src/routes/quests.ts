@@ -86,7 +86,7 @@ questsRouter.post("/generate", zValidator("json", generateQuestRequestSchema), a
   const { category, difficulty, customPrompt } = c.req.valid("json");
 
   // Generate quest using OpenAI
-  const questData = await generateQuestWithAI(category, difficulty, customPrompt);
+  const questData = await generateQuestWithAI(category, difficulty, customPrompt, user.id);
 
   // Create quest in database
   const quest = await db.quest.create({
@@ -232,7 +232,8 @@ questsRouter.post("/:id/record", zValidator("json", recordQuestActionRequestSche
 async function generateQuestWithAI(
   category?: string,
   difficulty?: string,
-  customPrompt?: string
+  customPrompt?: string,
+  userId?: string
 ): Promise<{
   title: string;
   description: string;
@@ -251,9 +252,55 @@ async function generateQuestWithAI(
   }
 
   try {
+    // Get user's previous quests to avoid duplicates
+    let previousQuestTitles: string[] = [];
+    if (userId) {
+      const userQuests = await db.userQuest.findMany({
+        where: { userId },
+        include: { quest: true },
+        take: 20,
+        orderBy: { createdAt: "desc" },
+      });
+      previousQuestTitles = userQuests.map((uq) => uq.quest.title);
+    }
+
+    const previousQuestsContext =
+      previousQuestTitles.length > 0
+        ? `\n\nIMPORTANT: Do NOT create quests similar to these previous quests:\n${previousQuestTitles.join("\n")}\n\nCreate a completely NEW and UNIQUE challenge.`
+        : "";
+
     const prompt = customPrompt
-      ? `Create a "Go for No" rejection challenge based on: ${customPrompt}. Return a JSON object with: title, description (2-3 sentences), category (SALES/SOCIAL/ENTREPRENEURSHIP/DATING/CONFIDENCE/CAREER), difficulty (EASY/MEDIUM/HARD/EXPERT), goalType (COLLECT_NOS or COLLECT_YES), goalCount (1-10).`
-      : `Create a "Go for No" rejection challenge for ${category || "general"} category at ${difficulty || "medium"} difficulty level. The goal is to help users overcome fear of rejection by collecting "NO" responses. Return a JSON object with: title, description (2-3 sentences explaining the challenge), category (SALES/SOCIAL/ENTREPRENEURSHIP/DATING/CONFIDENCE/CAREER), difficulty (EASY/MEDIUM/HARD/EXPERT), goalType (COLLECT_NOS or COLLECT_YES), goalCount (number of NOs or YESes to collect, 1-10).`;
+      ? `Create a "Go for No" rejection challenge based on: ${customPrompt}.
+
+REQUIREMENTS:
+- Title MUST be exactly 3 words (action statement, e.g., "Ask Coffee Shops", "Request Business Cards", "Pitch Startup Idea")
+- Description should be 2-3 sentences explaining the specific challenge
+- Make it actionable and specific
+- Category: SALES/SOCIAL/ENTREPRENEURSHIP/DATING/CONFIDENCE/CAREER
+- Difficulty: EASY/MEDIUM/HARD/EXPERT
+- goalType: COLLECT_NOS (most common) or COLLECT_YES
+- goalCount: number of NOs or YESes to collect (3-15 based on difficulty)
+${previousQuestsContext}
+
+Return a JSON object with: title (exactly 3 words), description, category, difficulty, goalType, goalCount.`
+      : `Create a unique "Go for No" rejection challenge for ${category || "general"} category at ${difficulty || "medium"} difficulty level.
+
+REQUIREMENTS:
+- Title MUST be exactly 3 words (action statement, e.g., "Ask Coffee Shops", "Request Business Cards", "Pitch Startup Idea")
+- Description should be 2-3 sentences with specific, actionable instructions
+- The goal is to help users overcome fear of rejection by collecting "NO" responses
+- Make each challenge unique and creative
+- Category: ${category || "SALES/SOCIAL/ENTREPRENEURSHIP/DATING/CONFIDENCE/CAREER"}
+- Difficulty: ${difficulty || "EASY/MEDIUM/HARD/EXPERT"}
+- goalType: COLLECT_NOS (primary) or COLLECT_YES (rare)
+- goalCount:
+  * EASY: 3-5 NOs
+  * MEDIUM: 5-8 NOs
+  * HARD: 8-12 NOs
+  * EXPERT: 12-15 NOs
+${previousQuestsContext}
+
+Return a JSON object with: title (exactly 3 words), description, category, difficulty, goalType, goalCount.`;
 
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
@@ -267,16 +314,28 @@ async function generateQuestWithAI(
           {
             role: "system",
             content:
-              "You are a motivational coach creating rejection challenges. Be creative and encouraging.",
+              "You are a creative motivational coach creating unique rejection challenges. Each title MUST be exactly 3 words. Each challenge must be completely unique and different from previous challenges. Be specific and actionable.",
           },
           { role: "user", content: prompt },
         ],
         response_format: { type: "json_object" },
+        temperature: 0.9, // Higher temperature for more creativity and uniqueness
       }),
     });
 
     const data = await response.json();
     const questData = JSON.parse(data.choices[0].message.content);
+
+    // Ensure title is 3 words
+    const titleWords = questData.title.split(" ");
+    if (titleWords.length > 3) {
+      questData.title = titleWords.slice(0, 3).join(" ");
+    } else if (titleWords.length < 3) {
+      // Pad with action words if needed
+      while (questData.title.split(" ").length < 3) {
+        questData.title += " Challenge";
+      }
+    }
 
     // Calculate rewards based on difficulty
     const difficultyMultiplier = {

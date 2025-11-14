@@ -24,9 +24,11 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
   const queryClient = useQueryClient();
   const [showMore, setShowMore] = useState(false);
   const [showCompletion, setShowCompletion] = useState(false);
+  const [showLoading, setShowLoading] = useState(false);
   const [completionData, setCompletionData] = useState<any>(null);
   const [celebrationAnim] = useState(new Animated.Value(0));
-  const [timeRemaining, setTimeRemaining] = useState(300); // 5 minutes default
+  const [loadingAnim] = useState(new Animated.Value(0));
+  const [timeRemaining, setTimeRemaining] = useState(300); // Will be set based on difficulty
   const [isGeneratingNext, setIsGeneratingNext] = useState(false);
 
   const { data: questsData, isLoading } = useQuery<GetUserQuestsResponse>({
@@ -49,6 +51,21 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
       return api.get<GetLeaderboardResponse>("/api/stats/leaderboard");
     },
   });
+
+  const userQuest = questsData?.activeQuests.find((q) => q.id === currentUserQuestId);
+
+  // Set timer based on difficulty when quest loads
+  useEffect(() => {
+    if (userQuest?.quest.difficulty) {
+      const timerSettings = {
+        EASY: 10 * 60, // 10 minutes
+        MEDIUM: 15 * 60, // 15 minutes
+        HARD: 20 * 60, // 20 minutes
+        EXPERT: 30 * 60, // 30 minutes
+      };
+      setTimeRemaining(timerSettings[userQuest.quest.difficulty as keyof typeof timerSettings] || 15 * 60);
+    }
+  }, [userQuest?.quest.difficulty]);
 
   // Timer countdown
   useEffect(() => {
@@ -108,24 +125,46 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
         // Refresh leaderboard data
         queryClient.invalidateQueries({ queryKey: ["leaderboard"] });
 
-        // Show completion celebration
-        setCompletionData(data);
-        setShowCompletion(true);
+        // Show loading screen first
+        setShowLoading(true);
 
-        // Trigger animation
-        Animated.sequence([
-          Animated.spring(celebrationAnim, {
-            toValue: 1,
-            useNativeDriver: true,
-            tension: 50,
-            friction: 7,
-          }),
-        ]).start();
+        // Start loading animation
+        Animated.loop(
+          Animated.sequence([
+            Animated.timing(loadingAnim, {
+              toValue: 1,
+              duration: 1000,
+              useNativeDriver: true,
+            }),
+            Animated.timing(loadingAnim, {
+              toValue: 0,
+              duration: 1000,
+              useNativeDriver: true,
+            }),
+          ])
+        ).start();
 
-        // Auto-generate next quest after a short delay
+        // After 2 seconds, show completion modal
         setTimeout(() => {
-          handleGenerateNext();
-        }, 3000);
+          setShowLoading(false);
+          setCompletionData(data);
+          setShowCompletion(true);
+
+          // Trigger celebration animation
+          Animated.sequence([
+            Animated.spring(celebrationAnim, {
+              toValue: 1,
+              useNativeDriver: true,
+              tension: 50,
+              friction: 7,
+            }),
+          ]).start();
+
+          // Auto-generate next quest after showing accomplishments
+          setTimeout(() => {
+            handleGenerateNext();
+          }, 5000); // Give more time to view accomplishments
+        }, 2000);
       }
     },
   });
@@ -145,8 +184,6 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
       difficulty: nextDifficulty,
     });
   };
-
-  const userQuest = questsData?.activeQuests.find((q) => q.id === currentUserQuestId);
 
   const getCategoryColor = (category: string) => {
     const colors: Record<string, string> = {
@@ -843,6 +880,83 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                 </Text>
               </Pressable>
             </View>
+          </Animated.View>
+        </View>
+      </Modal>
+
+      {/* Loading Screen Modal */}
+      <Modal
+        visible={showLoading}
+        transparent
+        animationType="fade"
+        onRequestClose={() => {}}
+      >
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: "rgba(0, 0, 0, 0.8)",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Animated.View
+            style={{
+              alignItems: "center",
+              opacity: loadingAnim.interpolate({
+                inputRange: [0, 1],
+                outputRange: [0.5, 1],
+              }),
+            }}
+          >
+            {/* Animated Trophy */}
+            <Animated.View
+              style={{
+                marginBottom: 32,
+                transform: [
+                  {
+                    scale: loadingAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [1, 1.2],
+                    }),
+                  },
+                ],
+              }}
+            >
+              <LinearGradient
+                colors={["#FFD700", "#FFA500", "#FF8C00"]}
+                style={{
+                  width: 120,
+                  height: 120,
+                  borderRadius: 60,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Trophy size={60} color="white" />
+              </LinearGradient>
+            </Animated.View>
+
+            {/* Loading Text */}
+            <Text
+              style={{
+                fontSize: 28,
+                fontWeight: "bold",
+                color: "white",
+                marginBottom: 16,
+              }}
+            >
+              Quest Complete!
+            </Text>
+
+            <Text
+              style={{
+                fontSize: 16,
+                color: "#D1D5DB",
+                textAlign: "center",
+              }}
+            >
+              Calculating rewards...
+            </Text>
           </Animated.View>
         </View>
       </Modal>
