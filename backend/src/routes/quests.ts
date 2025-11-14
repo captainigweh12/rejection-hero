@@ -275,6 +275,8 @@ async function generateQuestWithAI(
 REQUIREMENTS:
 - Title MUST be exactly 3 words (action statement, e.g., "Ask Coffee Shops", "Request Business Cards", "Pitch Startup Idea")
 - Description should be 2-3 sentences explaining the specific challenge
+- BE EXTREMELY SPECIFIC - avoid generic phrases like "pitch your product", "ask strangers", "reach out to people"
+- Include concrete details: specific locations, specific types of people, specific items/services, specific situations
 - Make it actionable and specific
 - Category: SALES/SOCIAL/ENTREPRENEURSHIP/DATING/CONFIDENCE/CAREER
 - Difficulty: EASY/MEDIUM/HARD/EXPERT
@@ -282,14 +284,30 @@ REQUIREMENTS:
 - goalCount: number of NOs or YESes to collect (3-15 based on difficulty)
 ${previousQuestsContext}
 
+GOOD EXAMPLES:
+- "Ask baristas at 5 different coffee shops if they can make a 'unicorn rainbow latte' (not on menu)"
+- "Request 8 business owners for a 90% discount on their most expensive item"
+- "Ask 5 gym trainers if you can teach their next class for free"
+
+BAD EXAMPLES (too generic):
+- "Pitch your product to 10 people"
+- "Ask strangers for help"
+- "Reach out to potential clients"
+
 Return a JSON object with: title (exactly 3 words), description, category, difficulty, goalType, goalCount.`
       : `Create a unique "Go for No" rejection challenge for ${category || "general"} category at ${difficulty || "medium"} difficulty level.
 
 REQUIREMENTS:
 - Title MUST be exactly 3 words (action statement, e.g., "Ask Coffee Shops", "Request Business Cards", "Pitch Startup Idea")
 - Description should be 2-3 sentences with specific, actionable instructions
+- BE EXTREMELY SPECIFIC - avoid generic phrases like "pitch your product", "ask strangers", "reach out to people"
+- Include concrete details:
+  * Specific locations (coffee shops, gyms, malls, restaurants, libraries, etc.)
+  * Specific types of people (baristas, managers, gym trainers, store owners, etc.)
+  * Specific items or services (menu items, products, classes, discounts, etc.)
+  * Specific situations or contexts (during lunch rush, at closing time, etc.)
 - The goal is to help users overcome fear of rejection by collecting "NO" responses
-- Make each challenge unique and creative
+- Make each challenge unique, creative, and VERY specific
 - Category: ${category || "SALES/SOCIAL/ENTREPRENEURSHIP/DATING/CONFIDENCE/CAREER"}
 - Difficulty: ${difficulty || "EASY/MEDIUM/HARD/EXPERT"}
 - goalType: COLLECT_NOS (primary) or COLLECT_YES (rare)
@@ -299,6 +317,20 @@ REQUIREMENTS:
   * HARD: 8-12 NOs
   * EXPERT: 12-15 NOs
 ${previousQuestsContext}
+
+GOOD EXAMPLES:
+- SALES: "Request grocery stores for expired produce samples to take home"
+- SOCIAL: "Ask 5 dog owners at the park if you can walk their dog for 5 minutes"
+- ENTREPRENEURSHIP: "Pitch restaurant managers to let you place your flyers on their tables"
+- DATING: "Ask 5 people at the bookstore for their book recommendation and phone number"
+- CONFIDENCE: "Request clothing stores for a private fashion show of their most expensive items"
+- CAREER: "Ask 6 professionals on LinkedIn to mentor you for free for 3 months"
+
+BAD EXAMPLES (too generic):
+- "Pitch your product to 10 people"
+- "Ask strangers for their contact info"
+- "Request help from business owners"
+- "Reach out to potential clients"
 
 Return a JSON object with: title (exactly 3 words), description, category, difficulty, goalType, goalCount.`;
 
@@ -314,7 +346,7 @@ Return a JSON object with: title (exactly 3 words), description, category, diffi
           {
             role: "system",
             content:
-              "You are a creative motivational coach creating unique rejection challenges. Each title MUST be exactly 3 words. Each challenge must be completely unique and different from previous challenges. Be specific and actionable.",
+              "You are a creative motivational coach creating unique rejection challenges. Each title MUST be exactly 3 words. Each challenge must be completely unique and different from previous challenges. BE EXTREMELY SPECIFIC - include concrete locations, specific types of people, specific items/services. Avoid generic phrases like 'pitch your product' or 'ask strangers'. Instead say things like 'ask baristas for a custom drink not on the menu' or 'request bookstore managers to display your handmade bookmark'. Be actionable and specific.",
           },
           { role: "user", content: prompt },
         ],

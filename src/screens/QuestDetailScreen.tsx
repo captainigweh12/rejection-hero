@@ -26,6 +26,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
   const [showCompletion, setShowCompletion] = useState(false);
   const [showLoading, setShowLoading] = useState(false);
   const [completionData, setCompletionData] = useState<any>(null);
+  const [savedQuestData, setSavedQuestData] = useState<any>(null); // Save quest before it's removed
   const [celebrationAnim] = useState(new Animated.Value(0));
   const [loadingAnim] = useState(new Animated.Value(0));
   const [timeRemaining, setTimeRemaining] = useState(300); // Will be set based on difficulty
@@ -53,6 +54,13 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
   });
 
   const userQuest = questsData?.activeQuests.find((q) => q.id === currentUserQuestId);
+
+  // Save quest data before it gets removed from active quests
+  useEffect(() => {
+    if (userQuest && !showLoading && !showCompletion) {
+      setSavedQuestData(userQuest);
+    }
+  }, [userQuest, showLoading, showCompletion]);
 
   // Set timer based on difficulty when quest loads
   useEffect(() => {
@@ -217,7 +225,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
     );
   }
 
-  if (!userQuest) {
+  if (!userQuest && !showLoading && !showCompletion) {
     return (
       <View style={{ flex: 1, backgroundColor: "#F5F5F7" }}>
         <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
@@ -237,11 +245,34 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
     );
   }
 
-  const quest = userQuest.quest;
+  // Use saved quest data if quest was completed and removed from active quests
+  const displayQuest = userQuest || savedQuestData;
+
+  if (!displayQuest && !isLoading) {
+    return (
+      <View style={{ flex: 1, backgroundColor: "#F5F5F7" }}>
+        <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
+          <View style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 32 }}>
+            <Text style={{ color: "#1C1C1E", fontSize: 20, fontWeight: "bold", marginBottom: 16 }}>
+              Quest not found
+            </Text>
+            <Pressable
+              onPress={() => navigation.goBack()}
+              style={{ backgroundColor: "#FF6B35", paddingHorizontal: 32, paddingVertical: 16, borderRadius: 999 }}
+            >
+              <Text style={{ color: "white", fontWeight: "bold", fontSize: 18 }}>Go Back</Text>
+            </Pressable>
+          </View>
+        </SafeAreaView>
+      </View>
+    );
+  }
+
+  const quest = displayQuest.quest;
   const progress =
     quest.goalType === "COLLECT_NOS"
-      ? (userQuest.noCount / quest.goalCount) * 100
-      : (userQuest.yesCount / quest.goalCount) * 100;
+      ? (displayQuest.noCount / quest.goalCount) * 100
+      : (displayQuest.yesCount / quest.goalCount) * 100;
 
   return (
     <View style={{ flex: 1, backgroundColor: "#F5F5F7" }}>
@@ -482,7 +513,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                   }}
                 >
                   <Text style={{ color: "#065F46", fontSize: 15, fontWeight: "700", textAlign: "center" }}>
-                    NOs: {userQuest.noCount}/{quest.goalCount}
+                    NOs: {displayQuest.noCount}/{quest.goalCount}
                   </Text>
                 </View>
                 <View
@@ -494,7 +525,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                   }}
                 >
                   <Text style={{ color: "#991B1B", fontSize: 15, fontWeight: "700", textAlign: "center" }}>
-                    YES: {userQuest.yesCount}
+                    YES: {displayQuest.yesCount}
                   </Text>
                 </View>
               </View>
@@ -713,7 +744,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                   }}
                 >
                   <Text style={{ color: "#92400E", fontSize: 20, fontWeight: "bold" }}>
-                    +{userQuest?.quest.xpReward || 0}
+                    +{savedQuestData?.quest.xpReward || 0}
                   </Text>
                   <Text style={{ color: "#92400E", fontSize: 12 }}>XP</Text>
                 </View>
@@ -727,7 +758,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                   }}
                 >
                   <Text style={{ color: "#9A3412", fontSize: 20, fontWeight: "bold" }}>
-                    +{userQuest?.quest.pointReward || 0}
+                    +{savedQuestData?.quest.pointReward || 0}
                   </Text>
                   <Text style={{ color: "#9A3412", fontSize: 12 }}>Points</Text>
                 </View>
