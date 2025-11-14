@@ -156,26 +156,39 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 - **COMMUNITY**: Groups, Manage Categories, Explore World
 - Log out and version display
 
-**Profile & Settings**
-- Dedicated Settings screen accessible from Profile page
-- Tap the cog wheel icon in Profile to navigate to Settings
-- **Account**: Main account header
-- **Appearance**: Theme toggle (Light/Dark mode)
-- **Preferences**: Language selection with 10 languages supported
-  - 🇺🇸 English
-  - 🇪🇸 Spanish (Español)
-  - 🇫🇷 French (Français)
-  - 🇩🇪 German (Deutsch)
-  - 🇧🇷 Portuguese (Português)
-  - 🇮🇹 Italian (Italiano)
-  - 🇯🇵 Japanese (日本語)
-  - 🇨🇳 Chinese (中文)
-  - 🇰🇷 Korean (한국어)
-  - 🇸🇦 Arabic (العربية)
-- **Live Features**: Enable livestreaming configuration
-- **Notifications**: Quest reminders toggle
-- **Legal**: Safety Guidelines access
-- **Account Actions**: Sign out option
+**Profile & Settings** ✨ ENHANCED!
+- **Modern UI Design**: Clean, card-based layout with consistent spacing and shadows
+- **Theme System** 🎨 NEW!:
+  - Full dark/light mode support throughout the app
+  - System theme option (follows device settings)
+  - Tap theme card to cycle: System → Light → Dark
+  - Dynamic color system that adapts all screens
+  - Smooth transitions between themes
+  - Icon indicators: Sun (Light), Moon (Dark), Smartphone (System)
+- **Language Selection** 🌍 ENHANCED!:
+  - Dedicated full-screen Language Selection page
+  - Modern card-based language picker with flags
+  - 10 languages fully supported with native translations
+  - Real-time app-wide language switching
+  - Selected language highlighted with checkmark
+  - Languages supported:
+    - 🇺🇸 English
+    - 🇪🇸 Spanish (Español)
+    - 🇫🇷 French (Français)
+    - 🇩🇪 German (Deutsch)
+    - 🇧🇷 Portuguese (Português)
+    - 🇮🇹 Italian (Italiano)
+    - 🇯🇵 Japanese (日本語)
+    - 🇨🇳 Chinese (中文)
+    - 🇰🇷 Korean (한국어)
+    - 🇸🇦 Arabic (العربية)
+- **Settings Categories**:
+  - Appearance: Theme switcher with visual icons
+  - Preferences: Language selection (navigates to dedicated page)
+  - Live Features: Enable livestreaming with description
+  - Notifications: Quest reminders toggle
+  - Legal: Safety Guidelines access
+  - Account Actions: Sign out with confirmation
 
 **Live Streaming** ✨ NEW!
 - Real-time live streaming powered by Daily.co

@@ -20,6 +20,7 @@ import EditProfileScreen from "@/screens/EditProfileScreen";
 import QuestDetailScreen from "@/screens/QuestDetailScreen";
 import CreateQuestScreen from "@/screens/CreateQuestScreen";
 import SettingsScreen from "@/screens/SettingsScreen";
+import LanguageSelectionScreen from "@/screens/LanguageSelectionScreen";
 import { useSession } from "@/lib/useSession";
 
 /**
@@ -61,6 +62,11 @@ const RootNavigator = () => {
           name="Settings"
           component={SettingsScreen}
           options={{ title: "Settings", headerShown: true }}
+        />
+        <RootStack.Screen
+          name="LanguageSelection"
+          component={LanguageSelectionScreen}
+          options={{ headerShown: false }}
         />
       </RootStack.Navigator>
     </>

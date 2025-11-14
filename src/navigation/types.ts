@@ -17,6 +17,7 @@ export type RootStackParamList = {
   QuestDetail: { userQuestId: string };
   CreateQuest: undefined;
   Settings: undefined;
+  LanguageSelection: undefined;
 };
 
 export type BottomTabParamList = {

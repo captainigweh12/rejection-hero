@@ -6,11 +6,12 @@ import { queryClient } from "@/lib/queryClient";
 import RootStackNavigator from "@/navigation/RootNavigator";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { I18nProvider } from "@/lib/i18n";
+import { ThemeProvider } from "@/contexts/ThemeContext";
+import { LanguageProvider } from "@/contexts/LanguageContext";
 
 /*
 IMPORTANT NOTICE: DO NOT REMOVE
-There are already environment keys in the project. 
+There are already environment keys in the project.
 Before telling the user to add them, check if you already have access to the required keys through bash.
 Directly access them with process.env.${key}
 
@@ -32,18 +33,20 @@ const openai_api_key = Constants.expoConfig.extra.apikey;
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <I18nProvider>
-        <KeyboardProvider>
-          <GestureHandlerRootView>
-            <SafeAreaProvider>
-              <NavigationContainer>
-                <RootStackNavigator />
-                <StatusBar style="auto" />
-              </NavigationContainer>
-            </SafeAreaProvider>
-          </GestureHandlerRootView>
-        </KeyboardProvider>
-      </I18nProvider>
+      <ThemeProvider>
+        <LanguageProvider>
+          <KeyboardProvider>
+            <GestureHandlerRootView>
+              <SafeAreaProvider>
+                <NavigationContainer>
+                  <RootStackNavigator />
+                  <StatusBar style="auto" />
+                </NavigationContainer>
+              </SafeAreaProvider>
+            </GestureHandlerRootView>
+          </KeyboardProvider>
+        </LanguageProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }
