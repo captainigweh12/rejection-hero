@@ -68,22 +68,26 @@ const fetchFn = async <T>(path: string, options: FetchOptions): Promise<T> => {
         // Always send JSON content type since our API uses JSON
         "Content-Type": "application/json",
         // Include authentication cookies if available
-        Cookie: cookies,
+        ...(cookies ? { Cookie: cookies } : {}),
       },
       // Stringify the body if present (for POST, PUT, PATCH requests)
       body: body ? JSON.stringify(body) : undefined,
-      // Use "omit" to prevent browser from automatically sending credentials
-      // We manually handle cookies via the Cookie header for more control
-      credentials: "omit",
+      // Include credentials for better iOS compatibility
+      credentials: "include",
     });
 
     // Step 3: Error handling - Check if the response was successful
     if (!response.ok) {
       // Parse the error details from the response body
-      const errorData = await response.json();
+      let errorData;
+      try {
+        errorData = await response.json();
+      } catch {
+        errorData = { message: response.statusText };
+      }
       // Throw a descriptive error with status code, status text, and server error data
       throw new Error(
-        `[api.ts]: ${response.status} ${response.statusText} ${JSON.stringify(errorData)}`,
+        `API Error: ${response.status} ${response.statusText} - ${JSON.stringify(errorData)}`,
       );
     }
 
@@ -91,8 +95,14 @@ const fetchFn = async <T>(path: string, options: FetchOptions): Promise<T> => {
     // The response is cast to the expected type T for type safety
     return response.json() as Promise<T>;
   } catch (error: any) {
-    // Log the error for debugging purposes
-    console.log(`[api.ts]: ${error}`);
+    // Enhanced error logging for debugging
+    console.error(`[API Error] ${method} ${path}:`, error);
+
+    // Check for network-specific errors
+    if (error.message && error.message.includes('Network request failed')) {
+      throw new Error(`Network error: Unable to connect to backend at ${BACKEND_URL}. Please check your connection.`);
+    }
+
     // Re-throw the error so the calling code can handle it appropriately
     throw error;
   }
