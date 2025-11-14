@@ -7,6 +7,8 @@ import {
   ActivityIndicator,
   Modal,
   Animated,
+  Switch,
+  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
@@ -30,11 +32,16 @@ import {
   Users,
   FolderOpen,
   Globe,
-  LogOut
+  LogOut,
+  Sun,
+  Video,
+  ChevronRight,
+  Shield,
 } from "lucide-react-native";
 import type { BottomTabScreenProps } from "@/navigation/types";
 import { api } from "@/lib/api";
 import { useSession } from "@/lib/useSession";
+import { authClient } from "@/lib/authClient";
 import type { GetUserQuestsResponse, GetUserStatsResponse } from "@/shared/contracts";
 
 type Props = BottomTabScreenProps<"HomeTab">;
@@ -42,6 +49,9 @@ type Props = BottomTabScreenProps<"HomeTab">;
 export default function HomeScreen({ navigation }: Props) {
   const { data: sessionData } = useSession();
   const [showMenu, setShowMenu] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [darkMode, setDarkMode] = useState(true);
+  const [questReminders, setQuestReminders] = useState(false);
 
   console.log("[HomeScreen] Rendering - User logged in:", !!sessionData?.user);
 
@@ -62,6 +72,23 @@ export default function HomeScreen({ navigation }: Props) {
   });
 
   const activeQuests = questsData?.activeQuests || [];
+
+  const handleLogout = async () => {
+    Alert.alert(
+      "Sign Out",
+      "Are you sure you want to sign out?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Sign Out",
+          style: "destructive",
+          onPress: async () => {
+            await authClient.signOut();
+          },
+        },
+      ]
+    );
+  };
 
   const getCategoryColor = (category: string) => {
     const colors: Record<string, string> = {
@@ -424,7 +451,7 @@ export default function HomeScreen({ navigation }: Props) {
                   <Pressable
                     onPress={() => {
                       setShowMenu(false);
-                      navigation.navigate("ProfileTab");
+                      setShowSettings(true);
                     }}
                     style={{
                       paddingHorizontal: 24,
@@ -434,7 +461,7 @@ export default function HomeScreen({ navigation }: Props) {
                       gap: 16,
                     }}
                   >
-                    <User size={24} color="#0A0A0F" />
+                    <Settings size={24} color="#0A0A0F" />
                     <Text style={{ fontSize: 16, color: "#0A0A0F", fontWeight: "500" }}>
                       Profile & Settings
                     </Text>
@@ -643,6 +670,147 @@ export default function HomeScreen({ navigation }: Props) {
           </Pressable>
         </Pressable>
       </Modal>
+
+      {/* Settings Modal */}
+      {showSettings && (
+        <Modal
+          visible={showSettings}
+          transparent
+          animationType="slide"
+          onRequestClose={() => setShowSettings(false)}
+        >
+          <Pressable
+            style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.5)" }}
+            onPress={() => setShowSettings(false)}
+          >
+            <Pressable
+              style={{ flex: 1, justifyContent: "flex-end" }}
+              onPress={(e) => e.stopPropagation()}
+            >
+              <View style={{ backgroundColor: "#E8E9ED", borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: "90%" }}>
+                <View style={{ backgroundColor: "white", paddingVertical: 16, paddingHorizontal: 20, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+                  <Text style={{ fontSize: 20, fontWeight: "bold" }}>Settings</Text>
+                  <Pressable onPress={() => setShowSettings(false)}>
+                    <X size={24} color="#333" />
+                  </Pressable>
+                </View>
+
+                <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 32 }}>
+                  {/* Account Section */}
+                  <View style={{ paddingHorizontal: 20, paddingTop: 24 }}>
+                    <Text style={{ fontSize: 28, fontWeight: "bold", color: "#000", marginBottom: 16 }}>Account</Text>
+                  </View>
+
+                  {/* Appearance */}
+                  <View style={{ paddingHorizontal: 20, paddingTop: 8 }}>
+                    <Text style={{ fontSize: 20, fontWeight: "bold", marginBottom: 12, color: "#000" }}>Appearance</Text>
+                    <View style={{ backgroundColor: "white", borderRadius: 12, padding: 16 }}>
+                      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+                        <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+                          <Sun size={24} color="#333" />
+                          <View>
+                            <Text style={{ fontWeight: "600", fontSize: 16 }}>Theme</Text>
+                            <Text style={{ color: "#999", fontSize: 14 }}>Light Mode</Text>
+                          </View>
+                        </View>
+                        <Switch value={darkMode} onValueChange={setDarkMode} />
+                      </View>
+                    </View>
+                  </View>
+
+                  {/* Preferences */}
+                  <View style={{ paddingHorizontal: 20, paddingTop: 24 }}>
+                    <Text style={{ fontSize: 20, fontWeight: "bold", marginBottom: 12, color: "#000" }}>Preferences</Text>
+                    <Pressable style={{ backgroundColor: "white", borderRadius: 12, padding: 16, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+                      <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+                        <Globe size={24} color="#333" />
+                        <View>
+                          <Text style={{ fontWeight: "600", fontSize: 16 }}>Language</Text>
+                          <Text style={{ color: "#999", fontSize: 14 }}>English</Text>
+                        </View>
+                      </View>
+                      <ChevronRight size={20} color="#999" />
+                    </Pressable>
+                  </View>
+
+                  {/* Live Features */}
+                  <View style={{ paddingHorizontal: 20, paddingTop: 24 }}>
+                    <Text style={{ fontSize: 20, fontWeight: "bold", marginBottom: 12, color: "#000" }}>Live Features</Text>
+                    <View style={{ backgroundColor: "white", borderRadius: 12, padding: 16 }}>
+                      <View style={{ flexDirection: "row", alignItems: "flex-start", gap: 12, marginBottom: 16 }}>
+                        <Video size={24} color="#333" style={{ marginTop: 2 }} />
+                        <View style={{ flex: 1 }}>
+                          <Text style={{ fontWeight: "600", fontSize: 16, marginBottom: 4 }}>Enable Live</Text>
+                          <Text style={{ color: "#999", fontSize: 14 }}>
+                            Configure backend and unlock livestreaming features
+                          </Text>
+                        </View>
+                      </View>
+                      <Pressable
+                        onPress={() => {
+                          setShowSettings(false);
+                          navigation.navigate("LiveTab");
+                        }}
+                        style={{
+                          backgroundColor: "#FF6B35",
+                          paddingVertical: 14,
+                          borderRadius: 8,
+                          alignItems: "center",
+                        }}
+                      >
+                        <Text style={{ color: "white", fontWeight: "bold", fontSize: 16 }}>Enable</Text>
+                      </Pressable>
+                    </View>
+                  </View>
+
+                  {/* Notifications */}
+                  <View style={{ paddingHorizontal: 20, paddingTop: 24 }}>
+                    <Text style={{ fontSize: 20, fontWeight: "bold", marginBottom: 12, color: "#000" }}>Notifications</Text>
+                    <View style={{ backgroundColor: "white", borderRadius: 12, padding: 16, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+                      <View style={{ flexDirection: "row", alignItems: "center", gap: 12, flex: 1 }}>
+                        <Bell size={24} color="#333" />
+                        <View style={{ flex: 1 }}>
+                          <Text style={{ fontWeight: "600", fontSize: 16 }}>Quest Reminders</Text>
+                          <Text style={{ color: "#999", fontSize: 14 }}>Get notified to complete daily quests</Text>
+                        </View>
+                      </View>
+                      <Switch value={questReminders} onValueChange={setQuestReminders} />
+                    </View>
+                  </View>
+
+                  {/* Legal */}
+                  <View style={{ paddingHorizontal: 20, paddingTop: 24 }}>
+                    <Text style={{ fontSize: 20, fontWeight: "bold", marginBottom: 12, color: "#000" }}>Legal</Text>
+                    <Pressable style={{ backgroundColor: "white", borderRadius: 12, padding: 16, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+                      <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+                        <Shield size={24} color="#333" />
+                        <View>
+                          <Text style={{ fontWeight: "600", fontSize: 16 }}>Safety Guidelines</Text>
+                          <Text style={{ color: "#999", fontSize: 14 }}>Read important safety information</Text>
+                        </View>
+                      </View>
+                      <ChevronRight size={20} color="#999" />
+                    </Pressable>
+                  </View>
+
+                  {/* Account Actions */}
+                  <View style={{ paddingHorizontal: 20, paddingTop: 24 }}>
+                    <Text style={{ fontSize: 20, fontWeight: "bold", marginBottom: 12, color: "#000" }}>Account</Text>
+                    <Pressable
+                      onPress={handleLogout}
+                      style={{ backgroundColor: "white", borderRadius: 12, padding: 16 }}
+                    >
+                      <Text style={{ color: "#FF3B30", fontWeight: "600", fontSize: 16, textAlign: "center" }}>
+                        Sign Out
+                      </Text>
+                    </Pressable>
+                  </View>
+                </ScrollView>
+              </View>
+            </Pressable>
+          </Pressable>
+        </Modal>
+      )}
     </View>
   );
 }
