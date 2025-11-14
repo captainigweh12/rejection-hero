@@ -244,12 +244,15 @@ async function generateQuestWithAI(
   xpReward: number;
   pointReward: number;
 }> {
-  const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+  const OPENAI_API_KEY = process.env.OPENAI_API_KEY || process.env.EXPO_PUBLIC_VIBECODE_OPENAI_API_KEY;
 
   if (!OPENAI_API_KEY) {
+    console.log("No OpenAI API key found, using predefined quest");
     // Fallback to predefined quests if no API key
     return getPredefinedQuest(category, difficulty);
   }
+
+  console.log("Using OpenAI API to generate quest");
 
   try {
     // Get user's previous quests to avoid duplicates
