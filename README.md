@@ -22,6 +22,22 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 - Rewards: Earn XP and points based on difficulty
 - Max 2 active quests (extras go to queue)
 
+**Quest Detail Experience** ✨ NEW!
+- Clean, modern UI with reduced clutter (Duolingo-inspired design)
+- Countdown timer (5 minutes) with visual indicator
+- Progress bar showing completion percentage
+- Single focused quest card with category badge
+- Large, easy-to-tap NO (green) and YES (red) buttons
+
+**Quest Completion Flow** ✨ NEW!
+- Beautiful achievement modal with animated trophy
+- Shows current daily streak with fire icon
+- Displays number of NOs collected
+- "Next Quest" button auto-generates harder quest in same category
+- Progressive difficulty: EASY → MEDIUM → HARD → EXPERT
+- Stay in quest flow or return to home
+- Smooth animations and spring physics
+
 **Quest Examples:**
 - Ask 5 coffee shops for an item that's not on their menu
 - Ask 5 strangers for their phone numbers
