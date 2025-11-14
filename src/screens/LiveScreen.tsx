@@ -670,140 +670,335 @@ export default function LiveScreen({ navigation }: Props) {
     <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
       <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
         {/* Header */}
-        <View style={{ paddingTop: 16, paddingBottom: 12, paddingHorizontal: 24 }}>
-          <Text style={{ color: "white", fontSize: 28, fontWeight: "bold" }}>Live</Text>
-          <Text style={{ color: "rgba(255, 255, 255, 0.5)", fontSize: 14, marginTop: 4 }}>
-            Watch live streams or go live yourself
+        <View style={{ paddingTop: 16, paddingBottom: 20, paddingHorizontal: 24 }}>
+          <Text style={{ color: "white", fontSize: 32, fontWeight: "bold", letterSpacing: -1 }}>
+            Live Now
+          </Text>
+          <Text style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: 15, marginTop: 6 }}>
+            Join warriors streaming their quest challenges
           </Text>
         </View>
 
-        <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 96 }}>
-          {/* Go Live Button */}
-          <Pressable
-            onPress={handleStartStream}
-            style={{
-              backgroundColor: "#FF0000",
-              borderRadius: 16,
-              padding: 20,
-              marginBottom: 24,
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 12,
-              shadowColor: "#FF0000",
-              shadowOffset: { width: 0, height: 4 },
-              shadowOpacity: 0.4,
-              shadowRadius: 8,
-              elevation: 8,
-            }}
-          >
-            <Radio size={24} color="white" />
-            <Text style={{ color: "white", fontSize: 18, fontWeight: "bold" }}>Go Live</Text>
-          </Pressable>
+        <ScrollView
+          style={{ flex: 1 }}
+          contentContainerStyle={{ paddingBottom: 120 }}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Go Live Hero Card */}
+          <View style={{ paddingHorizontal: 24, marginBottom: 32 }}>
+            <Pressable
+              onPress={handleStartStream}
+              style={{
+                backgroundColor: "#FF0000",
+                borderRadius: 20,
+                padding: 24,
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 16,
+                shadowColor: "#FF0000",
+                shadowOffset: { width: 0, height: 8 },
+                shadowOpacity: 0.5,
+                shadowRadius: 16,
+                elevation: 12,
+              }}
+            >
+              <View
+                style={{
+                  width: 56,
+                  height: 56,
+                  borderRadius: 28,
+                  backgroundColor: "rgba(255, 255, 255, 0.2)",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Radio size={28} color="white" />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={{ color: "white", fontSize: 20, fontWeight: "bold", marginBottom: 4 }}>
+                  Start Streaming
+                </Text>
+                <Text style={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
+                  Share your quest journey live
+                </Text>
+              </View>
+            </Pressable>
+          </View>
 
-          {/* Active Streams */}
-          <Text style={{ color: "white", fontSize: 20, fontWeight: "bold", marginBottom: 16 }}>
-            Active Streams
-          </Text>
+          {/* Featured Live Streams (Horizontal Scroll) */}
+          {streamsData?.streams && streamsData.streams.length > 0 && (
+            <View style={{ marginBottom: 32 }}>
+              <View style={{ paddingHorizontal: 24, marginBottom: 16, flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+                <Text style={{ color: "white", fontSize: 22, fontWeight: "bold" }}>
+                  Featured Streams
+                </Text>
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+                  <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: "#FF0000" }} />
+                  <Text style={{ color: "#FF0000", fontSize: 14, fontWeight: "600" }}>
+                    {streamsData.streams.length} LIVE
+                  </Text>
+                </View>
+              </View>
 
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{ paddingHorizontal: 24, gap: 16 }}
+              >
+                {streamsData.streams.slice(0, 3).map((stream) => (
+                  <Pressable
+                    key={stream.id}
+                    onPress={() => setViewingStreamId(stream.id)}
+                    style={{
+                      width: 280,
+                      backgroundColor: "rgba(255, 255, 255, 0.08)",
+                      borderRadius: 16,
+                      overflow: "hidden",
+                      borderWidth: 1.5,
+                      borderColor: "rgba(255, 0, 0, 0.3)",
+                    }}
+                  >
+                    {/* Thumbnail Area */}
+                    <View
+                      style={{
+                        height: 160,
+                        backgroundColor: "#2A2A2A",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        position: "relative",
+                      }}
+                    >
+                      <Video size={48} color="#555" />
+
+                      {/* LIVE Badge */}
+                      <View
+                        style={{
+                          position: "absolute",
+                          top: 12,
+                          left: 12,
+                          flexDirection: "row",
+                          alignItems: "center",
+                          backgroundColor: "#FF0000",
+                          paddingHorizontal: 10,
+                          paddingVertical: 6,
+                          borderRadius: 6,
+                        }}
+                      >
+                        <Radio size={12} color="white" style={{ marginRight: 6 }} />
+                        <Text style={{ color: "white", fontWeight: "bold", fontSize: 11 }}>LIVE</Text>
+                      </View>
+
+                      {/* Viewer Count */}
+                      <View
+                        style={{
+                          position: "absolute",
+                          top: 12,
+                          right: 12,
+                          flexDirection: "row",
+                          alignItems: "center",
+                          backgroundColor: "rgba(0, 0, 0, 0.7)",
+                          paddingHorizontal: 10,
+                          paddingVertical: 6,
+                          borderRadius: 6,
+                          gap: 6,
+                        }}
+                      >
+                        <Users size={14} color="white" />
+                        <Text style={{ color: "white", fontWeight: "bold", fontSize: 12 }}>
+                          {stream.viewerCount}
+                        </Text>
+                      </View>
+                    </View>
+
+                    {/* Stream Info */}
+                    <View style={{ padding: 14 }}>
+                      <View style={{ flexDirection: "row", alignItems: "center", gap: 10, marginBottom: 10 }}>
+                        <View
+                          style={{
+                            width: 40,
+                            height: 40,
+                            borderRadius: 20,
+                            backgroundColor: "#FF6B35",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <Text style={{ color: "white", fontWeight: "bold", fontSize: 16 }}>
+                            {stream.user.name?.[0] || "U"}
+                          </Text>
+                        </View>
+                        <View style={{ flex: 1 }}>
+                          <Text style={{ color: "white", fontSize: 15, fontWeight: "700" }}>
+                            {stream.user.name || "Anonymous"}
+                          </Text>
+                          {stream.userQuest && (
+                            <Text style={{ color: "#FF6B35", fontSize: 11, fontWeight: "600", marginTop: 2 }}>
+                              {stream.userQuest.quest.category}
+                            </Text>
+                          )}
+                        </View>
+                      </View>
+
+                      {/* Quest Title */}
+                      {stream.userQuest && (
+                        <Text
+                          style={{ color: "rgba(255, 255, 255, 0.8)", fontSize: 13, lineHeight: 18 }}
+                          numberOfLines={2}
+                        >
+                          {stream.userQuest.quest.title}
+                        </Text>
+                      )}
+                    </View>
+                  </Pressable>
+                ))}
+              </ScrollView>
+            </View>
+          )}
+
+          {/* All Live Streams Grid */}
           {streamsData?.streams && streamsData.streams.length > 0 ? (
-            streamsData.streams.map((stream) => (
-              <Pressable
-                key={stream.id}
-                onPress={() => setViewingStreamId(stream.id)}
+            <View style={{ paddingHorizontal: 24 }}>
+              <Text style={{ color: "white", fontSize: 22, fontWeight: "bold", marginBottom: 16 }}>
+                All Streams
+              </Text>
+
+              <View style={{ gap: 16 }}>
+                {streamsData.streams.map((stream) => (
+                  <Pressable
+                    key={stream.id}
+                    onPress={() => setViewingStreamId(stream.id)}
+                    style={{
+                      backgroundColor: "rgba(255, 255, 255, 0.06)",
+                      borderRadius: 16,
+                      overflow: "hidden",
+                      borderWidth: 1,
+                      borderColor: "rgba(255, 255, 255, 0.1)",
+                    }}
+                  >
+                    <View style={{ flexDirection: "row", padding: 14, gap: 14 }}>
+                      {/* Thumbnail */}
+                      <View
+                        style={{
+                          width: 100,
+                          height: 100,
+                          borderRadius: 12,
+                          backgroundColor: "#2A2A2A",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          position: "relative",
+                        }}
+                      >
+                        <Video size={32} color="#555" />
+
+                        {/* Mini LIVE Badge */}
+                        <View
+                          style={{
+                            position: "absolute",
+                            top: 6,
+                            left: 6,
+                            flexDirection: "row",
+                            alignItems: "center",
+                            backgroundColor: "#FF0000",
+                            paddingHorizontal: 6,
+                            paddingVertical: 3,
+                            borderRadius: 4,
+                          }}
+                        >
+                          <Radio size={8} color="white" style={{ marginRight: 4 }} />
+                          <Text style={{ color: "white", fontWeight: "bold", fontSize: 9 }}>LIVE</Text>
+                        </View>
+                      </View>
+
+                      {/* Info */}
+                      <View style={{ flex: 1, justifyContent: "center" }}>
+                        <View style={{ flexDirection: "row", alignItems: "center", gap: 10, marginBottom: 8 }}>
+                          <View
+                            style={{
+                              width: 36,
+                              height: 36,
+                              borderRadius: 18,
+                              backgroundColor: "#FF6B35",
+                              alignItems: "center",
+                              justifyContent: "center",
+                            }}
+                          >
+                            <Text style={{ color: "white", fontWeight: "bold", fontSize: 14 }}>
+                              {stream.user.name?.[0] || "U"}
+                            </Text>
+                          </View>
+                          <View style={{ flex: 1 }}>
+                            <Text style={{ color: "white", fontSize: 16, fontWeight: "700" }}>
+                              {stream.user.name || "Anonymous"}
+                            </Text>
+                            <View style={{ flexDirection: "row", alignItems: "center", gap: 6, marginTop: 2 }}>
+                              <Users size={12} color="#999" />
+                              <Text style={{ color: "#999", fontSize: 12 }}>
+                                {stream.viewerCount} watching
+                              </Text>
+                            </View>
+                          </View>
+                        </View>
+
+                        {/* Quest Info */}
+                        {stream.userQuest && (
+                          <View
+                            style={{
+                              backgroundColor: "rgba(255, 107, 53, 0.15)",
+                              borderRadius: 8,
+                              padding: 8,
+                              borderLeftWidth: 2,
+                              borderLeftColor: "#FF6B35",
+                            }}
+                          >
+                            <Text style={{ color: "#FF6B35", fontSize: 10, fontWeight: "700", marginBottom: 3 }}>
+                              {stream.userQuest.quest.category}
+                            </Text>
+                            <Text
+                              style={{ color: "white", fontSize: 13, fontWeight: "600" }}
+                              numberOfLines={1}
+                            >
+                              {stream.userQuest.quest.title}
+                            </Text>
+                          </View>
+                        )}
+                      </View>
+                    </View>
+                  </Pressable>
+                ))}
+              </View>
+            </View>
+          ) : (
+            <View style={{ paddingHorizontal: 24 }}>
+              <View
                 style={{
                   backgroundColor: "rgba(255, 255, 255, 0.05)",
-                  borderRadius: 16,
-                  padding: 16,
-                  marginBottom: 16,
+                  borderRadius: 20,
+                  padding: 40,
+                  alignItems: "center",
                   borderWidth: 1,
                   borderColor: "rgba(255, 255, 255, 0.1)",
                 }}
               >
-                {/* Live Badge */}
                 <View
                   style={{
-                    position: "absolute",
-                    top: 16,
-                    right: 16,
-                    flexDirection: "row",
+                    width: 80,
+                    height: 80,
+                    borderRadius: 40,
+                    backgroundColor: "rgba(255, 0, 0, 0.1)",
                     alignItems: "center",
-                    backgroundColor: "#FF0000",
-                    paddingHorizontal: 8,
-                    paddingVertical: 4,
-                    borderRadius: 4,
+                    justifyContent: "center",
+                    marginBottom: 20,
                   }}
                 >
-                  <Radio size={10} color="white" style={{ marginRight: 4 }} />
-                  <Text style={{ color: "white", fontWeight: "bold", fontSize: 10 }}>LIVE</Text>
+                  <Video size={40} color="#FF0000" />
                 </View>
-
-                {/* Stream Info */}
-                <View style={{ flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 12 }}>
-                  <View
-                    style={{
-                      width: 48,
-                      height: 48,
-                      borderRadius: 24,
-                      backgroundColor: "#FF6B35",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <Text style={{ color: "white", fontWeight: "bold", fontSize: 18 }}>
-                      {stream.user.name?.[0] || "U"}
-                    </Text>
-                  </View>
-                  <View style={{ flex: 1 }}>
-                    <Text style={{ color: "white", fontSize: 16, fontWeight: "bold" }}>
-                      {stream.user.name || "Anonymous"}
-                    </Text>
-                    <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginTop: 4 }}>
-                      <Users size={14} color="#999" />
-                      <Text style={{ color: "#999", fontSize: 12 }}>{stream.viewerCount} watching</Text>
-                    </View>
-                  </View>
-                </View>
-
-                {/* Quest Info */}
-                {stream.userQuest && (
-                  <View
-                    style={{
-                      backgroundColor: "rgba(255, 107, 53, 0.1)",
-                      borderRadius: 8,
-                      padding: 12,
-                      borderLeftWidth: 3,
-                      borderLeftColor: "#FF6B35",
-                    }}
-                  >
-                    <Text style={{ color: "#FF6B35", fontSize: 10, fontWeight: "bold", marginBottom: 4 }}>
-                      {stream.userQuest.quest.category}
-                    </Text>
-                    <Text style={{ color: "white", fontSize: 14, fontWeight: "600" }}>
-                      {stream.userQuest.quest.title}
-                    </Text>
-                  </View>
-                )}
-              </Pressable>
-            ))
-          ) : (
-            <View
-              style={{
-                backgroundColor: "rgba(255, 255, 255, 0.05)",
-                borderRadius: 16,
-                padding: 32,
-                alignItems: "center",
-                borderWidth: 1,
-                borderColor: "rgba(255, 255, 255, 0.1)",
-              }}
-            >
-              <Video size={48} color="#666" />
-              <Text style={{ color: "white", fontSize: 16, fontWeight: "600", marginTop: 16, marginBottom: 8 }}>
-                No Live Streams
-              </Text>
-              <Text style={{ color: "#999", fontSize: 14, textAlign: "center" }}>
-                Be the first to go live and share your quest journey!
-              </Text>
+                <Text style={{ color: "white", fontSize: 20, fontWeight: "700", marginBottom: 8 }}>
+                  No Live Streams
+                </Text>
+                <Text style={{ color: "#999", fontSize: 15, textAlign: "center", lineHeight: 22 }}>
+                  Be the first warrior to go live and{"\n"}share your quest journey!
+                </Text>
+              </View>
             </View>
           )}
         </ScrollView>
