@@ -16,6 +16,7 @@ export type RootStackParamList = {
   EditProfile: undefined;
   QuestDetail: { userQuestId: string };
   CreateQuest: undefined;
+  Settings: undefined;
 };
 
 export type BottomTabParamList = {

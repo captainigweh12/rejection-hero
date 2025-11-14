@@ -62,7 +62,8 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 - Log out and version display
 
 **Profile & Settings**
-- Comprehensive settings modal accessible from hamburger menu
+- Dedicated Settings screen accessible from Profile page
+- Tap the cog wheel icon in Profile to navigate to Settings
 - **Account**: Main account header
 - **Appearance**: Theme toggle (Light/Dark mode)
 - **Preferences**: Language selection (English)
@@ -70,7 +71,6 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 - **Notifications**: Quest reminders toggle
 - **Legal**: Safety Guidelines access
 - **Account Actions**: Sign out option
-- Settings accessible via dedicated "Settings" menu item in the three-line menu
 
 **Live Streaming** ✨ NEW!
 - Real-time live streaming powered by Daily.co
