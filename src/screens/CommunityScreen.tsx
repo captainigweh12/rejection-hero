@@ -176,20 +176,20 @@ export default function CommunityScreen({ navigation }: Props) {
 
   if (!sessionData?.user) {
     return (
-      <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
         <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
           <View style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 32 }}>
-            <Users size={64} color={colors.primary} />
-            <Text style={{ fontSize: 28, fontWeight: "bold", marginTop: 24, marginBottom: 16, textAlign: "center", color: colors.text }}>
+            <Users size={64} color="#7E3FE4" />
+            <Text style={{ fontSize: 28, fontWeight: "bold", marginTop: 24, marginBottom: 16, textAlign: "center", color: "white" }}>
               Join the Community
             </Text>
-            <Text style={{ color: colors.textSecondary, fontSize: 16, textAlign: "center", marginBottom: 32 }}>
+            <Text style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: 16, textAlign: "center", marginBottom: 32 }}>
               Connect with friends, chat, join groups, and share quests together!
             </Text>
             <Pressable
               onPress={() => navigation.navigate("LoginModalScreen")}
               style={{
-                backgroundColor: colors.primary,
+                backgroundColor: "#7E3FE4",
                 paddingHorizontal: 48,
                 paddingVertical: 16,
                 borderRadius: 999,
@@ -210,25 +210,25 @@ export default function CommunityScreen({ navigation }: Props) {
   const discoverGroups = groupsData?.discoverGroups || [];
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
+    <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
       <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
         {/* Header */}
         <View style={{ paddingHorizontal: 20, paddingTop: 16, paddingBottom: 12 }}>
           <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-            <Text style={{ fontSize: 32, fontWeight: "bold", color: colors.text }}>Community</Text>
+            <Text style={{ fontSize: 32, fontWeight: "bold", color: "white" }}>Community</Text>
             <View style={{ flexDirection: "row", gap: 12 }}>
               <Pressable
                 style={{
                   width: 40,
                   height: 40,
                   borderRadius: 20,
-                  backgroundColor: colors.surface,
+                  backgroundColor: "rgba(255, 255, 255, 0.03)",
                   alignItems: "center",
                   justifyContent: "center",
                   position: "relative",
                 }}
               >
-                <Bell size={20} color={colors.text} />
+                <Bell size={20} color="white" />
                 {requests.length > 0 && (
                   <View
                     style={{
@@ -238,7 +238,7 @@ export default function CommunityScreen({ navigation }: Props) {
                       width: 16,
                       height: 16,
                       borderRadius: 8,
-                      backgroundColor: colors.error,
+                      backgroundColor: "#FF3B30",
                       alignItems: "center",
                       justifyContent: "center",
                     }}
@@ -255,12 +255,12 @@ export default function CommunityScreen({ navigation }: Props) {
                   width: 40,
                   height: 40,
                   borderRadius: 20,
-                  backgroundColor: colors.surface,
+                  backgroundColor: "rgba(255, 255, 255, 0.03)",
                   alignItems: "center",
                   justifyContent: "center",
                 }}
               >
-                <Search size={20} color={colors.text} />
+                <Search size={20} color="white" />
               </Pressable>
             </View>
           </View>
@@ -270,11 +270,11 @@ export default function CommunityScreen({ navigation }: Props) {
             <View
               style={{
                 flex: 1,
-                backgroundColor: colors.card,
+                backgroundColor: "rgba(255, 255, 255, 0.05)",
                 borderRadius: 16,
                 padding: 16,
                 borderWidth: 1,
-                borderColor: colors.border,
+                borderColor: "rgba(126, 63, 228, 0.3)",
               }}
             >
               <View
@@ -282,28 +282,28 @@ export default function CommunityScreen({ navigation }: Props) {
                   width: 40,
                   height: 40,
                   borderRadius: 20,
-                  backgroundColor: colors.primary + "20",
+                  backgroundColor: "#7E3FE4" + "20",
                   alignItems: "center",
                   justifyContent: "center",
                   marginBottom: 8,
                 }}
               >
-                <Users size={20} color={colors.primary} />
+                <Users size={20} color="#7E3FE4" />
               </View>
-              <Text style={{ fontSize: 24, fontWeight: "bold", color: colors.text, marginBottom: 4 }}>
+              <Text style={{ fontSize: 24, fontWeight: "bold", color: "white", marginBottom: 4 }}>
                 {friends.length}
               </Text>
-              <Text style={{ fontSize: 12, color: colors.textSecondary }}>Friends</Text>
+              <Text style={{ fontSize: 12, color: "rgba(255, 255, 255, 0.6)" }}>Friends</Text>
             </View>
 
             <View
               style={{
                 flex: 1,
-                backgroundColor: colors.card,
+                backgroundColor: "rgba(255, 255, 255, 0.05)",
                 borderRadius: 16,
                 padding: 16,
                 borderWidth: 1,
-                borderColor: colors.border,
+                borderColor: "rgba(126, 63, 228, 0.3)",
               }}
             >
               <View
@@ -311,28 +311,28 @@ export default function CommunityScreen({ navigation }: Props) {
                   width: 40,
                   height: 40,
                   borderRadius: 20,
-                  backgroundColor: colors.info + "20",
+                  backgroundColor: "#00D9FF" + "20",
                   alignItems: "center",
                   justifyContent: "center",
                   marginBottom: 8,
                 }}
               >
-                <MessageCircle size={20} color={colors.info} />
+                <MessageCircle size={20} color="#00D9FF" />
               </View>
-              <Text style={{ fontSize: 24, fontWeight: "bold", color: colors.text, marginBottom: 4 }}>
+              <Text style={{ fontSize: 24, fontWeight: "bold", color: "white", marginBottom: 4 }}>
                 {conversations.length}
               </Text>
-              <Text style={{ fontSize: 12, color: colors.textSecondary }}>Chats</Text>
+              <Text style={{ fontSize: 12, color: "rgba(255, 255, 255, 0.6)" }}>Chats</Text>
             </View>
 
             <View
               style={{
                 flex: 1,
-                backgroundColor: colors.card,
+                backgroundColor: "rgba(255, 255, 255, 0.05)",
                 borderRadius: 16,
                 padding: 16,
                 borderWidth: 1,
-                borderColor: colors.border,
+                borderColor: "rgba(126, 63, 228, 0.3)",
               }}
             >
               <View
@@ -340,18 +340,18 @@ export default function CommunityScreen({ navigation }: Props) {
                   width: 40,
                   height: 40,
                   borderRadius: 20,
-                  backgroundColor: colors.success + "20",
+                  backgroundColor: "#4CAF50" + "20",
                   alignItems: "center",
                   justifyContent: "center",
                   marginBottom: 8,
                 }}
               >
-                <UsersRound size={20} color={colors.success} />
+                <UsersRound size={20} color="#4CAF50" />
               </View>
-              <Text style={{ fontSize: 24, fontWeight: "bold", color: colors.text, marginBottom: 4 }}>
+              <Text style={{ fontSize: 24, fontWeight: "bold", color: "white", marginBottom: 4 }}>
                 {myGroups.length}
               </Text>
-              <Text style={{ fontSize: 12, color: colors.textSecondary }}>Groups</Text>
+              <Text style={{ fontSize: 12, color: "rgba(255, 255, 255, 0.6)" }}>Groups</Text>
             </View>
           </View>
 
@@ -359,7 +359,7 @@ export default function CommunityScreen({ navigation }: Props) {
           <View
             style={{
               flexDirection: "row",
-              backgroundColor: colors.surface,
+              backgroundColor: "rgba(255, 255, 255, 0.03)",
               borderRadius: 12,
               padding: 4,
             }}
@@ -381,7 +381,7 @@ export default function CommunityScreen({ navigation }: Props) {
                   paddingVertical: 10,
                   paddingHorizontal: 12,
                   borderRadius: 8,
-                  backgroundColor: activeTab === tab.key ? colors.primary : "transparent",
+                  backgroundColor: activeTab === tab.key ? "#7E3FE4" : "transparent",
                 }}
               >
                 <tab.icon
@@ -411,19 +411,19 @@ export default function CommunityScreen({ navigation }: Props) {
               {/* Friend Requests */}
               {requests.length > 0 && (
                 <View style={{ marginBottom: 24 }}>
-                  <Text style={{ fontSize: 18, fontWeight: "bold", color: colors.text, marginBottom: 12 }}>
+                  <Text style={{ fontSize: 18, fontWeight: "bold", color: "white", marginBottom: 12 }}>
                     Friend Requests ({requests.length})
                   </Text>
                   {requests.map((request) => (
                     <View
                       key={request.id}
                       style={{
-                        backgroundColor: colors.card,
+                        backgroundColor: "rgba(255, 255, 255, 0.05)",
                         borderRadius: 16,
                         padding: 16,
                         marginBottom: 12,
                         borderWidth: 1,
-                        borderColor: colors.border,
+                        borderColor: "rgba(126, 63, 228, 0.3)",
                       }}
                     >
                       <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
@@ -432,7 +432,7 @@ export default function CommunityScreen({ navigation }: Props) {
                             width: 48,
                             height: 48,
                             borderRadius: 24,
-                            backgroundColor: colors.primary + "20",
+                            backgroundColor: "#7E3FE4" + "20",
                             alignItems: "center",
                             justifyContent: "center",
                           }}
@@ -443,16 +443,16 @@ export default function CommunityScreen({ navigation }: Props) {
                               style={{ width: 48, height: 48, borderRadius: 24 }}
                             />
                           ) : (
-                            <Text style={{ fontSize: 20, fontWeight: "bold", color: colors.primary }}>
+                            <Text style={{ fontSize: 20, fontWeight: "bold", color: "#7E3FE4" }}>
                               {request.displayName.charAt(0).toUpperCase()}
                             </Text>
                           )}
                         </View>
                         <View style={{ flex: 1 }}>
-                          <Text style={{ fontSize: 16, fontWeight: "700", color: colors.text }}>
+                          <Text style={{ fontSize: 16, fontWeight: "700", color: "white" }}>
                             {request.displayName}
                           </Text>
-                          <Text style={{ fontSize: 13, color: colors.textSecondary }}>
+                          <Text style={{ fontSize: 13, color: "rgba(255, 255, 255, 0.6)" }}>
                             {new Date(request.requestedAt).toLocaleDateString()}
                           </Text>
                         </View>
@@ -464,7 +464,7 @@ export default function CommunityScreen({ navigation }: Props) {
                               width: 36,
                               height: 36,
                               borderRadius: 18,
-                              backgroundColor: colors.success,
+                              backgroundColor: "#4CAF50",
                               alignItems: "center",
                               justifyContent: "center",
                               opacity: acceptFriendMutation.isPending ? 0.5 : 1,
@@ -483,16 +483,16 @@ export default function CommunityScreen({ navigation }: Props) {
                               width: 36,
                               height: 36,
                               borderRadius: 18,
-                              backgroundColor: colors.error + "20",
+                              backgroundColor: "#FF3B30" + "20",
                               alignItems: "center",
                               justifyContent: "center",
                               opacity: declineFriendMutation.isPending ? 0.5 : 1,
                             }}
                           >
                             {declineFriendMutation.isPending ? (
-                              <ActivityIndicator size="small" color={colors.error} />
+                              <ActivityIndicator size="small" color="#FF3B30" />
                             ) : (
-                              <X size={18} color={colors.error} />
+                              <X size={18} color="#FF3B30" />
                             )}
                           </Pressable>
                         </View>
@@ -503,15 +503,15 @@ export default function CommunityScreen({ navigation }: Props) {
               )}
 
               {/* Friends List */}
-              <Text style={{ fontSize: 18, fontWeight: "bold", color: colors.text, marginBottom: 12 }}>
+              <Text style={{ fontSize: 18, fontWeight: "bold", color: "white", marginBottom: 12 }}>
                 My Friends ({friends.length})
               </Text>
               {friendsLoading ? (
-                <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 40 }} />
+                <ActivityIndicator size="large" color="#7E3FE4" style={{ marginTop: 40 }} />
               ) : friends.length === 0 ? (
                 <View style={{ alignItems: "center", paddingVertical: 60 }}>
-                  <Users size={48} color={colors.textSecondary} />
-                  <Text style={{ fontSize: 16, color: colors.textSecondary, marginTop: 16, textAlign: "center" }}>
+                  <Users size={48} color="rgba(255, 255, 255, 0.6)" />
+                  <Text style={{ fontSize: 16, color: "rgba(255, 255, 255, 0.6)", marginTop: 16, textAlign: "center" }}>
                     No friends yet. Search for users to connect!
                   </Text>
                 </View>
@@ -520,12 +520,12 @@ export default function CommunityScreen({ navigation }: Props) {
                   <Pressable
                     key={friend.id}
                     style={{
-                      backgroundColor: colors.card,
+                      backgroundColor: "rgba(255, 255, 255, 0.05)",
                       borderRadius: 16,
                       padding: 16,
                       marginBottom: 12,
                       borderWidth: 1,
-                      borderColor: colors.border,
+                      borderColor: "rgba(126, 63, 228, 0.3)",
                     }}
                   >
                     <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
@@ -534,7 +534,7 @@ export default function CommunityScreen({ navigation }: Props) {
                           width: 56,
                           height: 56,
                           borderRadius: 28,
-                          backgroundColor: colors.primary + "20",
+                          backgroundColor: "#7E3FE4" + "20",
                           alignItems: "center",
                           justifyContent: "center",
                         }}
@@ -545,16 +545,16 @@ export default function CommunityScreen({ navigation }: Props) {
                             style={{ width: 56, height: 56, borderRadius: 28 }}
                           />
                         ) : (
-                          <Text style={{ fontSize: 24, fontWeight: "bold", color: colors.primary }}>
+                          <Text style={{ fontSize: 24, fontWeight: "bold", color: "#7E3FE4" }}>
                             {friend.displayName.charAt(0).toUpperCase()}
                           </Text>
                         )}
                       </View>
                       <View style={{ flex: 1 }}>
-                        <Text style={{ fontSize: 17, fontWeight: "700", color: colors.text, marginBottom: 2 }}>
+                        <Text style={{ fontSize: 17, fontWeight: "700", color: "white", marginBottom: 2 }}>
                           {friend.displayName}
                         </Text>
-                        <Text style={{ fontSize: 13, color: colors.textSecondary }}>
+                        <Text style={{ fontSize: 13, color: "rgba(255, 255, 255, 0.6)" }}>
                           Friends since {new Date(friend.friendsSince).toLocaleDateString()}
                         </Text>
                       </View>
@@ -565,12 +565,12 @@ export default function CommunityScreen({ navigation }: Props) {
                             width: 40,
                             height: 40,
                             borderRadius: 20,
-                            backgroundColor: colors.info + "20",
+                            backgroundColor: "#00D9FF" + "20",
                             alignItems: "center",
                             justifyContent: "center",
                           }}
                         >
-                          <MessageCircle size={18} color={colors.info} />
+                          <MessageCircle size={18} color="#00D9FF" />
                         </Pressable>
                         <Pressable
                           onPress={() => handleShareQuest(friend.id)}
@@ -578,12 +578,12 @@ export default function CommunityScreen({ navigation }: Props) {
                             width: 40,
                             height: 40,
                             borderRadius: 20,
-                            backgroundColor: colors.primary + "20",
+                            backgroundColor: "#7E3FE4" + "20",
                             alignItems: "center",
                             justifyContent: "center",
                           }}
                         >
-                          <Share2 size={18} color={colors.primary} />
+                          <Share2 size={18} color="#7E3FE4" />
                         </Pressable>
                       </View>
                     </View>
@@ -596,15 +596,15 @@ export default function CommunityScreen({ navigation }: Props) {
           {/* Messages Tab */}
           {activeTab === "messages" && (
             <View style={{ paddingHorizontal: 20 }}>
-              <Text style={{ fontSize: 18, fontWeight: "bold", color: colors.text, marginBottom: 12 }}>
+              <Text style={{ fontSize: 18, fontWeight: "bold", color: "white", marginBottom: 12 }}>
                 Messages
               </Text>
               {conversationsLoading ? (
-                <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 40 }} />
+                <ActivityIndicator size="large" color="#7E3FE4" style={{ marginTop: 40 }} />
               ) : conversations.length === 0 ? (
                 <View style={{ alignItems: "center", paddingVertical: 60 }}>
-                  <MessageCircle size={48} color={colors.textSecondary} />
-                  <Text style={{ fontSize: 16, color: colors.textSecondary, marginTop: 16, textAlign: "center" }}>
+                  <MessageCircle size={48} color="rgba(255, 255, 255, 0.6)" />
+                  <Text style={{ fontSize: 16, color: "rgba(255, 255, 255, 0.6)", marginTop: 16, textAlign: "center" }}>
                     No messages yet. Start a conversation!
                   </Text>
                 </View>
@@ -614,12 +614,12 @@ export default function CommunityScreen({ navigation }: Props) {
                     key={conv.userId}
                     onPress={() => handleOpenConversation(conv.userId)}
                     style={{
-                      backgroundColor: colors.card,
+                      backgroundColor: "rgba(255, 255, 255, 0.05)",
                       borderRadius: 16,
                       padding: 16,
                       marginBottom: 12,
                       borderWidth: 1,
-                      borderColor: colors.border,
+                      borderColor: "rgba(126, 63, 228, 0.3)",
                     }}
                   >
                     <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
@@ -629,7 +629,7 @@ export default function CommunityScreen({ navigation }: Props) {
                             width: 56,
                             height: 56,
                             borderRadius: 28,
-                            backgroundColor: colors.info + "20",
+                            backgroundColor: "#00D9FF" + "20",
                             alignItems: "center",
                             justifyContent: "center",
                           }}
@@ -640,7 +640,7 @@ export default function CommunityScreen({ navigation }: Props) {
                               style={{ width: 56, height: 56, borderRadius: 28 }}
                             />
                           ) : (
-                            <Text style={{ fontSize: 24, fontWeight: "bold", color: colors.info }}>
+                            <Text style={{ fontSize: 24, fontWeight: "bold", color: "#00D9FF" }}>
                               {conv.displayName.charAt(0).toUpperCase()}
                             </Text>
                           )}
@@ -654,7 +654,7 @@ export default function CommunityScreen({ navigation }: Props) {
                               width: 20,
                               height: 20,
                               borderRadius: 10,
-                              backgroundColor: colors.error,
+                              backgroundColor: "#FF3B30",
                               alignItems: "center",
                               justifyContent: "center",
                             }}
@@ -667,10 +667,10 @@ export default function CommunityScreen({ navigation }: Props) {
                       </View>
                       <View style={{ flex: 1 }}>
                         <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 4 }}>
-                          <Text style={{ fontSize: 17, fontWeight: "700", color: colors.text }}>
+                          <Text style={{ fontSize: 17, fontWeight: "700", color: "white" }}>
                             {conv.displayName}
                           </Text>
-                          <Text style={{ fontSize: 12, color: colors.textSecondary }}>
+                          <Text style={{ fontSize: 12, color: "rgba(255, 255, 255, 0.6)" }}>
                             {new Date(conv.lastMessageAt).toLocaleDateString()}
                           </Text>
                         </View>
@@ -698,7 +698,7 @@ export default function CommunityScreen({ navigation }: Props) {
               {/* My Groups */}
               {myGroups.length > 0 && (
                 <View style={{ marginBottom: 24 }}>
-                  <Text style={{ fontSize: 18, fontWeight: "bold", color: colors.text, marginBottom: 12 }}>
+                  <Text style={{ fontSize: 18, fontWeight: "bold", color: "white", marginBottom: 12 }}>
                     My Groups ({myGroups.length})
                   </Text>
                   {myGroups.map((group) => (
@@ -706,12 +706,12 @@ export default function CommunityScreen({ navigation }: Props) {
                       key={group.id}
                       onPress={() => handleOpenGroup(group.id)}
                       style={{
-                        backgroundColor: colors.card,
+                        backgroundColor: "rgba(255, 255, 255, 0.05)",
                         borderRadius: 16,
                         overflow: "hidden",
                         marginBottom: 12,
                         borderWidth: 1,
-                        borderColor: colors.border,
+                        borderColor: "rgba(126, 63, 228, 0.3)",
                       }}
                     >
                       {group.coverImage && (
@@ -724,23 +724,23 @@ export default function CommunityScreen({ navigation }: Props) {
                       <View style={{ padding: 16 }}>
                         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
                           <View style={{ flex: 1 }}>
-                            <Text style={{ fontSize: 18, fontWeight: "700", color: colors.text, marginBottom: 4 }}>
+                            <Text style={{ fontSize: 18, fontWeight: "700", color: "white", marginBottom: 4 }}>
                               {group.name}
                             </Text>
                             {group.description && (
-                              <Text style={{ fontSize: 14, color: colors.textSecondary, marginBottom: 8 }} numberOfLines={2}>
+                              <Text style={{ fontSize: 14, color: "rgba(255, 255, 255, 0.6)", marginBottom: 8 }} numberOfLines={2}>
                                 {group.description}
                               </Text>
                             )}
                             <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-                              <UsersRound size={14} color={colors.textSecondary} />
-                              <Text style={{ fontSize: 13, color: colors.textSecondary }}>
+                              <UsersRound size={14} color="rgba(255, 255, 255, 0.6)" />
+                              <Text style={{ fontSize: 13, color: "rgba(255, 255, 255, 0.6)" }}>
                                 {group.memberCount} members
                               </Text>
                               {group.role && (
                                 <>
-                                  <Text style={{ color: colors.textSecondary }}>•</Text>
-                                  <Text style={{ fontSize: 13, color: colors.primary, fontWeight: "600" }}>
+                                  <Text style={{ color: "rgba(255, 255, 255, 0.6)" }}>•</Text>
+                                  <Text style={{ fontSize: 13, color: "#7E3FE4", fontWeight: "600" }}>
                                     {group.role}
                                   </Text>
                                 </>
@@ -755,15 +755,15 @@ export default function CommunityScreen({ navigation }: Props) {
               )}
 
               {/* Discover Groups */}
-              <Text style={{ fontSize: 18, fontWeight: "bold", color: colors.text, marginBottom: 12 }}>
+              <Text style={{ fontSize: 18, fontWeight: "bold", color: "white", marginBottom: 12 }}>
                 Discover Groups
               </Text>
               {groupsLoading ? (
-                <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 40 }} />
+                <ActivityIndicator size="large" color="#7E3FE4" style={{ marginTop: 40 }} />
               ) : discoverGroups.length === 0 ? (
                 <View style={{ alignItems: "center", paddingVertical: 60 }}>
-                  <Group size={48} color={colors.textSecondary} />
-                  <Text style={{ fontSize: 16, color: colors.textSecondary, marginTop: 16, textAlign: "center" }}>
+                  <Group size={48} color="rgba(255, 255, 255, 0.6)" />
+                  <Text style={{ fontSize: 16, color: "rgba(255, 255, 255, 0.6)", marginTop: 16, textAlign: "center" }}>
                     No groups to discover. Create your own!
                   </Text>
                 </View>
@@ -772,12 +772,12 @@ export default function CommunityScreen({ navigation }: Props) {
                   <Pressable
                     key={group.id}
                     style={{
-                      backgroundColor: colors.card,
+                      backgroundColor: "rgba(255, 255, 255, 0.05)",
                       borderRadius: 16,
                       overflow: "hidden",
                       marginBottom: 12,
                       borderWidth: 1,
-                      borderColor: colors.border,
+                      borderColor: "rgba(126, 63, 228, 0.3)",
                     }}
                   >
                     {group.coverImage && (
@@ -790,17 +790,17 @@ export default function CommunityScreen({ navigation }: Props) {
                     <View style={{ padding: 16 }}>
                       <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
                         <View style={{ flex: 1 }}>
-                          <Text style={{ fontSize: 18, fontWeight: "700", color: colors.text, marginBottom: 4 }}>
+                          <Text style={{ fontSize: 18, fontWeight: "700", color: "white", marginBottom: 4 }}>
                             {group.name}
                           </Text>
                           {group.description && (
-                            <Text style={{ fontSize: 14, color: colors.textSecondary, marginBottom: 8 }} numberOfLines={2}>
+                            <Text style={{ fontSize: 14, color: "rgba(255, 255, 255, 0.6)", marginBottom: 8 }} numberOfLines={2}>
                               {group.description}
                             </Text>
                           )}
                           <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-                            <UsersRound size={14} color={colors.textSecondary} />
-                            <Text style={{ fontSize: 13, color: colors.textSecondary }}>
+                            <UsersRound size={14} color="rgba(255, 255, 255, 0.6)" />
+                            <Text style={{ fontSize: 13, color: "rgba(255, 255, 255, 0.6)" }}>
                               {group.memberCount} members
                             </Text>
                           </View>
@@ -809,7 +809,7 @@ export default function CommunityScreen({ navigation }: Props) {
                           onPress={() => handleJoinGroup(group.id)}
                           disabled={joinGroupMutation.isPending}
                           style={{
-                            backgroundColor: colors.primary,
+                            backgroundColor: "#7E3FE4",
                             paddingHorizontal: 20,
                             paddingVertical: 10,
                             borderRadius: 20,

@@ -442,7 +442,37 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 
 ## Design
 
-### Color Palette
+### Modern 3D UI Theme
+The app features a cohesive dark theme with modern 3D-style UI elements throughout all screens:
+
+**Color Palette:**
+- 🌑 **Dark Gradients**: `#0A0A0F` → `#1A1A24` → `#2A1A34` (main background)
+- 🟣 **Primary Purple**: `#7E3FE4` (buttons, active states, primary actions)
+- 🟠 **Vibrant Orange**: `#FF6B35` (accent, warning states)
+- 🔵 **Electric Cyan**: `#00D9FF` (info, secondary accent)
+- 🟢 **Success Green**: `#4CAF50` (success states, positive actions)
+- 🟡 **Gold**: `#FFD700` (rewards, achievements, XP)
+- 🔴 **Error Red**: `#FF3B30` (errors, destructive actions)
+- ⚪ **Text Colors**:
+  - Primary: `#FFFFFF` (white)
+  - Secondary: `rgba(255, 255, 255, 0.6)` (60% white)
+
+**3D Card Styling:**
+- Card Background: `rgba(255, 255, 255, 0.05)` (5% white overlay)
+- Card Borders: `rgba(126, 63, 228, 0.3)` (30% purple border)
+- Surface Background: `rgba(255, 255, 255, 0.03)` (3% white for nested elements)
+- Shadows: Deep shadows with elevation for depth
+- Border Radius: 16px for cards, 12px for buttons
+- Smooth gradients on hero sections
+
+**Consistent UI Elements:**
+- All cards use semi-transparent backgrounds with purple-tinted borders
+- Icon badges with colored backgrounds at 20% opacity
+- Progress bars with gradient fills
+- Tab switchers with pill-style active states
+- Category badges with rounded pills and semi-transparent backgrounds
+
+### Color Palette (Legacy)
 - 🟠 Orange/Coral: `#FF6B35` (primary action)
 - 🟣 Deep purples: `#7B3FE4`, `#5E1FA8`
 - 🔵 Electric blue: `#00D9FF`, `#0099FF`
@@ -451,10 +481,11 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 - 🟡 Gold (rewards): `#FFD700`
 
 ### Style
-- Modern glassmorphism with blur effects
-- Smooth spring animations
-- Category-based color coding
-- Dark theme optimized
+- Modern 3D glassmorphism with semi-transparent card backgrounds
+- Smooth spring animations with physics-based transitions
+- Category-based color coding with consistent accent colors
+- Dark theme optimized with gradient backgrounds throughout
+- Cohesive purple-tinted borders and subtle depth effects across all screens
 
 ## Project Structure
 
