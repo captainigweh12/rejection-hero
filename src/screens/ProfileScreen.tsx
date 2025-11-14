@@ -1,19 +1,47 @@
 import React, { useState } from "react";
-import { View, Text, Pressable, ActivityIndicator, ScrollView, Alert } from "react-native";
+import { View, Text, Pressable, ActivityIndicator, ScrollView, Alert, TextInput, Image, Modal } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useQuery } from "@tanstack/react-query";
-import { Settings, Shield, Zap, Video } from "lucide-react-native";
+import { LinearGradient } from "expo-linear-gradient";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  Settings,
+  Shield,
+  Zap,
+  Video,
+  Camera,
+  Sparkles,
+  Edit3,
+  Save,
+  X,
+  Trophy,
+  Flame,
+  Star,
+  Target,
+  Award,
+  TrendingUp,
+  Upload,
+} from "lucide-react-native";
 import type { BottomTabScreenProps } from "@/navigation/types";
 import { api } from "@/lib/api";
 import { useSession } from "@/lib/useSession";
 import { authClient } from "@/lib/authClient";
+import { useTheme } from "@/contexts/ThemeContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import type { GetProfileResponse, GetUserStatsResponse } from "@/shared/contracts";
 
 type Props = BottomTabScreenProps<"ProfileTab">;
 
 export default function ProfileScreen({ navigation }: Props) {
   const { data: sessionData } = useSession();
-  const [selectedTab, setSelectedTab] = useState<"quests" | "journals" | "about">("quests");
+  const { colors } = useTheme();
+  const { t } = useLanguage();
+  const queryClient = useQueryClient();
+  const [selectedTab, setSelectedTab] = useState<"quests" | "stats" | "about">("quests");
+  const [isEditingAbout, setIsEditingAbout] = useState(false);
+  const [showAvatarModal, setShowAvatarModal] = useState(false);
+  const [userContext, setUserContext] = useState("");
+  const [goals, setGoals] = useState("");
+  const [interests, setInterests] = useState("");
 
   const { data: profileData, isLoading: profileLoading } = useQuery<GetProfileResponse>({
     queryKey: ["profile"],
@@ -48,22 +76,31 @@ export default function ProfileScreen({ navigation }: Props) {
     );
   };
 
+  const handleSaveContext = () => {
+    // TODO: Save user context to backend for AI quest generation
+    setIsEditingAbout(false);
+    Alert.alert(
+      "Context Saved",
+      "Your information will help Ben create more personalized quests for you!"
+    );
+  };
+
   if (!sessionData?.user) {
     return (
-      <View style={{ flex: 1, backgroundColor: "#E8E9ED" }}>
+      <View style={{ flex: 1, backgroundColor: colors.background }}>
         <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
           <View style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 32 }}>
-            <Shield size={64} color="#FF6B35" />
-            <Text style={{ fontSize: 28, fontWeight: "bold", marginTop: 24, marginBottom: 16, textAlign: "center" }}>
+            <Shield size={64} color={colors.primary} />
+            <Text style={{ fontSize: 28, fontWeight: "bold", marginTop: 24, marginBottom: 16, textAlign: "center", color: colors.text }}>
               Your Profile
             </Text>
-            <Text style={{ color: "#666", fontSize: 16, textAlign: "center", marginBottom: 32 }}>
+            <Text style={{ color: colors.textSecondary, fontSize: 16, textAlign: "center", marginBottom: 32 }}>
               Sign in to view your profile, track your progress, and manage your account.
             </Text>
             <Pressable
               onPress={() => navigation.navigate("LoginModalScreen")}
               style={{
-                backgroundColor: "#FF6B35",
+                backgroundColor: colors.primary,
                 paddingHorizontal: 48,
                 paddingVertical: 16,
                 borderRadius: 999,
@@ -79,116 +116,342 @@ export default function ProfileScreen({ navigation }: Props) {
 
   if (profileLoading) {
     return (
-      <View style={{ flex: 1, backgroundColor: "#E8E9ED" }}>
+      <View style={{ flex: 1, backgroundColor: colors.background }}>
         <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
           <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-            <ActivityIndicator size="large" color="#FF6B35" />
+            <ActivityIndicator size="large" color={colors.primary} />
           </View>
         </SafeAreaView>
       </View>
     );
   }
 
-  const username = sessionData.user.email?.split("@")[0] || "User";
+  const username = sessionData.user.email?.split("@")[0] || "Warrior";
   const level = Math.floor((statsData?.totalXP || 0) / 100) + 1;
+  const xpProgress = ((statsData?.totalXP || 0) % 100) / 100;
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#E8E9ED" }}>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
       <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
-        {/* Header */}
-        <View style={{ backgroundColor: "white", paddingVertical: 16, paddingHorizontal: 20, borderBottomWidth: 1, borderBottomColor: "#E0E0E0" }}>
-          <Text style={{ fontSize: 20, fontWeight: "bold", textAlign: "center" }}>Profile</Text>
-        </View>
-
         <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 100 }}>
-          {/* Profile Header */}
-          <View style={{ backgroundColor: "white", paddingVertical: 32, paddingHorizontal: 20 }}>
-            {/* Online Status & Settings */}
-            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-              <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-                <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: "#4CAF50" }} />
-                <Text style={{ color: "#666", fontSize: 14 }}>Online</Text>
-              </View>
-              <Pressable onPress={() => {
-                console.log('[ProfileScreen] Settings cog clicked');
-                navigation.navigate("Settings");
-              }}>
-                <Settings size={24} color="#333" />
+          {/* Hero Header with Gradient */}
+          <LinearGradient
+            colors={[colors.primary, "#C45FD4", "#5B8DEF"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={{ paddingBottom: 80, paddingTop: 20 }}
+          >
+            {/* Settings Button */}
+            <View style={{ paddingHorizontal: 20, alignItems: "flex-end", marginBottom: 20 }}>
+              <Pressable
+                onPress={() => navigation.navigate("Settings")}
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 20,
+                  backgroundColor: "rgba(255, 255, 255, 0.2)",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Settings size={20} color="white" />
               </Pressable>
             </View>
 
-            {/* Avatar & Badges */}
-            <View style={{ alignItems: "center", marginBottom: 16 }}>
+            {/* Avatar & Level */}
+            <View style={{ alignItems: "center" }}>
               <View style={{ position: "relative" }}>
-                {/* Admin Badge */}
-                <View style={{ position: "absolute", top: 0, left: -90, backgroundColor: "#7E3FE4", paddingHorizontal: 16, paddingVertical: 6, borderRadius: 999, flexDirection: "row", alignItems: "center", gap: 6 }}>
-                  <Shield size={16} color="white" />
-                  <Text style={{ color: "white", fontWeight: "bold", fontSize: 12 }}>Admin</Text>
-                </View>
-
-                {/* Avatar */}
-                <View style={{ width: 120, height: 120, borderRadius: 60, backgroundColor: "#DDD", alignItems: "center", justifyContent: "center" }}>
-                  <Text style={{ fontSize: 48, fontWeight: "bold", color: "#333" }}>
+                {/* Avatar with Glow */}
+                <View
+                  style={{
+                    width: 140,
+                    height: 140,
+                    borderRadius: 70,
+                    backgroundColor: "rgba(255, 255, 255, 0.2)",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    borderWidth: 4,
+                    borderColor: "white",
+                    shadowColor: "#FFD700",
+                    shadowOffset: { width: 0, height: 0 },
+                    shadowOpacity: 0.8,
+                    shadowRadius: 20,
+                    elevation: 10,
+                  }}
+                >
+                  <Text style={{ fontSize: 64, fontWeight: "bold", color: "white" }}>
                     {username.charAt(0).toUpperCase()}
                   </Text>
                 </View>
 
+                {/* Camera Button */}
+                <Pressable
+                  onPress={() => setShowAvatarModal(true)}
+                  style={{
+                    position: "absolute",
+                    bottom: 5,
+                    right: 5,
+                    width: 40,
+                    height: 40,
+                    borderRadius: 20,
+                    backgroundColor: colors.primary,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    borderWidth: 3,
+                    borderColor: "white",
+                  }}
+                >
+                  <Camera size={20} color="white" />
+                </Pressable>
+
                 {/* Level Badge */}
-                <View style={{ position: "absolute", top: 0, right: -90, backgroundColor: "#FF9500", paddingHorizontal: 16, paddingVertical: 6, borderRadius: 999 }}>
-                  <Text style={{ color: "white", fontWeight: "bold", fontSize: 14 }}>LV. {level}</Text>
+                <View
+                  style={{
+                    position: "absolute",
+                    top: -10,
+                    right: -10,
+                    backgroundColor: "#FFD700",
+                    paddingHorizontal: 16,
+                    paddingVertical: 8,
+                    borderRadius: 20,
+                    borderWidth: 3,
+                    borderColor: "white",
+                    shadowColor: "#000",
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.3,
+                    shadowRadius: 4,
+                    elevation: 5,
+                  }}
+                >
+                  <Text style={{ color: "#000", fontWeight: "900", fontSize: 16 }}>LV {level}</Text>
                 </View>
               </View>
 
               {/* Username */}
-              <Text style={{ fontSize: 28, fontWeight: "bold", marginTop: 16, textTransform: "uppercase" }}>
+              <Text
+                style={{
+                  fontSize: 32,
+                  fontWeight: "900",
+                  marginTop: 20,
+                  color: "white",
+                  textTransform: "uppercase",
+                  letterSpacing: 2,
+                  textShadowColor: "rgba(0, 0, 0, 0.3)",
+                  textShadowOffset: { width: 0, height: 2 },
+                  textShadowRadius: 4,
+                }}
+              >
                 {username}
               </Text>
-            </View>
 
-            {/* Stats */}
-            <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: 16 }}>
-              <View style={{ alignItems: "center" }}>
-                <Text style={{ fontSize: 32, fontWeight: "bold", color: "#FF6B35" }}>
-                  {statsData?.totalPoints || 0}
+              {/* XP Progress Bar */}
+              <View style={{ width: "80%", marginTop: 16 }}>
+                <View
+                  style={{
+                    height: 8,
+                    backgroundColor: "rgba(255, 255, 255, 0.3)",
+                    borderRadius: 4,
+                    overflow: "hidden",
+                  }}
+                >
+                  <View
+                    style={{
+                      width: `${xpProgress * 100}%`,
+                      height: "100%",
+                      backgroundColor: "#FFD700",
+                    }}
+                  />
+                </View>
+                <Text style={{ color: "white", fontSize: 12, textAlign: "center", marginTop: 6, fontWeight: "600" }}>
+                  {(statsData?.totalXP || 0) % 100} / 100 XP to Level {level + 1}
                 </Text>
-                <Text style={{ color: "#666", fontSize: 14, marginTop: 4 }}>Quests</Text>
               </View>
-              <View style={{ alignItems: "center" }}>
-                <Text style={{ fontSize: 32, fontWeight: "bold", color: "#FF6B35" }}>{level}</Text>
-                <Text style={{ color: "#666", fontSize: 14, marginTop: 4 }}>Level</Text>
-              </View>
-              <View style={{ alignItems: "center" }}>
-                <Text style={{ fontSize: 32, fontWeight: "bold", color: "#FF6B35" }}>
+            </View>
+          </LinearGradient>
+
+          {/* Stats Cards */}
+          <View style={{ marginTop: -60, paddingHorizontal: 20 }}>
+            <View style={{ flexDirection: "row", gap: 12 }}>
+              {/* Streak Card */}
+              <View
+                style={{
+                  flex: 1,
+                  backgroundColor: colors.card,
+                  borderRadius: 16,
+                  padding: 20,
+                  alignItems: "center",
+                  borderWidth: 1,
+                  borderColor: colors.border,
+                  shadowColor: colors.shadow,
+                  shadowOffset: { width: 0, height: 4 },
+                  shadowOpacity: 0.1,
+                  shadowRadius: 8,
+                  elevation: 4,
+                }}
+              >
+                <View
+                  style={{
+                    width: 48,
+                    height: 48,
+                    borderRadius: 24,
+                    backgroundColor: colors.warning + "20",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginBottom: 12,
+                  }}
+                >
+                  <Flame size={24} color={colors.warning} />
+                </View>
+                <Text style={{ fontSize: 28, fontWeight: "bold", color: colors.text }}>
                   {statsData?.currentStreak || 0}
                 </Text>
-                <Text style={{ color: "#666", fontSize: 14, marginTop: 4 }}>Streak</Text>
+                <Text style={{ fontSize: 12, color: colors.textSecondary, fontWeight: "600" }}>Day Streak</Text>
+              </View>
+
+              {/* Quests Card */}
+              <View
+                style={{
+                  flex: 1,
+                  backgroundColor: colors.card,
+                  borderRadius: 16,
+                  padding: 20,
+                  alignItems: "center",
+                  borderWidth: 1,
+                  borderColor: colors.border,
+                  shadowColor: colors.shadow,
+                  shadowOffset: { width: 0, height: 4 },
+                  shadowOpacity: 0.1,
+                  shadowRadius: 8,
+                  elevation: 4,
+                }}
+              >
+                <View
+                  style={{
+                    width: 48,
+                    height: 48,
+                    borderRadius: 24,
+                    backgroundColor: colors.primary + "20",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginBottom: 12,
+                  }}
+                >
+                  <Target size={24} color={colors.primary} />
+                </View>
+                <Text style={{ fontSize: 28, fontWeight: "bold", color: colors.text }}>
+                  {Math.floor((statsData?.totalPoints || 0) / 100)}
+                </Text>
+                <Text style={{ fontSize: 12, color: colors.textSecondary, fontWeight: "600" }}>Quests Done</Text>
+              </View>
+
+              {/* Trophies Card */}
+              <View
+                style={{
+                  flex: 1,
+                  backgroundColor: colors.card,
+                  borderRadius: 16,
+                  padding: 20,
+                  alignItems: "center",
+                  borderWidth: 1,
+                  borderColor: colors.border,
+                  shadowColor: colors.shadow,
+                  shadowOffset: { width: 0, height: 4 },
+                  shadowOpacity: 0.1,
+                  shadowRadius: 8,
+                  elevation: 4,
+                }}
+              >
+                <View
+                  style={{
+                    width: 48,
+                    height: 48,
+                    borderRadius: 24,
+                    backgroundColor: colors.warning + "20",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginBottom: 12,
+                  }}
+                >
+                  <Trophy size={24} color={colors.warning} />
+                </View>
+                <Text style={{ fontSize: 28, fontWeight: "bold", color: colors.text }}>
+                  {statsData?.trophies || 0}
+                </Text>
+                <Text style={{ fontSize: 12, color: colors.textSecondary, fontWeight: "600" }}>Trophies</Text>
               </View>
             </View>
           </View>
 
           {/* Tabs */}
-          <View style={{ flexDirection: "row", backgroundColor: "white", marginTop: 8, borderBottomWidth: 2, borderBottomColor: "#E0E0E0" }}>
+          <View
+            style={{
+              flexDirection: "row",
+              backgroundColor: colors.card,
+              marginTop: 20,
+              marginHorizontal: 20,
+              borderRadius: 16,
+              padding: 4,
+              borderWidth: 1,
+              borderColor: colors.border,
+            }}
+          >
             <Pressable
               onPress={() => setSelectedTab("quests")}
-              style={{ flex: 1, paddingVertical: 16, borderBottomWidth: 3, borderBottomColor: selectedTab === "quests" ? "#FF6B35" : "transparent" }}
+              style={{
+                flex: 1,
+                paddingVertical: 12,
+                borderRadius: 12,
+                backgroundColor: selectedTab === "quests" ? colors.primary : "transparent",
+              }}
             >
-              <Text style={{ textAlign: "center", fontWeight: "600", color: selectedTab === "quests" ? "#FF6B35" : "#666" }}>
+              <Text
+                style={{
+                  textAlign: "center",
+                  fontWeight: "700",
+                  color: selectedTab === "quests" ? "white" : colors.textSecondary,
+                  fontSize: 14,
+                }}
+              >
                 Quests
               </Text>
             </Pressable>
             <Pressable
-              onPress={() => setSelectedTab("journals")}
-              style={{ flex: 1, paddingVertical: 16, borderBottomWidth: 3, borderBottomColor: selectedTab === "journals" ? "#FF6B35" : "transparent" }}
+              onPress={() => setSelectedTab("stats")}
+              style={{
+                flex: 1,
+                paddingVertical: 12,
+                borderRadius: 12,
+                backgroundColor: selectedTab === "stats" ? colors.primary : "transparent",
+              }}
             >
-              <Text style={{ textAlign: "center", fontWeight: "600", color: selectedTab === "journals" ? "#FF6B35" : "#666" }}>
-                Journals
+              <Text
+                style={{
+                  textAlign: "center",
+                  fontWeight: "700",
+                  color: selectedTab === "stats" ? "white" : colors.textSecondary,
+                  fontSize: 14,
+                }}
+              >
+                Stats
               </Text>
             </Pressable>
             <Pressable
               onPress={() => setSelectedTab("about")}
-              style={{ flex: 1, paddingVertical: 16, borderBottomWidth: 3, borderBottomColor: selectedTab === "about" ? "#FF6B35" : "transparent" }}
+              style={{
+                flex: 1,
+                paddingVertical: 12,
+                borderRadius: 12,
+                backgroundColor: selectedTab === "about" ? colors.primary : "transparent",
+              }}
             >
-              <Text style={{ textAlign: "center", fontWeight: "600", color: selectedTab === "about" ? "#FF6B35" : "#666" }}>
+              <Text
+                style={{
+                  textAlign: "center",
+                  fontWeight: "700",
+                  color: selectedTab === "about" ? "white" : colors.textSecondary,
+                  fontSize: 14,
+                }}
+              >
                 About
               </Text>
             </Pressable>
@@ -196,105 +459,563 @@ export default function ProfileScreen({ navigation }: Props) {
 
           {/* Tab Content */}
           {selectedTab === "quests" && (
-            <View style={{ marginTop: 16, paddingHorizontal: 20 }}>
-              {/* Featured Quests */}
-              <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 12 }}>
-                <Zap size={20} color="#333" />
-                <Text style={{ fontSize: 18, fontWeight: "bold" }}>Featured Quests</Text>
-              </View>
-
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 24 }}>
-                {[1, 2, 3].map((i) => (
+            <View style={{ marginTop: 20, paddingHorizontal: 20, gap: 16 }}>
+              {/* Live Streaming Card */}
+              <LinearGradient
+                colors={["#FF0000", "#FF4081"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={{ borderRadius: 16, padding: 20 }}
+              >
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 12 }}>
                   <View
-                    key={i}
                     style={{
-                      width: 220,
-                      marginRight: 12,
-                      borderRadius: 16,
-                      overflow: "hidden",
-                      borderWidth: 2,
-                      borderColor: "#FF6B35",
+                      width: 48,
+                      height: 48,
+                      borderRadius: 24,
+                      backgroundColor: "rgba(255, 255, 255, 0.2)",
+                      alignItems: "center",
+                      justifyContent: "center",
                     }}
                   >
-                    <View style={{ height: 140, backgroundColor: "#333" }} />
-                    <View style={{ padding: 12, backgroundColor: "white" }}>
-                      <Text style={{ fontWeight: "bold", fontSize: 14 }}>
-                        {i === 1 ? "Share Your Account" : i === 2 ? "Start Conversation" : "Speak Up in Class"}
-                      </Text>
-                    </View>
+                    <Video size={24} color="white" />
                   </View>
-                ))}
-              </ScrollView>
-
-              {/* Live Streaming Section */}
-              <View style={{ backgroundColor: "white", borderRadius: 16, padding: 20, marginBottom: 16 }}>
-                <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 8 }}>
-                  <Video size={24} color="#FF0000" />
-                  <Text style={{ fontSize: 18, fontWeight: "bold" }}>Live Streaming</Text>
+                  <Text style={{ fontSize: 20, fontWeight: "bold", color: "white", flex: 1 }}>
+                    Go Live
+                  </Text>
+                  <View
+                    style={{
+                      backgroundColor: "rgba(255, 255, 255, 0.3)",
+                      paddingHorizontal: 12,
+                      paddingVertical: 4,
+                      borderRadius: 12,
+                    }}
+                  >
+                    <Text style={{ color: "white", fontSize: 12, fontWeight: "700" }}>BETA</Text>
+                  </View>
                 </View>
-                <Text style={{ color: "#666", fontSize: 14, marginBottom: 16 }}>
-                  Stream your quest journey live and share your rejection challenges with the community in real-time!
+                <Text style={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14, marginBottom: 16, lineHeight: 20 }}>
+                  Stream your quest challenges live and connect with the rejection therapy community!
                 </Text>
                 <Pressable
                   onPress={() => navigation.navigate("LiveTab")}
                   style={{
-                    backgroundColor: "#FF0000",
+                    backgroundColor: "white",
                     paddingVertical: 14,
-                    borderRadius: 8,
+                    borderRadius: 12,
                     alignItems: "center",
-                    marginBottom: 12,
                   }}
                 >
-                  <Text style={{ color: "white", fontWeight: "bold", fontSize: 16 }}>Go Live Now</Text>
+                  <Text style={{ color: "#FF0000", fontWeight: "bold", fontSize: 16 }}>Start Streaming</Text>
                 </Pressable>
-                <Text style={{ color: "#999", fontSize: 12, textAlign: "center" }}>
-                  Powered by Daily.co • Connect quests to your streams
+              </LinearGradient>
+
+              {/* Quick Actions */}
+              <View
+                style={{
+                  backgroundColor: colors.card,
+                  borderRadius: 16,
+                  padding: 20,
+                  borderWidth: 1,
+                  borderColor: colors.border,
+                }}
+              >
+                <Text style={{ fontSize: 18, fontWeight: "bold", color: colors.text, marginBottom: 16 }}>
+                  Quick Actions
                 </Text>
+                <View style={{ gap: 12 }}>
+                  <Pressable
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 16,
+                      padding: 16,
+                      backgroundColor: colors.surface,
+                      borderRadius: 12,
+                    }}
+                  >
+                    <View
+                      style={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: 20,
+                        backgroundColor: colors.primary + "20",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Zap size={20} color={colors.primary} />
+                    </View>
+                    <Text style={{ fontSize: 16, fontWeight: "600", color: colors.text, flex: 1 }}>
+                      View Active Quests
+                    </Text>
+                  </Pressable>
+                  <Pressable
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 16,
+                      padding: 16,
+                      backgroundColor: colors.surface,
+                      borderRadius: 12,
+                    }}
+                  >
+                    <View
+                      style={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: 20,
+                        backgroundColor: colors.warning + "20",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Award size={20} color={colors.warning} />
+                    </View>
+                    <Text style={{ fontSize: 16, fontWeight: "600", color: colors.text, flex: 1 }}>
+                      View Achievements
+                    </Text>
+                  </Pressable>
+                </View>
               </View>
             </View>
           )}
 
-          {selectedTab === "journals" && (
-            <View style={{ marginTop: 16, paddingHorizontal: 20 }}>
-              <View style={{ backgroundColor: "white", borderRadius: 16, padding: 32, alignItems: "center" }}>
-                <Text style={{ fontSize: 18, fontWeight: "bold", marginBottom: 8 }}>No Journals Yet</Text>
-                <Text style={{ color: "#666", textAlign: "center" }}>
-                  Complete quests and write about your experiences to build your rejection journal.
+          {selectedTab === "stats" && (
+            <View style={{ marginTop: 20, paddingHorizontal: 20, gap: 16 }}>
+              {/* Detailed Stats */}
+              <View
+                style={{
+                  backgroundColor: colors.card,
+                  borderRadius: 16,
+                  padding: 20,
+                  borderWidth: 1,
+                  borderColor: colors.border,
+                }}
+              >
+                <Text style={{ fontSize: 18, fontWeight: "bold", color: colors.text, marginBottom: 20 }}>
+                  Your Progress
                 </Text>
+
+                <View style={{ gap: 20 }}>
+                  <View>
+                    <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 8 }}>
+                      <Text style={{ fontSize: 14, color: colors.textSecondary, fontWeight: "600" }}>Total XP</Text>
+                      <Text style={{ fontSize: 16, fontWeight: "bold", color: colors.primary }}>
+                        {statsData?.totalXP || 0}
+                      </Text>
+                    </View>
+                    <View
+                      style={{
+                        height: 8,
+                        backgroundColor: colors.surface,
+                        borderRadius: 4,
+                        overflow: "hidden",
+                      }}
+                    >
+                      <View
+                        style={{
+                          width: `${Math.min(((statsData?.totalXP || 0) / 10000) * 100, 100)}%`,
+                          height: "100%",
+                          backgroundColor: colors.primary,
+                        }}
+                      />
+                    </View>
+                  </View>
+
+                  <View>
+                    <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 8 }}>
+                      <Text style={{ fontSize: 14, color: colors.textSecondary, fontWeight: "600" }}>
+                        Total Points
+                      </Text>
+                      <Text style={{ fontSize: 16, fontWeight: "bold", color: colors.info }}>
+                        {statsData?.totalPoints || 0}
+                      </Text>
+                    </View>
+                  </View>
+
+                  <View>
+                    <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 8 }}>
+                      <Text style={{ fontSize: 14, color: colors.textSecondary, fontWeight: "600" }}>
+                        Longest Streak
+                      </Text>
+                      <Text style={{ fontSize: 16, fontWeight: "bold", color: colors.warning }}>
+                        {statsData?.longestStreak || 0} days
+                      </Text>
+                    </View>
+                  </View>
+
+                  <View>
+                    <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 8 }}>
+                      <Text style={{ fontSize: 14, color: colors.textSecondary, fontWeight: "600" }}>Diamonds</Text>
+                      <Text style={{ fontSize: 16, fontWeight: "bold", color: colors.info }}>
+                        {statsData?.diamonds || 0}
+                      </Text>
+                    </View>
+                  </View>
+                </View>
               </View>
+
+              {/* Rank Card */}
+              <LinearGradient
+                colors={["#FFD700", "#FFA500"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={{ borderRadius: 16, padding: 20 }}
+              >
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 16 }}>
+                  <View
+                    style={{
+                      width: 64,
+                      height: 64,
+                      borderRadius: 32,
+                      backgroundColor: "rgba(255, 255, 255, 0.3)",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <TrendingUp size={32} color="white" />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 24, fontWeight: "900", color: "white", marginBottom: 4 }}>
+                      #{Math.floor(Math.random() * 1000) + 1}
+                    </Text>
+                    <Text style={{ fontSize: 14, color: "rgba(255, 255, 255, 0.9)", fontWeight: "600" }}>
+                      Global Ranking
+                    </Text>
+                  </View>
+                </View>
+              </LinearGradient>
             </View>
           )}
 
           {selectedTab === "about" && (
-            <View style={{ marginTop: 16, paddingHorizontal: 20 }}>
-              <View style={{ backgroundColor: "white", borderRadius: 16, padding: 20 }}>
-                <Text style={{ fontSize: 16, fontWeight: "600", marginBottom: 8 }}>Email</Text>
-                <Text style={{ color: "#666", marginBottom: 16 }}>{sessionData.user.email}</Text>
+            <View style={{ marginTop: 20, paddingHorizontal: 20, gap: 16 }}>
+              {/* User Context Card */}
+              <View
+                style={{
+                  backgroundColor: colors.card,
+                  borderRadius: 16,
+                  padding: 20,
+                  borderWidth: 1,
+                  borderColor: colors.border,
+                }}
+              >
+                <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+                  <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+                    <View
+                      style={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: 20,
+                        backgroundColor: colors.primary + "20",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Sparkles size={20} color={colors.primary} />
+                    </View>
+                    <Text style={{ fontSize: 18, fontWeight: "bold", color: colors.text }}>
+                      AI Quest Context
+                    </Text>
+                  </View>
+                  <Pressable onPress={() => setIsEditingAbout(!isEditingAbout)}>
+                    {isEditingAbout ? (
+                      <X size={24} color={colors.textSecondary} />
+                    ) : (
+                      <Edit3 size={20} color={colors.primary} />
+                    )}
+                  </Pressable>
+                </View>
 
-                <Text style={{ fontSize: 16, fontWeight: "600", marginBottom: 8 }}>Member Since</Text>
-                <Text style={{ color: "#666", marginBottom: 16 }}>
-                  {new Date(sessionData.user.createdAt || Date.now()).toLocaleDateString()}
+                <Text style={{ fontSize: 14, color: colors.textSecondary, marginBottom: 16, lineHeight: 20 }}>
+                  Tell Ben about yourself to get personalized quests tailored to your goals and interests!
                 </Text>
 
-                <Text style={{ fontSize: 16, fontWeight: "600", marginBottom: 8 }}>Total XP</Text>
-                <Text style={{ color: "#666", marginBottom: 24 }}>{statsData?.totalXP || 0}</Text>
+                {isEditingAbout ? (
+                  <View style={{ gap: 16 }}>
+                    <View>
+                      <Text style={{ fontSize: 14, fontWeight: "600", color: colors.text, marginBottom: 8 }}>
+                        About You
+                      </Text>
+                      <TextInput
+                        value={userContext}
+                        onChangeText={setUserContext}
+                        placeholder="e.g., I'm a software developer looking to network..."
+                        placeholderTextColor={colors.textSecondary}
+                        multiline
+                        numberOfLines={3}
+                        style={{
+                          backgroundColor: colors.surface,
+                          borderRadius: 12,
+                          padding: 16,
+                          fontSize: 16,
+                          color: colors.text,
+                          borderWidth: 1,
+                          borderColor: colors.border,
+                          textAlignVertical: "top",
+                          minHeight: 100,
+                        }}
+                      />
+                    </View>
 
-                <Pressable
-                  onPress={handleLogout}
-                  style={{
-                    backgroundColor: "#FF3B30",
-                    paddingVertical: 14,
-                    borderRadius: 8,
-                    alignItems: "center",
-                  }}
-                >
-                  <Text style={{ color: "white", fontWeight: "bold", fontSize: 16 }}>Sign Out</Text>
-                </Pressable>
+                    <View>
+                      <Text style={{ fontSize: 14, fontWeight: "600", color: colors.text, marginBottom: 8 }}>
+                        Your Goals
+                      </Text>
+                      <TextInput
+                        value={goals}
+                        onChangeText={setGoals}
+                        placeholder="e.g., Get more confident in public speaking..."
+                        placeholderTextColor={colors.textSecondary}
+                        multiline
+                        numberOfLines={3}
+                        style={{
+                          backgroundColor: colors.surface,
+                          borderRadius: 12,
+                          padding: 16,
+                          fontSize: 16,
+                          color: colors.text,
+                          borderWidth: 1,
+                          borderColor: colors.border,
+                          textAlignVertical: "top",
+                          minHeight: 100,
+                        }}
+                      />
+                    </View>
+
+                    <View>
+                      <Text style={{ fontSize: 14, fontWeight: "600", color: colors.text, marginBottom: 8 }}>
+                        Interests & Hobbies
+                      </Text>
+                      <TextInput
+                        value={interests}
+                        onChangeText={setInterests}
+                        placeholder="e.g., Fitness, startups, travel, music..."
+                        placeholderTextColor={colors.textSecondary}
+                        multiline
+                        numberOfLines={2}
+                        style={{
+                          backgroundColor: colors.surface,
+                          borderRadius: 12,
+                          padding: 16,
+                          fontSize: 16,
+                          color: colors.text,
+                          borderWidth: 1,
+                          borderColor: colors.border,
+                          textAlignVertical: "top",
+                          minHeight: 80,
+                        }}
+                      />
+                    </View>
+
+                    <Pressable
+                      onPress={handleSaveContext}
+                      style={{
+                        backgroundColor: colors.primary,
+                        paddingVertical: 16,
+                        borderRadius: 12,
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: 8,
+                      }}
+                    >
+                      <Save size={20} color="white" />
+                      <Text style={{ color: "white", fontWeight: "bold", fontSize: 16 }}>Save Context</Text>
+                    </Pressable>
+                  </View>
+                ) : (
+                  <View style={{ gap: 12 }}>
+                    <View>
+                      <Text style={{ fontSize: 14, fontWeight: "600", color: colors.text, marginBottom: 4 }}>
+                        About You
+                      </Text>
+                      <Text style={{ fontSize: 14, color: colors.textSecondary, lineHeight: 20 }}>
+                        {userContext || "No information added yet"}
+                      </Text>
+                    </View>
+                    <View>
+                      <Text style={{ fontSize: 14, fontWeight: "600", color: colors.text, marginBottom: 4 }}>
+                        Your Goals
+                      </Text>
+                      <Text style={{ fontSize: 14, color: colors.textSecondary, lineHeight: 20 }}>
+                        {goals || "No goals added yet"}
+                      </Text>
+                    </View>
+                    <View>
+                      <Text style={{ fontSize: 14, fontWeight: "600", color: colors.text, marginBottom: 4 }}>
+                        Interests
+                      </Text>
+                      <Text style={{ fontSize: 14, color: colors.textSecondary, lineHeight: 20 }}>
+                        {interests || "No interests added yet"}
+                      </Text>
+                    </View>
+                  </View>
+                )}
               </View>
+
+              {/* Account Info */}
+              <View
+                style={{
+                  backgroundColor: colors.card,
+                  borderRadius: 16,
+                  padding: 20,
+                  borderWidth: 1,
+                  borderColor: colors.border,
+                }}
+              >
+                <Text style={{ fontSize: 18, fontWeight: "bold", color: colors.text, marginBottom: 16 }}>
+                  Account Info
+                </Text>
+                <View style={{ gap: 12 }}>
+                  <View>
+                    <Text style={{ fontSize: 14, fontWeight: "600", color: colors.textSecondary, marginBottom: 4 }}>
+                      Email
+                    </Text>
+                    <Text style={{ fontSize: 16, color: colors.text }}>{sessionData.user.email}</Text>
+                  </View>
+                  <View>
+                    <Text style={{ fontSize: 14, fontWeight: "600", color: colors.textSecondary, marginBottom: 4 }}>
+                      Member Since
+                    </Text>
+                    <Text style={{ fontSize: 16, color: colors.text }}>
+                      {new Date(sessionData.user.createdAt || Date.now()).toLocaleDateString()}
+                    </Text>
+                  </View>
+                </View>
+              </View>
+
+              {/* Sign Out */}
+              <Pressable
+                onPress={handleLogout}
+                style={{
+                  backgroundColor: colors.card,
+                  borderRadius: 16,
+                  padding: 20,
+                  borderWidth: 2,
+                  borderColor: colors.error,
+                  alignItems: "center",
+                }}
+              >
+                <Text style={{ color: colors.error, fontWeight: "bold", fontSize: 16 }}>Sign Out</Text>
+              </Pressable>
             </View>
           )}
         </ScrollView>
       </SafeAreaView>
+
+      {/* Avatar Modal */}
+      <Modal visible={showAvatarModal} transparent animationType="slide">
+        <View style={{ flex: 1, backgroundColor: "rgba(0, 0, 0, 0.7)", justifyContent: "flex-end" }}>
+          <View
+            style={{
+              backgroundColor: colors.card,
+              borderTopLeftRadius: 24,
+              borderTopRightRadius: 24,
+              padding: 24,
+              paddingBottom: 40,
+            }}
+          >
+            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
+              <Text style={{ fontSize: 22, fontWeight: "bold", color: colors.text }}>Choose Avatar</Text>
+              <Pressable onPress={() => setShowAvatarModal(false)}>
+                <X size={28} color={colors.textSecondary} />
+              </Pressable>
+            </View>
+
+            <View style={{ gap: 16 }}>
+              <Pressable
+                onPress={() => {
+                  Alert.alert("Coming Soon", "Upload your own photo avatar!");
+                  setShowAvatarModal(false);
+                }}
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 16,
+                  padding: 20,
+                  backgroundColor: colors.surface,
+                  borderRadius: 16,
+                  borderWidth: 1,
+                  borderColor: colors.border,
+                }}
+              >
+                <View
+                  style={{
+                    width: 56,
+                    height: 56,
+                    borderRadius: 28,
+                    backgroundColor: colors.primary + "20",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Upload size={28} color={colors.primary} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontSize: 18, fontWeight: "700", color: colors.text, marginBottom: 4 }}>
+                    Upload Photo
+                  </Text>
+                  <Text style={{ fontSize: 14, color: colors.textSecondary }}>
+                    Choose from gallery or take a photo
+                  </Text>
+                </View>
+              </Pressable>
+
+              <Pressable
+                onPress={() => {
+                  Alert.alert("Coming Soon", "Generate an AI gaming avatar!");
+                  setShowAvatarModal(false);
+                }}
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 16,
+                  padding: 20,
+                  backgroundColor: colors.surface,
+                  borderRadius: 16,
+                  borderWidth: 2,
+                  borderColor: colors.primary,
+                }}
+              >
+                <View
+                  style={{
+                    width: 56,
+                    height: 56,
+                    borderRadius: 28,
+                    backgroundColor: colors.primary + "20",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Sparkles size={28} color={colors.primary} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                    <Text style={{ fontSize: 18, fontWeight: "700", color: colors.text }}>
+                      Generate AI Avatar
+                    </Text>
+                    <View
+                      style={{
+                        backgroundColor: colors.primary,
+                        paddingHorizontal: 8,
+                        paddingVertical: 2,
+                        borderRadius: 8,
+                      }}
+                    >
+                      <Text style={{ fontSize: 10, fontWeight: "900", color: "white" }}>NEW</Text>
+                    </View>
+                  </View>
+                  <Text style={{ fontSize: 14, color: colors.textSecondary }}>
+                    Create a gaming-style avatar with AI
+                  </Text>
+                </View>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }

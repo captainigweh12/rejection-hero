@@ -156,39 +156,85 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 - **COMMUNITY**: Groups, Manage Categories, Explore World
 - Log out and version display
 
-**Profile & Settings** ✨ ENHANCED!
-- **Modern UI Design**: Clean, card-based layout with consistent spacing and shadows
-- **Theme System** 🎨 NEW!:
-  - Full dark/light mode support throughout the app
-  - System theme option (follows device settings)
-  - Tap theme card to cycle: System → Light → Dark
-  - Dynamic color system that adapts all screens
-  - Smooth transitions between themes
-  - Icon indicators: Sun (Light), Moon (Dark), Smartphone (System)
-- **Language Selection** 🌍 ENHANCED!:
-  - Dedicated full-screen Language Selection page
-  - Modern card-based language picker with flags
-  - 10 languages fully supported with native translations
-  - Real-time app-wide language switching
-  - Selected language highlighted with checkmark
-  - Languages supported:
-    - 🇺🇸 English
-    - 🇪🇸 Spanish (Español)
-    - 🇫🇷 French (Français)
-    - 🇩🇪 German (Deutsch)
-    - 🇧🇷 Portuguese (Português)
-    - 🇮🇹 Italian (Italiano)
-    - 🇯🇵 Japanese (日本語)
-    - 🇨🇳 Chinese (中文)
-    - 🇰🇷 Korean (한국어)
-    - 🇸🇦 Arabic (العربية)
-- **Settings Categories**:
-  - Appearance: Theme switcher with visual icons
-  - Preferences: Language selection (navigates to dedicated page)
-  - Live Features: Enable livestreaming with description
-  - Notifications: Quest reminders toggle
-  - Legal: Safety Guidelines access
-  - Account Actions: Sign out with confirmation
+**Profile & Settings** ✨ FULLY REDESIGNED!
+
+**Gaming-Style Profile Page** 🎮 NEW!
+- **Hero Header with Gradient**: Purple/blue/orange gradient banner
+- **Glowing Avatar** ✨:
+  - Large 140x140px avatar with white border
+  - Golden (#FFD700) shadow glow effect for gaming aesthetic
+  - Camera button overlay for avatar changes
+  - Golden level badge positioned on avatar (top-right)
+- **Username Display**: Large, uppercase with letter-spacing
+- **XP Progress Bar** 📊:
+  - Shows current XP out of 100 to next level
+  - Golden progress indicator
+  - "X / 100 XP to Level Y" text
+- **Three Gaming Stat Cards** 🏆:
+  - **Streak**: Flame icon with current streak days
+  - **Quests**: Target icon with total quests completed
+  - **Trophies**: Trophy icon with total trophies earned
+  - Each card has colored icon badge and large stat number
+- **Modern Tab System**: Three tabs with smooth transitions
+  - **Quests Tab**: List of completed quests with badges
+  - **Stats Tab**: Detailed progress metrics and global ranking card
+  - **About Tab**: User context for AI quest personalization
+- **AI Quest Context Section** 🤖 NEW!:
+  - Edit mode with three personalization fields:
+    - **About You**: Background and current situation (for tailored quests)
+    - **Your Goals**: What you want to achieve (quest personalization)
+    - **Interests & Hobbies**: Topics and activities you enjoy
+  - Save button to store context for better AI quest generation
+  - Context helps AI create quests that match your life and goals
+- **Avatar Upload Modal** 📸:
+  - Upload Photo option (camera/gallery)
+  - Generate AI Avatar option (marked as NEW)
+  - Coming soon functionality
+
+**Theme System** 🎨:
+- Full dark/light mode support throughout the app
+- System theme option (follows device settings)
+- Tap theme card to cycle: System → Light → Dark
+- Dynamic color system that adapts all screens
+- Smooth transitions between themes
+- Icon indicators: Sun (Light), Moon (Dark), Smartphone (System)
+- Persisted in AsyncStorage
+
+**Language Selection** 🌍:
+- Dedicated full-screen Language Selection page
+- Modern card-based language picker with flags
+- 10 languages fully supported with native translations
+- Real-time app-wide language switching
+- Selected language highlighted with checkmark badge
+- Persisted in AsyncStorage
+- Languages supported:
+  - 🇺🇸 English
+  - 🇪🇸 Spanish (Español)
+  - 🇫🇷 French (Français)
+  - 🇩🇪 German (Deutsch)
+  - 🇧🇷 Portuguese (Português)
+  - 🇮🇹 Italian (Italiano)
+  - 🇯🇵 Japanese (日本語)
+  - 🇨🇳 Chinese (中文)
+  - 🇰🇷 Korean (한국어)
+  - 🇸🇦 Arabic (العربية)
+
+**Settings Screen** ⚙️:
+- Modern card-based layout with consistent spacing
+- **Appearance**: Theme switcher with visual icons
+- **Preferences**: Language selection (navigates to dedicated page)
+- **Live Features**: Enable livestreaming with description
+- **Notifications**: Quest reminders toggle
+- **Legal**: Safety Guidelines access
+- **Account Actions**: Sign out with confirmation
+
+**Hamburger Menu** 📱:
+- Modern card-based design throughout
+- Color-coded icon badges in circular containers
+- ChevronRight indicators for navigation
+- Profile card with gradient avatar
+- Organized sections: Profile, Adventure, Community
+- Theme-aware colors
 
 **Live Streaming** ✨ NEW!
 - Real-time live streaming powered by Daily.co
