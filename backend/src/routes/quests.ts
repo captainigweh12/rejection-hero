@@ -356,6 +356,21 @@ Return a JSON object with: title (exactly 3 words), description, category, diffi
     });
 
     const data = await response.json();
+
+    // Log the response for debugging
+    console.log("OpenAI API response:", JSON.stringify(data, null, 2));
+
+    // Check for API errors
+    if (data.error) {
+      console.error("OpenAI API error:", data.error);
+      throw new Error(`OpenAI API error: ${data.error.message || JSON.stringify(data.error)}`);
+    }
+
+    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+      console.error("Unexpected API response format:", data);
+      throw new Error("Invalid response format from OpenAI API");
+    }
+
     const questData = JSON.parse(data.choices[0].message.content);
 
     // Ensure title is 3 words
