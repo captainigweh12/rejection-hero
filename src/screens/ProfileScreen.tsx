@@ -122,7 +122,7 @@ export default function ProfileScreen({ navigation }: Props) {
 
   if (!sessionData?.user) {
     return (
-      <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
         <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
           <View style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 32 }}>
             <Shield size={64} color="#7E3FE4" />
@@ -151,7 +151,7 @@ export default function ProfileScreen({ navigation }: Props) {
 
   if (profileLoading) {
     return (
-      <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
         <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
           <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
             <ActivityIndicator size="large" color="#7E3FE4" />
@@ -453,7 +453,7 @@ export default function ProfileScreen({ navigation }: Props) {
                 style={{
                   textAlign: "center",
                   fontWeight: "700",
-                  color: selectedTab === "quests" ? "white" : colors.textSecondary,
+                  color: selectedTab === "quests" ? "white" : "rgba(255, 255, 255, 0.6)",
                   fontSize: 14,
                 }}
               >
@@ -473,7 +473,7 @@ export default function ProfileScreen({ navigation }: Props) {
                 style={{
                   textAlign: "center",
                   fontWeight: "700",
-                  color: selectedTab === "stats" ? "white" : colors.textSecondary,
+                  color: selectedTab === "stats" ? "white" : "rgba(255, 255, 255, 0.6)",
                   fontSize: 14,
                 }}
               >
@@ -493,7 +493,7 @@ export default function ProfileScreen({ navigation }: Props) {
                 style={{
                   textAlign: "center",
                   fontWeight: "700",
-                  color: selectedTab === "about" ? "white" : colors.textSecondary,
+                  color: selectedTab === "about" ? "white" : "rgba(255, 255, 255, 0.6)",
                   fontSize: 14,
                 }}
               >
@@ -787,7 +787,7 @@ export default function ProfileScreen({ navigation }: Props) {
                         value={userContext}
                         onChangeText={setUserContext}
                         placeholder="e.g., I'm a software developer looking to network..."
-                        placeholderTextColor={colors.textSecondary}
+                        placeholderTextColor="rgba(255, 255, 255, 0.4)"
                         multiline
                         numberOfLines={3}
                         style={{
@@ -812,7 +812,7 @@ export default function ProfileScreen({ navigation }: Props) {
                         value={goals}
                         onChangeText={setGoals}
                         placeholder="e.g., Get more confident in public speaking..."
-                        placeholderTextColor={colors.textSecondary}
+                        placeholderTextColor="rgba(255, 255, 255, 0.4)"
                         multiline
                         numberOfLines={3}
                         style={{
@@ -837,7 +837,7 @@ export default function ProfileScreen({ navigation }: Props) {
                         value={interests}
                         onChangeText={setInterests}
                         placeholder="e.g., Fitness, startups, travel, music..."
-                        placeholderTextColor={colors.textSecondary}
+                        placeholderTextColor="rgba(255, 255, 255, 0.4)"
                         multiline
                         numberOfLines={2}
                         style={{
