@@ -53,7 +53,19 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 - Each page is tap-to-advance for intuitive flow
 
 **AI Quest Generation** ✨ ENHANCED! (Context-Aware & Location-Based with Google Maps)
-- **3-word titles**: All quests have concise 3-word action titles (e.g., "Ask Coffee Shops", "Request Business Cards")
+- **Personal Context** 🎯 NEW!:
+  - Add personal context when creating quests (e.g., "I'm a software developer looking for a job")
+  - AI tailors quests to your specific goals and situation
+  - Examples provided for Career, Dating, Sales, etc.
+- **Smart Quest Types** ⭐ NEW!:
+  - **TAKE_ACTION quests**: For action-based tasks (applying to jobs, sending emails, attending events)
+    - Shows golden star "I Did It!" button instead of YES/NO
+    - Tracks actions completed with star counter
+    - Perfect for career advancement, networking, and personal growth
+  - **COLLECT_NOS quests**: Traditional rejection challenges (asking for discounts, favors, etc.)
+    - Shows YES/NO buttons to track responses
+  - **COLLECT_YES quests**: For collecting approvals
+- **3-word titles**: All quests have concise 3-word action titles (e.g., "Ask Coffee Shops", "Request Business Cards", "Apply To Jobs")
 - **Unique challenges**: AI tracks your last 20 quests and ensures no duplicates
 - **Google Maps Places API Integration** 🗺️:
   - Fetches real verified places within 10 miles using Google Maps
@@ -72,10 +84,16 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 - **Map integration**: "📍 View on Map" button opens Google Maps with exact quest location (using accurate coordinates from verified places)
 - **Higher creativity**: Temperature set to 0.9 for more variety
 - **Difficulty-based goals**:
-  - EASY: 3-5 NOs (10 min timer)
-  - MEDIUM: 5-8 NOs (15 min timer)
-  - HARD: 8-12 NOs (20 min timer)
-  - EXPERT: 12-15 NOs (30 min timer)
+  - For COLLECT_NOS/COLLECT_YES:
+    - EASY: 3-5 NOs/YESes (10 min timer)
+    - MEDIUM: 5-8 NOs/YESes (15 min timer)
+    - HARD: 8-12 NOs/YESes (20 min timer)
+    - EXPERT: 12-15 NOs/YESes (30 min timer)
+  - For TAKE_ACTION:
+    - EASY: 1-3 actions (10 min timer)
+    - MEDIUM: 3-5 actions (15 min timer)
+    - HARD: 5-8 actions (20 min timer)
+    - EXPERT: 8-12 actions (30 min timer)
   - **Smart goal counts**: Single-location front desk quests automatically set to 1 NO (e.g., "Visit Hilton Hotel and ask front desk for free upgrade" = 1 NO)
 - Specific, actionable descriptions with clear instructions
 

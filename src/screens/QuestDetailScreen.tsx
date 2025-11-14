@@ -3,7 +3,7 @@ import { View, Text, Pressable, ActivityIndicator, ScrollView, Modal, Animated, 
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Bell, Menu as MenuIcon, Flame, Trophy, Diamond, Clock, Sparkles } from "lucide-react-native";
+import { ArrowLeft, Bell, Menu as MenuIcon, Flame, Trophy, Diamond, Clock, Sparkles, Star } from "lucide-react-native";
 import * as Location from "expo-location";
 import type { RootStackScreenProps } from "@/navigation/types";
 import { api } from "@/lib/api";
@@ -409,7 +409,9 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
   const progress =
     quest.goalType === "COLLECT_NOS"
       ? (displayQuest.noCount / quest.goalCount) * 100
-      : (displayQuest.yesCount / quest.goalCount) * 100;
+      : quest.goalType === "COLLECT_YES"
+      ? (displayQuest.yesCount / quest.goalCount) * 100
+      : (displayQuest.actionCount / quest.goalCount) * 100;
 
   return (
     <View style={{ flex: 1, backgroundColor: "#F5F5F7" }}>
@@ -646,32 +648,55 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
               </View>
 
               {/* Progress Indicators */}
-              <View style={{ flexDirection: "row", gap: 12, marginBottom: 16 }}>
-                <View
-                  style={{
-                    flex: 1,
-                    backgroundColor: "#D1FAE5",
-                    paddingVertical: 10,
-                    borderRadius: 12,
-                  }}
-                >
-                  <Text style={{ color: "#065F46", fontSize: 15, fontWeight: "700", textAlign: "center" }}>
-                    NOs: {displayQuest.noCount}/{quest.goalCount}
-                  </Text>
+              {quest.goalType === "TAKE_ACTION" ? (
+                /* Single Action Counter for TAKE_ACTION quests */
+                <View style={{ marginBottom: 16 }}>
+                  <View
+                    style={{
+                      backgroundColor: "#FEF3C7",
+                      paddingVertical: 12,
+                      borderRadius: 12,
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 8,
+                    }}
+                  >
+                    <Star size={20} color="#D97706" fill="#D97706" />
+                    <Text style={{ color: "#92400E", fontSize: 16, fontWeight: "700" }}>
+                      Actions: {displayQuest.actionCount}/{quest.goalCount}
+                    </Text>
+                  </View>
                 </View>
-                <View
-                  style={{
-                    flex: 1,
-                    backgroundColor: "#FEE2E2",
-                    paddingVertical: 10,
-                    borderRadius: 12,
-                  }}
-                >
-                  <Text style={{ color: "#991B1B", fontSize: 15, fontWeight: "700", textAlign: "center" }}>
-                    YES: {displayQuest.yesCount}
-                  </Text>
+              ) : (
+                /* YES/NO Counters for COLLECT_NOS and COLLECT_YES quests */
+                <View style={{ flexDirection: "row", gap: 12, marginBottom: 16 }}>
+                  <View
+                    style={{
+                      flex: 1,
+                      backgroundColor: "#D1FAE5",
+                      paddingVertical: 10,
+                      borderRadius: 12,
+                    }}
+                  >
+                    <Text style={{ color: "#065F46", fontSize: 15, fontWeight: "700", textAlign: "center" }}>
+                      NOs: {displayQuest.noCount}/{quest.goalCount}
+                    </Text>
+                  </View>
+                  <View
+                    style={{
+                      flex: 1,
+                      backgroundColor: "#FEE2E2",
+                      paddingVertical: 10,
+                      borderRadius: 12,
+                    }}
+                  >
+                    <Text style={{ color: "#991B1B", fontSize: 15, fontWeight: "700", textAlign: "center" }}>
+                      YES: {displayQuest.yesCount}
+                    </Text>
+                  </View>
                 </View>
-              </View>
+              )}
 
               {/* Progress Bar */}
               <View
@@ -831,49 +856,79 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
             backgroundColor: "#F5F5F7",
           }}
         >
-          <View style={{ flexDirection: "row", gap: 12 }}>
-            {/* YES Button */}
+          {quest.goalType === "TAKE_ACTION" ? (
+            /* Action Star Button for TAKE_ACTION quests */
             <Pressable
-              onPress={() => recordMutation.mutate({ action: "YES" })}
+              onPress={() => recordMutation.mutate({ action: "ACTION" })}
               disabled={recordMutation.isPending}
               style={{
-                flex: 1,
-                backgroundColor: "#EF4444",
+                backgroundColor: "#FFD700",
                 paddingVertical: 20,
                 borderRadius: 24,
                 alignItems: "center",
                 justifyContent: "center",
                 opacity: recordMutation.isPending ? 0.5 : 1,
+                flexDirection: "row",
+                gap: 12,
               }}
             >
               {recordMutation.isPending ? (
                 <ActivityIndicator size="small" color="white" />
               ) : (
-                <Text style={{ color: "white", fontSize: 20, fontWeight: "bold" }}>YES</Text>
+                <>
+                  <Star size={28} color="white" fill="white" />
+                  <Text style={{ color: "white", fontSize: 20, fontWeight: "bold" }}>
+                    I Did It!
+                  </Text>
+                </>
               )}
             </Pressable>
+          ) : (
+            /* YES/NO Buttons for COLLECT_NOS and COLLECT_YES quests */
+            <View style={{ flexDirection: "row", gap: 12 }}>
+              {/* YES Button */}
+              <Pressable
+                onPress={() => recordMutation.mutate({ action: "YES" })}
+                disabled={recordMutation.isPending}
+                style={{
+                  flex: 1,
+                  backgroundColor: "#EF4444",
+                  paddingVertical: 20,
+                  borderRadius: 24,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  opacity: recordMutation.isPending ? 0.5 : 1,
+                }}
+              >
+                {recordMutation.isPending ? (
+                  <ActivityIndicator size="small" color="white" />
+                ) : (
+                  <Text style={{ color: "white", fontSize: 20, fontWeight: "bold" }}>YES</Text>
+                )}
+              </Pressable>
 
-            {/* NO Button */}
-            <Pressable
-              onPress={() => recordMutation.mutate({ action: "NO" })}
-              disabled={recordMutation.isPending}
-              style={{
-                flex: 1,
-                backgroundColor: "#10B981",
-                paddingVertical: 20,
-                borderRadius: 24,
-                alignItems: "center",
-                justifyContent: "center",
-                opacity: recordMutation.isPending ? 0.5 : 1,
-              }}
-            >
-              {recordMutation.isPending ? (
-                <ActivityIndicator size="small" color="white" />
-              ) : (
-                <Text style={{ color: "white", fontSize: 20, fontWeight: "bold" }}>NO</Text>
-              )}
-            </Pressable>
-          </View>
+              {/* NO Button */}
+              <Pressable
+                onPress={() => recordMutation.mutate({ action: "NO" })}
+                disabled={recordMutation.isPending}
+                style={{
+                  flex: 1,
+                  backgroundColor: "#10B981",
+                  paddingVertical: 20,
+                  borderRadius: 24,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  opacity: recordMutation.isPending ? 0.5 : 1,
+                }}
+              >
+                {recordMutation.isPending ? (
+                  <ActivityIndicator size="small" color="white" />
+                ) : (
+                  <Text style={{ color: "white", fontSize: 20, fontWeight: "bold" }}>NO</Text>
+                )}
+              </Pressable>
+            </View>
+          )}
         </View>
       </SafeAreaView>
 

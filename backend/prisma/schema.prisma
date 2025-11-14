@@ -142,7 +142,7 @@ model Quest {
   description   String
   category      String
   difficulty    String
-  goalType      String
+  goalType      String      // COLLECT_NOS, COLLECT_YES, or TAKE_ACTION
   goalCount     Int         @default(1)
   xpReward      Int
   pointReward   Int
@@ -166,6 +166,7 @@ model UserQuest {
   status      String
   noCount     Int          @default(0)
   yesCount    Int          @default(0)
+  actionCount Int          @default(0) // For TAKE_ACTION quests
   startedAt   DateTime?
   completedAt DateTime?
   createdAt   DateTime     @default(now())

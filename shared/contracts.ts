@@ -161,6 +161,7 @@ export const getUserQuestsResponseSchema = z.object({
       }),
       noCount: z.number(),
       yesCount: z.number(),
+      actionCount: z.number(),
       status: z.string(),
       startedAt: z.string().nullable(),
     })
@@ -224,7 +225,7 @@ export type StartQuestResponse = z.infer<typeof startQuestResponseSchema>;
 
 // POST /api/quests/:id/record - Record NO or YES
 export const recordQuestActionRequestSchema = z.object({
-  action: z.enum(["NO", "YES"]),
+  action: z.enum(["NO", "YES", "ACTION"]),
 });
 export type RecordQuestActionRequest = z.infer<typeof recordQuestActionRequestSchema>;
 export const recordQuestActionResponseSchema = z.object({
@@ -232,6 +233,7 @@ export const recordQuestActionResponseSchema = z.object({
   completed: z.boolean(),
   noCount: z.number(),
   yesCount: z.number(),
+  actionCount: z.number(),
 });
 export type RecordQuestActionResponse = z.infer<typeof recordQuestActionResponseSchema>;
 

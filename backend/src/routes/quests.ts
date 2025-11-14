@@ -55,6 +55,7 @@ questsRouter.get("/", async (c) => {
       },
       noCount: uq.noCount,
       yesCount: uq.yesCount,
+      actionCount: uq.actionCount,
       status: uq.status,
       startedAt: uq.startedAt?.toISOString() || null,
     }));
@@ -198,7 +199,7 @@ questsRouter.post("/:id/start", async (c) => {
 });
 
 // ============================================
-// POST /api/quests/:id/record - Record NO or YES
+// POST /api/quests/:id/record - Record NO, YES, or ACTION
 // ============================================
 questsRouter.post("/:id/record", zValidator("json", recordQuestActionRequestSchema), async (c) => {
   const user = c.get("user");
@@ -219,14 +220,16 @@ questsRouter.post("/:id/record", zValidator("json", recordQuestActionRequestSche
     return c.json({ message: "Quest not found" }, 404);
   }
 
-  // Update counts
+  // Update counts based on action type
   const newNoCount = action === "NO" ? userQuest.noCount + 1 : userQuest.noCount;
   const newYesCount = action === "YES" ? userQuest.yesCount + 1 : userQuest.yesCount;
+  const newActionCount = action === "ACTION" ? userQuest.actionCount + 1 : userQuest.actionCount;
 
   // Check if quest is completed
   const isCompleted =
     (userQuest.quest.goalType === "COLLECT_NOS" && newNoCount >= userQuest.quest.goalCount) ||
-    (userQuest.quest.goalType === "COLLECT_YES" && newYesCount >= userQuest.quest.goalCount);
+    (userQuest.quest.goalType === "COLLECT_YES" && newYesCount >= userQuest.quest.goalCount) ||
+    (userQuest.quest.goalType === "TAKE_ACTION" && newActionCount >= userQuest.quest.goalCount);
 
   // Update user quest
   const updated = await db.userQuest.update({
@@ -234,6 +237,7 @@ questsRouter.post("/:id/record", zValidator("json", recordQuestActionRequestSche
     data: {
       noCount: newNoCount,
       yesCount: newYesCount,
+      actionCount: newActionCount,
       ...(isCompleted && {
         status: "COMPLETED",
         completedAt: new Date(),
@@ -251,6 +255,7 @@ questsRouter.post("/:id/record", zValidator("json", recordQuestActionRequestSche
     completed: isCompleted,
     noCount: newNoCount,
     yesCount: newYesCount,
+    actionCount: newActionCount,
   } satisfies RecordQuestActionResponse);
 });
 
@@ -482,12 +487,31 @@ REQUIREMENTS:
 - Make each challenge unique, creative, and VERY specific
 - Category: ${category || "SALES/SOCIAL/ENTREPRENEURSHIP/DATING/CONFIDENCE/CAREER"}
 - Difficulty: ${difficulty || "EASY/MEDIUM/HARD/EXPERT"}
-- goalType: COLLECT_NOS (primary) or COLLECT_YES (rare)
-- goalCount:
-  * EASY: 3-5 NOs
-  * MEDIUM: 5-8 NOs
-  * HARD: 8-12 NOs
-  * EXPERT: 12-15 NOs
+- goalType:
+  * COLLECT_NOS (for collecting rejections/NOs)
+  * COLLECT_YES (for collecting approvals/YESes)
+  * TAKE_ACTION (for action-based tasks where you just track completion, not yes/no responses)
+
+- When to use TAKE_ACTION:
+  * Use this for quests that don't involve asking yes/no questions
+  * Examples: "Apply to 5 jobs", "Send 3 cold emails", "Attend 2 networking events", "Update your resume", "Create a portfolio"
+  * If the user's custom prompt mentions taking action (applying, sending, creating, updating, attending), use TAKE_ACTION
+
+- When to use COLLECT_NOS/COLLECT_YES:
+  * Use these for quests that involve asking people for something and getting yes/no responses
+  * Examples: "Ask for discounts", "Request favors", "Pitch ideas", "Ask someone out"
+
+- goalCount: number based on difficulty and goalType
+  * For COLLECT_NOS/COLLECT_YES:
+    - EASY: 3-5 NOs/YESes
+    - MEDIUM: 5-8 NOs/YESes
+    - HARD: 8-12 NOs/YESes
+    - EXPERT: 12-15 NOs/YESes
+  * For TAKE_ACTION:
+    - EASY: 1-3 actions
+    - MEDIUM: 3-5 actions
+    - HARD: 5-8 actions
+    - EXPERT: 8-12 actions
 ${previousQuestsContext}${locationContext}${timeContext}
 
 GOOD EXAMPLES:

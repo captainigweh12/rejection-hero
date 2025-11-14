@@ -460,18 +460,21 @@ export default function CreateQuestScreen({ navigation }: Props) {
             </View>
           </View>
 
-          {/* Custom Prompt */}
+          {/* Add Context */}
           <View>
             <Text style={{ fontSize: 18, fontWeight: "bold", color: "#1C1C1E", marginBottom: 4 }}>
-              Custom Prompt{" "}
+              Add Personal Context{" "}
               <Text style={{ fontSize: 14, fontWeight: "normal", color: "#999" }}>
                 (Optional)
               </Text>
             </Text>
+            <Text style={{ fontSize: 14, color: "#666", marginBottom: 12 }}>
+              Tell AI about your goals so it can create tailored quests
+            </Text>
             <TextInput
               value={customPrompt}
               onChangeText={setCustomPrompt}
-              placeholder="Describe your ideal rejection challenge..."
+              placeholder="E.g., I'm a software developer looking for a job, help me take action towards applying for multiple positions"
               placeholderTextColor="#999"
               multiline
               numberOfLines={4}
@@ -485,12 +488,14 @@ export default function CreateQuestScreen({ navigation }: Props) {
                 borderWidth: 1,
                 borderColor: "#E5E5EA",
                 textAlignVertical: "top",
-                minHeight: 100,
-                marginTop: 12,
+                minHeight: 120,
               }}
             />
-            <Text style={{ fontSize: 12, color: "#999", marginTop: 8 }}>
-              Example: &quot;Ask local business owners for advice on starting a company&quot;
+            <Text style={{ fontSize: 12, color: "#999", marginTop: 8, lineHeight: 16 }}>
+              💡 Examples:{"\n"}
+              • Career: &quot;I&apos;m a software developer looking for a job&quot;{"\n"}
+              • Dating: &quot;I want to practice asking people out on dates&quot;{"\n"}
+              • Sales: &quot;I&apos;m building a SaaS product and need to talk to potential customers&quot;
             </Text>
           </View>
         </ScrollView>
