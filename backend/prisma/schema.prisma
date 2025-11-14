@@ -152,6 +152,11 @@ model Quest {
   xpReward    Int
   pointReward Int
   isAIGenerated Boolean   @default(false)
+  location    String?     // Human-readable location name
+  latitude    Float?      // GPS latitude
+  longitude   Float?      // GPS longitude
+  timeContext String?     // Time of day context (morning, afternoon, evening)
+  dateContext String?     // Date context (weekday, weekend, holiday, special event)
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
   UserQuests  UserQuest[]

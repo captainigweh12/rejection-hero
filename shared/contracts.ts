@@ -153,6 +153,11 @@ export const getUserQuestsResponseSchema = z.object({
         goalCount: z.number(),
         xpReward: z.number(),
         pointReward: z.number(),
+        location: z.string().nullable(),
+        latitude: z.number().nullable(),
+        longitude: z.number().nullable(),
+        timeContext: z.string().nullable(),
+        dateContext: z.string().nullable(),
       }),
       noCount: z.number(),
       yesCount: z.number(),
@@ -169,6 +174,9 @@ export const getUserQuestsResponseSchema = z.object({
         description: z.string(),
         category: z.string(),
         difficulty: z.string(),
+        location: z.string().nullable(),
+        latitude: z.number().nullable(),
+        longitude: z.number().nullable(),
       }),
     })
   ),
@@ -180,6 +188,9 @@ export const generateQuestRequestSchema = z.object({
   category: z.string().optional(),
   difficulty: z.string().optional(),
   customPrompt: z.string().optional(),
+  userLocation: z.string().optional(), // User's current location name
+  userLatitude: z.number().optional(), // User's GPS latitude
+  userLongitude: z.number().optional(), // User's GPS longitude
 });
 export type GenerateQuestRequest = z.infer<typeof generateQuestRequestSchema>;
 export const generateQuestResponseSchema = z.object({
@@ -195,6 +206,11 @@ export const generateQuestResponseSchema = z.object({
     goalCount: z.number(),
     xpReward: z.number(),
     pointReward: z.number(),
+    location: z.string().nullable(),
+    latitude: z.number().nullable(),
+    longitude: z.number().nullable(),
+    timeContext: z.string().nullable(),
+    dateContext: z.string().nullable(),
   }),
 });
 export type GenerateQuestResponse = z.infer<typeof generateQuestResponseSchema>;

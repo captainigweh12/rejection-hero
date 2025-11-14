@@ -47,6 +47,11 @@ questsRouter.get("/", async (c) => {
         goalCount: uq.quest.goalCount,
         xpReward: uq.quest.xpReward,
         pointReward: uq.quest.pointReward,
+        location: uq.quest.location,
+        latitude: uq.quest.latitude,
+        longitude: uq.quest.longitude,
+        timeContext: uq.quest.timeContext,
+        dateContext: uq.quest.dateContext,
       },
       noCount: uq.noCount,
       yesCount: uq.yesCount,
@@ -64,6 +69,9 @@ questsRouter.get("/", async (c) => {
         description: uq.quest.description,
         category: uq.quest.category,
         difficulty: uq.quest.difficulty,
+        location: uq.quest.location,
+        latitude: uq.quest.latitude,
+        longitude: uq.quest.longitude,
       },
     }));
 
@@ -83,10 +91,18 @@ questsRouter.post("/generate", zValidator("json", generateQuestRequestSchema), a
     return c.json({ message: "Unauthorized" }, 401);
   }
 
-  const { category, difficulty, customPrompt } = c.req.valid("json");
+  const { category, difficulty, customPrompt, userLocation, userLatitude, userLongitude } = c.req.valid("json");
 
-  // Generate quest using OpenAI
-  const questData = await generateQuestWithAI(category, difficulty, customPrompt, user.id);
+  // Generate quest using OpenAI with location context
+  const questData = await generateQuestWithAI(
+    category,
+    difficulty,
+    customPrompt,
+    user.id,
+    userLocation,
+    userLatitude,
+    userLongitude
+  );
 
   // Create quest in database
   const quest = await db.quest.create({
@@ -100,6 +116,11 @@ questsRouter.post("/generate", zValidator("json", generateQuestRequestSchema), a
       xpReward: questData.xpReward,
       pointReward: questData.pointReward,
       isAIGenerated: true,
+      location: questData.location,
+      latitude: questData.latitude,
+      longitude: questData.longitude,
+      timeContext: questData.timeContext,
+      dateContext: questData.dateContext,
     },
   });
 
@@ -125,6 +146,11 @@ questsRouter.post("/generate", zValidator("json", generateQuestRequestSchema), a
       goalCount: quest.goalCount,
       xpReward: quest.xpReward,
       pointReward: quest.pointReward,
+      location: quest.location,
+      latitude: quest.latitude,
+      longitude: quest.longitude,
+      timeContext: quest.timeContext,
+      dateContext: quest.dateContext,
     },
   } satisfies GenerateQuestResponse);
 });
@@ -233,7 +259,10 @@ async function generateQuestWithAI(
   category?: string,
   difficulty?: string,
   customPrompt?: string,
-  userId?: string
+  userId?: string,
+  userLocation?: string,
+  userLatitude?: number,
+  userLongitude?: number
 ): Promise<{
   title: string;
   description: string;
@@ -243,6 +272,11 @@ async function generateQuestWithAI(
   goalCount: number;
   xpReward: number;
   pointReward: number;
+  location?: string;
+  latitude?: number;
+  longitude?: number;
+  timeContext?: string;
+  dateContext?: string;
 }> {
   const OPENAI_API_KEY = process.env.OPENAI_API_KEY || process.env.EXPO_PUBLIC_VIBECODE_OPENAI_API_KEY;
 
@@ -255,6 +289,37 @@ async function generateQuestWithAI(
   console.log("Using OpenAI API to generate quest");
 
   try {
+    // Get current date/time context
+    const now = new Date();
+    const hour = now.getHours();
+    const day = now.getDay(); // 0 = Sunday, 6 = Saturday
+    const dayName = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][day];
+    const month = now.toLocaleDateString("en-US", { month: "long" });
+    const date = now.getDate();
+
+    // Determine time of day
+    let timeOfDay = "morning";
+    if (hour >= 12 && hour < 17) timeOfDay = "afternoon";
+    else if (hour >= 17 && hour < 21) timeOfDay = "evening";
+    else if (hour >= 21 || hour < 6) timeOfDay = "night";
+
+    // Determine day type
+    const isWeekend = day === 0 || day === 6;
+    const dayType = isWeekend ? "weekend" : "weekday";
+
+    // Build context string
+    const locationContext = userLocation
+      ? `\n\nLOCATION CONTEXT: User is in/near ${userLocation}. Create quests that reference specific places, businesses, or venues that would typically be found in this area. Make the quest locally relevant.`
+      : "";
+
+    const timeContext = `\n\nTIME/DATE CONTEXT:
+- Current time: ${timeOfDay} (${hour}:00)
+- Day: ${dayName} (${dayType})
+- Date: ${month} ${date}
+- Consider what businesses/places are typically open and busy at this time
+- Consider what activities are appropriate for this time of day
+- If it's ${timeOfDay}, suggest locations and activities that would be active right now`;
+
     // Get user's previous quests to avoid duplicates
     let previousQuestTitles: string[] = [];
     if (userId) {
@@ -297,7 +362,7 @@ BAD EXAMPLES (too generic):
 - "Ask strangers for help"
 - "Reach out to potential clients"
 
-Return a JSON object with: title (exactly 3 words), description, category, difficulty, goalType, goalCount.`
+Return a JSON object with: title (exactly 3 words), description, category, difficulty, goalType, goalCount, location (specific place name if relevant), latitude (number), longitude (number).${locationContext}${timeContext}`
       : `Create a unique "Go for No" rejection challenge for ${category || "general"} category at ${difficulty || "medium"} difficulty level.
 
 REQUIREMENTS:
@@ -319,7 +384,7 @@ REQUIREMENTS:
   * MEDIUM: 5-8 NOs
   * HARD: 8-12 NOs
   * EXPERT: 12-15 NOs
-${previousQuestsContext}
+${previousQuestsContext}${locationContext}${timeContext}
 
 GOOD EXAMPLES:
 - SALES: "Request grocery stores for expired produce samples to take home"
@@ -335,7 +400,7 @@ BAD EXAMPLES (too generic):
 - "Request help from business owners"
 - "Reach out to potential clients"
 
-Return a JSON object with: title (exactly 3 words), description, category, difficulty, goalType, goalCount.`;
+Return a JSON object with: title (exactly 3 words), description, category, difficulty, goalType, goalCount, location (specific place name if mentioned), latitude (approx number if location given), longitude (approx number if location given).`;
 
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
@@ -399,6 +464,11 @@ Return a JSON object with: title (exactly 3 words), description, category, diffi
       ...questData,
       xpReward: Math.round(questData.goalCount * 10 * difficultyMultiplier + 50),
       pointReward: Math.round(questData.goalCount * 20 * difficultyMultiplier + 100),
+      location: questData.location || null,
+      latitude: questData.latitude || null,
+      longitude: questData.longitude || null,
+      timeContext: `${dayType} ${timeOfDay}`,
+      dateContext: `${dayName}, ${month} ${date}`,
     };
   } catch (error) {
     console.error("AI generation failed, using predefined quest:", error);

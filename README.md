@@ -45,15 +45,19 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 - Visual feedback while generating next quest
 - Each page is tap-to-advance for intuitive flow
 
-**AI Quest Generation** ✨ ENHANCED!
+**AI Quest Generation** ✨ ENHANCED! (Context-Aware & Location-Based)
 - **3-word titles**: All quests have concise 3-word action titles (e.g., "Ask Coffee Shops", "Request Business Cards")
 - **Unique challenges**: AI tracks your last 20 quests and ensures no duplicates
+- **Location-aware**: Quests are generated based on your current location with specific nearby places
+- **Time-aware**: Considers current time of day (morning, afternoon, evening, night) for relevant activities
+- **Date-aware**: Adapts to weekday vs weekend and considers what businesses are open
+- **Map integration**: View quest locations on Google Maps with one tap
 - **Higher creativity**: Temperature set to 0.9 for more variety
 - **Difficulty-based goals**:
-  - EASY: 3-5 NOs
-  - MEDIUM: 5-8 NOs
-  - HARD: 8-12 NOs
-  - EXPERT: 12-15 NOs
+  - EASY: 3-5 NOs (10 min timer)
+  - MEDIUM: 5-8 NOs (15 min timer)
+  - HARD: 8-12 NOs (20 min timer)
+  - EXPERT: 12-15 NOs (30 min timer)
 - Specific, actionable descriptions with clear instructions
 
 **Quest Examples:**
