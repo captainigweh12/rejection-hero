@@ -3,7 +3,7 @@ import { View, Text, Pressable, ActivityIndicator, ScrollView, Modal, Animated, 
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Bell, Menu as MenuIcon, Flame, Trophy, Diamond, Clock, Sparkles, Star } from "lucide-react-native";
+import { ArrowLeft, Bell, Menu as MenuIcon, Flame, Trophy, Diamond, Clock, Sparkles, Star, X } from "lucide-react-native";
 import * as Location from "expo-location";
 import type { RootStackScreenProps } from "@/navigation/types";
 import { api } from "@/lib/api";
@@ -40,6 +40,8 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [showDifficultyModal, setShowDifficultyModal] = useState(false);
   const [isRegenerating, setIsRegenerating] = useState(false);
+  const [confettiAnims] = useState(() => Array.from({ length: 20 }, () => new Animated.Value(0)));
+  const [pageTransitionAnim] = useState(new Animated.Value(0));
 
   const { data: questsData, isLoading } = useQuery<GetUserQuestsResponse>({
     queryKey: ["quests"],
@@ -208,15 +210,27 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
           setCompletionData(data);
           setShowCompletion(true);
 
-          // Trigger celebration animation
-          Animated.sequence([
-            Animated.spring(celebrationAnim, {
+          // Trigger celebration animation with bounce effect
+          Animated.spring(celebrationAnim, {
+            toValue: 1,
+            useNativeDriver: true,
+            tension: 40,
+            friction: 8,
+          }).start();
+
+          // Initialize page transition animation
+          pageTransitionAnim.setValue(1);
+
+          // Animate confetti particles
+          confettiAnims.forEach((anim, index) => {
+            anim.setValue(0);
+            Animated.timing(anim, {
               toValue: 1,
+              duration: 2000 + Math.random() * 1000,
+              delay: index * 50,
               useNativeDriver: true,
-              tension: 50,
-              friction: 7,
-            }),
-          ]).start();
+            }).start();
+          });
 
           // Reset page to accomplishments
           setCompletionPage("accomplishments");
@@ -336,13 +350,51 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
 
   const handleNextPage = () => {
     if (completionPage === "accomplishments") {
-      setCompletionPage("leaderboard");
+      // Fade out current page and fade in next
+      Animated.timing(pageTransitionAnim, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }).start(() => {
+        setCompletionPage("leaderboard");
+        Animated.timing(pageTransitionAnim, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }).start();
+      });
     } else if (completionPage === "leaderboard") {
-      setCompletionPage("streak");
+      Animated.timing(pageTransitionAnim, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }).start(() => {
+        setCompletionPage("streak");
+        Animated.timing(pageTransitionAnim, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }).start();
+      });
     } else if (completionPage === "streak") {
       // Navigate to next quest
       handleGenerateNext();
     }
+  };
+
+  const handleQuitQuest = () => {
+    Alert.alert(
+      "End Quest",
+      "Are you sure you want to end this quest? Your progress will be saved but the quest will remain incomplete.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "End Quest",
+          style: "destructive",
+          onPress: () => navigation.goBack(),
+        },
+      ]
+    );
   };
 
   const getCategoryColor = (category: string) => {
@@ -463,28 +515,46 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
             </View>
           </View>
 
-          {/* Timer */}
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 6,
-              backgroundColor: timeRemaining < 60 ? "#FEE2E2" : "#FFF7ED",
-              paddingHorizontal: 12,
-              paddingVertical: 6,
-              borderRadius: 12,
-            }}
-          >
-            <Clock size={18} color={timeRemaining < 60 ? "#FF3B30" : "#FF6B35"} />
-            <Text
+          {/* Right side: Timer and Quit button */}
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+            {/* Timer */}
+            <View
               style={{
-                color: timeRemaining < 60 ? "#FF3B30" : "#FF6B35",
-                fontSize: 14,
-                fontWeight: "bold",
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 6,
+                backgroundColor: timeRemaining < 60 ? "#FEE2E2" : "#FFF7ED",
+                paddingHorizontal: 12,
+                paddingVertical: 6,
+                borderRadius: 12,
               }}
             >
-              {formatTime(timeRemaining)}
-            </Text>
+              <Clock size={18} color={timeRemaining < 60 ? "#FF3B30" : "#FF6B35"} />
+              <Text
+                style={{
+                  color: timeRemaining < 60 ? "#FF3B30" : "#FF6B35",
+                  fontSize: 14,
+                  fontWeight: "bold",
+                }}
+              >
+                {formatTime(timeRemaining)}
+              </Text>
+            </View>
+
+            {/* Quit Button */}
+            <Pressable
+              onPress={handleQuitQuest}
+              style={{
+                backgroundColor: "#EF4444",
+                width: 36,
+                height: 36,
+                borderRadius: 18,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <X size={20} color="white" />
+            </Pressable>
           </View>
         </View>
 
@@ -947,7 +1017,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
         </View>
       </SafeAreaView>
 
-      {/* Completion Modal - Sequential Pages */}
+      {/* Completion Modal - Sequential Pages with Duolingo-style Animations */}
       <Modal visible={showCompletion} transparent animationType="fade" onRequestClose={() => {}}>
         <Pressable
           onPress={handleNextPage}
@@ -957,6 +1027,51 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
           }}
         >
           <SafeAreaView style={{ flex: 1 }}>
+            {/* Floating Confetti Particles */}
+            {confettiAnims.map((anim, index) => {
+              const colors = ["#FFD700", "#FF6B35", "#00D9FF", "#7E3FE4", "#4CAF50"];
+              const size = 8 + Math.random() * 8;
+              const leftPosition = Math.random() * 100;
+
+              return (
+                <Animated.View
+                  key={index}
+                  style={{
+                    position: "absolute",
+                    left: `${leftPosition}%`,
+                    width: size,
+                    height: size,
+                    borderRadius: size / 2,
+                    backgroundColor: colors[index % colors.length],
+                    opacity: anim.interpolate({
+                      inputRange: [0, 0.5, 1],
+                      outputRange: [0, 1, 0],
+                    }),
+                    transform: [
+                      {
+                        translateY: anim.interpolate({
+                          inputRange: [0, 1],
+                          outputRange: [-50, 800],
+                        }),
+                      },
+                      {
+                        translateX: anim.interpolate({
+                          inputRange: [0, 1],
+                          outputRange: [0, (Math.random() - 0.5) * 100],
+                        }),
+                      },
+                      {
+                        rotate: anim.interpolate({
+                          inputRange: [0, 1],
+                          outputRange: ["0deg", `${360 * (Math.random() > 0.5 ? 1 : -1)}deg`],
+                        }),
+                      },
+                    ],
+                  }}
+                />
+              );
+            })}
+
             {/* Page 1: Accomplishments */}
             {completionPage === "accomplishments" && (
               <Animated.View
@@ -965,6 +1080,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                   justifyContent: "center",
                   alignItems: "center",
                   paddingHorizontal: 32,
+                  opacity: pageTransitionAnim,
                   transform: [
                     {
                       scale: celebrationAnim.interpolate({
@@ -972,18 +1088,30 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                         outputRange: [0.8, 1],
                       }),
                     },
+                    {
+                      translateY: pageTransitionAnim.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [50, 0],
+                      }),
+                    },
                   ],
                 }}
               >
-                {/* Trophy Icon */}
+                {/* Trophy Icon with bounce */}
                 <Animated.View
                   style={{
                     marginBottom: 40,
                     transform: [
                       {
+                        scale: celebrationAnim.interpolate({
+                          inputRange: [0, 0.5, 1],
+                          outputRange: [0, 1.2, 1],
+                        }),
+                      },
+                      {
                         rotate: celebrationAnim.interpolate({
-                          inputRange: [0, 1],
-                          outputRange: ["0deg", "360deg"],
+                          inputRange: [0, 0.5, 1],
+                          outputRange: ["-20deg", "20deg", "0deg"],
                         }),
                       },
                     ],
@@ -997,43 +1125,72 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                       borderRadius: 70,
                       alignItems: "center",
                       justifyContent: "center",
+                      shadowColor: "#FFD700",
+                      shadowOffset: { width: 0, height: 0 },
+                      shadowOpacity: 0.6,
+                      shadowRadius: 20,
+                      elevation: 10,
                     }}
                   >
                     <Trophy size={70} color="white" />
                   </LinearGradient>
                 </Animated.View>
 
-                {/* Title */}
-                <Text
+                {/* Title with slide up animation */}
+                <Animated.Text
                   style={{
                     fontSize: 40,
                     fontWeight: "bold",
                     color: "white",
                     marginBottom: 16,
                     textAlign: "center",
+                    opacity: celebrationAnim,
+                    transform: [
+                      {
+                        translateY: celebrationAnim.interpolate({
+                          inputRange: [0, 1],
+                          outputRange: [30, 0],
+                        }),
+                      },
+                    ],
                   }}
                 >
                   Quest Complete!
-                </Text>
+                </Animated.Text>
 
-                <Text
+                <Animated.Text
                   style={{
                     fontSize: 18,
                     color: "rgba(255, 255, 255, 0.9)",
                     textAlign: "center",
                     marginBottom: 48,
+                    opacity: celebrationAnim,
                   }}
                 >
                   You collected {completionData?.noCount} NOs!
-                </Text>
+                </Animated.Text>
 
-                {/* Accomplishments */}
-                <View
+                {/* Accomplishments Card with slide up */}
+                <Animated.View
                   style={{
                     width: "100%",
                     backgroundColor: "white",
                     borderRadius: 24,
                     padding: 24,
+                    shadowColor: "#000",
+                    shadowOffset: { width: 0, height: 4 },
+                    shadowOpacity: 0.2,
+                    shadowRadius: 10,
+                    elevation: 5,
+                    opacity: celebrationAnim,
+                    transform: [
+                      {
+                        translateY: celebrationAnim.interpolate({
+                          inputRange: [0, 1],
+                          outputRange: [50, 0],
+                        }),
+                      },
+                    ],
                   }}
                 >
                   <Text
@@ -1111,34 +1268,56 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                       <Text style={{ color: "#666", fontSize: 14 }}>Total Points</Text>
                     </View>
                   </View>
-                </View>
+                </Animated.View>
 
                 {/* Tap to continue */}
-                <Text
+                <Animated.Text
                   style={{
                     marginTop: 32,
                     fontSize: 16,
                     color: "rgba(255, 255, 255, 0.8)",
                     textAlign: "center",
+                    opacity: celebrationAnim,
                   }}
                 >
                   Tap to continue
-                </Text>
+                </Animated.Text>
               </Animated.View>
             )}
 
             {/* Page 2: Leaderboard */}
             {completionPage === "leaderboard" && (
-              <View
+              <Animated.View
                 style={{
                   flex: 1,
                   justifyContent: "center",
                   alignItems: "center",
                   paddingHorizontal: 32,
+                  opacity: pageTransitionAnim,
+                  transform: [
+                    {
+                      translateY: pageTransitionAnim.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [50, 0],
+                      }),
+                    },
+                  ],
                 }}
               >
-                {/* Trophy Icon */}
-                <View style={{ marginBottom: 32 }}>
+                {/* Trophy Icon with pulse */}
+                <Animated.View
+                  style={{
+                    marginBottom: 32,
+                    transform: [
+                      {
+                        scale: pageTransitionAnim.interpolate({
+                          inputRange: [0, 0.5, 1],
+                          outputRange: [0.5, 1.1, 1],
+                        }),
+                      },
+                    ],
+                  }}
+                >
                   <LinearGradient
                     colors={["#0EA5E9", "#0284C7"]}
                     style={{
@@ -1147,27 +1326,33 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                       borderRadius: 50,
                       alignItems: "center",
                       justifyContent: "center",
+                      shadowColor: "#0EA5E9",
+                      shadowOffset: { width: 0, height: 0 },
+                      shadowOpacity: 0.6,
+                      shadowRadius: 15,
+                      elevation: 8,
                     }}
                   >
                     <Trophy size={50} color="white" />
                   </LinearGradient>
-                </View>
+                </Animated.View>
 
                 {/* Title */}
-                <Text
+                <Animated.Text
                   style={{
                     fontSize: 32,
                     fontWeight: "bold",
                     color: "white",
                     marginBottom: 48,
                     textAlign: "center",
+                    opacity: pageTransitionAnim,
                   }}
                 >
                   Leaderboard Position
-                </Text>
+                </Animated.Text>
 
-                {/* User Position */}
-                <View
+                {/* User Position with bounce */}
+                <Animated.View
                   style={{
                     width: "100%",
                     backgroundColor: "white",
@@ -1175,6 +1360,20 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                     padding: 32,
                     alignItems: "center",
                     marginBottom: 24,
+                    shadowColor: "#000",
+                    shadowOffset: { width: 0, height: 4 },
+                    shadowOpacity: 0.2,
+                    shadowRadius: 10,
+                    elevation: 5,
+                    opacity: pageTransitionAnim,
+                    transform: [
+                      {
+                        scale: pageTransitionAnim.interpolate({
+                          inputRange: [0, 0.8, 1],
+                          outputRange: [0.8, 1.05, 1],
+                        }),
+                      },
+                    ],
                   }}
                 >
                   <Text style={{ fontSize: 72, fontWeight: "bold", color: "#0C4A6E" }}>
@@ -1183,17 +1382,26 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                   <Text style={{ fontSize: 16, color: "#0369A1", marginTop: 8 }}>
                     out of {leaderboardData?.totalUsers || 0} warriors
                   </Text>
-                </View>
+                </Animated.View>
 
                 {/* Top Users */}
                 {leaderboardData?.leaderboard && leaderboardData.leaderboard.length > 0 && (
-                  <View
+                  <Animated.View
                     style={{
                       width: "100%",
                       backgroundColor: "rgba(255, 255, 255, 0.95)",
                       borderRadius: 20,
                       padding: 20,
                       maxHeight: 250,
+                      opacity: pageTransitionAnim,
+                      transform: [
+                        {
+                          translateY: pageTransitionAnim.interpolate({
+                            inputRange: [0, 1],
+                            outputRange: [30, 0],
+                          }),
+                        },
+                      ],
                     }}
                   >
                     <Text
@@ -1250,35 +1458,57 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                         </View>
                       ))}
                     </ScrollView>
-                  </View>
+                  </Animated.View>
                 )}
 
                 {/* Tap to continue */}
-                <Text
+                <Animated.Text
                   style={{
                     marginTop: 32,
                     fontSize: 16,
                     color: "rgba(255, 255, 255, 0.8)",
                     textAlign: "center",
+                    opacity: pageTransitionAnim,
                   }}
                 >
                   Tap to continue
-                </Text>
-              </View>
+                </Animated.Text>
+              </Animated.View>
             )}
 
             {/* Page 3: Streak */}
             {completionPage === "streak" && (
-              <View
+              <Animated.View
                 style={{
                   flex: 1,
                   justifyContent: "center",
                   alignItems: "center",
                   paddingHorizontal: 32,
+                  opacity: pageTransitionAnim,
+                  transform: [
+                    {
+                      translateY: pageTransitionAnim.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [50, 0],
+                      }),
+                    },
+                  ],
                 }}
               >
-                {/* Flame Icon */}
-                <View style={{ marginBottom: 48 }}>
+                {/* Flame Icon with flicker animation */}
+                <Animated.View
+                  style={{
+                    marginBottom: 48,
+                    transform: [
+                      {
+                        scale: pageTransitionAnim.interpolate({
+                          inputRange: [0, 0.5, 1],
+                          outputRange: [0.5, 1.15, 1],
+                        }),
+                      },
+                    ],
+                  }}
+                >
                   <LinearGradient
                     colors={["#FF6B35", "#FF8C42"]}
                     style={{
@@ -1287,20 +1517,39 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                       borderRadius: 70,
                       alignItems: "center",
                       justifyContent: "center",
+                      shadowColor: "#FF6B35",
+                      shadowOffset: { width: 0, height: 0 },
+                      shadowOpacity: 0.7,
+                      shadowRadius: 20,
+                      elevation: 10,
                     }}
                   >
                     <Flame size={80} color="white" />
                   </LinearGradient>
-                </View>
+                </Animated.View>
 
-                {/* Streak Number */}
-                <View
+                {/* Streak Number with bounce */}
+                <Animated.View
                   style={{
                     backgroundColor: "white",
                     borderRadius: 24,
                     padding: 40,
                     alignItems: "center",
                     width: "100%",
+                    shadowColor: "#000",
+                    shadowOffset: { width: 0, height: 4 },
+                    shadowOpacity: 0.2,
+                    shadowRadius: 10,
+                    elevation: 5,
+                    opacity: pageTransitionAnim,
+                    transform: [
+                      {
+                        scale: pageTransitionAnim.interpolate({
+                          inputRange: [0, 0.7, 1],
+                          outputRange: [0.8, 1.1, 1],
+                        }),
+                      },
+                    ],
                   }}
                 >
                   <Text style={{ fontSize: 80, fontWeight: "bold", color: "#FF6B35" }}>
@@ -1309,11 +1558,11 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                   <Text style={{ fontSize: 24, color: "#92400E", fontWeight: "600" }}>
                     day streak
                   </Text>
-                </View>
+                </Animated.View>
 
                 {/* Generating Next Quest */}
                 {isGeneratingNext ? (
-                  <View
+                  <Animated.View
                     style={{
                       marginTop: 48,
                       backgroundColor: "rgba(255, 255, 255, 0.95)",
@@ -1323,26 +1572,28 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                       alignItems: "center",
                       gap: 16,
                       width: "100%",
+                      opacity: pageTransitionAnim,
                     }}
                   >
                     <ActivityIndicator size="large" color="#FF6B35" />
                     <Text style={{ color: "#1C1C1E", fontSize: 16, fontWeight: "600", flex: 1 }}>
                       Generating your next challenge...
                     </Text>
-                  </View>
+                  </Animated.View>
                 ) : (
-                  <Text
+                  <Animated.Text
                     style={{
                       marginTop: 48,
                       fontSize: 16,
                       color: "rgba(255, 255, 255, 0.8)",
                       textAlign: "center",
+                      opacity: pageTransitionAnim,
                     }}
                   >
                     Tap to start next quest
-                  </Text>
+                  </Animated.Text>
                 )}
-              </View>
+              </Animated.View>
             )}
           </SafeAreaView>
         </Pressable>

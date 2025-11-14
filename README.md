@@ -32,6 +32,7 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 - Progress bar showing completion percentage
 - Single focused quest card with category badge
 - Large, easy-to-tap NO (green) and YES (red) buttons
+- **Quit Quest Button** 🆕: Red X button in header to end quest anytime with confirmation
 - **Quest Regeneration** 🔄 NEW!:
   - Tap on category or difficulty badges to change them
   - Select new category and difficulty from dropdown modals
@@ -40,15 +41,23 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
   - Keeps your location context for nearby places
   - Works even when you have 2 active quests (replaces the current one)
 
-**Quest Completion Flow** ✨ NEW! (Duolingo-Inspired Sequential Pages)
+**Quest Completion Flow** ✨ ENHANCED! (Duolingo-Style Animations)
 - **Loading screen**: 2-second loading animation with pulsing trophy
+- **Duolingo-style animations** 🎨 NEW!:
+  - Floating confetti particles with random colors, sizes, and rotation
+  - Bounce and scale animations on all elements
+  - Smooth fade and slide transitions between pages
+  - Trophy with rotation and bounce effect
+  - Flame icon with pulsing glow
+  - Card elements slide up with staggered timing
+  - Golden glowing shadows on icons (Duolingo aesthetic)
 - **Sequential completion pages** (tap to advance through each):
   - **Page 1 - Accomplishments**: Full-screen green background showing XP/Points earned and total stats
   - **Page 2 - Leaderboard**: Shows your rank and top 5 warriors with their XP
   - **Page 3 - Streak**: Large streak display with fire icon
 - **Auto-generation**: Automatically creates next harder quest when you tap on streak page
 - Progressive difficulty: EASY → MEDIUM → HARD → EXPERT
-- Smooth animations and spring physics
+- Smooth spring physics and bounce animations throughout
 - Visual feedback while generating next quest
 - Each page is tap-to-advance for intuitive flow
 - **Smart quest limit handling**: Properly handles the 2-quest active limit when auto-generating next quest
