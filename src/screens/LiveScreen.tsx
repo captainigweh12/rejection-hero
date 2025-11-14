@@ -412,81 +412,102 @@ export default function LiveScreen({ navigation }: Props) {
           </View>
         )}
 
-        {/* Chat Section */}
+        {/* Chat Section - Modern Design */}
         <View
           style={{
             position: "absolute",
             bottom: 85,
             left: 0,
             right: 0,
-            maxHeight: 280,
           }}
         >
-          {/* Chat Messages */}
-          {showChat && commentsData?.comments && commentsData.comments.length > 0 && (
-            <View style={{ maxHeight: 160, paddingHorizontal: 16, marginBottom: 8 }}>
+          {/* Chat Messages - Minimal Bubbles */}
+          {commentsData?.comments && commentsData.comments.length > 0 && (
+            <View style={{ paddingHorizontal: 16, paddingBottom: 12, maxHeight: 200 }}>
               <ScrollView showsVerticalScrollIndicator={false}>
-                {commentsData.comments.slice(0, 5).reverse().map((comment) => (
+                {commentsData.comments.slice(-4).map((comment) => (
                   <View
                     key={comment.id}
                     style={{
-                      backgroundColor: "rgba(0, 0, 0, 0.7)",
-                      borderRadius: 12,
-                      padding: 10,
-                      marginBottom: 6,
-                      maxWidth: "85%",
+                      marginBottom: 8,
+                      alignSelf: "flex-start",
+                      maxWidth: "80%",
                     }}
                   >
-                    <Text style={{ color: "#FFD700", fontSize: 12, fontWeight: "bold", marginBottom: 2 }}>
-                      {comment.user.name || "Anonymous"}
-                    </Text>
-                    <Text style={{ color: "white", fontSize: 14 }}>{comment.message}</Text>
+                    <View
+                      style={{
+                        backgroundColor: "#000000",
+                        borderRadius: 16,
+                        paddingHorizontal: 14,
+                        paddingVertical: 10,
+                        borderWidth: 1,
+                        borderColor: "rgba(255, 255, 255, 0.08)",
+                      }}
+                    >
+                      <Text style={{ color: "#FF6B35", fontSize: 11, fontWeight: "700", marginBottom: 3 }}>
+                        {comment.user.name || "Anonymous"}
+                      </Text>
+                      <Text style={{ color: "rgba(255, 255, 255, 0.95)", fontSize: 13, lineHeight: 18 }}>
+                        {comment.message}
+                      </Text>
+                    </View>
                   </View>
                 ))}
               </ScrollView>
             </View>
           )}
 
-          {/* Input Area */}
+          {/* Input Area - Sleek & Modern */}
           <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : "height"}
             style={{
-              backgroundColor: "rgba(0, 0, 0, 0.9)",
+              backgroundColor: "#000000",
               paddingHorizontal: 16,
-              paddingTop: 12,
-              paddingBottom: 12,
+              paddingVertical: 14,
               borderTopWidth: 1,
-              borderTopColor: "rgba(255, 255, 255, 0.1)",
+              borderTopColor: "rgba(255, 255, 255, 0.05)",
             }}
           >
             <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
-              <TextInput
-                value={commentText}
-                onChangeText={setCommentText}
-                placeholder="Send a message..."
-                placeholderTextColor="#999"
+              <View
                 style={{
                   flex: 1,
-                  backgroundColor: "rgba(255, 255, 255, 0.1)",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  backgroundColor: "rgba(255, 255, 255, 0.06)",
                   borderRadius: 24,
-                  paddingHorizontal: 16,
-                  paddingVertical: 12,
-                  color: "white",
-                  fontSize: 14,
+                  paddingHorizontal: 18,
+                  borderWidth: 1,
+                  borderColor: "rgba(255, 255, 255, 0.08)",
                 }}
-              />
+              >
+                <MessageCircle size={18} color="rgba(255, 255, 255, 0.4)" style={{ marginRight: 10 }} />
+                <TextInput
+                  value={commentText}
+                  onChangeText={setCommentText}
+                  placeholder="Add a message..."
+                  placeholderTextColor="rgba(255, 255, 255, 0.35)"
+                  style={{
+                    flex: 1,
+                    paddingVertical: 12,
+                    color: "white",
+                    fontSize: 14,
+                  }}
+                />
+              </View>
               <Pressable
                 onPress={handleSendComment}
+                disabled={!commentText.trim()}
                 style={{
-                  width: 48,
-                  height: 48,
-                  borderRadius: 24,
-                  backgroundColor: "#FF6B35",
+                  width: 46,
+                  height: 46,
+                  borderRadius: 23,
+                  backgroundColor: commentText.trim() ? "#FF6B35" : "rgba(255, 255, 255, 0.1)",
                   alignItems: "center",
                   justifyContent: "center",
                 }}
               >
-                <Send size={20} color="white" />
+                <Send size={19} color={commentText.trim() ? "white" : "rgba(255, 255, 255, 0.3)"} />
               </Pressable>
             </View>
           </KeyboardAvoidingView>
@@ -933,81 +954,102 @@ export default function LiveScreen({ navigation }: Props) {
           </View>
         )}
 
-        {/* Chat Section */}
+        {/* Chat Section - Modern Design */}
         <View
           style={{
             position: "absolute",
             bottom: 85,
             left: 0,
             right: 0,
-            maxHeight: 280,
           }}
         >
-          {/* Chat Messages */}
-          {showChat && commentsData?.comments && commentsData.comments.length > 0 && (
-            <View style={{ maxHeight: 160, paddingHorizontal: 16, marginBottom: 8 }}>
+          {/* Chat Messages - Minimal Bubbles */}
+          {commentsData?.comments && commentsData.comments.length > 0 && (
+            <View style={{ paddingHorizontal: 16, paddingBottom: 12, maxHeight: 200 }}>
               <ScrollView showsVerticalScrollIndicator={false}>
-                {commentsData.comments.slice(0, 5).reverse().map((comment) => (
+                {commentsData.comments.slice(-4).map((comment) => (
                   <View
                     key={comment.id}
                     style={{
-                      backgroundColor: "rgba(0, 0, 0, 0.7)",
-                      borderRadius: 12,
-                      padding: 10,
-                      marginBottom: 6,
-                      maxWidth: "85%",
+                      marginBottom: 8,
+                      alignSelf: "flex-start",
+                      maxWidth: "80%",
                     }}
                   >
-                    <Text style={{ color: "#FFD700", fontSize: 12, fontWeight: "bold", marginBottom: 2 }}>
-                      {comment.user.name || "Anonymous"}
-                    </Text>
-                    <Text style={{ color: "white", fontSize: 14 }}>{comment.message}</Text>
+                    <View
+                      style={{
+                        backgroundColor: "#000000",
+                        borderRadius: 16,
+                        paddingHorizontal: 14,
+                        paddingVertical: 10,
+                        borderWidth: 1,
+                        borderColor: "rgba(255, 255, 255, 0.08)",
+                      }}
+                    >
+                      <Text style={{ color: "#FF6B35", fontSize: 11, fontWeight: "700", marginBottom: 3 }}>
+                        {comment.user.name || "Anonymous"}
+                      </Text>
+                      <Text style={{ color: "rgba(255, 255, 255, 0.95)", fontSize: 13, lineHeight: 18 }}>
+                        {comment.message}
+                      </Text>
+                    </View>
                   </View>
                 ))}
               </ScrollView>
             </View>
           )}
 
-          {/* Input Area */}
+          {/* Input Area - Sleek & Modern */}
           <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : "height"}
             style={{
-              backgroundColor: "rgba(0, 0, 0, 0.9)",
+              backgroundColor: "#000000",
               paddingHorizontal: 16,
-              paddingTop: 12,
-              paddingBottom: 12,
+              paddingVertical: 14,
               borderTopWidth: 1,
-              borderTopColor: "rgba(255, 255, 255, 0.1)",
+              borderTopColor: "rgba(255, 255, 255, 0.05)",
             }}
           >
             <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
-              <TextInput
-                value={commentText}
-                onChangeText={setCommentText}
-                placeholder="Chat with viewers..."
-                placeholderTextColor="#999"
+              <View
                 style={{
                   flex: 1,
-                  backgroundColor: "rgba(255, 255, 255, 0.1)",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  backgroundColor: "rgba(255, 255, 255, 0.06)",
                   borderRadius: 24,
-                  paddingHorizontal: 16,
-                  paddingVertical: 12,
-                  color: "white",
-                  fontSize: 14,
+                  paddingHorizontal: 18,
+                  borderWidth: 1,
+                  borderColor: "rgba(255, 255, 255, 0.08)",
                 }}
-              />
+              >
+                <MessageCircle size={18} color="rgba(255, 255, 255, 0.4)" style={{ marginRight: 10 }} />
+                <TextInput
+                  value={commentText}
+                  onChangeText={setCommentText}
+                  placeholder="Chat with viewers..."
+                  placeholderTextColor="rgba(255, 255, 255, 0.35)"
+                  style={{
+                    flex: 1,
+                    paddingVertical: 12,
+                    color: "white",
+                    fontSize: 14,
+                  }}
+                />
+              </View>
               <Pressable
                 onPress={handleSendComment}
+                disabled={!commentText.trim()}
                 style={{
-                  width: 48,
-                  height: 48,
-                  borderRadius: 24,
-                  backgroundColor: "#FF6B35",
+                  width: 46,
+                  height: 46,
+                  borderRadius: 23,
+                  backgroundColor: commentText.trim() ? "#FF6B35" : "rgba(255, 255, 255, 0.1)",
                   alignItems: "center",
                   justifyContent: "center",
                 }}
               >
-                <Send size={20} color="white" />
+                <Send size={19} color={commentText.trim() ? "white" : "rgba(255, 255, 255, 0.3)"} />
               </Pressable>
             </View>
           </KeyboardAvoidingView>
