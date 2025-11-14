@@ -602,27 +602,40 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
               {displayQuest.quest.latitude && displayQuest.quest.longitude ? (
                 <Pressable
                   onPress={() => {
-                    const url = `https://www.google.com/maps/search/?api=1&query=${displayQuest.quest.latitude},${displayQuest.quest.longitude}`;
+                    // Use place name if available, otherwise fall back to coordinates
+                    const query = displayQuest.quest.location
+                      ? encodeURIComponent(displayQuest.quest.location)
+                      : `${displayQuest.quest.latitude},${displayQuest.quest.longitude}`;
+                    const url = `https://www.google.com/maps/search/?api=1&query=${query}`;
                     Linking.openURL(url).catch((err) => console.error("Error opening map:", err));
                   }}
                   style={{
                     marginTop: 16,
                     backgroundColor: "#00D9FF",
                     paddingVertical: 12,
-                    paddingHorizontal: 20,
+                    paddingHorizontal: 16,
                     borderRadius: 12,
                     flexDirection: "row",
                     alignItems: "center",
                     justifyContent: "center",
-                    gap: 8,
+                    gap: 6,
+                    maxWidth: "100%",
                   }}
                 >
                   <Text style={{ color: "white", fontSize: 16, fontWeight: "600" }}>
                     📍 View on Map
                   </Text>
                   {displayQuest.quest.location && (
-                    <Text style={{ color: "rgba(255, 255, 255, 0.8)", fontSize: 14 }}>
-                      ({displayQuest.quest.location})
+                    <Text
+                      style={{
+                        color: "rgba(255, 255, 255, 0.9)",
+                        fontSize: 14,
+                        flexShrink: 1,
+                      }}
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                    >
+                      ({displayQuest.quest.location.split(' - ')[0]})
                     </Text>
                   )}
                 </Pressable>
