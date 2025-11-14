@@ -130,21 +130,36 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
       return api.post<GenerateQuestResponse>("/api/quests/generate", data);
     },
     onSuccess: async (data) => {
-      queryClient.invalidateQueries({ queryKey: ["quests"] });
+      // Invalidate and wait for quests to refresh
+      await queryClient.invalidateQueries({ queryKey: ["quests"] });
 
-      // Auto-start the quest
+      // Auto-start the quest - no need for skipLimitCheck since the completed quest is no longer active
       try {
         await api.post(`/api/quests/${data.userQuestId}/start`, {});
-        queryClient.invalidateQueries({ queryKey: ["quests"] });
+        await queryClient.invalidateQueries({ queryKey: ["quests"] });
 
         // Update current quest ID to show the new quest
         setCurrentUserQuestId(data.userQuestId);
         setShowCompletion(false);
         setIsGeneratingNext(false);
         setTimeRemaining(300); // Reset timer
-      } catch (error) {
+      } catch (error: any) {
         console.error("Failed to start next quest:", error);
         setIsGeneratingNext(false);
+
+        // Check if it's the "Maximum 2 active quests" error
+        const errorMessage = error?.message || error?.toString() || "";
+        if (errorMessage.includes("Maximum 2 active quests")) {
+          Alert.alert(
+            "Quest Limit Reached",
+            "You already have 2 active quests. The new quest has been added to your queue. Please complete an active quest first."
+          );
+        } else {
+          Alert.alert(
+            "Unable to Start Quest",
+            "The new quest was created but couldn't be started automatically. Please check your active quests and try starting it manually from the main screen."
+          );
+        }
       }
     },
     onError: (error) => {

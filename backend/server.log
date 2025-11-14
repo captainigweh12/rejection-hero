@@ -178,3 +178,15 @@ OpenAI API response: {
 --> POST /api/quests/cmhzcniwv0007m2esa8v48kop/start [33m400[0m 2ms
 <-- GET /api/quests
 --> GET /api/quests [32m200[0m 3ms
+<-- GET /api/quests
+<-- GET /api/stats
+--> GET /api/quests [32m200[0m 16ms
+--> GET /api/stats [32m200[0m 15ms
+<-- GET /api/stats/leaderboard
+--> GET /api/stats/leaderboard [32m200[0m 14ms
+<-- GET /api/stats
+--> GET /api/stats [32m200[0m 13ms
+<-- GET /api/stats/leaderboard
+<-- GET /api/quests
+--> GET /api/quests [32m200[0m 13ms
+--> GET /api/stats/leaderboard [32m200[0m 26ms

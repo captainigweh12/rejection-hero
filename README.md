@@ -51,6 +51,8 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 - Smooth animations and spring physics
 - Visual feedback while generating next quest
 - Each page is tap-to-advance for intuitive flow
+- **Smart quest limit handling**: Properly handles the 2-quest active limit when auto-generating next quest
+- User-friendly error messages if quest limit is reached
 
 **AI Quest Generation** ✨ ENHANCED! (Context-Aware & Location-Based with Google Maps)
 - **Personal Context** 🎯:
