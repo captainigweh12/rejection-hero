@@ -32,6 +32,12 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 - Progress bar showing completion percentage
 - Single focused quest card with category badge
 - Large, easy-to-tap NO (green) and YES (red) buttons
+- **Quest Regeneration** 🔄 NEW!:
+  - Tap on category or difficulty badges to change them
+  - Select new category and difficulty from dropdown modals
+  - "Regenerate Quest" button appears when both are selected
+  - Instantly replaces current quest with new AI-generated quest matching your selections
+  - Keeps your location context for nearby places
 
 **Quest Completion Flow** ✨ NEW! (Duolingo-Inspired Sequential Pages)
 - **Loading screen**: 2-second loading animation with pulsing trophy

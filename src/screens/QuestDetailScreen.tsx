@@ -35,6 +35,11 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
   const [completionPage, setCompletionPage] = useState<"accomplishments" | "leaderboard" | "streak">("accomplishments");
   const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number; address?: string } | null>(null);
   const [locationPermission, setLocationPermission] = useState<boolean>(false);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedDifficulty, setSelectedDifficulty] = useState<string | null>(null);
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [showDifficultyModal, setShowDifficultyModal] = useState(false);
+  const [isRegenerating, setIsRegenerating] = useState(false);
 
   const { data: questsData, isLoading } = useQuery<GetUserQuestsResponse>({
     queryKey: ["quests"],
@@ -221,6 +226,59 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
       userLocation: userLocation?.address,
       userLatitude: userLocation?.latitude,
       userLongitude: userLocation?.longitude,
+    });
+  };
+
+  // Regenerate quest with new category/difficulty
+  const regenerateQuestMutation = useMutation({
+    mutationFn: async (params: { category: string; difficulty: string }) => {
+      const response = await api.post<GenerateQuestResponse>("/api/quests/generate", {
+        category: params.category,
+        difficulty: params.difficulty,
+        userLocation: userLocation?.address,
+        userLatitude: userLocation?.latitude,
+        userLongitude: userLocation?.longitude,
+      });
+      return response;
+    },
+    onSuccess: async (data) => {
+      // Delete the current quest
+      if (userQuest) {
+        await api.delete(`/api/quests/${userQuest.id}`);
+      }
+
+      // Start the new quest
+      await api.post(`/api/quests/${data.quest.id}/start`);
+
+      // Refresh quests data
+      await queryClient.invalidateQueries({ queryKey: ["quests"] });
+
+      // Navigate to the new quest
+      const updatedQuests = await api.get<GetUserQuestsResponse>("/api/quests");
+      const newUserQuest = updatedQuests.activeQuests.find((q) => q.quest.id === data.quest.id);
+      if (newUserQuest) {
+        setCurrentUserQuestId(newUserQuest.id);
+      }
+
+      setIsRegenerating(false);
+    },
+    onError: (error) => {
+      console.error("Failed to regenerate quest:", error);
+      setIsRegenerating(false);
+      Alert.alert("Error", "Failed to regenerate quest. Please try again.");
+    },
+  });
+
+  const handleRegenerate = () => {
+    if (!selectedCategory || !selectedDifficulty) {
+      Alert.alert("Selection Required", "Please select both category and difficulty");
+      return;
+    }
+
+    setIsRegenerating(true);
+    regenerateQuestMutation.mutate({
+      category: selectedCategory,
+      difficulty: selectedDifficulty,
     });
   };
 
@@ -431,14 +489,17 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                 elevation: 4,
               }}
             >
-              {/* Category & Difficulty Badges */}
+              {/* Category & Difficulty Badges with Tap to Change */}
               <View style={{ flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 16 }}>
-                <View
+                <Pressable
+                  onPress={() => setShowCategoryModal(true)}
                   style={{
                     backgroundColor: getCategoryColor(quest.category) + "20",
                     paddingHorizontal: 16,
                     paddingVertical: 8,
                     borderRadius: 16,
+                    borderWidth: 2,
+                    borderColor: getCategoryColor(quest.category) + "40",
                   }}
                 >
                   <Text
@@ -449,15 +510,18 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                       textTransform: "uppercase",
                     }}
                   >
-                    {quest.category}
+                    {quest.category} ⌄
                   </Text>
-                </View>
-                <View
+                </Pressable>
+                <Pressable
+                  onPress={() => setShowDifficultyModal(true)}
                   style={{
                     backgroundColor: getDifficultyColor(quest.difficulty) + "30",
                     paddingHorizontal: 16,
                     paddingVertical: 8,
                     borderRadius: 16,
+                    borderWidth: 2,
+                    borderColor: getDifficultyColor(quest.difficulty) + "40",
                   }}
                 >
                   <Text
@@ -468,9 +532,9 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                       textTransform: "uppercase",
                     }}
                   >
-                    {quest.difficulty}
+                    {quest.difficulty} ⌄
                   </Text>
-                </View>
+                </Pressable>
               </View>
 
               {/* Title */}
@@ -671,6 +735,41 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                   </Text>
                 </Pressable>
               ) : null}
+
+              {/* Regenerate Quest Button */}
+              {selectedCategory && selectedDifficulty && (
+                <Pressable
+                  onPress={handleRegenerate}
+                  disabled={isRegenerating}
+                  style={{
+                    marginTop: 16,
+                    backgroundColor: isRegenerating ? "#9CA3AF" : "#8B5CF6",
+                    paddingVertical: 14,
+                    paddingHorizontal: 20,
+                    borderRadius: 12,
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 8,
+                  }}
+                >
+                  {isRegenerating ? (
+                    <>
+                      <ActivityIndicator color="white" size="small" />
+                      <Text style={{ color: "white", fontSize: 16, fontWeight: "600" }}>
+                        Regenerating...
+                      </Text>
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles size={20} color="white" />
+                      <Text style={{ color: "white", fontSize: 16, fontWeight: "600" }}>
+                        Regenerate Quest ({selectedCategory} • {selectedDifficulty})
+                      </Text>
+                    </>
+                  )}
+                </Pressable>
+              )}
             </View>
           </View>
 
@@ -1217,6 +1316,127 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
             </Text>
           </Animated.View>
         </View>
+      </Modal>
+
+      {/* Category Selection Modal */}
+      <Modal
+        visible={showCategoryModal}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowCategoryModal(false)}
+      >
+        <Pressable
+          style={{
+            flex: 1,
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            justifyContent: "flex-end",
+          }}
+          onPress={() => setShowCategoryModal(false)}
+        >
+          <Pressable
+            style={{
+              backgroundColor: "white",
+              borderTopLeftRadius: 24,
+              borderTopRightRadius: 24,
+              padding: 24,
+              maxHeight: "80%",
+            }}
+            onPress={(e) => e.stopPropagation()}
+          >
+            <Text style={{ fontSize: 24, fontWeight: "bold", marginBottom: 20, textAlign: "center" }}>
+              Select Category
+            </Text>
+            <ScrollView>
+              {["SALES", "SOCIAL", "ENTREPRENEURSHIP", "DATING", "CONFIDENCE", "CAREER"].map((category) => (
+                <Pressable
+                  key={category}
+                  onPress={() => {
+                    setSelectedCategory(category);
+                    setShowCategoryModal(false);
+                  }}
+                  style={{
+                    backgroundColor: selectedCategory === category ? getCategoryColor(category) + "20" : "#F3F4F6",
+                    padding: 16,
+                    borderRadius: 12,
+                    marginBottom: 12,
+                    borderWidth: 2,
+                    borderColor: selectedCategory === category ? getCategoryColor(category) : "transparent",
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      fontWeight: selectedCategory === category ? "700" : "600",
+                      color: selectedCategory === category ? getCategoryColor(category) : "#374151",
+                      textAlign: "center",
+                    }}
+                  >
+                    {category}
+                  </Text>
+                </Pressable>
+              ))}
+            </ScrollView>
+          </Pressable>
+        </Pressable>
+      </Modal>
+
+      {/* Difficulty Selection Modal */}
+      <Modal
+        visible={showDifficultyModal}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowDifficultyModal(false)}
+      >
+        <Pressable
+          style={{
+            flex: 1,
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            justifyContent: "flex-end",
+          }}
+          onPress={() => setShowDifficultyModal(false)}
+        >
+          <Pressable
+            style={{
+              backgroundColor: "white",
+              borderTopLeftRadius: 24,
+              borderTopRightRadius: 24,
+              padding: 24,
+            }}
+            onPress={(e) => e.stopPropagation()}
+          >
+            <Text style={{ fontSize: 24, fontWeight: "bold", marginBottom: 20, textAlign: "center" }}>
+              Select Difficulty
+            </Text>
+            {["EASY", "MEDIUM", "HARD", "EXPERT"].map((difficulty) => (
+              <Pressable
+                key={difficulty}
+                onPress={() => {
+                  setSelectedDifficulty(difficulty);
+                  setShowDifficultyModal(false);
+                }}
+                style={{
+                  backgroundColor: selectedDifficulty === difficulty ? getDifficultyColor(difficulty) + "30" : "#F3F4F6",
+                  padding: 16,
+                  borderRadius: 12,
+                  marginBottom: 12,
+                  borderWidth: 2,
+                  borderColor: selectedDifficulty === difficulty ? getDifficultyColor(difficulty) : "transparent",
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 16,
+                    fontWeight: selectedDifficulty === difficulty ? "700" : "600",
+                    color: selectedDifficulty === difficulty ? getDifficultyColor(difficulty) : "#374151",
+                    textAlign: "center",
+                  }}
+                >
+                  {difficulty}
+                </Text>
+              </Pressable>
+            ))}
+          </Pressable>
+        </Pressable>
       </Modal>
     </View>
   );
