@@ -320,18 +320,28 @@ export default function ProfileScreen({ navigation }: Props) {
               <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 32 }}>
                 {/* Account Section */}
                 <View style={{ paddingHorizontal: 20, paddingTop: 24 }}>
-                  <Text style={{ fontSize: 28, fontWeight: "bold", marginBottom: 16, color: "#000" }}>Account</Text>
+                  <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+                    <Text style={{ fontSize: 28, fontWeight: "bold", color: "#000" }}>Account</Text>
+                    <Pressable onPress={() => setShowSettings(false)}>
+                      <Text style={{ fontSize: 28 }}>×</Text>
+                    </Pressable>
+                  </View>
+                </View>
 
-                  {/* Theme */}
-                  <View style={{ backgroundColor: "white", borderRadius: 12, padding: 16, marginBottom: 16, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-                    <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
-                      <Sun size={24} color="#333" />
-                      <View>
-                        <Text style={{ fontWeight: "600", fontSize: 16 }}>Theme</Text>
-                        <Text style={{ color: "#999", fontSize: 14 }}>Light Mode</Text>
+                {/* Appearance */}
+                <View style={{ paddingHorizontal: 20, paddingTop: 8 }}>
+                  <Text style={{ fontSize: 20, fontWeight: "bold", marginBottom: 12, color: "#000" }}>Appearance</Text>
+                  <View style={{ backgroundColor: "white", borderRadius: 12, padding: 16 }}>
+                    <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+                      <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+                        <Sun size={24} color="#333" />
+                        <View>
+                          <Text style={{ fontWeight: "600", fontSize: 16 }}>Theme</Text>
+                          <Text style={{ color: "#999", fontSize: 14 }}>Light Mode</Text>
+                        </View>
                       </View>
+                      <Switch value={darkMode} onValueChange={setDarkMode} />
                     </View>
-                    <Switch value={darkMode} onValueChange={setDarkMode} />
                   </View>
                 </View>
 

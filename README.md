@@ -61,6 +61,16 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 - **COMMUNITY**: Groups, Manage Categories, Explore World
 - Log out and version display
 
+**Profile & Settings**
+- Comprehensive settings modal with organized sections
+- **Account**: Main account header with close button
+- **Appearance**: Theme toggle (Light/Dark mode)
+- **Preferences**: Language selection (English)
+- **Live Features**: Enable livestreaming configuration
+- **Notifications**: Quest reminders toggle
+- **Legal**: Safety Guidelines access
+- **Account Actions**: Sign out option
+
 **Live Streaming** ✨ NEW!
 - Real-time live streaming powered by Daily.co
 - Stream your quest challenges to the community
