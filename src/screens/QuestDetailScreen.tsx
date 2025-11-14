@@ -232,6 +232,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
   // Regenerate quest with new category/difficulty
   const regenerateQuestMutation = useMutation({
     mutationFn: async (params: { category: string; difficulty: string }) => {
+      console.log("Mutation function called with params:", params);
       const response = await api.post<GenerateQuestResponse>("/api/quests/generate", {
         category: params.category,
         difficulty: params.difficulty,
@@ -239,28 +240,47 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
         userLatitude: userLocation?.latitude,
         userLongitude: userLocation?.longitude,
       });
+      console.log("Quest generated:", response);
       return response;
     },
     onSuccess: async (data) => {
+      console.log("onSuccess called with data:", data);
+
       // Delete the current quest
       if (userQuest) {
-        await api.delete(`/api/quests/${userQuest.id}`);
+        console.log("Deleting current quest:", userQuest.id);
+        try {
+          await api.delete(`/api/quests/${userQuest.id}`);
+          console.log("Quest deleted successfully");
+        } catch (error) {
+          console.error("Error deleting quest:", error);
+        }
       }
 
       // Start the new quest
+      console.log("Starting new quest:", data.quest.id);
       await api.post(`/api/quests/${data.quest.id}/start`);
+      console.log("New quest started");
 
       // Refresh quests data
       await queryClient.invalidateQueries({ queryKey: ["quests"] });
+      console.log("Queries invalidated");
 
       // Navigate to the new quest
       const updatedQuests = await api.get<GetUserQuestsResponse>("/api/quests");
       const newUserQuest = updatedQuests.activeQuests.find((q) => q.quest.id === data.quest.id);
+      console.log("New user quest found:", newUserQuest);
+
       if (newUserQuest) {
         setCurrentUserQuestId(newUserQuest.id);
+        console.log("Updated current user quest ID to:", newUserQuest.id);
       }
 
+      // Reset selections
+      setSelectedCategory(null);
+      setSelectedDifficulty(null);
       setIsRegenerating(false);
+      console.log("Regeneration complete!");
     },
     onError: (error) => {
       console.error("Failed to regenerate quest:", error);
@@ -270,11 +290,16 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
   });
 
   const handleRegenerate = () => {
+    console.log("handleRegenerate called");
+    console.log("selectedCategory:", selectedCategory);
+    console.log("selectedDifficulty:", selectedDifficulty);
+
     if (!selectedCategory || !selectedDifficulty) {
       Alert.alert("Selection Required", "Please select both category and difficulty");
       return;
     }
 
+    console.log("Starting regeneration...");
     setIsRegenerating(true);
     regenerateQuestMutation.mutate({
       category: selectedCategory,

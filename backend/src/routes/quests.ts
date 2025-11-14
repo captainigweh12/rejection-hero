@@ -637,4 +637,37 @@ async function updateUserStats(userId: string, xpReward: number, pointReward: nu
   });
 }
 
+// ============================================
+// DELETE /api/quests/:id - Delete a user quest
+// ============================================
+questsRouter.delete("/:id", async (c) => {
+  const user = c.get("user");
+
+  if (!user) {
+    return c.json({ message: "Unauthorized" }, 401);
+  }
+
+  const userQuestId = c.req.param("id");
+
+  // Check if the user quest exists and belongs to the user
+  const userQuest = await db.userQuest.findUnique({
+    where: { id: userQuestId },
+  });
+
+  if (!userQuest) {
+    return c.json({ message: "Quest not found" }, 404);
+  }
+
+  if (userQuest.userId !== user.id) {
+    return c.json({ message: "Forbidden" }, 403);
+  }
+
+  // Delete the user quest
+  await db.userQuest.delete({
+    where: { id: userQuestId },
+  });
+
+  return c.json({ message: "Quest deleted successfully" }, 200);
+});
+
 export { questsRouter };
