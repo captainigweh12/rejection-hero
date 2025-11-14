@@ -307,16 +307,22 @@ async function generateQuestWithAI(
     const isWeekend = day === 0 || day === 6;
     const dayType = isWeekend ? "weekend" : "weekday";
 
-    // Build context string
-    const locationContext = userLocation
+    // Build context string with GPS coordinates
+    const locationContext = userLocation && userLatitude && userLongitude
+      ? `\n\nLOCATION CONTEXT: User is currently at ${userLocation} (GPS: ${userLatitude}, ${userLongitude}).
+CRITICAL LOCATION REQUIREMENTS:
+- Generate a quest location that is WITHIN 10 MILES (16 km) of coordinates ${userLatitude}, ${userLongitude}
+- Calculate approximate coordinates for the quest location that are near the user
+- For example, if user is in "San Francisco, CA" at 37.7749, -122.4194, suggest places like:
+  * "Downtown coffee shops" - location: "Union Square, SF" with coordinates around 37.7879, -122.4074
+  * "Marina district restaurants" - location: "Marina District, SF" with coordinates around 37.8016, -122.4377
+- DO NOT suggest locations in different cities or far away neighborhoods
+- The quest location should be accessible within 15-20 minutes by car or public transit
+- Include specific neighborhood or district names from ${userLocation}
+- Provide approximate latitude/longitude that is close to ${userLatitude}, ${userLongitude} (within 10 miles radius)`
+      : userLocation
       ? `\n\nLOCATION CONTEXT: User is in/near ${userLocation}.
-IMPORTANT LOCATION REQUIREMENTS:
-- Only suggest locations within 10 miles (16 km) of the user's location
-- Recommend specific nearby places that are walkable or a short drive away
-- Consider local neighborhoods, streets, and business districts
-- DO NOT suggest locations that would require long travel times
-- Focus on accessible, local spots the user can easily visit
-- If you mention specific business names, they should be common chains or types found in most areas`
+IMPORTANT: Only suggest generic location types (coffee shops, gyms, malls) without specific coordinates since exact location is unavailable. User should find these places nearby themselves.`
       : "";
 
     const timeContext = `\n\nTIME/DATE CONTEXT:
