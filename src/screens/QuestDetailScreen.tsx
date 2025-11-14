@@ -31,6 +31,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
   const [loadingAnim] = useState(new Animated.Value(0));
   const [timeRemaining, setTimeRemaining] = useState(300); // Will be set based on difficulty
   const [isGeneratingNext, setIsGeneratingNext] = useState(false);
+  const [completionPage, setCompletionPage] = useState<"accomplishments" | "leaderboard" | "streak">("accomplishments");
 
   const { data: questsData, isLoading } = useQuery<GetUserQuestsResponse>({
     queryKey: ["quests"],
@@ -168,29 +169,38 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
             }),
           ]).start();
 
-          // Auto-generate next quest after showing accomplishments
-          setTimeout(() => {
-            handleGenerateNext();
-          }, 5000); // Give more time to view accomplishments
+          // Reset page to accomplishments
+          setCompletionPage("accomplishments");
         }, 2000);
       }
     },
   });
 
   const handleGenerateNext = () => {
-    if (!userQuest) return;
+    if (!savedQuestData) return;
 
     setIsGeneratingNext(true);
 
     // Get next difficulty level
     const difficulties = ["EASY", "MEDIUM", "HARD", "EXPERT"];
-    const currentDifficultyIndex = difficulties.indexOf(userQuest.quest.difficulty);
+    const currentDifficultyIndex = difficulties.indexOf(savedQuestData.quest.difficulty);
     const nextDifficulty = difficulties[Math.min(currentDifficultyIndex + 1, difficulties.length - 1)];
 
     generateNextMutation.mutate({
-      category: userQuest.quest.category,
+      category: savedQuestData.quest.category,
       difficulty: nextDifficulty,
     });
+  };
+
+  const handleNextPage = () => {
+    if (completionPage === "accomplishments") {
+      setCompletionPage("leaderboard");
+    } else if (completionPage === "leaderboard") {
+      setCompletionPage("streak");
+    } else if (completionPage === "streak") {
+      // Navigate to next quest
+      handleGenerateNext();
+    }
   };
 
   const getCategoryColor = (category: string) => {
@@ -625,294 +635,405 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
         </View>
       </SafeAreaView>
 
-      {/* Completion Modal */}
-      <Modal
-        visible={showCompletion}
-        transparent
-        animationType="fade"
-        onRequestClose={() => {}}
-      >
-        <View
+      {/* Completion Modal - Sequential Pages */}
+      <Modal visible={showCompletion} transparent animationType="fade" onRequestClose={() => {}}>
+        <Pressable
+          onPress={handleNextPage}
           style={{
             flex: 1,
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
-            alignItems: "center",
-            justifyContent: "center",
+            backgroundColor: "#58CC02",
           }}
         >
-          <Animated.View
-            style={{
-              width: "85%",
-              backgroundColor: "white",
-              borderRadius: 32,
-              padding: 32,
-              alignItems: "center",
-              transform: [
-                {
-                  scale: celebrationAnim.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [0.5, 1],
-                  }),
-                },
-              ],
-            }}
-          >
-            {/* Animated Trophy Icon */}
-            <Animated.View
-              style={{
-                marginBottom: 24,
-                transform: [
-                  {
-                    rotate: celebrationAnim.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: ["0deg", "360deg"],
-                    }),
-                  },
-                ],
-              }}
-            >
-              <View
+          <SafeAreaView style={{ flex: 1 }}>
+            {/* Page 1: Accomplishments */}
+            {completionPage === "accomplishments" && (
+              <Animated.View
                 style={{
-                  width: 120,
-                  height: 120,
-                  borderRadius: 60,
-                  alignItems: "center",
+                  flex: 1,
                   justifyContent: "center",
+                  alignItems: "center",
+                  paddingHorizontal: 32,
+                  transform: [
+                    {
+                      scale: celebrationAnim.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [0.8, 1],
+                      }),
+                    },
+                  ],
                 }}
               >
-                <LinearGradient
-                  colors={["#FFD700", "#FFA500", "#FF8C00"]}
+                {/* Trophy Icon */}
+                <Animated.View
                   style={{
-                    width: 120,
-                    height: 120,
-                    borderRadius: 60,
-                    alignItems: "center",
-                    justifyContent: "center",
+                    marginBottom: 40,
+                    transform: [
+                      {
+                        rotate: celebrationAnim.interpolate({
+                          inputRange: [0, 1],
+                          outputRange: ["0deg", "360deg"],
+                        }),
+                      },
+                    ],
                   }}
                 >
-                  <Trophy size={60} color="white" />
-                </LinearGradient>
-              </View>
-            </Animated.View>
+                  <LinearGradient
+                    colors={["#FFD700", "#FFA500"]}
+                    style={{
+                      width: 140,
+                      height: 140,
+                      borderRadius: 70,
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Trophy size={70} color="white" />
+                  </LinearGradient>
+                </Animated.View>
 
-            {/* Quest Completed */}
-            <Text
-              style={{
-                fontSize: 32,
-                fontWeight: "bold",
-                color: "#1C1C1E",
-                marginBottom: 12,
-              }}
-            >
-              Quest Complete!
-            </Text>
-
-            <Text
-              style={{
-                fontSize: 16,
-                color: "#666",
-                textAlign: "center",
-                marginBottom: 24,
-              }}
-            >
-              You collected {completionData?.noCount} NOs!
-            </Text>
-
-            {/* Accomplishments Section */}
-            <View
-              style={{
-                width: "100%",
-                backgroundColor: "#F5F5F7",
-                borderRadius: 20,
-                padding: 20,
-                marginBottom: 20,
-              }}
-            >
-              <Text style={{ fontSize: 18, fontWeight: "bold", color: "#1C1C1E", marginBottom: 16 }}>
-                Accomplishments
-              </Text>
-
-              {/* XP & Points Earned */}
-              <View style={{ flexDirection: "row", gap: 12, marginBottom: 12 }}>
-                <View
+                {/* Title */}
+                <Text
                   style={{
-                    flex: 1,
-                    backgroundColor: "#FEF3C7",
-                    paddingVertical: 12,
-                    borderRadius: 12,
-                    alignItems: "center",
+                    fontSize: 40,
+                    fontWeight: "bold",
+                    color: "white",
+                    marginBottom: 16,
+                    textAlign: "center",
                   }}
                 >
-                  <Text style={{ color: "#92400E", fontSize: 20, fontWeight: "bold" }}>
-                    +{savedQuestData?.quest.xpReward || 0}
-                  </Text>
-                  <Text style={{ color: "#92400E", fontSize: 12 }}>XP</Text>
-                </View>
-                <View
-                  style={{
-                    flex: 1,
-                    backgroundColor: "#FED7AA",
-                    paddingVertical: 12,
-                    borderRadius: 12,
-                    alignItems: "center",
-                  }}
-                >
-                  <Text style={{ color: "#9A3412", fontSize: 20, fontWeight: "bold" }}>
-                    +{savedQuestData?.quest.pointReward || 0}
-                  </Text>
-                  <Text style={{ color: "#9A3412", fontSize: 12 }}>Points</Text>
-                </View>
-              </View>
-
-              {/* Total Stats */}
-              <View style={{ flexDirection: "row", gap: 12 }}>
-                <View
-                  style={{
-                    flex: 1,
-                    backgroundColor: "white",
-                    paddingVertical: 12,
-                    borderRadius: 12,
-                    alignItems: "center",
-                  }}
-                >
-                  <Text style={{ color: "#7E3FE4", fontSize: 20, fontWeight: "bold" }}>
-                    {statsData?.totalXP || 0}
-                  </Text>
-                  <Text style={{ color: "#666", fontSize: 12 }}>Total XP</Text>
-                </View>
-                <View
-                  style={{
-                    flex: 1,
-                    backgroundColor: "white",
-                    paddingVertical: 12,
-                    borderRadius: 12,
-                    alignItems: "center",
-                  }}
-                >
-                  <Text style={{ color: "#FF6B35", fontSize: 20, fontWeight: "bold" }}>
-                    {statsData?.totalPoints || 0}
-                  </Text>
-                  <Text style={{ color: "#666", fontSize: 12 }}>Total Points</Text>
-                </View>
-              </View>
-            </View>
-
-            {/* Leaderboard Position */}
-            <View
-              style={{
-                width: "100%",
-                backgroundColor: "#E0F2FE",
-                borderRadius: 20,
-                padding: 20,
-                marginBottom: 20,
-                alignItems: "center",
-              }}
-            >
-              <Text style={{ fontSize: 16, fontWeight: "600", color: "#0369A1", marginBottom: 8 }}>
-                Leaderboard Position
-              </Text>
-              <Text style={{ fontSize: 36, fontWeight: "bold", color: "#0C4A6E" }}>
-                #{leaderboardData?.currentUserRank || "-"}
-              </Text>
-              <Text style={{ fontSize: 12, color: "#0369A1" }}>
-                out of {leaderboardData?.totalUsers || 0} warriors
-              </Text>
-            </View>
-
-            {/* Streak Display */}
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 12,
-                backgroundColor: "#FFF7ED",
-                paddingHorizontal: 24,
-                paddingVertical: 16,
-                borderRadius: 20,
-                marginBottom: 24,
-              }}
-            >
-              <Flame size={32} color="#FF6B35" />
-              <View>
-                <Text style={{ fontSize: 28, fontWeight: "bold", color: "#FF6B35" }}>
-                  {statsData?.currentStreak || 1}
+                  Quest Complete!
                 </Text>
-                <Text style={{ fontSize: 14, color: "#92400E" }}>day streak</Text>
-              </View>
-            </View>
 
-            {/* Auto-generating message */}
-            {isGeneratingNext && (
+                <Text
+                  style={{
+                    fontSize: 18,
+                    color: "rgba(255, 255, 255, 0.9)",
+                    textAlign: "center",
+                    marginBottom: 48,
+                  }}
+                >
+                  You collected {completionData?.noCount} NOs!
+                </Text>
+
+                {/* Accomplishments */}
+                <View
+                  style={{
+                    width: "100%",
+                    backgroundColor: "white",
+                    borderRadius: 24,
+                    padding: 24,
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 20,
+                      fontWeight: "bold",
+                      color: "#1C1C1E",
+                      marginBottom: 24,
+                      textAlign: "center",
+                    }}
+                  >
+                    Accomplishments
+                  </Text>
+
+                  {/* XP & Points Earned */}
+                  <View style={{ flexDirection: "row", gap: 16, marginBottom: 16 }}>
+                    <View
+                      style={{
+                        flex: 1,
+                        backgroundColor: "#FEF3C7",
+                        paddingVertical: 16,
+                        borderRadius: 16,
+                        alignItems: "center",
+                      }}
+                    >
+                      <Text style={{ color: "#92400E", fontSize: 24, fontWeight: "bold" }}>
+                        +{savedQuestData?.quest.xpReward || 0}
+                      </Text>
+                      <Text style={{ color: "#92400E", fontSize: 14 }}>XP</Text>
+                    </View>
+                    <View
+                      style={{
+                        flex: 1,
+                        backgroundColor: "#FED7AA",
+                        paddingVertical: 16,
+                        borderRadius: 16,
+                        alignItems: "center",
+                      }}
+                    >
+                      <Text style={{ color: "#9A3412", fontSize: 24, fontWeight: "bold" }}>
+                        +{savedQuestData?.quest.pointReward || 0}
+                      </Text>
+                      <Text style={{ color: "#9A3412", fontSize: 14 }}>Points</Text>
+                    </View>
+                  </View>
+
+                  {/* Total Stats */}
+                  <View style={{ flexDirection: "row", gap: 16 }}>
+                    <View
+                      style={{
+                        flex: 1,
+                        backgroundColor: "#F5F5F7",
+                        paddingVertical: 16,
+                        borderRadius: 16,
+                        alignItems: "center",
+                      }}
+                    >
+                      <Text style={{ color: "#7E3FE4", fontSize: 24, fontWeight: "bold" }}>
+                        {statsData?.totalXP || 0}
+                      </Text>
+                      <Text style={{ color: "#666", fontSize: 14 }}>Total XP</Text>
+                    </View>
+                    <View
+                      style={{
+                        flex: 1,
+                        backgroundColor: "#F5F5F7",
+                        paddingVertical: 16,
+                        borderRadius: 16,
+                        alignItems: "center",
+                      }}
+                    >
+                      <Text style={{ color: "#FF6B35", fontSize: 24, fontWeight: "bold" }}>
+                        {statsData?.totalPoints || 0}
+                      </Text>
+                      <Text style={{ color: "#666", fontSize: 14 }}>Total Points</Text>
+                    </View>
+                  </View>
+                </View>
+
+                {/* Tap to continue */}
+                <Text
+                  style={{
+                    marginTop: 32,
+                    fontSize: 16,
+                    color: "rgba(255, 255, 255, 0.8)",
+                    textAlign: "center",
+                  }}
+                >
+                  Tap to continue
+                </Text>
+              </Animated.View>
+            )}
+
+            {/* Page 2: Leaderboard */}
+            {completionPage === "leaderboard" && (
               <View
                 style={{
-                  width: "100%",
-                  backgroundColor: "#FFF7ED",
-                  borderRadius: 16,
-                  padding: 16,
-                  marginBottom: 16,
-                  flexDirection: "row",
+                  flex: 1,
+                  justifyContent: "center",
                   alignItems: "center",
-                  gap: 12,
+                  paddingHorizontal: 32,
                 }}
               >
-                <ActivityIndicator size="small" color="#FF6B35" />
-                <Text style={{ color: "#92400E", fontSize: 14, fontWeight: "600", flex: 1 }}>
-                  Generating your next challenge...
+                {/* Trophy Icon */}
+                <View style={{ marginBottom: 32 }}>
+                  <LinearGradient
+                    colors={["#0EA5E9", "#0284C7"]}
+                    style={{
+                      width: 100,
+                      height: 100,
+                      borderRadius: 50,
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Trophy size={50} color="white" />
+                  </LinearGradient>
+                </View>
+
+                {/* Title */}
+                <Text
+                  style={{
+                    fontSize: 32,
+                    fontWeight: "bold",
+                    color: "white",
+                    marginBottom: 48,
+                    textAlign: "center",
+                  }}
+                >
+                  Leaderboard Position
+                </Text>
+
+                {/* User Position */}
+                <View
+                  style={{
+                    width: "100%",
+                    backgroundColor: "white",
+                    borderRadius: 24,
+                    padding: 32,
+                    alignItems: "center",
+                    marginBottom: 24,
+                  }}
+                >
+                  <Text style={{ fontSize: 72, fontWeight: "bold", color: "#0C4A6E" }}>
+                    #{leaderboardData?.currentUserRank || "-"}
+                  </Text>
+                  <Text style={{ fontSize: 16, color: "#0369A1", marginTop: 8 }}>
+                    out of {leaderboardData?.totalUsers || 0} warriors
+                  </Text>
+                </View>
+
+                {/* Top Users */}
+                {leaderboardData?.leaderboard && leaderboardData.leaderboard.length > 0 && (
+                  <View
+                    style={{
+                      width: "100%",
+                      backgroundColor: "rgba(255, 255, 255, 0.95)",
+                      borderRadius: 20,
+                      padding: 20,
+                      maxHeight: 250,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontSize: 16,
+                        fontWeight: "bold",
+                        color: "#1C1C1E",
+                        marginBottom: 12,
+                      }}
+                    >
+                      Top Warriors
+                    </Text>
+                    <ScrollView>
+                      {leaderboardData.leaderboard.slice(0, 5).map((user) => (
+                        <View
+                          key={user.userId}
+                          style={{
+                            flexDirection: "row",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            paddingVertical: 10,
+                            borderBottomWidth: 1,
+                            borderBottomColor: "#E5E7EB",
+                            backgroundColor: user.isCurrentUser ? "#FFF7ED" : "transparent",
+                            paddingHorizontal: user.isCurrentUser ? 12 : 0,
+                            borderRadius: user.isCurrentUser ? 12 : 0,
+                            marginBottom: user.isCurrentUser ? 4 : 0,
+                          }}
+                        >
+                          <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+                            <Text
+                              style={{
+                                fontSize: 18,
+                                fontWeight: "bold",
+                                color: user.rank <= 3 ? "#FFD700" : "#666",
+                                width: 30,
+                              }}
+                            >
+                              #{user.rank}
+                            </Text>
+                            <Text
+                              style={{
+                                fontSize: 16,
+                                color: "#1C1C1E",
+                                fontWeight: user.isCurrentUser ? "bold" : "normal",
+                              }}
+                            >
+                              {user.userName}
+                            </Text>
+                          </View>
+                          <Text style={{ fontSize: 16, fontWeight: "600", color: "#7E3FE4" }}>
+                            {user.totalXP} XP
+                          </Text>
+                        </View>
+                      ))}
+                    </ScrollView>
+                  </View>
+                )}
+
+                {/* Tap to continue */}
+                <Text
+                  style={{
+                    marginTop: 32,
+                    fontSize: 16,
+                    color: "rgba(255, 255, 255, 0.8)",
+                    textAlign: "center",
+                  }}
+                >
+                  Tap to continue
                 </Text>
               </View>
             )}
 
-            {/* Buttons */}
-            <View style={{ width: "100%", gap: 12 }}>
-              <Pressable
-                onPress={handleGenerateNext}
-                disabled={isGeneratingNext}
+            {/* Page 3: Streak */}
+            {completionPage === "streak" && (
+              <View
                 style={{
-                  backgroundColor: isGeneratingNext ? "#999" : "#FF6B35",
-                  paddingVertical: 16,
-                  borderRadius: 16,
-                  alignItems: "center",
-                  flexDirection: "row",
+                  flex: 1,
                   justifyContent: "center",
-                  gap: 8,
-                }}
-              >
-                {isGeneratingNext ? (
-                  <>
-                    <ActivityIndicator size="small" color="white" />
-                    <Text style={{ color: "white", fontSize: 18, fontWeight: "bold" }}>
-                      Generating...
-                    </Text>
-                  </>
-                ) : (
-                  <>
-                    <Sparkles size={20} color="white" />
-                    <Text style={{ color: "white", fontSize: 18, fontWeight: "bold" }}>
-                      Next Quest
-                    </Text>
-                  </>
-                )}
-              </Pressable>
-
-              <Pressable
-                onPress={() => {
-                  setShowCompletion(false);
-                  navigation.goBack();
-                }}
-                style={{
-                  backgroundColor: "#E5E7EB",
-                  paddingVertical: 16,
-                  borderRadius: 16,
                   alignItems: "center",
+                  paddingHorizontal: 32,
                 }}
               >
-                <Text style={{ color: "#1C1C1E", fontSize: 18, fontWeight: "600" }}>
-                  Back to Home
-                </Text>
-              </Pressable>
-            </View>
-          </Animated.View>
-        </View>
+                {/* Flame Icon */}
+                <View style={{ marginBottom: 48 }}>
+                  <LinearGradient
+                    colors={["#FF6B35", "#FF8C42"]}
+                    style={{
+                      width: 140,
+                      height: 140,
+                      borderRadius: 70,
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Flame size={80} color="white" />
+                  </LinearGradient>
+                </View>
+
+                {/* Streak Number */}
+                <View
+                  style={{
+                    backgroundColor: "white",
+                    borderRadius: 24,
+                    padding: 40,
+                    alignItems: "center",
+                    width: "100%",
+                  }}
+                >
+                  <Text style={{ fontSize: 80, fontWeight: "bold", color: "#FF6B35" }}>
+                    {statsData?.currentStreak || 1}
+                  </Text>
+                  <Text style={{ fontSize: 24, color: "#92400E", fontWeight: "600" }}>
+                    day streak
+                  </Text>
+                </View>
+
+                {/* Generating Next Quest */}
+                {isGeneratingNext ? (
+                  <View
+                    style={{
+                      marginTop: 48,
+                      backgroundColor: "rgba(255, 255, 255, 0.95)",
+                      borderRadius: 20,
+                      padding: 24,
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 16,
+                      width: "100%",
+                    }}
+                  >
+                    <ActivityIndicator size="large" color="#FF6B35" />
+                    <Text style={{ color: "#1C1C1E", fontSize: 16, fontWeight: "600", flex: 1 }}>
+                      Generating your next challenge...
+                    </Text>
+                  </View>
+                ) : (
+                  <Text
+                    style={{
+                      marginTop: 48,
+                      fontSize: 16,
+                      color: "rgba(255, 255, 255, 0.8)",
+                      textAlign: "center",
+                    }}
+                  >
+                    Tap to start next quest
+                  </Text>
+                )}
+              </View>
+            )}
+          </SafeAreaView>
+        </Pressable>
       </Modal>
 
       {/* Loading Screen Modal */}

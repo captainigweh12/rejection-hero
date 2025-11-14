@@ -33,18 +33,17 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 - Single focused quest card with category badge
 - Large, easy-to-tap NO (green) and YES (red) buttons
 
-**Quest Completion Flow** ✨ NEW!
+**Quest Completion Flow** ✨ NEW! (Duolingo-Inspired Sequential Pages)
 - **Loading screen**: 2-second loading animation with pulsing trophy
-- **Accomplishments display**: Shows XP/Points earned and total stats
-- **Leaderboard position**: See your rank among all warriors
-- Shows current daily streak with fire icon
-- Displays number of NOs collected
-- **Auto-generation**: Automatically creates next harder quest after 5 seconds
-- "Next Quest" button for manual generation
+- **Sequential completion pages** (tap to advance through each):
+  - **Page 1 - Accomplishments**: Full-screen green background showing XP/Points earned and total stats
+  - **Page 2 - Leaderboard**: Shows your rank and top 5 warriors with their XP
+  - **Page 3 - Streak**: Large streak display with fire icon
+- **Auto-generation**: Automatically creates next harder quest when you tap on streak page
 - Progressive difficulty: EASY → MEDIUM → HARD → EXPERT
-- Stay in quest flow or return to home
 - Smooth animations and spring physics
 - Visual feedback while generating next quest
+- Each page is tap-to-advance for intuitive flow
 
 **AI Quest Generation** ✨ ENHANCED!
 - **3-word titles**: All quests have concise 3-word action titles (e.g., "Ask Coffee Shops", "Request Business Cards")
