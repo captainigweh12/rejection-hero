@@ -10,7 +10,7 @@ import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import type { BottomTabParamList, RootStackParamList } from "@/navigation/types";
 import HomeScreen from "@/screens/HomeScreen";
-import SwipeScreen from "@/screens/SwipeScreen";
+import CommunityScreen from "@/screens/CommunityScreen";
 import MatchesScreen from "@/screens/MatchesScreen";
 import LiveScreen from "@/screens/LiveScreen";
 import MapScreen from "@/screens/MapScreen";
@@ -136,7 +136,7 @@ const BottomTabNavigator = () => {
       />
       <BottomTab.Screen
         name="SwipeTab"
-        component={SwipeScreen}
+        component={CommunityScreen}
         options={{
           title: "Community",
           tabBarIcon: ({ color, size }) => <Users size={size} color={color} />,

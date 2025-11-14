@@ -131,6 +131,49 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 
 ### 👥 Community Features
 
+**Community Hub** ✨ NEW! (Comprehensive Social Network)
+- **Modern Tabbed Interface** with three main sections:
+  - 👥 **Friends Tab**: Manage friendships and requests
+  - 💬 **Messages Tab**: Direct messaging conversations
+  - 🏘️ **Groups Tab**: Join and manage groups
+- **Real-time Stats Cards** showing:
+  - Friend count with purple badge
+  - Active conversations with blue badge
+  - Group memberships with green badge
+- **Friend System**:
+  - Search for users by name or email
+  - Send/receive friend requests
+  - Accept or decline requests with smooth animations
+  - View all friends with profile avatars
+  - Message friends directly
+  - Share quests with friends
+- **Direct Messaging**:
+  - One-on-one conversations with friends
+  - Unread message badges and counts
+  - Last message preview with timestamps
+  - Message read/unread tracking
+  - Tap to open chat screen (coming soon)
+- **Groups (Facebook-style)**:
+  - **My Groups**: Groups you've joined with role badges (admin/moderator/member)
+  - **Discover Groups**: Browse and join public groups
+  - Create new groups with custom names, descriptions, and cover images
+  - Public/private group options
+  - Member count and role management
+  - Leave groups or delete (if creator)
+- **Quest Sharing**:
+  - Share any quest with your friends
+  - Friends can accept or decline shared quests
+  - Optional message when sharing
+  - Accepted quests automatically added to friend's queue
+  - Only friends can share quests with each other
+- **Beautiful Modern UI**:
+  - Card-based design with smooth animations
+  - Theme-aware (adapts to light/dark mode)
+  - Loading states with spinners
+  - Empty states with helpful messages
+  - Glassmorphism effects on buttons
+  - Responsive tap feedback
+
 **Swipe Interface** ✨ MODERNIZED!
 - **Modern Dating App UI** inspired by Tinder/Bumble
 - **Three Action Buttons**:
@@ -281,9 +324,11 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 - "Go Live" button from Profile page
 
 ### Coming Soon
+- 💬 **Chat Screen**: Full conversation view with message history
+- 🎁 **Quest Sharing Modal**: Beautiful UI for selecting and sharing quests
+- 🏘️ **Group Detail Screen**: Full group management with member roles
+- 👥 **User Search Screen**: Advanced search with filters
 - 📍 **Quest Markers**: Show active quests on map with color-coded categories
-- 💬 **Messaging**: Chat with your matches
-- 👥 **Groups**: Join communities for specific challenges
 - 🎥 **WebRTC Integration**: Full Daily.co camera/audio integration
 
 ## Tech Stack
@@ -322,6 +367,11 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 - **Match**: Store mutual matches
 - **LiveStream**: Live streaming sessions with room URLs
 - **LiveStreamComment**: Comments on live streams
+- **Friendship** ✨ NEW!: Friend connections with status (PENDING/ACCEPTED/BLOCKED)
+- **Message** ✨ NEW!: Direct messages between users with read tracking
+- **Group** ✨ NEW!: Facebook-style groups with privacy settings
+- **GroupMember** ✨ NEW!: Group memberships with roles (admin/moderator/member)
+- **SharedQuest** ✨ NEW!: Quest sharing between friends with status tracking
 
 ## Design
 
@@ -345,14 +395,14 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 /home/user/workspace/
 ├── src/
 │   ├── screens/
-│   │   ├── HomeScreen.tsx           # Quest dashboard (NEW!)
+│   │   ├── HomeScreen.tsx           # Quest dashboard
 │   │   ├── QuestDetailScreen.tsx    # Quest tracking with clean card UI
-│   │   ├── SwipeScreen.tsx          # Community swipe
+│   │   ├── CommunityScreen.tsx      # Community Hub (NEW!)
 │   │   ├── MatchesScreen.tsx        # View matches
 │   │   ├── ProfileScreen.tsx        # User profile
 │   │   ├── EditProfileScreen.tsx    # Edit profile
-│   │   ├── LiveScreen.tsx           # Live (placeholder)
-│   │   ├── MapScreen.tsx            # Map (placeholder)
+│   │   ├── LiveScreen.tsx           # Live streaming
+│   │   ├── MapScreen.tsx            # Map with location
 │   │   └── LoginModalScreen.tsx     # Auth modal
 │   ├── components/
 │   │   ├── SwipeCard.tsx
@@ -376,9 +426,13 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 │   │   │   ├── discover.ts
 │   │   │   ├── swipe.ts
 │   │   │   ├── matches.ts
-│   │   │   ├── quests.ts    # NEW!
-│   │   │   ├── stats.ts     # NEW!
-│   │   │   └── live.ts      # NEW!
+│   │   │   ├── quests.ts
+│   │   │   ├── stats.ts
+│   │   │   ├── live.ts
+│   │   │   ├── friends.ts      # NEW!
+│   │   │   ├── messages.ts     # NEW!
+│   │   │   ├── groups.ts       # NEW!
+│   │   │   └── sharedQuests.ts # NEW!
 │   │   ├── auth.ts
 │   │   └── db.ts
 │   └── prisma/
@@ -405,6 +459,35 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 - `GET /api/live/active` - Get all active live streams
 - `POST /api/live/:id/comment` - Add comment to stream
 - `GET /api/live/:id/comments` - Get stream comments
+
+### Friends ✨ NEW!
+- `GET /api/friends` - Get accepted friends list
+- `GET /api/friends/requests` - Get pending friend requests
+- `GET /api/friends/search?query=` - Search for users by name or email
+- `POST /api/friends/request` - Send friend request to a user
+- `POST /api/friends/accept/:id` - Accept friend request
+- `POST /api/friends/decline/:id` - Decline friend request
+- `DELETE /api/friends/:userId` - Remove a friend
+
+### Messages ✨ NEW!
+- `GET /api/messages/conversations` - Get all conversations with unread counts
+- `GET /api/messages/:userId` - Get messages with specific user (marks as read)
+- `POST /api/messages/send` - Send a message to a user
+- `DELETE /api/messages/:messageId` - Delete your own message
+
+### Groups ✨ NEW!
+- `GET /api/groups` - Get user's groups and discover public groups
+- `GET /api/groups/:groupId` - Get group details with members
+- `POST /api/groups/create` - Create a new group
+- `POST /api/groups/:groupId/join` - Join a public group
+- `POST /api/groups/:groupId/leave` - Leave a group
+- `DELETE /api/groups/:groupId` - Delete a group (creator only)
+
+### Shared Quests ✨ NEW!
+- `GET /api/shared-quests` - Get received quest shares
+- `POST /api/shared-quests/share` - Share a quest with a friend
+- `POST /api/shared-quests/:id/accept` - Accept shared quest
+- `POST /api/shared-quests/:id/decline` - Decline shared quest
 
 ### Profile
 - `GET /api/profile` - Get current user's profile
