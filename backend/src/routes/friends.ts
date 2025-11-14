@@ -1,0 +1,321 @@
+import { Hono } from "hono";
+import { zValidator } from "@hono/zod-validator";
+import { z } from "zod";
+import { type AppType } from "../types";
+import { db } from "../db";
+
+const friendsRouter = new Hono<AppType>();
+
+// ============================================
+// GET /api/friends - Get user's friends list
+// ============================================
+friendsRouter.get("/", async (c) => {
+  const user = c.get("user");
+
+  if (!user) {
+    return c.json({ message: "Unauthorized" }, 401);
+  }
+
+  // Get all accepted friendships where user is either initiator or receiver
+  const friendships = await db.friendship.findMany({
+    where: {
+      OR: [
+        { initiatorId: user.id, status: "ACCEPTED" },
+        { receiverId: user.id, status: "ACCEPTED" },
+      ],
+    },
+    include: {
+      initiator: {
+        include: {
+          Profile: true,
+        },
+      },
+      receiver: {
+        include: {
+          Profile: true,
+        },
+      },
+    },
+  });
+
+  // Format friends list
+  const friends = friendships.map((friendship) => {
+    const friend = friendship.initiatorId === user.id ? friendship.receiver : friendship.initiator;
+    const profile = friend.Profile;
+
+    return {
+      id: friend.id,
+      email: friend.email,
+      displayName: profile?.displayName || friend.email?.split("@")[0] || "User",
+      avatar: profile?.avatar || null,
+      bio: profile?.bio || null,
+      friendshipId: friendship.id,
+      friendsSince: friendship.createdAt,
+    };
+  });
+
+  return c.json({ friends });
+});
+
+// ============================================
+// GET /api/friends/requests - Get pending friend requests
+// ============================================
+friendsRouter.get("/requests", async (c) => {
+  const user = c.get("user");
+
+  if (!user) {
+    return c.json({ message: "Unauthorized" }, 401);
+  }
+
+  // Get pending requests where user is the receiver
+  const requests = await db.friendship.findMany({
+    where: {
+      receiverId: user.id,
+      status: "PENDING",
+    },
+    include: {
+      initiator: {
+        include: {
+          Profile: true,
+        },
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  const formattedRequests = requests.map((request) => {
+    const profile = request.initiator.Profile;
+    return {
+      id: request.id,
+      userId: request.initiator.id,
+      email: request.initiator.email,
+      displayName: profile?.displayName || request.initiator.email?.split("@")[0] || "User",
+      avatar: profile?.avatar || null,
+      bio: profile?.bio || null,
+      requestedAt: request.createdAt,
+    };
+  });
+
+  return c.json({ requests: formattedRequests });
+});
+
+// ============================================
+// POST /api/friends/request - Send friend request
+// ============================================
+const sendRequestSchema = z.object({
+  userId: z.string(),
+});
+
+friendsRouter.post("/request", zValidator("json", sendRequestSchema), async (c) => {
+  const user = c.get("user");
+
+  if (!user) {
+    return c.json({ message: "Unauthorized" }, 401);
+  }
+
+  const { userId } = c.req.valid("json");
+
+  // Check if user is trying to add themselves
+  if (userId === user.id) {
+    return c.json({ message: "You cannot add yourself as a friend" }, 400);
+  }
+
+  // Check if friendship already exists
+  const existing = await db.friendship.findFirst({
+    where: {
+      OR: [
+        { initiatorId: user.id, receiverId: userId },
+        { initiatorId: userId, receiverId: user.id },
+      ],
+    },
+  });
+
+  if (existing) {
+    return c.json({ message: "Friendship already exists or request already sent" }, 400);
+  }
+
+  // Create new friend request
+  const friendship = await db.friendship.create({
+    data: {
+      initiatorId: user.id,
+      receiverId: userId,
+      status: "PENDING",
+    },
+  });
+
+  return c.json({ success: true, friendshipId: friendship.id });
+});
+
+// ============================================
+// POST /api/friends/accept/:id - Accept friend request
+// ============================================
+friendsRouter.post("/accept/:id", async (c) => {
+  const user = c.get("user");
+
+  if (!user) {
+    return c.json({ message: "Unauthorized" }, 401);
+  }
+
+  const friendshipId = c.req.param("id");
+
+  // Find the friendship request
+  const friendship = await db.friendship.findUnique({
+    where: { id: friendshipId },
+  });
+
+  if (!friendship) {
+    return c.json({ message: "Friend request not found" }, 404);
+  }
+
+  // Check if user is the receiver
+  if (friendship.receiverId !== user.id) {
+    return c.json({ message: "You can only accept requests sent to you" }, 403);
+  }
+
+  // Update status to ACCEPTED
+  await db.friendship.update({
+    where: { id: friendshipId },
+    data: { status: "ACCEPTED" },
+  });
+
+  return c.json({ success: true, message: "Friend request accepted" });
+});
+
+// ============================================
+// POST /api/friends/decline/:id - Decline friend request
+// ============================================
+friendsRouter.post("/decline/:id", async (c) => {
+  const user = c.get("user");
+
+  if (!user) {
+    return c.json({ message: "Unauthorized" }, 401);
+  }
+
+  const friendshipId = c.req.param("id");
+
+  // Find the friendship request
+  const friendship = await db.friendship.findUnique({
+    where: { id: friendshipId },
+  });
+
+  if (!friendship) {
+    return c.json({ message: "Friend request not found" }, 404);
+  }
+
+  // Check if user is the receiver
+  if (friendship.receiverId !== user.id) {
+    return c.json({ message: "You can only decline requests sent to you" }, 403);
+  }
+
+  // Delete the friendship
+  await db.friendship.delete({
+    where: { id: friendshipId },
+  });
+
+  return c.json({ success: true, message: "Friend request declined" });
+});
+
+// ============================================
+// DELETE /api/friends/:userId - Remove friend
+// ============================================
+friendsRouter.delete("/:userId", async (c) => {
+  const user = c.get("user");
+
+  if (!user) {
+    return c.json({ message: "Unauthorized" }, 401);
+  }
+
+  const friendUserId = c.req.param("userId");
+
+  // Find the friendship
+  const friendship = await db.friendship.findFirst({
+    where: {
+      OR: [
+        { initiatorId: user.id, receiverId: friendUserId },
+        { initiatorId: friendUserId, receiverId: user.id },
+      ],
+    },
+  });
+
+  if (!friendship) {
+    return c.json({ message: "Friendship not found" }, 404);
+  }
+
+  // Delete the friendship
+  await db.friendship.delete({
+    where: { id: friendship.id },
+  });
+
+  return c.json({ success: true, message: "Friend removed" });
+});
+
+// ============================================
+// GET /api/friends/search - Search for users
+// ============================================
+const searchSchema = z.object({
+  query: z.string().min(1),
+});
+
+friendsRouter.get("/search", async (c) => {
+  const user = c.get("user");
+
+  if (!user) {
+    return c.json({ message: "Unauthorized" }, 401);
+  }
+
+  const query = c.req.query("query") || "";
+
+  if (!query || query.length < 2) {
+    return c.json({ users: [] });
+  }
+
+  // Search for users by email or display name
+  const profiles = await db.profile.findMany({
+    where: {
+      AND: [
+        { userId: { not: user.id } }, // Exclude current user
+        {
+          OR: [
+            { displayName: { contains: query } },
+            { user: { email: { contains: query } } },
+          ],
+        },
+      ],
+    },
+    include: {
+      user: true,
+    },
+    take: 20,
+  });
+
+  // Get user's existing friendships to mark friends
+  const friendships = await db.friendship.findMany({
+    where: {
+      OR: [
+        { initiatorId: user.id },
+        { receiverId: user.id },
+      ],
+    },
+  });
+
+  const friendshipMap = new Map();
+  friendships.forEach((f) => {
+    const friendId = f.initiatorId === user.id ? f.receiverId : f.initiatorId;
+    friendshipMap.set(friendId, f.status);
+  });
+
+  const users = profiles.map((profile) => ({
+    id: profile.userId,
+    email: profile.user.email,
+    displayName: profile.displayName,
+    avatar: profile.avatar,
+    bio: profile.bio,
+    friendshipStatus: friendshipMap.get(profile.userId) || null,
+  }));
+
+  return c.json({ users });
+});
+
+export { friendsRouter };

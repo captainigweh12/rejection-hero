@@ -27,6 +27,13 @@ model User {
   SwipesGiven        Swipe[]             @relation("SwipesGiven")
   UserQuests         UserQuest[]
   UserStats          UserStats?
+  FriendshipsInitiated Friendship[]      @relation("FriendshipInitiator")
+  FriendshipsReceived  Friendship[]      @relation("FriendshipReceiver")
+  MessagesSent       Message[]           @relation("MessageSender")
+  MessagesReceived   Message[]           @relation("MessageReceiver")
+  GroupMemberships   GroupMember[]
+  GroupsCreated      Group[]             @relation("GroupCreator")
+  SharedQuests       SharedQuest[]
 
   @@map("user")
 }
@@ -139,24 +146,25 @@ model UserStats {
 }
 
 model Quest {
-  id            String      @id @default(cuid())
+  id            String        @id @default(cuid())
   title         String
   description   String
   category      String
   difficulty    String
-  goalType      String      // COLLECT_NOS, COLLECT_YES, or TAKE_ACTION
-  goalCount     Int         @default(1)
+  goalType      String        // COLLECT_NOS, COLLECT_YES, or TAKE_ACTION
+  goalCount     Int           @default(1)
   xpReward      Int
   pointReward   Int
-  isAIGenerated Boolean     @default(false)
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  isAIGenerated Boolean       @default(false)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
   dateContext   String?
   latitude      Float?
   location      String?
   longitude     Float?
   timeContext   String?
   UserQuests    UserQuest[]
+  SharedQuests  SharedQuest[]
 
   @@map("quest")
 }
@@ -210,4 +218,73 @@ model LiveStreamComment {
   liveStream   LiveStream @relation(fields: [liveStreamId], references: [id], onDelete: Cascade)
 
   @@map("live_stream_comment")
+}
+
+model Friendship {
+  id          String   @id @default(cuid())
+  initiatorId String
+  receiverId  String
+  status      String   // PENDING, ACCEPTED, BLOCKED
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  initiator   User     @relation("FriendshipInitiator", fields: [initiatorId], references: [id], onDelete: Cascade)
+  receiver    User     @relation("FriendshipReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@unique([initiatorId, receiverId])
+  @@map("friendship")
+}
+
+model Message {
+  id         String   @id @default(cuid())
+  senderId   String
+  receiverId String
+  content    String
+  read       Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  sender     User     @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver   User     @relation("MessageReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@map("message")
+}
+
+model Group {
+  id          String        @id @default(cuid())
+  name        String
+  description String?
+  coverImage  String?
+  creatorId   String
+  isPrivate   Boolean       @default(false)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  creator     User          @relation("GroupCreator", fields: [creatorId], references: [id], onDelete: Cascade)
+  members     GroupMember[]
+
+  @@map("group")
+}
+
+model GroupMember {
+  id        String   @id @default(cuid())
+  groupId   String
+  userId    String
+  role      String   @default("member") // admin, moderator, member
+  joinedAt  DateTime @default(now())
+  group     Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, userId])
+  @@map("group_member")
+}
+
+model SharedQuest {
+  id         String   @id @default(cuid())
+  senderId   String
+  receiverId String
+  questId    String
+  message    String?
+  status     String   @default("pending") // pending, accepted, declined
+  createdAt  DateTime @default(now())
+  sender     User     @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  quest      Quest    @relation(fields: [questId], references: [id], onDelete: Cascade)
+
+  @@map("shared_quest")
 }

@@ -15,6 +15,10 @@ import { matchesRouter } from "./routes/matches";
 import { questsRouter } from "./routes/quests";
 import { statsRouter } from "./routes/stats";
 import liveRouter from "./routes/live";
+import { friendsRouter } from "./routes/friends";
+import { messagesRouter } from "./routes/messages";
+import { groupsRouter } from "./routes/groups";
+import { sharedQuestsRouter } from "./routes/sharedQuests";
 import { type AppType } from "./types";
 
 // AppType context adds user and session to the context, will be null if the user or session is null
@@ -73,6 +77,18 @@ app.route("/api/stats", statsRouter);
 console.log("📹 Mounting live routes at /api/live");
 app.route("/api/live", liveRouter);
 
+console.log("👥 Mounting friends routes at /api/friends");
+app.route("/api/friends", friendsRouter);
+
+console.log("💬 Mounting messages routes at /api/messages");
+app.route("/api/messages", messagesRouter);
+
+console.log("🏘️  Mounting groups routes at /api/groups");
+app.route("/api/groups", groupsRouter);
+
+console.log("🎁 Mounting shared quests routes at /api/shared-quests");
+app.route("/api/shared-quests", sharedQuestsRouter);
+
 // Health check endpoint
 // Used by load balancers and monitoring tools to verify service is running
 app.get("/health", (c) => {
@@ -89,16 +105,20 @@ serve({ fetch: app.fetch, port: Number(env.PORT) }, () => {
   console.log(`🔗 Base URL: http://localhost:${env.PORT}`);
   console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
   console.log("\n📚 Available endpoints:");
-  console.log("  🔐 Auth:     /api/auth/*");
-  console.log("  📤 Upload:   POST /api/upload/image");
-  console.log("  📝 Sample:   GET/POST /api/sample");
-  console.log("  👤 Profile:  GET/POST /api/profile");
-  console.log("  🔍 Discover: GET /api/discover");
-  console.log("  👆 Swipe:    POST /api/swipe");
-  console.log("  💕 Matches:  GET /api/matches");
-  console.log("  🎯 Quests:   GET/POST /api/quests");
-  console.log("  📊 Stats:    GET /api/stats");
-  console.log("  📹 Live:     GET/POST /api/live");
-  console.log("  💚 Health:   GET /health");
+  console.log("  🔐 Auth:         /api/auth/*");
+  console.log("  📤 Upload:       POST /api/upload/image");
+  console.log("  📝 Sample:       GET/POST /api/sample");
+  console.log("  👤 Profile:      GET/POST /api/profile");
+  console.log("  🔍 Discover:     GET /api/discover");
+  console.log("  👆 Swipe:        POST /api/swipe");
+  console.log("  💕 Matches:      GET /api/matches");
+  console.log("  🎯 Quests:       GET/POST /api/quests");
+  console.log("  📊 Stats:        GET /api/stats");
+  console.log("  📹 Live:         GET/POST /api/live");
+  console.log("  👥 Friends:      GET/POST /api/friends");
+  console.log("  💬 Messages:     GET/POST /api/messages");
+  console.log("  🏘️  Groups:       GET/POST /api/groups");
+  console.log("  🎁 SharedQuests: GET/POST /api/shared-quests");
+  console.log("  💚 Health:       GET /health");
   console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
 });
