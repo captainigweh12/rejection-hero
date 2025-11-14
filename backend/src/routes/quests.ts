@@ -166,17 +166,20 @@ questsRouter.post("/:id/start", async (c) => {
   }
 
   const userQuestId = c.req.param("id");
+  const skipLimitCheck = c.req.query("skipLimitCheck") === "true"; // Allow bypassing limit for regeneration
 
-  // Check active quests limit (max 2)
-  const activeCount = await db.userQuest.count({
-    where: {
-      userId: user.id,
-      status: "ACTIVE",
-    },
-  });
+  // Check active quests limit (max 2) - skip if this is a regeneration
+  if (!skipLimitCheck) {
+    const activeCount = await db.userQuest.count({
+      where: {
+        userId: user.id,
+        status: "ACTIVE",
+      },
+    });
 
-  if (activeCount >= 2) {
-    return c.json({ message: "Maximum 2 active quests allowed" }, 400);
+    if (activeCount >= 2) {
+      return c.json({ message: "Maximum 2 active quests allowed" }, 400);
+    }
   }
 
   // Update quest status

@@ -246,41 +246,53 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
     onSuccess: async (data) => {
       console.log("onSuccess called with data:", data);
 
-      // Delete the current quest
-      if (userQuest) {
-        console.log("Deleting current quest:", userQuest.id);
-        try {
+      try {
+        // Delete the current quest
+        if (userQuest) {
+          console.log("Deleting current quest:", userQuest.id);
           await api.delete(`/api/quests/${userQuest.id}`);
           console.log("Quest deleted successfully");
-        } catch (error) {
-          console.error("Error deleting quest:", error);
+        }
+
+        // Start the new quest using the userQuestId with skipLimitCheck
+        console.log("Starting new quest with userQuestId:", data.userQuestId);
+        await api.post(`/api/quests/${data.userQuestId}/start?skipLimitCheck=true`);
+        console.log("New quest started");
+
+        // Refresh quests data
+        await queryClient.invalidateQueries({ queryKey: ["quests"] });
+        console.log("Queries invalidated");
+
+        // Navigate to the new quest using the userQuestId
+        const updatedQuests = await api.get<GetUserQuestsResponse>("/api/quests");
+        const newUserQuest = updatedQuests.activeQuests.find((q) => q.id === data.userQuestId);
+        console.log("New user quest found:", newUserQuest);
+
+        if (newUserQuest) {
+          setCurrentUserQuestId(newUserQuest.id);
+          console.log("Updated current user quest ID to:", newUserQuest.id);
+        }
+
+        // Reset selections
+        setSelectedCategory(null);
+        setSelectedDifficulty(null);
+        setIsRegenerating(false);
+        console.log("Regeneration complete!");
+      } catch (error: any) {
+        console.error("Error during quest regeneration:", error);
+        setIsRegenerating(false);
+
+        // Parse error message if available
+        const errorMessage = error?.message || error?.toString() || "Unknown error";
+        if (errorMessage.includes("Maximum 2 active quests")) {
+          Alert.alert(
+            "Quest Limit Reached",
+            "You already have 2 active quests. Please complete one before regenerating this quest."
+          );
+        } else {
+          Alert.alert("Error", "Failed to regenerate quest. Please try again.");
         }
       }
-
-      // Start the new quest using the userQuestId
-      console.log("Starting new quest with userQuestId:", data.userQuestId);
-      await api.post(`/api/quests/${data.userQuestId}/start`);
-      console.log("New quest started");
-
-      // Refresh quests data
-      await queryClient.invalidateQueries({ queryKey: ["quests"] });
-      console.log("Queries invalidated");
-
-      // Navigate to the new quest using the userQuestId
-      const updatedQuests = await api.get<GetUserQuestsResponse>("/api/quests");
-      const newUserQuest = updatedQuests.activeQuests.find((q) => q.id === data.userQuestId);
-      console.log("New user quest found:", newUserQuest);
-
-      if (newUserQuest) {
-        setCurrentUserQuestId(newUserQuest.id);
-        console.log("Updated current user quest ID to:", newUserQuest.id);
-      }
-
-      // Reset selections
-      setSelectedCategory(null);
-      setSelectedDifficulty(null);
-      setIsRegenerating(false);
-      console.log("Regeneration complete!");
     },
     onError: (error) => {
       console.error("Failed to regenerate quest:", error);

@@ -38,6 +38,7 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
   - "Regenerate Quest" button appears when both are selected
   - Instantly replaces current quest with new AI-generated quest matching your selections
   - Keeps your location context for nearby places
+  - Works even when you have 2 active quests (replaces the current one)
 
 **Quest Completion Flow** ✨ NEW! (Duolingo-Inspired Sequential Pages)
 - **Loading screen**: 2-second loading animation with pulsing trophy
