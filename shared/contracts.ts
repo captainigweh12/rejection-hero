@@ -192,6 +192,7 @@ export const generateQuestRequestSchema = z.object({
   userLocation: z.string().optional(), // User's current location name
   userLatitude: z.number().optional(), // User's GPS latitude
   userLongitude: z.number().optional(), // User's GPS longitude
+  preferredQuestType: z.enum(["REJECTION", "ACTION"]).optional(), // User's preferred quest type
 });
 export type GenerateQuestRequest = z.infer<typeof generateQuestRequestSchema>;
 export const generateQuestResponseSchema = z.object({

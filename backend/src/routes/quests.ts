@@ -92,7 +92,7 @@ questsRouter.post("/generate", zValidator("json", generateQuestRequestSchema), a
     return c.json({ message: "Unauthorized" }, 401);
   }
 
-  const { category, difficulty, customPrompt, userLocation, userLatitude, userLongitude } = c.req.valid("json");
+  const { category, difficulty, customPrompt, userLocation, userLatitude, userLongitude, preferredQuestType } = c.req.valid("json");
 
   // Generate quest using OpenAI with location context
   const questData = await generateQuestWithAI(
@@ -102,7 +102,8 @@ questsRouter.post("/generate", zValidator("json", generateQuestRequestSchema), a
     user.id,
     userLocation,
     userLatitude,
-    userLongitude
+    userLongitude,
+    preferredQuestType
   );
 
   // Create quest in database
@@ -314,7 +315,8 @@ async function generateQuestWithAI(
   userId?: string,
   userLocation?: string,
   userLatitude?: number,
-  userLongitude?: number
+  userLongitude?: number,
+  preferredQuestType?: "REJECTION" | "ACTION"
 ): Promise<{
   title: string;
   description: string;
@@ -446,6 +448,42 @@ IMPORTANT: Describe generic location types (coffee shops, gyms, malls) without s
         ? `\n\nIMPORTANT: Do NOT create quests similar to these previous quests:\n${previousQuestTitles.join("\n")}\n\nCreate a completely NEW and UNIQUE challenge.`
         : "";
 
+    // Quest type preference context
+    const questTypeContext = preferredQuestType === "ACTION"
+      ? `\n\n🎯 USER PREFERENCE: The user wants an ACTION challenge (not rejection-based).
+
+IMPORTANT: Use goalType: "TAKE_ACTION" for this quest.
+This means the quest should be about COMPLETING ACTIONS, not asking yes/no questions.
+
+ACTION QUEST EXAMPLES:
+- "Apply to 5 jobs on LinkedIn"
+- "Send 3 cold emails to potential clients"
+- "Compliment 5 random people"
+- "Tell 5 people they have nice shoes"
+- "Give 3 strangers genuine compliments about their outfit"
+- "Post 2 updates on LinkedIn about your work"
+- "Attend 1 networking event"
+- "Update your resume with 3 new achievements"
+- "Create a portfolio showcasing 5 projects"
+- "Share your work with 3 people for feedback"
+
+These are POSITIVE ACTIONS the user will complete and track with a star button, not rejection challenges.`
+      : preferredQuestType === "REJECTION"
+      ? `\n\n🎯 USER PREFERENCE: The user wants a REJECTION challenge.
+
+IMPORTANT: Use goalType: "COLLECT_NOS" or "COLLECT_YES" for this quest.
+This means the quest should involve asking people for things and getting yes/no responses.
+
+REJECTION QUEST EXAMPLES:
+- "Ask 5 baristas for a custom drink not on the menu"
+- "Request 3 store managers for a discount on expensive items"
+- "Ask 5 people at the bookstore for their phone number"
+- "Pitch 3 business owners to display your flyers"
+- "Request 5 gym trainers if you can teach their class"
+
+These involve asking people for things and tracking their YES or NO responses.`
+      : "";
+
     const prompt = customPrompt
       ? `Create a "Go for No" rejection challenge based on: ${customPrompt}.
 
@@ -457,14 +495,16 @@ REQUIREMENTS:
 - Make it actionable and specific
 - Category: SALES/SOCIAL/ENTREPRENEURSHIP/DATING/CONFIDENCE/CAREER
 - Difficulty: EASY/MEDIUM/HARD/EXPERT
-- goalType: COLLECT_NOS (most common) or COLLECT_YES
-- goalCount: number of NOs or YESes to collect (3-15 based on difficulty)
-${previousQuestsContext}
+- goalType: COLLECT_NOS (most common), COLLECT_YES, or TAKE_ACTION
+- goalCount: number of NOs, YESes, or actions to complete (based on difficulty)
+${previousQuestsContext}${questTypeContext}
 
 GOOD EXAMPLES:
 - "Ask baristas at 5 different coffee shops if they can make a 'unicorn rainbow latte' (not on menu)"
 - "Request 8 business owners for a 90% discount on their most expensive item"
 - "Ask 5 gym trainers if you can teach their next class for free"
+- "Compliment 5 random people on their shoes" (TAKE_ACTION)
+- "Tell 3 strangers they have a great smile" (TAKE_ACTION)
 
 BAD EXAMPLES (too generic):
 - "Pitch your product to 10 people"
@@ -495,7 +535,8 @@ REQUIREMENTS:
 - When to use TAKE_ACTION:
   * Use this for quests that don't involve asking yes/no questions
   * Examples: "Apply to 5 jobs", "Send 3 cold emails", "Attend 2 networking events", "Update your resume", "Create a portfolio"
-  * If the user's custom prompt mentions taking action (applying, sending, creating, updating, attending), use TAKE_ACTION
+  * Social action examples: "Compliment 5 random people", "Tell 5 people they have nice shoes", "Give 3 strangers genuine compliments"
+  * If the user's custom prompt mentions taking action (applying, sending, creating, updating, attending, complimenting), use TAKE_ACTION
 
 - When to use COLLECT_NOS/COLLECT_YES:
   * Use these for quests that involve asking people for something and getting yes/no responses
@@ -512,15 +553,19 @@ REQUIREMENTS:
     - MEDIUM: 3-5 actions
     - HARD: 5-8 actions
     - EXPERT: 8-12 actions
-${previousQuestsContext}${locationContext}${timeContext}
+${previousQuestsContext}${questTypeContext}${locationContext}${timeContext}
 
 GOOD EXAMPLES:
 - SALES: "Request grocery stores for expired produce samples to take home"
 - SOCIAL: "Ask 5 dog owners at the park if you can walk their dog for 5 minutes"
+- SOCIAL (ACTION): "Compliment 5 random people on their outfit" (TAKE_ACTION)
+- SOCIAL (ACTION): "Tell 5 people they have nice shoes" (TAKE_ACTION)
 - ENTREPRENEURSHIP: "Pitch restaurant managers to let you place your flyers on their tables"
 - DATING: "Ask 5 people at the bookstore for their book recommendation and phone number"
+- CONFIDENCE (ACTION): "Give 3 strangers genuine compliments" (TAKE_ACTION)
 - CONFIDENCE: "Request clothing stores for a private fashion show of their most expensive items"
 - CAREER: "Ask 6 professionals on LinkedIn to mentor you for free for 3 months"
+- CAREER (ACTION): "Apply to 5 jobs on LinkedIn" (TAKE_ACTION)
 
 BAD EXAMPLES (too generic):
 - "Pitch your product to 10 people"

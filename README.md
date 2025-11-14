@@ -53,18 +53,31 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 - Each page is tap-to-advance for intuitive flow
 
 **AI Quest Generation** ✨ ENHANCED! (Context-Aware & Location-Based with Google Maps)
-- **Personal Context** 🎯 NEW!:
+- **Personal Context** 🎯:
   - Add personal context when creating quests (e.g., "I'm a software developer looking for a job")
   - AI tailors quests to your specific goals and situation
   - Examples provided for Career, Dating, Sales, etc.
-- **Smart Quest Types** ⭐ NEW!:
-  - **TAKE_ACTION quests**: For action-based tasks (applying to jobs, sending emails, attending events)
+- **Quest Type Selection** ⭐ NEW!:
+  - Choose between two quest styles when creating:
+    - **🎯 Rejection Challenge**: Track YES/NO responses from asking people for things
+    - **⭐ Action Challenge**: Complete positive actions and track with star button
+  - Visual selection cards with icons and descriptions
+  - Examples shown for each type
+- **Smart Quest Types** ⭐:
+  - **TAKE_ACTION quests**: For action-based tasks
+    - Examples: Applying to jobs, sending emails, complimenting people, networking events
     - Shows golden star "I Did It!" button instead of YES/NO
     - Tracks actions completed with star counter
-    - Perfect for career advancement, networking, and personal growth
-  - **COLLECT_NOS quests**: Traditional rejection challenges (asking for discounts, favors, etc.)
+    - Perfect for career advancement, personal growth, and positive social actions
+  - **COLLECT_NOS quests**: Traditional rejection challenges
+    - Examples: Asking for discounts, favors, custom items, dates
     - Shows YES/NO buttons to track responses
   - **COLLECT_YES quests**: For collecting approvals
+- **Social Action Examples** 🌟 NEW!:
+  - "Compliment 5 random people on their outfit"
+  - "Tell 5 people they have nice shoes"
+  - "Give 3 strangers genuine compliments"
+  - AI generates positive social interaction quests alongside career/rejection challenges
 - **3-word titles**: All quests have concise 3-word action titles (e.g., "Ask Coffee Shops", "Request Business Cards", "Apply To Jobs")
 - **Unique challenges**: AI tracks your last 20 quests and ensures no duplicates
 - **Google Maps Places API Integration** 🗺️:

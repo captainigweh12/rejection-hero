@@ -3,7 +3,7 @@ import { View, Text, Pressable, ActivityIndicator, TextInput, ScrollView, Alert,
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Sparkles, X, ChevronLeft } from "lucide-react-native";
+import { Sparkles, X, ChevronLeft, Star, ThumbsDown } from "lucide-react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "@/navigation/types";
 import { api } from "@/lib/api";
@@ -14,10 +14,13 @@ type Props = NativeStackScreenProps<RootStackParamList, "CreateQuest">;
 const CATEGORIES = ["SALES", "SOCIAL", "ENTREPRENEURSHIP", "DATING", "CONFIDENCE", "CAREER"];
 const DIFFICULTIES = ["EASY", "MEDIUM", "HARD", "EXPERT"];
 
+type QuestType = "REJECTION" | "ACTION";
+
 export default function CreateQuestScreen({ navigation }: Props) {
   const [showAIForm, setShowAIForm] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedDifficulty, setSelectedDifficulty] = useState<string | null>(null);
+  const [selectedQuestType, setSelectedQuestType] = useState<QuestType>("REJECTION");
   const [customPrompt, setCustomPrompt] = useState("");
 
   // Custom quest form
@@ -61,6 +64,7 @@ export default function CreateQuestScreen({ navigation }: Props) {
       category: selectedCategory,
       difficulty: selectedDifficulty,
       customPrompt: customPrompt || undefined,
+      preferredQuestType: selectedQuestType,
     });
   };
 
@@ -457,6 +461,118 @@ export default function CreateQuestScreen({ navigation }: Props) {
                   </Text>
                 </Pressable>
               ))}
+            </View>
+          </View>
+
+          {/* Quest Type Selection */}
+          <View style={{ marginBottom: 24 }}>
+            <Text style={{ fontSize: 18, fontWeight: "bold", color: "#1C1C1E", marginBottom: 4 }}>
+              Quest Type
+            </Text>
+            <Text style={{ fontSize: 14, color: "#666", marginBottom: 12 }}>
+              Choose your challenge style
+            </Text>
+
+            <View style={{ gap: 12 }}>
+              {/* Rejection Challenge Option */}
+              <Pressable
+                onPress={() => setSelectedQuestType("REJECTION")}
+                style={{
+                  backgroundColor: "white",
+                  borderRadius: 16,
+                  padding: 16,
+                  borderWidth: 2,
+                  borderColor: selectedQuestType === "REJECTION" ? "#FF6B35" : "#E5E5EA",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 12,
+                }}
+              >
+                <View
+                  style={{
+                    width: 48,
+                    height: 48,
+                    borderRadius: 24,
+                    backgroundColor: selectedQuestType === "REJECTION" ? "#FEE2E2" : "#F5F5F7",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <ThumbsDown size={24} color={selectedQuestType === "REJECTION" ? "#EF4444" : "#666"} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontSize: 16, fontWeight: "bold", color: "#1C1C1E", marginBottom: 4 }}>
+                    🎯 Rejection Challenge
+                  </Text>
+                  <Text style={{ fontSize: 13, color: "#666", lineHeight: 18 }}>
+                    Track YES/NO responses. Perfect for asking for discounts, favors, or dates.
+                  </Text>
+                </View>
+                {selectedQuestType === "REJECTION" && (
+                  <View
+                    style={{
+                      width: 24,
+                      height: 24,
+                      borderRadius: 12,
+                      backgroundColor: "#FF6B35",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Text style={{ color: "white", fontSize: 16, fontWeight: "bold" }}>✓</Text>
+                  </View>
+                )}
+              </Pressable>
+
+              {/* Action Challenge Option */}
+              <Pressable
+                onPress={() => setSelectedQuestType("ACTION")}
+                style={{
+                  backgroundColor: "white",
+                  borderRadius: 16,
+                  padding: 16,
+                  borderWidth: 2,
+                  borderColor: selectedQuestType === "ACTION" ? "#D97706" : "#E5E5EA",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 12,
+                }}
+              >
+                <View
+                  style={{
+                    width: 48,
+                    height: 48,
+                    borderRadius: 24,
+                    backgroundColor: selectedQuestType === "ACTION" ? "#FEF3C7" : "#F5F5F7",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Star size={24} color={selectedQuestType === "ACTION" ? "#D97706" : "#666"} fill={selectedQuestType === "ACTION" ? "#D97706" : "transparent"} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontSize: 16, fontWeight: "bold", color: "#1C1C1E", marginBottom: 4 }}>
+                    ⭐ Action Challenge
+                  </Text>
+                  <Text style={{ fontSize: 13, color: "#666", lineHeight: 18 }}>
+                    Complete actions. Great for applying to jobs, complimenting people, or networking.
+                  </Text>
+                </View>
+                {selectedQuestType === "ACTION" && (
+                  <View
+                    style={{
+                      width: 24,
+                      height: 24,
+                      borderRadius: 12,
+                      backgroundColor: "#D97706",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Text style={{ color: "white", fontSize: 16, fontWeight: "bold" }}>✓</Text>
+                  </View>
+                )}
+              </Pressable>
             </View>
           </View>
 
