@@ -92,7 +92,12 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
   - Suggests specific nearby places that are walkable or a short drive
   - Uses actual business names and addresses from Google Maps
   - "📍 Share Location" button appears if location not enabled
-- **Time-aware**: Considers current time of day (morning, afternoon, evening, night) for relevant activities
+- **Time-aware**: AI considers current time of day and ONLY suggests locations that are open right now
+  - **Morning (6am-12pm)**: Coffee shops, breakfast spots, gyms, professional networking
+  - **Afternoon (12pm-5pm)**: Lunch spots, retail stores, libraries, shopping malls
+  - **Evening (5pm-9pm)**: Dinner restaurants, evening cafes, stores still open, evening activities
+  - **Night (9pm-6am)**: Only late-night venues (24-hour stores, late-night diners, bars)
+  - User gets quests they can start immediately without waiting for businesses to open
 - **Date-aware**: Adapts to weekday vs weekend and considers what businesses are open
 - **Map integration**: "📍 View on Map" button opens Google Maps with exact quest location (using accurate coordinates from verified places)
 - **Higher creativity**: Temperature set to 0.9 for more variety

@@ -423,13 +423,49 @@ CRITICAL LOCATION REQUIREMENTS:
 IMPORTANT: Describe generic location types (coffee shops, gyms, malls) without specific coordinates.`
       : "";
 
-    const timeContext = `\n\nTIME/DATE CONTEXT:
+    const timeContext = `\n\n⏰ TIME/DATE CONTEXT (CRITICAL - FOLLOW STRICTLY):
 - Current time: ${timeOfDay} (${hour}:00)
 - Day: ${dayName} (${dayType})
 - Date: ${month} ${date}
-- Consider what businesses/places are typically open and busy at this time
-- Consider what activities are appropriate for this time of day
-- If it's ${timeOfDay}, suggest locations and activities that would be active right now`;
+
+🚨 IMPORTANT TIME-BASED QUEST RULES:
+${hour >= 6 && hour < 21
+  ? `✅ IT IS DAYTIME (${timeOfDay})
+- ONLY suggest businesses and places that are OPEN RIGHT NOW during ${timeOfDay}
+- Examples of places typically open during ${timeOfDay}:
+  * Coffee shops, cafes, restaurants
+  * Retail stores, malls, grocery stores
+  * Gyms, fitness centers (if morning/afternoon)
+  * Office buildings, coworking spaces
+  * Libraries, bookstores
+  * Parks (for outdoor activities)
+  * Banks (weekdays only during business hours)
+
+❌ DO NOT suggest places that are closed during ${timeOfDay}:
+- DO NOT suggest bars, nightclubs, or late-night venues
+- DO NOT suggest activities that happen at night
+- DO NOT suggest places that close early
+
+✅ TIME-APPROPRIATE ACTIVITIES for ${timeOfDay}:
+${hour >= 6 && hour < 12
+  ? '- Morning coffee runs, breakfast spots, gym visits\n  - Professional networking (offices, coworking spaces)\n  - Early bird shopping at retail stores'
+  : hour >= 12 && hour < 17
+  ? '- Lunch spots, cafes, restaurants\n  - Shopping at malls, stores\n  - Afternoon networking events\n  - Library or bookstore visits'
+  : '- Dinner restaurants, evening cafes\n  - Retail stores (before closing)\n  - Evening gym sessions\n  - Early evening social activities'
+}`
+  : `🌙 IT IS NIGHTTIME (${timeOfDay})
+- Only suggest places that are open late at night
+- Consider: 24-hour stores, late-night diners, bars, clubs
+- Avoid: Regular retail stores, most restaurants, banks, offices`
+}
+
+🎯 QUEST SHOULD MATCH THE CURRENT TIME:
+- If it's morning → suggest morning activities (coffee shops, breakfast places, gyms)
+- If it's afternoon → suggest lunch spots, retail stores, libraries, afternoon locations
+- If it's evening → suggest dinner spots, evening cafes, stores still open
+- If it's night → suggest late-night venues only
+
+The user is creating this quest RIGHT NOW at ${hour}:00 ${timeOfDay} and will likely start it soon, so make sure the locations you suggest are OPEN and APPROPRIATE for this time of day.`;
 
     // Get user's previous quests to avoid duplicates
     let previousQuestTitles: string[] = [];
