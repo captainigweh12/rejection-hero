@@ -257,18 +257,18 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
         }
       }
 
-      // Start the new quest
-      console.log("Starting new quest:", data.quest.id);
-      await api.post(`/api/quests/${data.quest.id}/start`);
+      // Start the new quest using the userQuestId
+      console.log("Starting new quest with userQuestId:", data.userQuestId);
+      await api.post(`/api/quests/${data.userQuestId}/start`);
       console.log("New quest started");
 
       // Refresh quests data
       await queryClient.invalidateQueries({ queryKey: ["quests"] });
       console.log("Queries invalidated");
 
-      // Navigate to the new quest
+      // Navigate to the new quest using the userQuestId
       const updatedQuests = await api.get<GetUserQuestsResponse>("/api/quests");
-      const newUserQuest = updatedQuests.activeQuests.find((q) => q.quest.id === data.quest.id);
+      const newUserQuest = updatedQuests.activeQuests.find((q) => q.id === data.userQuestId);
       console.log("New user quest found:", newUserQuest);
 
       if (newUserQuest) {

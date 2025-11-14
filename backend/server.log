@@ -7,14 +7,14 @@ $ prisma generate
 Environment variables loaded from .env
 Prisma schema loaded from prisma/schema.prisma
 
-✔ Generated Prisma Client (v6.17.1) to ./generated/prisma in 212ms
+✔ Generated Prisma Client (v6.17.1) to ./generated/prisma in 152ms
 
 Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
 
 Tip: Need your database queries to be 1000x faster? Accelerate offers you that and more: https://pris.ly/tip-2-accelerate
 
 
-Checked 760 installs across 702 packages (no changes) [1.50s]
+Checked 760 installs across 702 packages (no changes) [1408.00ms]
 Starting server in dev mode with hot reload...
 $ NODE_ENV=development bun run --hot src/index.ts
 Failed to find Response internal state key
@@ -101,111 +101,31 @@ Failed to find Response internal state key
 
 <-- GET /api/auth/get-session
 --> GET /api/auth/get-session [32m200[0m 10ms
-<-- GET /api/quests
---> GET /api/quests [32m200[0m 4ms
-<-- GET /api/stats
---> GET /api/stats [32m200[0m 4ms
-<-- GET /api/auth/get-session
---> GET /api/auth/get-session [32m200[0m 5ms
-<-- GET /api/quests
 <-- GET /api/stats
 --> GET /api/stats [32m200[0m 3ms
---> GET /api/quests [32m200[0m 5ms
 <-- GET /api/quests
+--> GET /api/quests [32m200[0m 3ms
+<-- GET /api/quests
+--> GET /api/quests [32m200[0m 3ms
+<-- GET /api/stats
+--> GET /api/stats [32m200[0m 1ms
 <-- GET /api/stats/leaderboard
---> GET /api/quests [32m200[0m 6ms
---> GET /api/stats/leaderboard [32m200[0m 6ms
-<-- GET /api/stats
---> GET /api/stats [32m200[0m 2ms
-<-- POST /api/quests/cmhz01a470004m2729xp41m0y/record
---> POST /api/quests/cmhz01a470004m2729xp41m0y/record [32m200[0m 125ms
-<-- GET /api/quests
---> GET /api/quests [32m200[0m 3ms
-<-- GET /api/stats
---> GET /api/stats [32m200[0m 4ms
-<-- POST /api/quests/cmhz01a470004m2729xp41m0y/record
---> POST /api/quests/cmhz01a470004m2729xp41m0y/record [32m200[0m 114ms
-<-- GET /api/quests
---> GET /api/quests [32m200[0m 3ms
-<-- GET /api/stats
---> GET /api/stats [32m200[0m 2ms
-<-- POST /api/quests/cmhz01a470004m2729xp41m0y/record
---> POST /api/quests/cmhz01a470004m2729xp41m0y/record [32m200[0m 12ms
-<-- GET /api/quests
-<-- GET /api/stats
---> GET /api/quests [32m200[0m 4ms
---> GET /api/stats [32m200[0m 2ms
-<-- POST /api/quests/cmhz01a470004m2729xp41m0y/record
---> POST /api/quests/cmhz01a470004m2729xp41m0y/record [32m200[0m 7ms
-<-- GET /api/stats
-<-- GET /api/quests
---> GET /api/quests [32m200[0m 3ms
---> GET /api/stats [32m200[0m 4ms
-<-- POST /api/quests/cmhz01a470004m2729xp41m0y/record
---> POST /api/quests/cmhz01a470004m2729xp41m0y/record [32m200[0m 5ms
-<-- GET /api/stats
-<-- GET /api/quests
---> GET /api/stats [32m200[0m 4ms
---> GET /api/quests [32m200[0m 3ms
-<-- POST /api/quests/cmhz01a470004m2729xp41m0y/record
---> POST /api/quests/cmhz01a470004m2729xp41m0y/record [32m200[0m 12ms
-<-- GET /api/stats
-<-- GET /api/quests
---> GET /api/quests [32m200[0m 2ms
---> GET /api/stats [32m200[0m 3ms
-<-- POST /api/quests/cmhz01a470004m2729xp41m0y/record
---> POST /api/quests/cmhz01a470004m2729xp41m0y/record [32m200[0m 9ms
-<-- GET /api/stats
-<-- GET /api/quests
---> GET /api/stats [32m200[0m 2ms
---> GET /api/quests [32m200[0m 3ms
-<-- POST /api/quests/cmhz01a470004m2729xp41m0y/record
---> POST /api/quests/cmhz01a470004m2729xp41m0y/record [32m200[0m 9ms
-<-- GET /api/quests
---> GET /api/quests [32m200[0m 3ms
-<-- GET /api/stats
---> GET /api/stats [32m200[0m 1ms
-<-- POST /api/quests/cmhz01a470004m2729xp41m0y/record
---> POST /api/quests/cmhz01a470004m2729xp41m0y/record [32m200[0m 3ms
-<-- GET /api/quests
---> GET /api/quests [32m200[0m 2ms
-<-- GET /api/stats
---> GET /api/stats [32m200[0m 1ms
-<-- POST /api/quests/cmhz01a470004m2729xp41m0y/record
---> POST /api/quests/cmhz01a470004m2729xp41m0y/record [32m200[0m 2ms
-<-- GET /api/quests
-<-- GET /api/stats
---> GET /api/quests [32m200[0m 4ms
---> GET /api/stats [32m200[0m 3ms
-<-- POST /api/quests/cmhz01a470004m2729xp41m0y/record
---> POST /api/quests/cmhz01a470004m2729xp41m0y/record [32m200[0m 9ms
-<-- GET /api/quests
---> GET /api/quests [32m200[0m 2ms
-<-- GET /api/stats
---> GET /api/stats [32m200[0m 1ms
-<-- POST /api/quests/cmhz01a470004m2729xp41m0y/record
---> POST /api/quests/cmhz01a470004m2729xp41m0y/record [32m200[0m 6ms
-<-- GET /api/quests
-<-- GET /api/stats
---> GET /api/stats [32m200[0m 3ms
---> GET /api/quests [32m200[0m 5ms
-<-- GET /api/stats/leaderboard
---> GET /api/stats/leaderboard [32m200[0m 3ms
+--> GET /api/stats/leaderboard [32m200[0m 4ms
 <-- POST /api/quests/generate
 Using OpenAI API to generate quest
-Fetching nearby places for Charlotte, NC at 35.30548620062718, -80.68611941371091
+Fetching nearby places for Charlotte, NC at 35.305449787417295, -80.6861119365397
 Found 10 nearby places
 OpenAI API response: {
-  "id": "chatcmpl-Cbpt6BgPH95MztG6VviBhTYFAhBbb",
+  "id": "chatcmpl-Cbpx8C0JZS5X1K2gwUO1kabRv0tqi",
   "object": "chat.completion",
-  "created": 1763133628,
+  "created": 1763133878,
   "model": "gpt-4o-mini-2024-07-18",
   "choices": [
     {
       "index": 0,
       "message": {
         "role": "assistant",
-        "content": "{\n  \"title\": \"Request Karaoke Night\",\n  \"description\": \"Visit PNC Music Pavilion and approach the event coordinator. Ask if they would be willing to host an impromptu karaoke night with a theme of your choice for the next event. Be ready for a 'no,' but enjoy the experience of trying!\",\n  \"category\": \"SOCIAL\",\n  \"difficulty\": \"EXPERT\",\n  \"goalType\": \"COLLECT_NOS\",\n  \"goalCount\": 1,\n  \"location\": \"PNC Music Pavilion - 707 Pavilion Boulevard\",\n  \"latitude\": 35.32715919999999,\n  \"longitude\": -80.7123113\n}",
+        "content": "{\n  \"title\": \"Ask Students Out\",\n  \"description\": \"Visit the University of North Carolina at Charlotte and approach 5 students in the student center. Politely ask each one if they would like to grab coffee with you this weekend. Make sure to keep track of their responses, focusing on collecting 'NO' answers to overcome rejection fears.\",\n  \"category\": \"DATING\",\n  \"difficulty\": \"MEDIUM\",\n  \"goalType\": \"COLLECT_NOS\",\n  \"goalCount\": 5,\n  \"location\": \"University of North Carolina at Charlotte - 9201 University City Boulevard\",\n  \"latitude\": 35.3074169,\n  \"longitude\": -80.73521219999999\n}",
         "refusal": null,
         "annotations": []
       },
@@ -214,9 +134,9 @@ OpenAI API response: {
     }
   ],
   "usage": {
-    "prompt_tokens": 1865,
-    "completion_tokens": 140,
-    "total_tokens": 2005,
+    "prompt_tokens": 1871,
+    "completion_tokens": 150,
+    "total_tokens": 2021,
     "prompt_tokens_details": {
       "cached_tokens": 0,
       "audio_tokens": 0
@@ -231,63 +151,42 @@ OpenAI API response: {
   "service_tier": "default",
   "system_fingerprint": "fp_560af6e559"
 }
---> POST /api/quests/generate [32m200[0m 4s
-<-- GET /api/quests
---> GET /api/quests [32m200[0m 3ms
-<-- POST /api/quests/cmhz08p8g0004m2u8265oh7b8/start
---> POST /api/quests/cmhz08p8g0004m2u8265oh7b8/start [32m200[0m 3ms
-<-- GET /api/quests
---> GET /api/quests [32m200[0m 2ms
-Failed to find Response internal state key
-✅ Environment variables validated successfully
-🔐 [Auth] Initializing Better Auth...
-✅ [Auth] Better Auth initialized
-🔗 [Auth] Base URL: https://preview-asiflbketxvq.share.sandbox.dev
-🌐 [Auth] Trusted origins: vibecode://, http://localhost:3000, http://localhost:8081, https://preview-asiflbketxvq.share.sandbox.dev
-🔑 [Auth] Google OAuth: Enabled
-📁 [Upload] Uploads directory exists: /home/user/workspace/backend/uploads
-🔧 Initializing Hono application...
-🔐 Mounting Better Auth handler at /api/auth/*
-📁 Serving static files from uploads/ directory
-📤 Mounting upload routes at /api/upload
-📝 Mounting sample routes at /api/sample
-👤 Mounting profile routes at /api/profile
-🔍 Mounting discover routes at /api/discover
-👆 Mounting swipe routes at /api/swipe
-💕 Mounting matches routes at /api/matches
-🎯 Mounting quests routes at /api/quests
-📊 Mounting stats routes at /api/stats
-📹 Mounting live routes at /api/live
-⚙️  Starting server...
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📍 Environment: development
-🚀 Server is running on port 3000
-🔗 Base URL: http://localhost:3000
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+--> POST /api/quests/generate [32m200[0m 5s
+<-- DELETE /api/quests/cmhz08p8g0004m2u8265oh7b8
+--> DELETE /api/quests/cmhz08p8g0004m2u8265oh7b8 [32m200[0m 4ms
+<-- POST /api/quests/cmhz0e3190000m2cu1dvpkd76/start
+19 | `)}
+20 | 
+21 | We suggest to move the contents of ${Y(l)} to ${Y(a)} to consolidate your env vars.
+22 | `;throw new Error(u)}else if(t==="warn"){let u=`Conflict for env var${s.length>1?"s":""} ${s.map(c=>W(c)).join(", ")} in ${Y(a)} and ${Y(l)}
+23 | Env vars from ${Y(l)} overwrite the ones from ${Y(a)}
+24 |       `;console.warn(`${Ie("warn(prisma)")} ${u}`)}}}}function Is(e){if(yp(e)){$i(`Environment variables loaded from ${e}`);let r=qi.default.config({path:e,debug:process.env.DOTENV_CONFIG_DEBUG?!0:void 0});return{dotenvResult:Cs(r),message:Ce(`Environment variables loaded from ${xr.default.relative(process.cwd(),e)}`),path:e}}else $i(`Environment variables not found at ${e}`);return null}function Ds(e,r){return e&&r&&xr.default.resolve(e)===xr.default.resolve(r)}function yp(e){return!!(e&&un.default.existsSync(e))}function Vi(e,r){return Object.prototype.hasOwnProperty.call(e,r)}function pn(e,r){let t={};for(let n of Object.keys(e))t[n]=r(e[n],n);return t}function ji(e,r){if(e.length===0)return;let t=e[0];for(let n=1;n<e.length;n++)r(t,e[n])<0&&(t=e[n]);return t}function x(e,r){Object.defineProperty(e,"name",{value:r,configurable:!0})}var ks=new Set,at=(e,r,...t)=>{ks.has(e)||(ks.add(e),_i(r,...t))};var P=class e extends Error{clientVersion;errorCode;retryable;constructor(r,t,n){super(r),this.name="PrismaClie
 
-📚 Available endpoints:
-  🔐 Auth:     /api/auth/*
-  📤 Upload:   POST /api/upload/image
-  📝 Sample:   GET/POST /api/sample
-  👤 Profile:  GET/POST /api/profile
-  🔍 Discover: GET /api/discover
-  👆 Swipe:    POST /api/swipe
-  💕 Matches:  GET /api/matches
-  🎯 Quests:   GET/POST /api/quests
-  📊 Stats:    GET /api/stats
-  📹 Live:     GET/POST /api/live
-  💚 Health:   GET /health
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PrismaClientKnownRequestError: 
+Invalid `db.userQuest.update()` invocation in
+/home/user/workspace/backend/src/routes/quests.ts:183:40
 
-<-- GET /api/quests
-<-- GET /api/stats/leaderboard
+  180 }
+  181 
+  182 // Update quest status
+→ 183 const userQuest = await db.userQuest.update(
+An operation failed because it depends on one or more records that were required but not found. No record was found for an update.
+       meta: {
+  modelName: "UserQuest",
+  cause: "No record was found for an update.",
+},
+ clientVersion: "6.17.1",
+       code: "P2025"
+
+      at new PrismaClientKnownRequestError (/home/user/workspace/backend/generated/prisma/runtime/library.js:24:1351)
+      at handleRequestError (/home/user/workspace/backend/generated/prisma/runtime/library.js:124:7268)
+      at handleAndLogRequestError (/home/user/workspace/backend/generated/prisma/runtime/library.js:124:6593)
+      at request (/home/user/workspace/backend/generated/prisma/runtime/library.js:124:6300)
+
+--> POST /api/quests/cmhz0e3190000m2cu1dvpkd76/start [31m500[0m 7ms
 <-- GET /api/stats
---> GET /api/quests [32m200[0m 40ms
---> GET /api/stats [32m200[0m 33ms
---> GET /api/stats/leaderboard [32m200[0m 45ms
-<-- GET /api/stats
+--> GET /api/stats [32m200[0m 14ms
 <-- GET /api/stats/leaderboard
---> GET /api/stats [32m200[0m 11ms
---> GET /api/stats/leaderboard [32m200[0m 45ms
 <-- GET /api/quests
 --> GET /api/quests [32m200[0m 4ms
+--> GET /api/stats/leaderboard [32m200[0m 8ms
