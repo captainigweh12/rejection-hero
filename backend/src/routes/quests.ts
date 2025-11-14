@@ -255,6 +255,50 @@ questsRouter.post("/:id/record", zValidator("json", recordQuestActionRequestSche
 // Helper Functions
 // ============================================
 
+// Get nearby places using Google Places API
+async function getNearbyPlaces(
+  latitude: number,
+  longitude: number,
+  radius: number = 16093, // 10 miles in meters
+  type?: string
+): Promise<Array<{ name: string; address: string; lat: number; lng: number; types: string[] }>> {
+  const GOOGLE_MAPS_API_KEY = process.env.GOOGLE_MAPS_API_KEY;
+
+  if (!GOOGLE_MAPS_API_KEY) {
+    console.log("No Google Maps API key found");
+    return [];
+  }
+
+  try {
+    const typeParam = type ? `&type=${type}` : "";
+    const url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${latitude},${longitude}&radius=${radius}${typeParam}&key=${GOOGLE_MAPS_API_KEY}`;
+
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (data.status !== "OK" && data.status !== "ZERO_RESULTS") {
+      console.error("Google Places API error:", data.status, data.error_message);
+      return [];
+    }
+
+    if (!data.results || data.results.length === 0) {
+      return [];
+    }
+
+    // Return up to 10 places with relevant details
+    return data.results.slice(0, 10).map((place: any) => ({
+      name: place.name,
+      address: place.vicinity || place.formatted_address || "",
+      lat: place.geometry.location.lat,
+      lng: place.geometry.location.lng,
+      types: place.types || [],
+    }));
+  } catch (error) {
+    console.error("Error fetching nearby places:", error);
+    return [];
+  }
+}
+
 async function generateQuestWithAI(
   category?: string,
   difficulty?: string,
@@ -307,16 +351,33 @@ async function generateQuestWithAI(
     const isWeekend = day === 0 || day === 6;
     const dayType = isWeekend ? "weekend" : "weekday";
 
-    // Build context string with GPS coordinates
-    const locationContext = userLocation && userLatitude && userLongitude
+    // Get nearby places from Google Places API if user location is available
+    let nearbyPlaces: Array<{ name: string; address: string; lat: number; lng: number; types: string[] }> = [];
+    if (userLatitude && userLongitude) {
+      console.log(`Fetching nearby places for ${userLocation} at ${userLatitude}, ${userLongitude}`);
+      nearbyPlaces = await getNearbyPlaces(userLatitude, userLongitude, 16093); // 10 miles
+      console.log(`Found ${nearbyPlaces.length} nearby places`);
+    }
+
+    // Build context string with verified nearby places from Google Maps
+    const locationContext = userLocation && userLatitude && userLongitude && nearbyPlaces.length > 0
+      ? `\n\nLOCATION CONTEXT: User is currently at ${userLocation} (GPS: ${userLatitude}, ${userLongitude}).
+
+VERIFIED NEARBY PLACES (from Google Maps within 10 miles):
+${nearbyPlaces.slice(0, 10).map((place, i) => `${i + 1}. ${place.name} - ${place.address} (GPS: ${place.lat}, ${place.lng})`).join("\n")}
+
+CRITICAL LOCATION REQUIREMENTS:
+- MUST select a location from the verified places list above or use their coordinates as reference
+- Pick a place that matches the quest category (${category || "any"})
+- Use the EXACT coordinates provided for the selected place
+- Include the place name and address in the quest description
+- DO NOT make up coordinates - use the real coordinates from the list above
+- The quest should direct users to visit these verified real locations`
+      : userLocation && userLatitude && userLongitude
       ? `\n\nLOCATION CONTEXT: User is currently at ${userLocation} (GPS: ${userLatitude}, ${userLongitude}).
 CRITICAL LOCATION REQUIREMENTS:
 - Generate a quest location that is WITHIN 10 MILES (16 km) of coordinates ${userLatitude}, ${userLongitude}
 - Calculate approximate coordinates for the quest location that are near the user
-- For example, if user is in "San Francisco, CA" at 37.7749, -122.4194, suggest places like:
-  * "Downtown coffee shops" - location: "Union Square, SF" with coordinates around 37.7879, -122.4074
-  * "Marina district restaurants" - location: "Marina District, SF" with coordinates around 37.8016, -122.4377
-- DO NOT suggest locations in different cities or far away neighborhoods
 - The quest location should be accessible within 15-20 minutes by car or public transit
 - Include specific neighborhood or district names from ${userLocation}
 - Provide approximate latitude/longitude that is close to ${userLatitude}, ${userLongitude} (within 10 miles radius)`
