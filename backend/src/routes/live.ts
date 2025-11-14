@@ -9,6 +9,11 @@ import {
   addLiveCommentRequestSchema,
   addLiveCommentResponseSchema,
   getLiveCommentsResponseSchema,
+  suggestQuestToStreamerRequestSchema,
+  suggestQuestToStreamerResponseSchema,
+  getQuestSuggestionsResponseSchema,
+  respondToSuggestionRequestSchema,
+  respondToSuggestionResponseSchema,
 } from "@/shared/contracts";
 
 const live = new Hono<AppType>();
@@ -259,6 +264,7 @@ live.get("/active", async (c) => {
                 title: true,
                 description: true,
                 category: true,
+                goalCount: true,
               },
             },
           },
@@ -284,10 +290,14 @@ live.get("/active", async (c) => {
         userQuest: stream.userQuest
           ? {
               id: stream.userQuest.id,
+              noCount: stream.userQuest.noCount,
+              yesCount: stream.userQuest.yesCount,
+              actionCount: stream.userQuest.actionCount,
               quest: {
                 title: stream.userQuest.quest.title,
                 description: stream.userQuest.quest.description,
                 category: stream.userQuest.quest.category,
+                goalCount: stream.userQuest.quest.goalCount,
               },
             }
           : null,
@@ -394,6 +404,302 @@ live.get("/:id/comments", async (c) => {
   } catch (error) {
     console.error("Get live comments error:", error);
     return c.json({ error: "Failed to get comments" }, 500);
+  }
+});
+
+// POST /api/live/:id/suggest-quest - Suggest a quest to streamer
+live.post("/:id/suggest-quest", async (c) => {
+  const user = c.get("user");
+  if (!user) {
+    return c.json({ error: "Unauthorized" }, 401);
+  }
+
+  try {
+    const liveStreamId = c.req.param("id");
+    const body = await c.req.json();
+    const { questId, boostAmount, message } = suggestQuestToStreamerRequestSchema.parse(body);
+
+    // Verify stream exists and is active
+    const liveStream = await db.liveStream.findUnique({
+      where: { id: liveStreamId },
+      include: { user: true },
+    });
+
+    if (!liveStream || !liveStream.isActive) {
+      return c.json({ error: "Live stream not found or ended" }, 404);
+    }
+
+    // Can't suggest quests to your own stream
+    if (liveStream.userId === user.id) {
+      return c.json({ error: "Cannot suggest quests to your own stream" }, 400);
+    }
+
+    // Verify quest exists
+    const quest = await db.quest.findUnique({
+      where: { id: questId },
+    });
+
+    if (!quest) {
+      return c.json({ error: "Quest not found" }, 404);
+    }
+
+    // Check if user has enough diamonds for boost
+    if (boostAmount > 0) {
+      const userStats = await db.userStats.findUnique({
+        where: { userId: user.id },
+      });
+
+      if (!userStats || userStats.diamonds < boostAmount) {
+        return c.json({ error: "Insufficient diamonds for boost" }, 400);
+      }
+
+      // Deduct diamonds
+      await db.userStats.update({
+        where: { userId: user.id },
+        data: {
+          diamonds: {
+            decrement: boostAmount,
+          },
+        },
+      });
+    }
+
+    // Create quest suggestion (will work once migration is run)
+    try {
+      const suggestion = await (db as any).questSuggestion.create({
+        data: {
+          liveStreamId,
+          suggestedBy: user.id,
+          questId,
+          boostAmount,
+          message,
+          status: "pending",
+        },
+      });
+
+      // Get updated diamond balance
+      const updatedStats = await db.userStats.findUnique({
+        where: { userId: user.id },
+      });
+
+      const response: suggestQuestToStreamerResponseSchema._type = {
+        success: true,
+        suggestionId: suggestion.id,
+        newDiamondBalance: updatedStats?.diamonds || 0,
+      };
+
+      return c.json(response);
+    } catch (dbError) {
+      console.error("[Live] Quest suggestion table not yet created:", dbError);
+      return c.json({ error: "Quest suggestions feature coming soon - database migration pending" }, 503);
+    }
+  } catch (error) {
+    console.error("Suggest quest error:", error);
+    return c.json({ error: "Failed to suggest quest" }, 500);
+  }
+});
+
+// GET /api/live/:id/quest-suggestions - Get pending quest suggestions for a stream
+live.get("/:id/quest-suggestions", async (c) => {
+  const user = c.get("user");
+  if (!user) {
+    return c.json({ error: "Unauthorized" }, 401);
+  }
+
+  try {
+    const liveStreamId = c.req.param("id");
+
+    // Verify user owns this stream
+    const liveStream = await db.liveStream.findUnique({
+      where: { id: liveStreamId },
+    });
+
+    if (!liveStream) {
+      return c.json({ error: "Live stream not found" }, 404);
+    }
+
+    if (liveStream.userId !== user.id) {
+      return c.json({ error: "Unauthorized - not your stream" }, 403);
+    }
+
+    try {
+      // Get pending suggestions sorted by boost amount (highest first)
+      const suggestions = await (db as any).questSuggestion.findMany({
+        where: {
+          liveStreamId,
+          status: "pending",
+        },
+        include: {
+          quest: {
+            select: {
+              id: true,
+              title: true,
+              description: true,
+              category: true,
+              difficulty: true,
+              goalType: true,
+              goalCount: true,
+            },
+          },
+          suggester: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+        orderBy: [
+          { boostAmount: "desc" }, // Highest boost first
+          { createdAt: "asc" }, // Then oldest first
+        ],
+      });
+
+      const response: getQuestSuggestionsResponseSchema._type = {
+        suggestions: suggestions.map((s: any) => ({
+          id: s.id,
+          quest: s.quest,
+          suggester: s.suggester,
+          boostAmount: s.boostAmount,
+          message: s.message,
+          status: s.status,
+          createdAt: s.createdAt.toISOString(),
+        })),
+      };
+
+      return c.json(response);
+    } catch (dbError) {
+      console.error("[Live] Quest suggestion table not yet created:", dbError);
+      return c.json({ suggestions: [] });
+    }
+  } catch (error) {
+    console.error("Get quest suggestions error:", error);
+    return c.json({ error: "Failed to get quest suggestions" }, 500);
+  }
+});
+
+// POST /api/live/:id/respond-to-suggestion - Accept or decline a quest suggestion
+live.post("/:id/respond-to-suggestion", async (c) => {
+  const user = c.get("user");
+  if (!user) {
+    return c.json({ error: "Unauthorized" }, 401);
+  }
+
+  try {
+    const liveStreamId = c.req.param("id");
+    const body = await c.req.json();
+    const { suggestionId, action } = respondToSuggestionRequestSchema.parse(body);
+
+    // Verify stream ownership
+    const liveStream = await db.liveStream.findUnique({
+      where: { id: liveStreamId },
+    });
+
+    if (!liveStream || liveStream.userId !== user.id) {
+      return c.json({ error: "Unauthorized" }, 403);
+    }
+
+    try {
+      // Get suggestion
+      const suggestion = await (db as any).questSuggestion.findUnique({
+        where: { id: suggestionId },
+        include: {
+          quest: true,
+        },
+      });
+
+      if (!suggestion || suggestion.liveStreamId !== liveStreamId) {
+        return c.json({ error: "Suggestion not found" }, 404);
+      }
+
+      if (suggestion.status !== "pending") {
+        return c.json({ error: "Suggestion already responded to" }, 400);
+      }
+
+      if (action === "accept") {
+        // Check active quests count
+        const activeQuests = await db.userQuest.findMany({
+          where: {
+            userId: user.id,
+            status: "active",
+          },
+        });
+
+        if (activeQuests.length >= 2) {
+          return c.json({ error: "Cannot accept - you already have 2 active quests" }, 400);
+        }
+
+        // Check if user already has this quest
+        const existingUserQuest = await db.userQuest.findUnique({
+          where: {
+            userId_questId: {
+              userId: user.id,
+              questId: suggestion.questId,
+            },
+          },
+        });
+
+        if (existingUserQuest) {
+          return c.json({ error: "You already have this quest" }, 400);
+        }
+
+        // Create UserQuest
+        const userQuest = await db.userQuest.create({
+          data: {
+            userId: user.id,
+            questId: suggestion.questId,
+            status: "active",
+            startedAt: new Date(),
+          },
+        });
+
+        // Update suggestion status
+        await (db as any).questSuggestion.update({
+          where: { id: suggestionId },
+          data: {
+            status: "accepted",
+            respondedAt: new Date(),
+          },
+        });
+
+        // Update live stream to link this quest
+        await db.liveStream.update({
+          where: { id: liveStreamId },
+          data: {
+            userQuestId: userQuest.id,
+          },
+        });
+
+        const response: respondToSuggestionResponseSchema._type = {
+          success: true,
+          userQuestId: userQuest.id,
+          message: "Quest accepted and started!",
+        };
+
+        return c.json(response);
+      } else {
+        // Decline
+        await (db as any).questSuggestion.update({
+          where: { id: suggestionId },
+          data: {
+            status: "declined",
+            respondedAt: new Date(),
+          },
+        });
+
+        const response: respondToSuggestionResponseSchema._type = {
+          success: true,
+          message: "Quest suggestion declined",
+        };
+
+        return c.json(response);
+      }
+    } catch (dbError) {
+      console.error("[Live] Quest suggestion table not yet created:", dbError);
+      return c.json({ error: "Quest suggestions feature coming soon - database migration pending" }, 503);
+    }
+  } catch (error) {
+    console.error("Respond to suggestion error:", error);
+    return c.json({ error: "Failed to respond to suggestion" }, 500);
   }
 });
 

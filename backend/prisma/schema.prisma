@@ -34,6 +34,7 @@ model User {
   GroupMemberships   GroupMember[]
   GroupsCreated      Group[]             @relation("GroupCreator")
   SharedQuests       SharedQuest[]
+  QuestSuggestions   QuestSuggestion[]
 
   @@map("user")
 }
@@ -165,6 +166,7 @@ model Quest {
   timeContext   String?
   UserQuests    UserQuest[]
   SharedQuests  SharedQuest[]
+  QuestSuggestions QuestSuggestion[]
 
   @@map("quest")
 }
@@ -204,6 +206,7 @@ model LiveStream {
   userQuest   UserQuest?          @relation(fields: [userQuestId], references: [id])
   user        User                @relation(fields: [userId], references: [id], onDelete: Cascade)
   comments    LiveStreamComment[]
+  questSuggestions QuestSuggestion[]
 
   @@map("live_stream")
 }
@@ -218,6 +221,23 @@ model LiveStreamComment {
   liveStream   LiveStream @relation(fields: [liveStreamId], references: [id], onDelete: Cascade)
 
   @@map("live_stream_comment")
+}
+
+model QuestSuggestion {
+  id           String     @id @default(cuid())
+  liveStreamId String
+  suggestedBy  String
+  questId      String
+  boostAmount  Int        @default(0) // Diamonds paid to boost this suggestion
+  status       String     @default("pending") // pending, accepted, declined
+  message      String?    // Optional message from viewer
+  createdAt    DateTime   @default(now())
+  respondedAt  DateTime?
+  liveStream   LiveStream @relation(fields: [liveStreamId], references: [id], onDelete: Cascade)
+  suggester    User       @relation(fields: [suggestedBy], references: [id], onDelete: Cascade)
+  quest        Quest      @relation(fields: [questId], references: [id], onDelete: Cascade)
+
+  @@map("quest_suggestion")
 }
 
 model Friendship {

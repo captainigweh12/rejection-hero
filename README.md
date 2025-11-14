@@ -313,7 +313,7 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 - Organized sections: Profile, Adventure, Community
 - Theme-aware colors
 
-**Live Streaming** ✨ ENHANCED!
+**Live Streaming** ✨ FULLY ENHANCED!
 - **Modern Live Page UI** 🎨:
   - "Live Now" header with featured streams section
   - Horizontal scrolling featured streams (top 3)
@@ -330,16 +330,50 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
   - Real-time live streaming powered by Daily.co
   - Stream your quest challenges to the community
   - Link active quests to your live streams
-  - Quest card overlay during streams
+  - **Modern Quest Overlay Card** with progress tracking
+  - Interactive quest card with "Track Progress" button
   - Stream controls (mic, video, flip camera)
-  - Live comments from viewers
+  - Camera permission handling with beautiful UI
   - "Go Live" hero button with description
+- **Live Chat System** 💬:
+  - Real-time chat during streams (3-second refresh)
+  - Send and receive messages from viewers
+  - Username display with golden highlights
+  - Smooth chat bubbles with modern design
+  - Chat visible for both streamers and viewers
+  - Keyboard-aware input with send button
+- **Quest Suggestion System** 🎁:
+  - **Viewers can send quest challenges** to streamers
+  - **Diamond boost system** for quest priority (0, 5, 10, 25, 50💎)
+  - Higher boosts = higher priority in suggestion queue
+  - Optional personal message with quest suggestions
+  - Suggestions automatically sorted by boost amount
+  - Crown badge shows boosted quests
+- **Streamer Quest Management** ⚡:
+  - Golden gift button with notification badge
+  - View all pending quest suggestions
+  - **Accept or Decline** quests with one tap
+  - Cannot exceed 2 active quest limit (enforced)
+  - Quest auto-links to stream when accepted
+  - Quest suggestions modal with full details
+  - Shows suggester name and custom messages
+  - Diamond boost amounts displayed prominently
 - **Viewer Experience** 👥:
   - Watch other warriors complete their challenges live
-  - View quest details and stream info
+  - View quest details with real-time progress
   - Send live comments to support streamers
+  - **Send quest challenges** with golden gift button
+  - Select from your active quests to share
+  - Boost priority with diamonds
+  - Add custom challenge messages
   - See viewer count in real-time
   - Smooth interface for joining/leaving streams
+- **Integration & Safety** 🔒:
+  - Respects 2-quest active limit for streamers
+  - Diamond balance shown when sending quests
+  - Prevents duplicate quests
+  - Quest suggestions persist until responded to
+  - Backend validation for all actions
 
 ### Coming Soon
 - 💬 **Chat Screen**: Full conversation view with message history
@@ -385,6 +419,10 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 - **Match**: Store mutual matches
 - **LiveStream**: Live streaming sessions with room URLs
 - **LiveStreamComment**: Comments on live streams
+- **QuestSuggestion** ✨ NEW!: Quest challenges sent from viewers to streamers
+  - Boost amount (diamonds) for priority
+  - Status tracking (pending/accepted/declined)
+  - Links suggester, quest, and stream
 - **Friendship** ✨ NEW!: Friend connections with status (PENDING/ACCEPTED/BLOCKED)
 - **Message** ✨ NEW!: Direct messages between users with read tracking
 - **Group** ✨ NEW!: Facebook-style groups with privacy settings
@@ -477,6 +515,9 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 - `GET /api/live/active` - Get all active live streams
 - `POST /api/live/:id/comment` - Add comment to stream
 - `GET /api/live/:id/comments` - Get stream comments
+- `POST /api/live/:id/suggest-quest` - Suggest quest to streamer (with boost)
+- `GET /api/live/:id/quest-suggestions` - Get pending quest suggestions
+- `POST /api/live/:id/respond-to-suggestion` - Accept or decline quest
 
 ### Friends ✨ NEW!
 - `GET /api/friends` - Get accepted friends list

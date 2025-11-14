@@ -326,10 +326,14 @@ export const getActiveLiveStreamsResponseSchema = z.object({
       userQuest: z
         .object({
           id: z.string(),
+          noCount: z.number(),
+          yesCount: z.number(),
+          actionCount: z.number(),
           quest: z.object({
             title: z.string(),
             description: z.string(),
             category: z.string(),
+            goalCount: z.number(),
           }),
         })
         .nullable(),
@@ -372,4 +376,58 @@ export const getLiveCommentsResponseSchema = z.object({
   ),
 });
 export type GetLiveCommentsResponse = z.infer<typeof getLiveCommentsResponseSchema>;
+
+// POST /api/live/:id/suggest-quest - Suggest a quest to streamer
+export const suggestQuestToStreamerRequestSchema = z.object({
+  questId: z.string(),
+  boostAmount: z.number().min(0).default(0), // Diamonds to boost priority
+  message: z.string().optional(),
+});
+export type SuggestQuestToStreamerRequest = z.infer<typeof suggestQuestToStreamerRequestSchema>;
+export const suggestQuestToStreamerResponseSchema = z.object({
+  success: z.boolean(),
+  suggestionId: z.string(),
+  newDiamondBalance: z.number(),
+});
+export type SuggestQuestToStreamerResponse = z.infer<typeof suggestQuestToStreamerResponseSchema>;
+
+// GET /api/live/:id/quest-suggestions - Get pending quest suggestions for a stream
+export const getQuestSuggestionsResponseSchema = z.object({
+  suggestions: z.array(
+    z.object({
+      id: z.string(),
+      quest: z.object({
+        id: z.string(),
+        title: z.string(),
+        description: z.string(),
+        category: z.string(),
+        difficulty: z.string(),
+        goalType: z.string(),
+        goalCount: z.number(),
+      }),
+      suggester: z.object({
+        id: z.string(),
+        name: z.string().nullable(),
+      }),
+      boostAmount: z.number(),
+      message: z.string().nullable(),
+      status: z.string(),
+      createdAt: z.string(),
+    })
+  ),
+});
+export type GetQuestSuggestionsResponse = z.infer<typeof getQuestSuggestionsResponseSchema>;
+
+// POST /api/live/:id/respond-to-suggestion - Accept or decline a quest suggestion
+export const respondToSuggestionRequestSchema = z.object({
+  suggestionId: z.string(),
+  action: z.enum(["accept", "decline"]),
+});
+export type RespondToSuggestionRequest = z.infer<typeof respondToSuggestionRequestSchema>;
+export const respondToSuggestionResponseSchema = z.object({
+  success: z.boolean(),
+  userQuestId: z.string().optional(), // Returned if accepted
+  message: z.string().optional(),
+});
+export type RespondToSuggestionResponse = z.infer<typeof respondToSuggestionResponseSchema>;
 

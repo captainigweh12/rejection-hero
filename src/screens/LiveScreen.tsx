@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { View, Text, Pressable, TextInput, ScrollView, KeyboardAvoidingView, Platform, Alert } from "react-native";
+import { View, Text, Pressable, TextInput, ScrollView, KeyboardAvoidingView, Platform, Alert, Modal, FlatList } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { CameraView, useCameraPermissions } from "expo-camera";
@@ -14,6 +14,12 @@ import {
   Users,
   Send,
   Radio,
+  Gift,
+  CheckCircle,
+  XCircle,
+  Crown,
+  MessageCircle,
+  Sparkles,
 } from "lucide-react-native";
 import type { BottomTabScreenProps } from "@/navigation/types";
 import { api } from "@/lib/api";
@@ -24,6 +30,9 @@ import type {
   GetUserQuestsResponse,
   GetLiveCommentsResponse,
   AddLiveCommentResponse,
+  GetQuestSuggestionsResponse,
+  SuggestQuestToStreamerResponse,
+  RespondToSuggestionResponse,
 } from "@/shared/contracts";
 
 type Props = BottomTabScreenProps<"LiveTab">;
@@ -34,7 +43,6 @@ export default function LiveScreen({ navigation }: Props) {
   const [isStreaming, setIsStreaming] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [isVideoOff, setIsVideoOff] = useState(false);
-  const [showParticipants, setShowParticipants] = useState(false);
   const [commentText, setCommentText] = useState("");
   const [currentStreamId, setCurrentStreamId] = useState<string | null>(null);
   const [selectedQuestId, setSelectedQuestId] = useState<string | null>(null);
@@ -42,11 +50,28 @@ export default function LiveScreen({ navigation }: Props) {
   const [facing, setFacing] = useState<"front" | "back">("front");
   const [permission, requestPermission] = useCameraPermissions();
 
+  // Chat and suggestions UI
+  const [showChat, setShowChat] = useState(true);
+  const [showQuestSuggestions, setShowQuestSuggestions] = useState(false);
+  const [showSendQuestModal, setShowSendQuestModal] = useState(false);
+  const [selectedSuggestQuestId, setSelectedSuggestQuestId] = useState<string | null>(null);
+  const [boostAmount, setBoostAmount] = useState(0);
+  const [questMessage, setQuestMessage] = useState("");
+
   // Fetch active quests for the user to select from
   const { data: questsData } = useQuery<GetUserQuestsResponse>({
     queryKey: ["quests"],
     queryFn: async () => {
       return api.get<GetUserQuestsResponse>("/api/quests");
+    },
+    enabled: !!sessionData?.user,
+  });
+
+  // Fetch user stats for diamond balance
+  const { data: userStats } = useQuery<{ diamonds: number; currentStreak: number; totalXP: number }>({
+    queryKey: ["userStats"],
+    queryFn: async () => {
+      return api.get("/api/stats");
     },
     enabled: !!sessionData?.user,
   });
@@ -62,12 +87,23 @@ export default function LiveScreen({ navigation }: Props) {
 
   // Fetch comments for current stream
   const { data: commentsData, refetch: refetchComments } = useQuery<GetLiveCommentsResponse>({
-    queryKey: ["liveComments", currentStreamId],
+    queryKey: ["liveComments", viewingStreamId || currentStreamId],
     queryFn: async () => {
-      return api.get<GetLiveCommentsResponse>(`/api/live/${currentStreamId}/comments`);
+      const streamId = viewingStreamId || currentStreamId;
+      return api.get<GetLiveCommentsResponse>(`/api/live/${streamId}/comments`);
     },
-    enabled: !!currentStreamId,
+    enabled: !!(viewingStreamId || currentStreamId),
     refetchInterval: 3000, // Refresh every 3 seconds
+  });
+
+  // Fetch quest suggestions (for streamers)
+  const { data: suggestionsData, refetch: refetchSuggestions } = useQuery<GetQuestSuggestionsResponse>({
+    queryKey: ["questSuggestions", currentStreamId],
+    queryFn: async () => {
+      return api.get<GetQuestSuggestionsResponse>(`/api/live/${currentStreamId}/quest-suggestions`);
+    },
+    enabled: !!currentStreamId && isStreaming,
+    refetchInterval: 5000,
   });
 
   // Start live stream mutation
@@ -105,14 +141,55 @@ export default function LiveScreen({ navigation }: Props) {
   // Send comment mutation
   const sendCommentMutation = useMutation({
     mutationFn: async (message: string) => {
-      if (!currentStreamId) return;
-      return api.post<AddLiveCommentResponse>(`/api/live/${currentStreamId}/comment`, {
+      const streamId = viewingStreamId || currentStreamId;
+      if (!streamId) return;
+      return api.post<AddLiveCommentResponse>(`/api/live/${streamId}/comment`, {
         message,
       });
     },
     onSuccess: () => {
       setCommentText("");
       refetchComments();
+    },
+  });
+
+  // Suggest quest mutation
+  const suggestQuestMutation = useMutation({
+    mutationFn: async (data: { questId: string; boostAmount: number; message?: string }) => {
+      if (!viewingStreamId) return;
+      return api.post<SuggestQuestToStreamerResponse>(`/api/live/${viewingStreamId}/suggest-quest`, data);
+    },
+    onSuccess: (data) => {
+      setShowSendQuestModal(false);
+      setSelectedSuggestQuestId(null);
+      setBoostAmount(0);
+      setQuestMessage("");
+      queryClient.invalidateQueries({ queryKey: ["userStats"] });
+      Alert.alert("Quest Sent!", `Quest suggestion sent! New diamond balance: ${data?.newDiamondBalance || 0}`);
+    },
+    onError: (error: any) => {
+      Alert.alert("Error", error.message || "Failed to send quest");
+    },
+  });
+
+  // Respond to suggestion mutation
+  const respondToSuggestionMutation = useMutation({
+    mutationFn: async (data: { suggestionId: string; action: "accept" | "decline" }) => {
+      if (!currentStreamId) return;
+      return api.post<RespondToSuggestionResponse>(`/api/live/${currentStreamId}/respond-to-suggestion`, data);
+    },
+    onSuccess: (data, variables) => {
+      refetchSuggestions();
+      queryClient.invalidateQueries({ queryKey: ["quests"] });
+      if (variables.action === "accept") {
+        Alert.alert("Quest Accepted!", data?.message || "Quest started!");
+        setShowQuestSuggestions(false);
+      } else {
+        Alert.alert("Declined", data?.message || "Quest suggestion declined");
+      }
+    },
+    onError: (error: any) => {
+      Alert.alert("Error", error.message || "Failed to respond to suggestion");
     },
   });
 
@@ -165,6 +242,25 @@ export default function LiveScreen({ navigation }: Props) {
     sendCommentMutation.mutate(commentText);
   };
 
+  const handleSuggestQuest = () => {
+    if (!selectedSuggestQuestId) {
+      Alert.alert("Error", "Please select a quest");
+      return;
+    }
+
+    const userDiamonds = userStats?.diamonds || 0;
+    if (boostAmount > userDiamonds) {
+      Alert.alert("Insufficient Diamonds", `You only have ${userDiamonds} diamonds`);
+      return;
+    }
+
+    suggestQuestMutation.mutate({
+      questId: selectedSuggestQuestId,
+      boostAmount,
+      message: questMessage || undefined,
+    });
+  };
+
   const activeQuest = questsData?.activeQuests.find((uq) => uq.id === selectedQuestId);
 
   // Find the stream being viewed
@@ -173,22 +269,19 @@ export default function LiveScreen({ navigation }: Props) {
   // If viewing someone else's stream, show viewer interface
   if (viewingStreamId && viewingStream) {
     return (
-      <View style={{ flex: 1, backgroundColor: "#1A1A1A" }}>
+      <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
         {/* Camera View Placeholder */}
         <View
           style={{
             flex: 1,
-            backgroundColor: "#2A2A2A",
+            backgroundColor: "#1A1A1A",
             alignItems: "center",
             justifyContent: "center",
           }}
         >
-          <Video size={80} color="#666" />
+          <Video size={80} color="#555" />
           <Text style={{ color: "#666", marginTop: 16, fontSize: 16 }}>
-            Viewing {viewingStream.user.name}&apos;s stream
-          </Text>
-          <Text style={{ color: "#999", marginTop: 8, fontSize: 12 }}>
-            Daily.co integration ready
+            {viewingStream.user.name}&apos;s stream
           </Text>
         </View>
 
@@ -220,7 +313,7 @@ export default function LiveScreen({ navigation }: Props) {
             width: 40,
             height: 40,
             borderRadius: 20,
-            backgroundColor: "rgba(0, 0, 0, 0.6)",
+            backgroundColor: "rgba(0, 0, 0, 0.7)",
             alignItems: "center",
             justifyContent: "center",
           }}
@@ -236,7 +329,7 @@ export default function LiveScreen({ navigation }: Props) {
             right: 20,
             flexDirection: "row",
             alignItems: "center",
-            backgroundColor: "rgba(0, 0, 0, 0.6)",
+            backgroundColor: "rgba(0, 0, 0, 0.7)",
             paddingHorizontal: 12,
             paddingVertical: 8,
             borderRadius: 20,
@@ -249,95 +342,303 @@ export default function LiveScreen({ navigation }: Props) {
           </Text>
         </View>
 
-        {/* Quest Card Overlay */}
+        {/* Send Quest Button */}
+        <Pressable
+          onPress={() => setShowSendQuestModal(true)}
+          style={{
+            position: "absolute",
+            top: 180,
+            right: 20,
+            width: 48,
+            height: 48,
+            borderRadius: 24,
+            backgroundColor: "#FFD700",
+            alignItems: "center",
+            justifyContent: "center",
+            shadowColor: "#FFD700",
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.5,
+            shadowRadius: 8,
+          }}
+        >
+          <Gift size={24} color="#000" />
+        </Pressable>
+
+        {/* Modern Quest Card Overlay */}
         {viewingStream.userQuest && (
           <View
             style={{
               position: "absolute",
-              bottom: 120,
+              bottom: 240,
               left: 20,
-              right: 20,
-              backgroundColor: "white",
+              right: 80,
+              backgroundColor: "rgba(255, 107, 53, 0.95)",
               borderRadius: 16,
               padding: 16,
+              borderLeftWidth: 4,
+              borderLeftColor: "#FFD700",
               shadowColor: "#000",
               shadowOffset: { width: 0, height: 4 },
-              shadowOpacity: 0.3,
-              shadowRadius: 8,
-              elevation: 8,
+              shadowOpacity: 0.4,
+              shadowRadius: 12,
             }}
           >
-            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start" }}>
-              <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: 12, fontWeight: "bold", color: "#666", marginBottom: 4 }}>Quest</Text>
-                <Text style={{ fontSize: 16, fontWeight: "bold", color: "#000", marginBottom: 8 }}>
-                  {viewingStream.userQuest.quest.title}
+            <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 8 }}>
+              <Text style={{ color: "white", fontSize: 11, fontWeight: "700", textTransform: "uppercase", letterSpacing: 1 }}>
+                {viewingStream.userQuest.quest.category}
+              </Text>
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+                <Text style={{ color: "white", fontSize: 10, fontWeight: "600" }}>
+                  {viewingStream.userQuest.noCount} / {viewingStream.userQuest.quest.goalCount}
                 </Text>
-                <Text style={{ fontSize: 14, color: "#666", marginBottom: 12 }} numberOfLines={2}>
-                  {viewingStream.userQuest.quest.description}
-                </Text>
+                <View style={{ width: 40, height: 6, backgroundColor: "rgba(255, 255, 255, 0.3)", borderRadius: 3 }}>
+                  <View
+                    style={{
+                      width: `${(viewingStream.userQuest.noCount / viewingStream.userQuest.quest.goalCount) * 100}%`,
+                      height: "100%",
+                      backgroundColor: "#FFD700",
+                      borderRadius: 3,
+                    }}
+                  />
+                </View>
               </View>
-              <Pressable
-                style={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: 16,
-                  backgroundColor: "#F0F0F0",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <X size={18} color="#666" />
-              </Pressable>
             </View>
+            <Text style={{ color: "white", fontSize: 16, fontWeight: "bold", marginBottom: 6 }}>
+              {viewingStream.userQuest.quest.title}
+            </Text>
+            <Text style={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 13, lineHeight: 18 }} numberOfLines={2}>
+              {viewingStream.userQuest.quest.description}
+            </Text>
           </View>
         )}
 
-        {/* Comment Section */}
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
+        {/* Chat Section */}
+        <View
           style={{
             position: "absolute",
             bottom: 0,
             left: 0,
             right: 0,
-            backgroundColor: "rgba(0, 0, 0, 0.8)",
-            paddingHorizontal: 16,
-            paddingTop: 12,
-            paddingBottom: 32,
+            maxHeight: 280,
           }}
         >
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
-            <TextInput
-              value={commentText}
-              onChangeText={setCommentText}
-              placeholder="Comment"
-              placeholderTextColor="#999"
+          {/* Chat Messages */}
+          {showChat && commentsData?.comments && commentsData.comments.length > 0 && (
+            <View style={{ maxHeight: 160, paddingHorizontal: 16, marginBottom: 8 }}>
+              <ScrollView showsVerticalScrollIndicator={false}>
+                {commentsData.comments.slice(0, 5).reverse().map((comment) => (
+                  <View
+                    key={comment.id}
+                    style={{
+                      backgroundColor: "rgba(0, 0, 0, 0.7)",
+                      borderRadius: 12,
+                      padding: 10,
+                      marginBottom: 6,
+                      maxWidth: "85%",
+                    }}
+                  >
+                    <Text style={{ color: "#FFD700", fontSize: 12, fontWeight: "bold", marginBottom: 2 }}>
+                      {comment.user.name || "Anonymous"}
+                    </Text>
+                    <Text style={{ color: "white", fontSize: 14 }}>{comment.message}</Text>
+                  </View>
+                ))}
+              </ScrollView>
+            </View>
+          )}
+
+          {/* Input Area */}
+          <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            style={{
+              backgroundColor: "rgba(0, 0, 0, 0.9)",
+              paddingHorizontal: 16,
+              paddingTop: 12,
+              paddingBottom: 32,
+              borderTopWidth: 1,
+              borderTopColor: "rgba(255, 255, 255, 0.1)",
+            }}
+          >
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+              <TextInput
+                value={commentText}
+                onChangeText={setCommentText}
+                placeholder="Send a message..."
+                placeholderTextColor="#999"
+                style={{
+                  flex: 1,
+                  backgroundColor: "rgba(255, 255, 255, 0.1)",
+                  borderRadius: 24,
+                  paddingHorizontal: 16,
+                  paddingVertical: 12,
+                  color: "white",
+                  fontSize: 14,
+                }}
+              />
+              <Pressable
+                onPress={handleSendComment}
+                style={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: 24,
+                  backgroundColor: "#FF6B35",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Send size={20} color="white" />
+              </Pressable>
+            </View>
+          </KeyboardAvoidingView>
+        </View>
+
+        {/* Send Quest Modal */}
+        <Modal
+          visible={showSendQuestModal}
+          animationType="slide"
+          transparent
+          onRequestClose={() => setShowSendQuestModal(false)}
+        >
+          <View style={{ flex: 1, backgroundColor: "rgba(0, 0, 0, 0.8)", justifyContent: "flex-end" }}>
+            <View
               style={{
-                flex: 1,
-                backgroundColor: "rgba(255, 255, 255, 0.1)",
-                borderRadius: 24,
-                paddingHorizontal: 16,
-                paddingVertical: 12,
-                color: "white",
-                fontSize: 14,
-              }}
-            />
-            <Pressable
-              onPress={handleSendComment}
-              style={{
-                width: 48,
-                height: 48,
-                borderRadius: 24,
-                backgroundColor: "#FF6B35",
-                alignItems: "center",
-                justifyContent: "center",
+                backgroundColor: "#1A1A1A",
+                borderTopLeftRadius: 24,
+                borderTopRightRadius: 24,
+                paddingTop: 20,
+                paddingBottom: 40,
+                paddingHorizontal: 20,
+                maxHeight: "80%",
               }}
             >
-              <Send size={20} color="white" />
-            </Pressable>
+              <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+                <Text style={{ color: "white", fontSize: 22, fontWeight: "bold" }}>
+                  Send Quest Challenge
+                </Text>
+                <Pressable onPress={() => setShowSendQuestModal(false)}>
+                  <X size={28} color="white" />
+                </Pressable>
+              </View>
+
+              <ScrollView showsVerticalScrollIndicator={false}>
+                <Text style={{ color: "rgba(255, 255, 255, 0.7)", fontSize: 14, marginBottom: 16 }}>
+                  Challenge {viewingStream.user.name} to complete a quest! Boost with diamonds for higher priority.
+                </Text>
+
+                {/* Diamond Balance */}
+                <View style={{ backgroundColor: "rgba(255, 215, 0, 0.1)", borderRadius: 12, padding: 12, marginBottom: 16 }}>
+                  <Text style={{ color: "#FFD700", fontSize: 12, fontWeight: "600" }}>
+                    Your Diamonds: {userStats?.diamonds || 0} 💎
+                  </Text>
+                </View>
+
+                {/* Available Quests */}
+                <Text style={{ color: "white", fontSize: 16, fontWeight: "bold", marginBottom: 12 }}>
+                  Select Quest
+                </Text>
+                {questsData?.activeQuests && questsData.activeQuests.length > 0 ? (
+                  questsData.activeQuests.map((uq) => (
+                    <Pressable
+                      key={uq.id}
+                      onPress={() => setSelectedSuggestQuestId(uq.quest.id)}
+                      style={{
+                        backgroundColor:
+                          selectedSuggestQuestId === uq.quest.id
+                            ? "rgba(255, 107, 53, 0.3)"
+                            : "rgba(255, 255, 255, 0.05)",
+                        borderRadius: 12,
+                        padding: 14,
+                        marginBottom: 10,
+                        borderWidth: 2,
+                        borderColor:
+                          selectedSuggestQuestId === uq.quest.id ? "#FF6B35" : "transparent",
+                      }}
+                    >
+                      <Text style={{ color: "#FF6B35", fontSize: 11, fontWeight: "600", marginBottom: 4 }}>
+                        {uq.quest.category}
+                      </Text>
+                      <Text style={{ color: "white", fontSize: 15, fontWeight: "600" }}>
+                        {uq.quest.title}
+                      </Text>
+                    </Pressable>
+                  ))
+                ) : (
+                  <Text style={{ color: "#999", fontSize: 14, textAlign: "center", paddingVertical: 20 }}>
+                    You don&apos;t have any active quests to share
+                  </Text>
+                )}
+
+                {/* Boost Amount */}
+                <Text style={{ color: "white", fontSize: 16, fontWeight: "bold", marginTop: 16, marginBottom: 12 }}>
+                  Boost Priority (Optional)
+                </Text>
+                <View style={{ flexDirection: "row", gap: 10, marginBottom: 16 }}>
+                  {[0, 5, 10, 25, 50].map((amount) => (
+                    <Pressable
+                      key={amount}
+                      onPress={() => setBoostAmount(amount)}
+                      style={{
+                        flex: 1,
+                        backgroundColor: boostAmount === amount ? "#FFD700" : "rgba(255, 255, 255, 0.1)",
+                        paddingVertical: 12,
+                        borderRadius: 8,
+                        alignItems: "center",
+                      }}
+                    >
+                      <Text
+                        style={{
+                          color: boostAmount === amount ? "#000" : "white",
+                          fontSize: 14,
+                          fontWeight: "700",
+                        }}
+                      >
+                        {amount === 0 ? "Free" : `${amount}💎`}
+                      </Text>
+                    </Pressable>
+                  ))}
+                </View>
+
+                {/* Message */}
+                <Text style={{ color: "white", fontSize: 16, fontWeight: "bold", marginBottom: 12 }}>
+                  Add Message (Optional)
+                </Text>
+                <TextInput
+                  value={questMessage}
+                  onChangeText={setQuestMessage}
+                  placeholder="Add a challenge message..."
+                  placeholderTextColor="#666"
+                  multiline
+                  style={{
+                    backgroundColor: "rgba(255, 255, 255, 0.1)",
+                    borderRadius: 12,
+                    padding: 12,
+                    color: "white",
+                    fontSize: 14,
+                    minHeight: 80,
+                    textAlignVertical: "top",
+                    marginBottom: 20,
+                  }}
+                />
+
+                {/* Send Button */}
+                <Pressable
+                  onPress={handleSuggestQuest}
+                  disabled={!selectedSuggestQuestId}
+                  style={{
+                    backgroundColor: selectedSuggestQuestId ? "#FF6B35" : "#333",
+                    paddingVertical: 16,
+                    borderRadius: 12,
+                    alignItems: "center",
+                  }}
+                >
+                  <Text style={{ color: selectedSuggestQuestId ? "white" : "#666", fontSize: 16, fontWeight: "bold" }}>
+                    Send Quest {boostAmount > 0 ? `(${boostAmount}💎)` : ""}
+                  </Text>
+                </Pressable>
+              </ScrollView>
+            </View>
           </View>
-        </KeyboardAvoidingView>
+        </Modal>
       </View>
     );
   }
@@ -422,23 +723,20 @@ export default function LiveScreen({ navigation }: Props) {
     }
 
     return (
-      <View style={{ flex: 1, backgroundColor: "#1A1A1A" }}>
+      <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
         {/* Camera View */}
         {!isVideoOff ? (
-          <CameraView
-            style={{ flex: 1 }}
-            facing={facing}
-          />
+          <CameraView style={{ flex: 1 }} facing={facing} />
         ) : (
           <View
             style={{
               flex: 1,
-              backgroundColor: "#2A2A2A",
+              backgroundColor: "#1A1A1A",
               alignItems: "center",
               justifyContent: "center",
             }}
           >
-            <VideoOff size={80} color="#666" />
+            <VideoOff size={80} color="#555" />
             <Text style={{ color: "#666", marginTop: 16, fontSize: 16 }}>
               Camera is off
             </Text>
@@ -473,7 +771,7 @@ export default function LiveScreen({ navigation }: Props) {
             width: 40,
             height: 40,
             borderRadius: 20,
-            backgroundColor: "rgba(0, 0, 0, 0.6)",
+            backgroundColor: "rgba(0, 0, 0, 0.7)",
             alignItems: "center",
             justifyContent: "center",
           }}
@@ -487,9 +785,44 @@ export default function LiveScreen({ navigation }: Props) {
             position: "absolute",
             top: 120,
             right: 20,
-            gap: 16,
+            gap: 12,
           }}
         >
+          {/* Quest Suggestions Badge */}
+          {suggestionsData && suggestionsData.suggestions.length > 0 && (
+            <Pressable
+              onPress={() => setShowQuestSuggestions(true)}
+              style={{
+                width: 48,
+                height: 48,
+                borderRadius: 24,
+                backgroundColor: "#FFD700",
+                alignItems: "center",
+                justifyContent: "center",
+                position: "relative",
+              }}
+            >
+              <Gift size={24} color="#000" />
+              <View
+                style={{
+                  position: "absolute",
+                  top: -4,
+                  right: -4,
+                  width: 20,
+                  height: 20,
+                  borderRadius: 10,
+                  backgroundColor: "#FF0000",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Text style={{ color: "white", fontSize: 10, fontWeight: "bold" }}>
+                  {suggestionsData.suggestions.length}
+                </Text>
+              </View>
+            </Pressable>
+          )}
+
           {/* Flip Camera */}
           <Pressable
             onPress={() => setFacing(facing === "front" ? "back" : "front")}
@@ -534,133 +867,304 @@ export default function LiveScreen({ navigation }: Props) {
           >
             {isVideoOff ? <VideoOff size={24} color="white" /> : <VideoIcon size={24} color="white" />}
           </Pressable>
-
-          {/* Participants */}
-          <Pressable
-            style={{
-              width: 48,
-              height: 48,
-              borderRadius: 24,
-              backgroundColor: "rgba(94, 114, 235, 0.8)",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Users size={24} color="white" />
-          </Pressable>
         </View>
 
-        {/* Quest Card Overlay */}
+        {/* Modern Quest Card Overlay */}
         {activeQuest && (
           <View
             style={{
               position: "absolute",
-              bottom: 120,
+              bottom: 240,
               left: 20,
-              right: 20,
-              backgroundColor: "white",
+              right: 80,
+              backgroundColor: "rgba(255, 107, 53, 0.95)",
               borderRadius: 16,
               padding: 16,
+              borderLeftWidth: 4,
+              borderLeftColor: "#FFD700",
               shadowColor: "#000",
               shadowOffset: { width: 0, height: 4 },
-              shadowOpacity: 0.3,
-              shadowRadius: 8,
-              elevation: 8,
+              shadowOpacity: 0.4,
+              shadowRadius: 12,
             }}
           >
-            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start" }}>
-              <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: 12, fontWeight: "bold", color: "#666", marginBottom: 4 }}>Quest</Text>
-                <Text style={{ fontSize: 16, fontWeight: "bold", color: "#000", marginBottom: 8 }}>
-                  {activeQuest.quest.title}
+            <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 8 }}>
+              <Text style={{ color: "white", fontSize: 11, fontWeight: "700", textTransform: "uppercase", letterSpacing: 1 }}>
+                {activeQuest.quest.category}
+              </Text>
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+                <Text style={{ color: "white", fontSize: 10, fontWeight: "600" }}>
+                  {activeQuest.noCount} / {activeQuest.quest.goalCount}
                 </Text>
-                <Text style={{ fontSize: 14, color: "#666", marginBottom: 12 }} numberOfLines={2}>
-                  {activeQuest.quest.description}
-                </Text>
-                <Pressable
-                  style={{
-                    backgroundColor: "#FF6B35",
-                    paddingHorizontal: 16,
-                    paddingVertical: 8,
-                    borderRadius: 8,
-                    alignSelf: "flex-start",
-                  }}
-                >
-                  <Text style={{ color: "white", fontWeight: "bold", fontSize: 12 }}>See more</Text>
-                </Pressable>
+                <View style={{ width: 40, height: 6, backgroundColor: "rgba(255, 255, 255, 0.3)", borderRadius: 3 }}>
+                  <View
+                    style={{
+                      width: `${(activeQuest.noCount / activeQuest.quest.goalCount) * 100}%`,
+                      height: "100%",
+                      backgroundColor: "#FFD700",
+                      borderRadius: 3,
+                    }}
+                  />
+                </View>
               </View>
+            </View>
+            <Text style={{ color: "white", fontSize: 16, fontWeight: "bold", marginBottom: 6 }}>
+              {activeQuest.quest.title}
+            </Text>
+            <Text style={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 13, lineHeight: 18 }} numberOfLines={2}>
+              {activeQuest.quest.description}
+            </Text>
+
+            {/* Interactive Quest Buttons */}
+            <View style={{ flexDirection: "row", gap: 8, marginTop: 12 }}>
               <Pressable
+                onPress={() => navigation.navigate("QuestDetail", { userQuestId: activeQuest.id })}
                 style={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: 16,
-                  backgroundColor: "#F0F0F0",
+                  flex: 1,
+                  backgroundColor: "rgba(255, 255, 255, 0.2)",
+                  paddingVertical: 8,
+                  borderRadius: 8,
                   alignItems: "center",
-                  justifyContent: "center",
                 }}
               >
-                <X size={18} color="#666" />
+                <Text style={{ color: "white", fontSize: 12, fontWeight: "600" }}>Track Progress</Text>
               </Pressable>
             </View>
           </View>
         )}
 
-        {/* Comment Section */}
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
+        {/* Chat Section */}
+        <View
           style={{
             position: "absolute",
             bottom: 0,
             left: 0,
             right: 0,
-            backgroundColor: "rgba(0, 0, 0, 0.8)",
-            paddingHorizontal: 16,
-            paddingTop: 12,
-            paddingBottom: 32,
+            maxHeight: 280,
           }}
         >
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
-            <TextInput
-              value={commentText}
-              onChangeText={setCommentText}
-              placeholder="Comment"
-              placeholderTextColor="#999"
+          {/* Chat Messages */}
+          {showChat && commentsData?.comments && commentsData.comments.length > 0 && (
+            <View style={{ maxHeight: 160, paddingHorizontal: 16, marginBottom: 8 }}>
+              <ScrollView showsVerticalScrollIndicator={false}>
+                {commentsData.comments.slice(0, 5).reverse().map((comment) => (
+                  <View
+                    key={comment.id}
+                    style={{
+                      backgroundColor: "rgba(0, 0, 0, 0.7)",
+                      borderRadius: 12,
+                      padding: 10,
+                      marginBottom: 6,
+                      maxWidth: "85%",
+                    }}
+                  >
+                    <Text style={{ color: "#FFD700", fontSize: 12, fontWeight: "bold", marginBottom: 2 }}>
+                      {comment.user.name || "Anonymous"}
+                    </Text>
+                    <Text style={{ color: "white", fontSize: 14 }}>{comment.message}</Text>
+                  </View>
+                ))}
+              </ScrollView>
+            </View>
+          )}
+
+          {/* Input Area */}
+          <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            style={{
+              backgroundColor: "rgba(0, 0, 0, 0.9)",
+              paddingHorizontal: 16,
+              paddingTop: 12,
+              paddingBottom: 32,
+              borderTopWidth: 1,
+              borderTopColor: "rgba(255, 255, 255, 0.1)",
+            }}
+          >
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+              <TextInput
+                value={commentText}
+                onChangeText={setCommentText}
+                placeholder="Chat with viewers..."
+                placeholderTextColor="#999"
+                style={{
+                  flex: 1,
+                  backgroundColor: "rgba(255, 255, 255, 0.1)",
+                  borderRadius: 24,
+                  paddingHorizontal: 16,
+                  paddingVertical: 12,
+                  color: "white",
+                  fontSize: 14,
+                }}
+              />
+              <Pressable
+                onPress={handleSendComment}
+                style={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: 24,
+                  backgroundColor: "#FF6B35",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Send size={20} color="white" />
+              </Pressable>
+            </View>
+          </KeyboardAvoidingView>
+        </View>
+
+        {/* Quest Suggestions Modal */}
+        <Modal
+          visible={showQuestSuggestions}
+          animationType="slide"
+          transparent
+          onRequestClose={() => setShowQuestSuggestions(false)}
+        >
+          <View style={{ flex: 1, backgroundColor: "rgba(0, 0, 0, 0.8)", justifyContent: "flex-end" }}>
+            <View
               style={{
-                flex: 1,
-                backgroundColor: "rgba(255, 255, 255, 0.1)",
-                borderRadius: 24,
-                paddingHorizontal: 16,
-                paddingVertical: 12,
-                color: "white",
-                fontSize: 14,
-              }}
-            />
-            <Pressable
-              onPress={handleSendComment}
-              style={{
-                width: 48,
-                height: 48,
-                borderRadius: 24,
-                backgroundColor: "#FF6B35",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <Send size={20} color="white" />
-            </Pressable>
-            <Pressable
-              onPress={handleEndStream}
-              style={{
+                backgroundColor: "#1A1A1A",
+                borderTopLeftRadius: 24,
+                borderTopRightRadius: 24,
+                paddingTop: 20,
+                paddingBottom: 40,
                 paddingHorizontal: 20,
-                paddingVertical: 12,
-                borderRadius: 24,
-                backgroundColor: "#FF0000",
+                maxHeight: "70%",
               }}
             >
-              <Text style={{ color: "white", fontWeight: "bold", fontSize: 14 }}>Flip</Text>
-            </Pressable>
+              <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+                <Text style={{ color: "white", fontSize: 22, fontWeight: "bold" }}>
+                  Quest Suggestions
+                </Text>
+                <Pressable onPress={() => setShowQuestSuggestions(false)}>
+                  <X size={28} color="white" />
+                </Pressable>
+              </View>
+
+              {suggestionsData && suggestionsData.suggestions.length > 0 ? (
+                <ScrollView showsVerticalScrollIndicator={false}>
+                  {suggestionsData.suggestions.map((suggestion) => (
+                    <View
+                      key={suggestion.id}
+                      style={{
+                        backgroundColor: "rgba(255, 255, 255, 0.05)",
+                        borderRadius: 16,
+                        padding: 16,
+                        marginBottom: 12,
+                        borderWidth: 1,
+                        borderColor: "rgba(255, 255, 255, 0.1)",
+                      }}
+                    >
+                      {/* Boost Badge */}
+                      {suggestion.boostAmount > 0 && (
+                        <View
+                          style={{
+                            position: "absolute",
+                            top: 12,
+                            right: 12,
+                            backgroundColor: "#FFD700",
+                            paddingHorizontal: 10,
+                            paddingVertical: 4,
+                            borderRadius: 12,
+                            flexDirection: "row",
+                            alignItems: "center",
+                            gap: 4,
+                          }}
+                        >
+                          <Crown size={12} color="#000" />
+                          <Text style={{ color: "#000", fontSize: 11, fontWeight: "bold" }}>
+                            {suggestion.boostAmount}💎
+                          </Text>
+                        </View>
+                      )}
+
+                      <Text style={{ color: "#999", fontSize: 11, marginBottom: 4 }}>
+                        From {suggestion.suggester.name || "Anonymous"}
+                      </Text>
+
+                      <Text style={{ color: "#FF6B35", fontSize: 12, fontWeight: "600", marginBottom: 6 }}>
+                        {suggestion.quest.category} • {suggestion.quest.difficulty}
+                      </Text>
+
+                      <Text style={{ color: "white", fontSize: 16, fontWeight: "bold", marginBottom: 8 }}>
+                        {suggestion.quest.title}
+                      </Text>
+
+                      <Text style={{ color: "rgba(255, 255, 255, 0.8)", fontSize: 14, marginBottom: 12 }} numberOfLines={2}>
+                        {suggestion.quest.description}
+                      </Text>
+
+                      {suggestion.message && (
+                        <View style={{ backgroundColor: "rgba(255, 215, 0, 0.1)", borderRadius: 8, padding: 10, marginBottom: 12 }}>
+                          <Text style={{ color: "#FFD700", fontSize: 13, fontStyle: "italic" }}>
+                            &quot;{suggestion.message}&quot;
+                          </Text>
+                        </View>
+                      )}
+
+                      {/* Action Buttons */}
+                      <View style={{ flexDirection: "row", gap: 10 }}>
+                        <Pressable
+                          onPress={() =>
+                            respondToSuggestionMutation.mutate({
+                              suggestionId: suggestion.id,
+                              action: "accept",
+                            })
+                          }
+                          style={{
+                            flex: 1,
+                            backgroundColor: "#4CAF50",
+                            paddingVertical: 12,
+                            borderRadius: 10,
+                            flexDirection: "row",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            gap: 6,
+                          }}
+                        >
+                          <CheckCircle size={18} color="white" />
+                          <Text style={{ color: "white", fontSize: 14, fontWeight: "bold" }}>Accept</Text>
+                        </Pressable>
+
+                        <Pressable
+                          onPress={() =>
+                            respondToSuggestionMutation.mutate({
+                              suggestionId: suggestion.id,
+                              action: "decline",
+                            })
+                          }
+                          style={{
+                            flex: 1,
+                            backgroundColor: "#F44336",
+                            paddingVertical: 12,
+                            borderRadius: 10,
+                            flexDirection: "row",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            gap: 6,
+                          }}
+                        >
+                          <XCircle size={18} color="white" />
+                          <Text style={{ color: "white", fontSize: 14, fontWeight: "bold" }}>Decline</Text>
+                        </Pressable>
+                      </View>
+                    </View>
+                  ))}
+                </ScrollView>
+              ) : (
+                <View style={{ alignItems: "center", paddingVertical: 40 }}>
+                  <Gift size={48} color="#666" />
+                  <Text style={{ color: "#999", fontSize: 16, marginTop: 16, textAlign: "center" }}>
+                    No quest suggestions yet
+                  </Text>
+                  <Text style={{ color: "#666", fontSize: 14, marginTop: 8, textAlign: "center" }}>
+                    Viewers can send you quest challenges during your stream
+                  </Text>
+                </View>
+              )}
+            </View>
           </View>
-        </KeyboardAvoidingView>
+        </Modal>
       </View>
     );
   }
