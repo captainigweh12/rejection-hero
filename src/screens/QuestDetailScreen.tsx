@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Pressable, ActivityIndicator, ScrollView, Modal, Animated } from "react-native";
+import { View, Text, Pressable, ActivityIndicator, ScrollView, Modal, Animated, Linking } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -571,10 +571,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                 <Pressable
                   onPress={() => {
                     const url = `https://www.google.com/maps/search/?api=1&query=${displayQuest.quest.latitude},${displayQuest.quest.longitude}`;
-                    // Open in browser
-                    if (typeof window !== "undefined") {
-                      window.open(url, "_blank");
-                    }
+                    Linking.openURL(url).catch((err) => console.error("Error opening map:", err));
                   }}
                   style={{
                     marginTop: 16,
