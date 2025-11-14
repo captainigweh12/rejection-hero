@@ -230,6 +230,24 @@ export const getUserStatsResponseSchema = z.object({
 });
 export type GetUserStatsResponse = z.infer<typeof getUserStatsResponseSchema>;
 
+// GET /api/stats/leaderboard - Get leaderboard
+export const getLeaderboardResponseSchema = z.object({
+  leaderboard: z.array(
+    z.object({
+      rank: z.number(),
+      userId: z.string(),
+      userName: z.string(),
+      totalXP: z.number(),
+      totalPoints: z.number(),
+      currentStreak: z.number(),
+      isCurrentUser: z.boolean(),
+    })
+  ),
+  currentUserRank: z.number(),
+  totalUsers: z.number(),
+});
+export type GetLeaderboardResponse = z.infer<typeof getLeaderboardResponseSchema>;
+
 // ==========================================
 // Live Stream Routes
 // ==========================================

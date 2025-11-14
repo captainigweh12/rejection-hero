@@ -31,12 +31,16 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 
 **Quest Completion Flow** ✨ NEW!
 - Beautiful achievement modal with animated trophy
+- **Accomplishments display**: Shows XP/Points earned and total stats
+- **Leaderboard position**: See your rank among all warriors
 - Shows current daily streak with fire icon
 - Displays number of NOs collected
-- "Next Quest" button auto-generates harder quest in same category
+- **Auto-generation**: Automatically creates next harder quest after 3 seconds
+- "Next Quest" button for manual generation
 - Progressive difficulty: EASY → MEDIUM → HARD → EXPERT
 - Stay in quest flow or return to home
 - Smooth animations and spring physics
+- Visual feedback while generating next quest
 
 **Quest Examples:**
 - Ask 5 coffee shops for an item that's not on their menu
@@ -227,6 +231,7 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 
 ### Stats
 - `GET /api/stats` - Get user statistics
+- `GET /api/stats/leaderboard` - Get leaderboard rankings
 
 ### Live Streaming ✨ NEW!
 - `POST /api/live/start` - Start a live stream

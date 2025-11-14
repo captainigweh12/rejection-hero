@@ -13,6 +13,7 @@ import type {
   GetUserStatsResponse,
   GenerateQuestRequest,
   GenerateQuestResponse,
+  GetLeaderboardResponse,
 } from "@/shared/contracts";
 
 type Props = RootStackScreenProps<"QuestDetail">;
@@ -39,6 +40,13 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
     queryKey: ["stats"],
     queryFn: async () => {
       return api.get<GetUserStatsResponse>("/api/stats");
+    },
+  });
+
+  const { data: leaderboardData } = useQuery<GetLeaderboardResponse>({
+    queryKey: ["leaderboard"],
+    queryFn: async () => {
+      return api.get<GetLeaderboardResponse>("/api/stats/leaderboard");
     },
   });
 
@@ -97,6 +105,9 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
       queryClient.invalidateQueries({ queryKey: ["stats"] });
 
       if (data.completed) {
+        // Refresh leaderboard data
+        queryClient.invalidateQueries({ queryKey: ["leaderboard"] });
+
         // Show completion celebration
         setCompletionData(data);
         setShowCompletion(true);
@@ -110,6 +121,11 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
             friction: 7,
           }),
         ]).start();
+
+        // Auto-generate next quest after a short delay
+        setTimeout(() => {
+          handleGenerateNext();
+        }, 3000);
       }
     },
   });
@@ -634,6 +650,107 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
               You collected {completionData?.noCount} NOs!
             </Text>
 
+            {/* Accomplishments Section */}
+            <View
+              style={{
+                width: "100%",
+                backgroundColor: "#F5F5F7",
+                borderRadius: 20,
+                padding: 20,
+                marginBottom: 20,
+              }}
+            >
+              <Text style={{ fontSize: 18, fontWeight: "bold", color: "#1C1C1E", marginBottom: 16 }}>
+                Accomplishments
+              </Text>
+
+              {/* XP & Points Earned */}
+              <View style={{ flexDirection: "row", gap: 12, marginBottom: 12 }}>
+                <View
+                  style={{
+                    flex: 1,
+                    backgroundColor: "#FEF3C7",
+                    paddingVertical: 12,
+                    borderRadius: 12,
+                    alignItems: "center",
+                  }}
+                >
+                  <Text style={{ color: "#92400E", fontSize: 20, fontWeight: "bold" }}>
+                    +{userQuest?.quest.xpReward || 0}
+                  </Text>
+                  <Text style={{ color: "#92400E", fontSize: 12 }}>XP</Text>
+                </View>
+                <View
+                  style={{
+                    flex: 1,
+                    backgroundColor: "#FED7AA",
+                    paddingVertical: 12,
+                    borderRadius: 12,
+                    alignItems: "center",
+                  }}
+                >
+                  <Text style={{ color: "#9A3412", fontSize: 20, fontWeight: "bold" }}>
+                    +{userQuest?.quest.pointReward || 0}
+                  </Text>
+                  <Text style={{ color: "#9A3412", fontSize: 12 }}>Points</Text>
+                </View>
+              </View>
+
+              {/* Total Stats */}
+              <View style={{ flexDirection: "row", gap: 12 }}>
+                <View
+                  style={{
+                    flex: 1,
+                    backgroundColor: "white",
+                    paddingVertical: 12,
+                    borderRadius: 12,
+                    alignItems: "center",
+                  }}
+                >
+                  <Text style={{ color: "#7E3FE4", fontSize: 20, fontWeight: "bold" }}>
+                    {statsData?.totalXP || 0}
+                  </Text>
+                  <Text style={{ color: "#666", fontSize: 12 }}>Total XP</Text>
+                </View>
+                <View
+                  style={{
+                    flex: 1,
+                    backgroundColor: "white",
+                    paddingVertical: 12,
+                    borderRadius: 12,
+                    alignItems: "center",
+                  }}
+                >
+                  <Text style={{ color: "#FF6B35", fontSize: 20, fontWeight: "bold" }}>
+                    {statsData?.totalPoints || 0}
+                  </Text>
+                  <Text style={{ color: "#666", fontSize: 12 }}>Total Points</Text>
+                </View>
+              </View>
+            </View>
+
+            {/* Leaderboard Position */}
+            <View
+              style={{
+                width: "100%",
+                backgroundColor: "#E0F2FE",
+                borderRadius: 20,
+                padding: 20,
+                marginBottom: 20,
+                alignItems: "center",
+              }}
+            >
+              <Text style={{ fontSize: 16, fontWeight: "600", color: "#0369A1", marginBottom: 8 }}>
+                Leaderboard Position
+              </Text>
+              <Text style={{ fontSize: 36, fontWeight: "bold", color: "#0C4A6E" }}>
+                #{leaderboardData?.currentUserRank || "-"}
+              </Text>
+              <Text style={{ fontSize: 12, color: "#0369A1" }}>
+                out of {leaderboardData?.totalUsers || 0} warriors
+              </Text>
+            </View>
+
             {/* Streak Display */}
             <View
               style={{
@@ -656,13 +773,34 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
               </View>
             </View>
 
+            {/* Auto-generating message */}
+            {isGeneratingNext && (
+              <View
+                style={{
+                  width: "100%",
+                  backgroundColor: "#FFF7ED",
+                  borderRadius: 16,
+                  padding: 16,
+                  marginBottom: 16,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 12,
+                }}
+              >
+                <ActivityIndicator size="small" color="#FF6B35" />
+                <Text style={{ color: "#92400E", fontSize: 14, fontWeight: "600", flex: 1 }}>
+                  Generating your next challenge...
+                </Text>
+              </View>
+            )}
+
             {/* Buttons */}
             <View style={{ width: "100%", gap: 12 }}>
               <Pressable
                 onPress={handleGenerateNext}
                 disabled={isGeneratingNext}
                 style={{
-                  backgroundColor: "#FF6B35",
+                  backgroundColor: isGeneratingNext ? "#999" : "#FF6B35",
                   paddingVertical: 16,
                   borderRadius: 16,
                   alignItems: "center",
