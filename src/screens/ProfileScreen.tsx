@@ -106,14 +106,15 @@ export default function ProfileScreen({ navigation }: Props) {
   const level = Math.floor((statsData?.totalXP || 0) / 100) + 1;
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#E8E9ED" }}>
-      <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
-        {/* Header */}
-        <View style={{ backgroundColor: "white", paddingVertical: 16, paddingHorizontal: 20, borderBottomWidth: 1, borderBottomColor: "#E0E0E0" }}>
-          <Text style={{ fontSize: 20, fontWeight: "bold", textAlign: "center" }}>Profile</Text>
-        </View>
+    <>
+      <View style={{ flex: 1, backgroundColor: "#E8E9ED" }}>
+        <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
+          {/* Header */}
+          <View style={{ backgroundColor: "white", paddingVertical: 16, paddingHorizontal: 20, borderBottomWidth: 1, borderBottomColor: "#E0E0E0" }}>
+            <Text style={{ fontSize: 20, fontWeight: "bold", textAlign: "center" }}>Profile</Text>
+          </View>
 
-        <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 100 }}>
+          <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 100 }}>
           {/* Profile Header */}
           <View style={{ backgroundColor: "white", paddingVertical: 32, paddingHorizontal: 20 }}>
             {/* Online Status & Settings */}
@@ -307,20 +308,28 @@ export default function ProfileScreen({ navigation }: Props) {
             </View>
           )}
         </ScrollView>
+      </SafeAreaView>
+    </View>
 
-        {/* Settings Modal */}
-        {showSettings && (
-          <View style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(0,0,0,0.5)" }}>
-            <Pressable style={{ flex: 1 }} onPress={() => setShowSettings(false)} />
-            <View style={{ backgroundColor: "#E8E9ED", borderTopLeftRadius: 20, borderTopRightRadius: 20, paddingTop: 20, maxHeight: "80%" }}>
-              <View style={{ backgroundColor: "white", paddingVertical: 16, paddingHorizontal: 20, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-                <Text style={{ fontSize: 20, fontWeight: "bold" }}>Settings</Text>
-                <Pressable onPress={() => setShowSettings(false)}>
-                  <Text style={{ fontSize: 24 }}>×</Text>
-                </Pressable>
-              </View>
+    {/* Settings Modal */}
+    {showSettings && (
+      <View style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(0,0,0,0.5)", zIndex: 1000 }}>
+        <Pressable style={{ flex: 1 }} onPress={() => {
+          console.log('[ProfileScreen] Backdrop pressed - closing settings');
+          setShowSettings(false);
+        }} />
+        <View style={{ backgroundColor: "#E8E9ED", borderTopLeftRadius: 20, borderTopRightRadius: 20, paddingTop: 20, maxHeight: "80%" }}>
+          <View style={{ backgroundColor: "white", paddingVertical: 16, paddingHorizontal: 20, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+            <Text style={{ fontSize: 20, fontWeight: "bold" }}>Settings</Text>
+            <Pressable onPress={() => {
+              console.log('[ProfileScreen] Close button pressed');
+              setShowSettings(false);
+            }}>
+              <Text style={{ fontSize: 24 }}>×</Text>
+            </Pressable>
+          </View>
 
-              <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 32 }}>
+          <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 32 }}>
                 {/* Account Section */}
                 <View style={{ paddingHorizontal: 20, paddingTop: 24 }}>
                   <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
@@ -434,12 +443,11 @@ export default function ProfileScreen({ navigation }: Props) {
                       Sign Out
                     </Text>
                   </Pressable>
-                </View>
-              </ScrollView>
-            </View>
+              </View>
+            </ScrollView>
           </View>
-        )}
-      </SafeAreaView>
-    </View>
+        </View>
+      )}
+    </>
   );
 }
