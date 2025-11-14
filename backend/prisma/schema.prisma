@@ -82,6 +82,7 @@ model Profile {
   bio         String?
   age         Int?
   photos      String?
+  avatar      String?  // AI-generated or uploaded avatar URL
   location    String?
   latitude    Float?
   longitude   Float?

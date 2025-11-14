@@ -39,6 +39,8 @@ export default function ProfileScreen({ navigation }: Props) {
   const [selectedTab, setSelectedTab] = useState<"quests" | "stats" | "about">("quests");
   const [isEditingAbout, setIsEditingAbout] = useState(false);
   const [showAvatarModal, setShowAvatarModal] = useState(false);
+  const [showStyleModal, setShowStyleModal] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [userContext, setUserContext] = useState("");
   const [goals, setGoals] = useState("");
   const [interests, setInterests] = useState("");
@@ -83,6 +85,39 @@ export default function ProfileScreen({ navigation }: Props) {
       "Context Saved",
       "Your information will help Ben create more personalized quests for you!"
     );
+  };
+
+  const handleGenerateAvatar = async (style: string) => {
+    setShowStyleModal(false);
+    setShowAvatarModal(false);
+    setIsGenerating(true);
+
+    try {
+      const response = await api.post<{ success: boolean; avatarUrl: string; message?: string }>(
+        "/api/profile/generate-avatar",
+        { style }
+      );
+
+      if (response.success && response.avatarUrl) {
+        // Save the avatar to the profile
+        await api.post("/api/profile", {
+          displayName: profileData?.displayName || sessionData?.user?.email?.split("@")[0] || "Warrior",
+          avatar: response.avatarUrl,
+        });
+
+        // Refetch profile to show new avatar
+        queryClient.invalidateQueries({ queryKey: ["profile"] });
+
+        Alert.alert("Success!", "Your AI avatar has been generated and saved!");
+      } else {
+        Alert.alert("Error", response.message || "Failed to generate avatar. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error generating avatar:", error);
+      Alert.alert("Error", "Failed to generate avatar. Please check your OpenAI API key in the ENV tab.");
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   if (!sessionData?.user) {
@@ -177,11 +212,20 @@ export default function ProfileScreen({ navigation }: Props) {
                     shadowOpacity: 0.8,
                     shadowRadius: 20,
                     elevation: 10,
+                    overflow: "hidden",
                   }}
                 >
-                  <Text style={{ fontSize: 64, fontWeight: "bold", color: "white" }}>
-                    {username.charAt(0).toUpperCase()}
-                  </Text>
+                  {profileData?.avatar ? (
+                    <Image
+                      source={{ uri: profileData.avatar }}
+                      style={{ width: "100%", height: "100%", borderRadius: 70 }}
+                      resizeMode="cover"
+                    />
+                  ) : (
+                    <Text style={{ fontSize: 64, fontWeight: "bold", color: "white" }}>
+                      {username.charAt(0).toUpperCase()}
+                    </Text>
+                  )}
                 </View>
 
                 {/* Camera Button */}
@@ -965,8 +1009,8 @@ export default function ProfileScreen({ navigation }: Props) {
 
               <Pressable
                 onPress={() => {
-                  Alert.alert("Coming Soon", "Generate an AI gaming avatar!");
                   setShowAvatarModal(false);
+                  setShowStyleModal(true);
                 }}
                 style={{
                   flexDirection: "row",
@@ -1016,6 +1060,111 @@ export default function ProfileScreen({ navigation }: Props) {
           </View>
         </View>
       </Modal>
+
+      {/* Style Selection Modal */}
+      <Modal visible={showStyleModal} transparent animationType="slide">
+        <View style={{ flex: 1, backgroundColor: "rgba(0, 0, 0, 0.7)", justifyContent: "flex-end" }}>
+          <View
+            style={{
+              backgroundColor: colors.card,
+              borderTopLeftRadius: 24,
+              borderTopRightRadius: 24,
+              padding: 24,
+              paddingBottom: 40,
+            }}
+          >
+            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
+              <Text style={{ fontSize: 22, fontWeight: "bold", color: colors.text }}>Choose Avatar Style</Text>
+              <Pressable onPress={() => setShowStyleModal(false)}>
+                <X size={28} color={colors.textSecondary} />
+              </Pressable>
+            </View>
+
+            <ScrollView style={{ maxHeight: 500 }}>
+              <View style={{ gap: 12 }}>
+                {[
+                  { style: "gaming", icon: "🎮", title: "Gaming Warrior", desc: "Epic futuristic warrior with neon glow" },
+                  { style: "anime", icon: "⚡", title: "Anime Hero", desc: "Bold anime character with determined look" },
+                  { style: "warrior", icon: "⚔️", title: "Fantasy Warrior", desc: "Powerful warrior with glowing armor" },
+                  { style: "ninja", icon: "🥷", title: "Stealth Ninja", desc: "Mysterious ninja in action pose" },
+                  { style: "mage", icon: "🔮", title: "Mystical Mage", desc: "Wizard casting magical spells" },
+                  { style: "cyborg", icon: "🤖", title: "Cyberpunk Cyborg", desc: "Half human, half machine with neon lights" },
+                  { style: "fantasy", icon: "✨", title: "Fantasy Hero", desc: "Magical character with glowing aura" },
+                  { style: "realistic", icon: "👤", title: "Realistic Photo", desc: "Professional photorealistic portrait" },
+                ].map((item) => (
+                  <Pressable
+                    key={item.style}
+                    onPress={() => handleGenerateAvatar(item.style)}
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 16,
+                      padding: 16,
+                      backgroundColor: colors.surface,
+                      borderRadius: 16,
+                      borderWidth: 1,
+                      borderColor: colors.border,
+                    }}
+                  >
+                    <View
+                      style={{
+                        width: 48,
+                        height: 48,
+                        borderRadius: 24,
+                        backgroundColor: colors.primary + "20",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Text style={{ fontSize: 24 }}>{item.icon}</Text>
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ fontSize: 16, fontWeight: "700", color: colors.text, marginBottom: 2 }}>
+                        {item.title}
+                      </Text>
+                      <Text style={{ fontSize: 13, color: colors.textSecondary }}>{item.desc}</Text>
+                    </View>
+                  </Pressable>
+                ))}
+              </View>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Loading Modal */}
+      {isGenerating && (
+        <Modal visible transparent>
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: "rgba(0, 0, 0, 0.8)",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: 32,
+            }}
+          >
+            <View
+              style={{
+                backgroundColor: colors.card,
+                borderRadius: 24,
+                padding: 32,
+                alignItems: "center",
+                width: "100%",
+                maxWidth: 300,
+              }}
+            >
+              <ActivityIndicator size="large" color={colors.primary} />
+              <Text style={{ fontSize: 18, fontWeight: "bold", color: colors.text, marginTop: 24, textAlign: "center" }}>
+                Generating Your Avatar
+              </Text>
+              <Text style={{ fontSize: 14, color: colors.textSecondary, marginTop: 8, textAlign: "center" }}>
+                This may take 10-20 seconds...
+              </Text>
+            </View>
+          </View>
+        </Modal>
+      )}
     </View>
   );
 }
