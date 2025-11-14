@@ -69,6 +69,7 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
   - MEDIUM: 5-8 NOs (15 min timer)
   - HARD: 8-12 NOs (20 min timer)
   - EXPERT: 12-15 NOs (30 min timer)
+  - **Smart goal counts**: Single-location front desk quests automatically set to 1 NO (e.g., "Visit Hilton Hotel and ask front desk for free upgrade" = 1 NO)
 - Specific, actionable descriptions with clear instructions
 
 **Quest Examples:**

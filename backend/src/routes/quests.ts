@@ -380,6 +380,16 @@ HOW TO USE THE VERIFIED PLACE IN YOUR JSON RESPONSE:
 
 3. "latitude" and "longitude" fields: Use the EXACT coordinates from the verified place
 
+4. "goalCount" field:
+   🚨 IMPORTANT: If the quest requires going to ONE SPECIFIC LOCATION and asking front desk/receptionist/manager:
+   - SET goalCount to 1 (only 1 NO required)
+   - Example: "Visit Hilton Hotel and ask front desk for free room upgrade" → goalCount: 1
+   - Example: "Go to Planet Fitness and ask manager for free lifetime membership" → goalCount: 1
+
+   For quests visiting MULTIPLE different locations, use normal difficulty-based counts:
+   - Example: "Visit 5 coffee shops and ask for custom drinks" → goalCount: 5
+   - Example: "Ask 3 gym trainers if you can teach their class" → goalCount: 3
+
 EXAMPLES OF CORRECT DESCRIPTIONS:
 ✅ "Visit Starbucks on Main Street and ask for a custom drink"
 ✅ "Go to Target on University Boulevard and request a manager discount"
@@ -505,7 +515,7 @@ Return a JSON object with: title (exactly 3 words), description, category, diffi
           {
             role: "system",
             content:
-              "You are a creative motivational coach creating unique rejection challenges. Each title MUST be exactly 3 words. Each challenge must be completely unique and different from previous challenges. BE EXTREMELY SPECIFIC - include concrete locations, specific types of people, specific items/services. Avoid generic phrases like 'pitch your product' or 'ask strangers'. Instead say things like 'ask baristas for a custom drink not on the menu' or 'request bookstore managers to display your handmade bookmark'. Be actionable and specific.\n\n🚨 CRITICAL: When writing the 'description' field, NEVER include GPS coordinates like '(GPS: 35.123, -80.456)' or '(Coordinates: 35.123, -80.456)' or raw numbers like '35.3088457, -80.7506283'. Write naturally like a human would speak: 'Visit Starbucks on Main Street' not 'Visit Starbucks (GPS: 35.123, -80.456)'. Coordinates belong ONLY in the separate latitude/longitude JSON fields, NEVER in the description text.",
+              "You are a creative motivational coach creating unique rejection challenges. Each title MUST be exactly 3 words. Each challenge must be completely unique and different from previous challenges. BE EXTREMELY SPECIFIC - include concrete locations, specific types of people, specific items/services. Avoid generic phrases like 'pitch your product' or 'ask strangers'. Instead say things like 'ask baristas for a custom drink not on the menu' or 'request bookstore managers to display your handmade bookmark'. Be actionable and specific.\n\n🚨 CRITICAL RULES:\n1. When writing the 'description' field, NEVER include GPS coordinates like '(GPS: 35.123, -80.456)' or '(Coordinates: 35.123, -80.456)' or raw numbers like '35.3088457, -80.7506283'. Write naturally like a human would speak: 'Visit Starbucks on Main Street' not 'Visit Starbucks (GPS: 35.123, -80.456)'. Coordinates belong ONLY in the separate latitude/longitude JSON fields, NEVER in the description text.\n\n2. GOAL COUNT RULE: If the quest requires visiting ONE SPECIFIC LOCATION and asking front desk/receptionist/manager, SET goalCount to 1. Examples: 'Visit Hilton Hotel and ask front desk for free upgrade' = goalCount: 1. 'Go to Planet Fitness and ask manager for free membership' = goalCount: 1. For quests visiting multiple locations, use normal counts.",
           },
           { role: "user", content: prompt },
         ],
