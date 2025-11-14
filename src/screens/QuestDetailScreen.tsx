@@ -531,45 +531,45 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                 <Pressable
                   onPress={() => setShowCategoryModal(true)}
                   style={{
-                    backgroundColor: getCategoryColor(quest.category) + "20",
+                    backgroundColor: getCategoryColor(selectedCategory || quest.category) + "20",
                     paddingHorizontal: 16,
                     paddingVertical: 8,
                     borderRadius: 16,
                     borderWidth: 2,
-                    borderColor: getCategoryColor(quest.category) + "40",
+                    borderColor: getCategoryColor(selectedCategory || quest.category) + "40",
                   }}
                 >
                   <Text
                     style={{
-                      color: getCategoryColor(quest.category),
+                      color: getCategoryColor(selectedCategory || quest.category),
                       fontSize: 14,
                       fontWeight: "700",
                       textTransform: "uppercase",
                     }}
                   >
-                    {quest.category} ⌄
+                    {selectedCategory || quest.category} ⌄
                   </Text>
                 </Pressable>
                 <Pressable
                   onPress={() => setShowDifficultyModal(true)}
                   style={{
-                    backgroundColor: getDifficultyColor(quest.difficulty) + "30",
+                    backgroundColor: getDifficultyColor(selectedDifficulty || quest.difficulty) + "30",
                     paddingHorizontal: 16,
                     paddingVertical: 8,
                     borderRadius: 16,
                     borderWidth: 2,
-                    borderColor: getDifficultyColor(quest.difficulty) + "40",
+                    borderColor: getDifficultyColor(selectedDifficulty || quest.difficulty) + "40",
                   }}
                 >
                   <Text
                     style={{
-                      color: getDifficultyColor(quest.difficulty),
+                      color: getDifficultyColor(selectedDifficulty || quest.difficulty),
                       fontSize: 14,
                       fontWeight: "700",
                       textTransform: "uppercase",
                     }}
                   >
-                    {quest.difficulty} ⌄
+                    {selectedDifficulty || quest.difficulty} ⌄
                   </Text>
                 </Pressable>
               </View>
