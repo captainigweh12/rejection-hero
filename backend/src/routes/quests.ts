@@ -309,7 +309,14 @@ async function generateQuestWithAI(
 
     // Build context string
     const locationContext = userLocation
-      ? `\n\nLOCATION CONTEXT: User is in/near ${userLocation}. Create quests that reference specific places, businesses, or venues that would typically be found in this area. Make the quest locally relevant.`
+      ? `\n\nLOCATION CONTEXT: User is in/near ${userLocation}.
+IMPORTANT LOCATION REQUIREMENTS:
+- Only suggest locations within 10 miles (16 km) of the user's location
+- Recommend specific nearby places that are walkable or a short drive away
+- Consider local neighborhoods, streets, and business districts
+- DO NOT suggest locations that would require long travel times
+- Focus on accessible, local spots the user can easily visit
+- If you mention specific business names, they should be common chains or types found in most areas`
       : "";
 
     const timeContext = `\n\nTIME/DATE CONTEXT:
