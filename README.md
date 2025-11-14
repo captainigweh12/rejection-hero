@@ -66,7 +66,17 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 - Tap the cog wheel icon in Profile to navigate to Settings
 - **Account**: Main account header
 - **Appearance**: Theme toggle (Light/Dark mode)
-- **Preferences**: Language selection (English)
+- **Preferences**: Language selection with 10 languages supported
+  - 🇺🇸 English
+  - 🇪🇸 Spanish (Español)
+  - 🇫🇷 French (Français)
+  - 🇩🇪 German (Deutsch)
+  - 🇧🇷 Portuguese (Português)
+  - 🇮🇹 Italian (Italiano)
+  - 🇯🇵 Japanese (日本語)
+  - 🇨🇳 Chinese (中文)
+  - 🇰🇷 Korean (한국어)
+  - 🇸🇦 Arabic (العربية)
 - **Live Features**: Enable livestreaming configuration
 - **Notifications**: Quest reminders toggle
 - **Legal**: Safety Guidelines access
@@ -101,6 +111,7 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 - **Daily.co React Native SDK**: Live streaming and WebRTC
 - **TanStack Query**: Data fetching and caching
 - **Lucide React Native**: Beautiful icons
+- **i18n**: Multi-language support with AsyncStorage persistence
 
 ### Backend
 - **Bun + Hono**: Fast TypeScript backend server

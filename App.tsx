@@ -6,6 +6,7 @@ import { queryClient } from "@/lib/queryClient";
 import RootStackNavigator from "@/navigation/RootNavigator";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { QueryClientProvider } from "@tanstack/react-query";
+import { I18nProvider } from "@/lib/i18n";
 
 /*
 IMPORTANT NOTICE: DO NOT REMOVE
@@ -31,16 +32,18 @@ const openai_api_key = Constants.expoConfig.extra.apikey;
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <KeyboardProvider>
-        <GestureHandlerRootView>
-          <SafeAreaProvider>
-            <NavigationContainer>
-              <RootStackNavigator />
-              <StatusBar style="auto" />
-            </NavigationContainer>
-          </SafeAreaProvider>
-        </GestureHandlerRootView>
-      </KeyboardProvider>
+      <I18nProvider>
+        <KeyboardProvider>
+          <GestureHandlerRootView>
+            <SafeAreaProvider>
+              <NavigationContainer>
+                <RootStackNavigator />
+                <StatusBar style="auto" />
+              </NavigationContainer>
+            </SafeAreaProvider>
+          </GestureHandlerRootView>
+        </KeyboardProvider>
+      </I18nProvider>
     </QueryClientProvider>
   );
 }
