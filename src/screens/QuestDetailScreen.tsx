@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Pressable, ActivityIndicator, Modal, Animated } from "react-native";
+import { View, Text, Pressable, ActivityIndicator, ScrollView, Modal, Animated } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { X, Flame, Trophy, Sparkles, Clock } from "lucide-react-native";
+import { ArrowLeft, Bell, Menu as MenuIcon, Flame, Trophy, Diamond, Clock, Sparkles } from "lucide-react-native";
 import type { RootStackScreenProps } from "@/navigation/types";
 import { api } from "@/lib/api";
 import type {
@@ -21,6 +21,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
   const { userQuestId: initialUserQuestId } = route.params;
   const [currentUserQuestId, setCurrentUserQuestId] = useState(initialUserQuestId);
   const queryClient = useQueryClient();
+  const [showMore, setShowMore] = useState(false);
   const [showCompletion, setShowCompletion] = useState(false);
   const [completionData, setCompletionData] = useState<any>(null);
   const [celebrationAnim] = useState(new Animated.Value(0));
@@ -143,6 +144,16 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
     return colors[category] || "#7E3FE4";
   };
 
+  const getDifficultyColor = (difficulty: string) => {
+    const colors: Record<string, string> = {
+      EASY: "#4CAF50",
+      MEDIUM: "#FFD700",
+      HARD: "#FF6B35",
+      EXPERT: "#FF4081",
+    };
+    return colors[difficulty] || "#FFD700";
+  };
+
   if (isLoading) {
     return (
       <View style={{ flex: 1, backgroundColor: "#F5F5F7" }}>
@@ -182,7 +193,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
   return (
     <View style={{ flex: 1, backgroundColor: "#F5F5F7" }}>
       <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
-        {/* Header with Exit and Timer */}
+        {/* Header */}
         <View
           style={{
             paddingHorizontal: 20,
@@ -192,47 +203,45 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
             alignItems: "center",
           }}
         >
-          <Pressable
-            onPress={() => navigation.goBack()}
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: 20,
-              backgroundColor: "white",
-              alignItems: "center",
-              justifyContent: "center",
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.1,
-              shadowRadius: 4,
-              elevation: 3,
-            }}
-          >
-            <X size={24} color="#1C1C1E" />
-          </Pressable>
+          {/* Stats Bar */}
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 16 }}>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+              <Flame size={20} color="#FF6B35" />
+              <Text style={{ color: "#1C1C1E", fontSize: 16, fontWeight: "600" }}>
+                {statsData?.currentStreak || 0}
+              </Text>
+            </View>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+              <Trophy size={20} color="#FFD700" />
+              <Text style={{ color: "#1C1C1E", fontSize: 16, fontWeight: "600" }}>
+                {statsData?.trophies || 0}
+              </Text>
+            </View>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+              <Diamond size={20} color="#00D9FF" />
+              <Text style={{ color: "#1C1C1E", fontSize: 16, fontWeight: "600" }}>
+                {statsData?.diamonds || 0}
+              </Text>
+            </View>
+          </View>
 
           {/* Timer */}
           <View
             style={{
               flexDirection: "row",
               alignItems: "center",
-              gap: 8,
-              backgroundColor: "white",
-              paddingHorizontal: 16,
-              paddingVertical: 10,
-              borderRadius: 20,
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.1,
-              shadowRadius: 4,
-              elevation: 3,
+              gap: 6,
+              backgroundColor: timeRemaining < 60 ? "#FEE2E2" : "#FFF7ED",
+              paddingHorizontal: 12,
+              paddingVertical: 6,
+              borderRadius: 12,
             }}
           >
-            <Clock size={20} color={timeRemaining < 60 ? "#FF3B30" : "#FF6B35"} />
+            <Clock size={18} color={timeRemaining < 60 ? "#FF3B30" : "#FF6B35"} />
             <Text
               style={{
-                color: timeRemaining < 60 ? "#FF3B30" : "#1C1C1E",
-                fontSize: 18,
+                color: timeRemaining < 60 ? "#FF3B30" : "#FF6B35",
+                fontSize: 14,
                 fontWeight: "bold",
               }}
             >
@@ -242,10 +251,10 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
         </View>
 
         {/* Progress Bar */}
-        <View style={{ paddingHorizontal: 20, marginBottom: 24 }}>
+        <View style={{ paddingHorizontal: 20, marginBottom: 8 }}>
           <View
             style={{
-              height: 12,
+              height: 8,
               backgroundColor: "#E5E7EB",
               borderRadius: 999,
               overflow: "hidden",
@@ -256,119 +265,238 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                 height: "100%",
                 backgroundColor: getCategoryColor(quest.category),
                 width: `${Math.min(progress, 100)}%`,
-                borderRadius: 999,
               }}
             />
           </View>
-          <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 8 }}>
-            <Text style={{ color: "#666", fontSize: 14, fontWeight: "600" }}>
-              {userQuest.noCount}/{quest.goalCount} NOs
-            </Text>
-            <Text style={{ color: "#666", fontSize: 14, fontWeight: "600" }}>
-              {Math.round(progress)}%
-            </Text>
-          </View>
         </View>
 
-        {/* Quest Card */}
-        <View style={{ flex: 1, paddingHorizontal: 20 }}>
-          <View
-            style={{
-              backgroundColor: "white",
-              borderRadius: 24,
-              padding: 24,
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 4 },
-              shadowOpacity: 0.1,
-              shadowRadius: 12,
-              elevation: 6,
-            }}
-          >
-            {/* Category Badge */}
+        <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 160 }}>
+          {/* Back Button */}
+          <View style={{ paddingHorizontal: 20, paddingVertical: 12 }}>
+            <Pressable
+              onPress={() => navigation.goBack()}
+              style={{
+                backgroundColor: "#1C1C1E",
+                paddingHorizontal: 20,
+                paddingVertical: 10,
+                borderRadius: 20,
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 8,
+                alignSelf: "flex-start",
+              }}
+            >
+              <ArrowLeft size={18} color="white" />
+              <Text style={{ color: "white", fontSize: 16, fontWeight: "600" }}>Main</Text>
+            </Pressable>
+          </View>
+
+          {/* Quest Card */}
+          <View style={{ paddingHorizontal: 20, paddingTop: 8 }}>
             <View
               style={{
-                alignSelf: "flex-start",
-                backgroundColor: getCategoryColor(quest.category) + "20",
-                paddingHorizontal: 16,
-                paddingVertical: 8,
-                borderRadius: 16,
-                marginBottom: 16,
+                backgroundColor: "white",
+                borderRadius: 24,
+                padding: 24,
+                shadowColor: "#000",
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.1,
+                shadowRadius: 8,
+                elevation: 4,
               }}
             >
+              {/* Category & Difficulty Badges */}
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 16 }}>
+                <View
+                  style={{
+                    backgroundColor: getCategoryColor(quest.category) + "20",
+                    paddingHorizontal: 16,
+                    paddingVertical: 8,
+                    borderRadius: 16,
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: getCategoryColor(quest.category),
+                      fontSize: 14,
+                      fontWeight: "700",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    {quest.category}
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    backgroundColor: getDifficultyColor(quest.difficulty) + "30",
+                    paddingHorizontal: 16,
+                    paddingVertical: 8,
+                    borderRadius: 16,
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: getDifficultyColor(quest.difficulty),
+                      fontSize: 14,
+                      fontWeight: "700",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    {quest.difficulty}
+                  </Text>
+                </View>
+              </View>
+
+              {/* Title */}
               <Text
                 style={{
-                  color: getCategoryColor(quest.category),
-                  fontSize: 12,
-                  fontWeight: "700",
-                  textTransform: "uppercase",
+                  color: "#1C1C1E",
+                  fontSize: 28,
+                  fontWeight: "bold",
+                  marginBottom: 12,
+                  lineHeight: 34,
                 }}
               >
-                {quest.category} • {quest.difficulty}
+                {quest.title}
               </Text>
+
+              {/* Description */}
+              <Text
+                style={{
+                  color: "#666",
+                  fontSize: 16,
+                  lineHeight: 24,
+                  marginBottom: 20,
+                }}
+                numberOfLines={showMore ? undefined : 2}
+              >
+                {quest.description}
+              </Text>
+
+              {/* Goal Badge */}
+              <View
+                style={{
+                  backgroundColor: "#10B981",
+                  paddingHorizontal: 20,
+                  paddingVertical: 12,
+                  borderRadius: 16,
+                  marginBottom: 16,
+                  borderWidth: 2,
+                  borderColor: "#10B981",
+                }}
+              >
+                <Text style={{ color: "white", fontSize: 16, fontWeight: "700", textAlign: "center" }}>
+                  Goal: Collect {quest.goalCount} NO&apos;s
+                </Text>
+              </View>
+
+              {/* Rewards */}
+              <View style={{ flexDirection: "row", gap: 12, marginBottom: 20 }}>
+                <View
+                  style={{
+                    flex: 1,
+                    backgroundColor: "#FEF3C7",
+                    paddingVertical: 12,
+                    borderRadius: 12,
+                  }}
+                >
+                  <Text style={{ color: "#92400E", fontSize: 16, fontWeight: "600", textAlign: "center" }}>
+                    +{quest.xpReward} XP
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    flex: 1,
+                    backgroundColor: "#FED7AA",
+                    paddingVertical: 12,
+                    borderRadius: 12,
+                  }}
+                >
+                  <Text style={{ color: "#9A3412", fontSize: 16, fontWeight: "600", textAlign: "center" }}>
+                    +{quest.pointReward} pts
+                  </Text>
+                </View>
+              </View>
+
+              {/* Progress Indicators */}
+              <View style={{ flexDirection: "row", gap: 12, marginBottom: 16 }}>
+                <View
+                  style={{
+                    flex: 1,
+                    backgroundColor: "#D1FAE5",
+                    paddingVertical: 10,
+                    borderRadius: 12,
+                  }}
+                >
+                  <Text style={{ color: "#065F46", fontSize: 15, fontWeight: "700", textAlign: "center" }}>
+                    NOs: {userQuest.noCount}/{quest.goalCount}
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    flex: 1,
+                    backgroundColor: "#FEE2E2",
+                    paddingVertical: 10,
+                    borderRadius: 12,
+                  }}
+                >
+                  <Text style={{ color: "#991B1B", fontSize: 15, fontWeight: "700", textAlign: "center" }}>
+                    YES: {userQuest.yesCount}
+                  </Text>
+                </View>
+              </View>
+
+              {/* Progress Bar */}
+              <View
+                style={{
+                  height: 8,
+                  backgroundColor: "#E5E7EB",
+                  borderRadius: 999,
+                  overflow: "hidden",
+                  marginBottom: 16,
+                }}
+              >
+                <View
+                  style={{
+                    height: "100%",
+                    backgroundColor: "#10B981",
+                    width: `${Math.min(progress, 100)}%`,
+                  }}
+                />
+              </View>
+
+              {/* See More */}
+              <Pressable onPress={() => setShowMore(!showMore)}>
+                <Text style={{ color: "#00D9FF", fontSize: 16, fontWeight: "600" }}>
+                  {showMore ? "See less" : "See more"}
+                </Text>
+              </Pressable>
             </View>
+          </View>
 
-            {/* Title */}
-            <Text
-              style={{
-                color: "#1C1C1E",
-                fontSize: 24,
-                fontWeight: "bold",
-                marginBottom: 16,
-                lineHeight: 32,
-              }}
-            >
-              {quest.title}
-            </Text>
-
-            {/* Description */}
-            <Text
-              style={{
-                color: "#666",
-                fontSize: 16,
-                lineHeight: 24,
-              }}
-            >
-              {quest.description}
+          {/* Bottom Text */}
+          <View style={{ paddingHorizontal: 20, paddingTop: 16 }}>
+            <Text style={{ color: "#666", fontSize: 13, textAlign: "center", lineHeight: 18 }}>
+              Complete your quests in order • Friend quests can be done anytime{"\n"}
+              Max 2 active quests • Extra quests go to queue
             </Text>
           </View>
-        </View>
+        </ScrollView>
 
         {/* Action Buttons */}
         <View
           style={{
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            right: 0,
             paddingHorizontal: 20,
             paddingVertical: 20,
             backgroundColor: "#F5F5F7",
           }}
         >
           <View style={{ flexDirection: "row", gap: 12 }}>
-            {/* NO Button (Green) */}
-            <Pressable
-              onPress={() => recordMutation.mutate({ action: "NO" })}
-              disabled={recordMutation.isPending}
-              style={{
-                flex: 1,
-                backgroundColor: "#10B981",
-                paddingVertical: 20,
-                borderRadius: 16,
-                alignItems: "center",
-                justifyContent: "center",
-                opacity: recordMutation.isPending ? 0.5 : 1,
-                shadowColor: "#10B981",
-                shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: 0.3,
-                shadowRadius: 8,
-                elevation: 6,
-              }}
-            >
-              {recordMutation.isPending ? (
-                <ActivityIndicator size="small" color="white" />
-              ) : (
-                <Text style={{ color: "white", fontSize: 22, fontWeight: "bold" }}>NO</Text>
-              )}
-            </Pressable>
-
-            {/* YES Button (Red) */}
+            {/* YES Button */}
             <Pressable
               onPress={() => recordMutation.mutate({ action: "YES" })}
               disabled={recordMutation.isPending}
@@ -376,21 +504,37 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                 flex: 1,
                 backgroundColor: "#EF4444",
                 paddingVertical: 20,
-                borderRadius: 16,
+                borderRadius: 24,
                 alignItems: "center",
                 justifyContent: "center",
                 opacity: recordMutation.isPending ? 0.5 : 1,
-                shadowColor: "#EF4444",
-                shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: 0.3,
-                shadowRadius: 8,
-                elevation: 6,
               }}
             >
               {recordMutation.isPending ? (
                 <ActivityIndicator size="small" color="white" />
               ) : (
-                <Text style={{ color: "white", fontSize: 22, fontWeight: "bold" }}>YES</Text>
+                <Text style={{ color: "white", fontSize: 20, fontWeight: "bold" }}>YES</Text>
+              )}
+            </Pressable>
+
+            {/* NO Button */}
+            <Pressable
+              onPress={() => recordMutation.mutate({ action: "NO" })}
+              disabled={recordMutation.isPending}
+              style={{
+                flex: 1,
+                backgroundColor: "#10B981",
+                paddingVertical: 20,
+                borderRadius: 24,
+                alignItems: "center",
+                justifyContent: "center",
+                opacity: recordMutation.isPending ? 0.5 : 1,
+              }}
+            >
+              {recordMutation.isPending ? (
+                <ActivityIndicator size="small" color="white" />
+              ) : (
+                <Text style={{ color: "white", fontSize: 20, fontWeight: "bold" }}>NO</Text>
               )}
             </Pressable>
           </View>
