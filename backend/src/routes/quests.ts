@@ -361,29 +361,46 @@ async function generateQuestWithAI(
 
     // Build context string with verified nearby places from Google Maps
     const locationContext = userLocation && userLatitude && userLongitude && nearbyPlaces.length > 0
-      ? `\n\nLOCATION CONTEXT: User is currently at ${userLocation} (GPS: ${userLatitude}, ${userLongitude}).
+      ? `\n\nLOCATION CONTEXT: User is currently at ${userLocation}.
 
 VERIFIED NEARBY PLACES (from Google Maps within 10 miles):
-${nearbyPlaces.slice(0, 10).map((place, i) => `${i + 1}. ${place.name} - ${place.address} (GPS: ${place.lat}, ${place.lng})`).join("\n")}
+${nearbyPlaces.slice(0, 10).map((place, i) => `${i + 1}. "${place.name}" at ${place.address} (Coordinates: ${place.lat}, ${place.lng})`).join("\n")}
 
-CRITICAL LOCATION REQUIREMENTS:
-- MUST select a location from the verified places list above or use their coordinates as reference
-- Pick a place that matches the quest category (${category || "any"})
-- Use the EXACT coordinates provided for the selected place
-- Include the place name and address in the quest description
-- DO NOT make up coordinates - use the real coordinates from the list above
-- The quest should direct users to visit these verified real locations`
+🚨 CRITICAL LOCATION REQUIREMENTS - READ CAREFULLY 🚨
+YOU MUST SELECT ONE SPECIFIC PLACE FROM THE VERIFIED LIST ABOVE.
+
+HOW TO USE THE VERIFIED PLACE IN YOUR JSON RESPONSE:
+1. "description" field: Write naturally like "Visit Starbucks on Main Street" or "Go to Target on University Blvd"
+   ❌ NEVER WRITE: "Visit (GPS: 35.123, -80.456)" or "at coordinates 35.123, -80.456"
+   ❌ NEVER WRITE: "(Coordinates: 35.123, -80.456)" anywhere in description
+   ❌ NEVER include numbers like "35.3088457, -80.7506283" in description
+   ✅ ALWAYS WRITE: Just the place name and street/area like normal human speech
+
+2. "location" field: Use format "Place Name - Street Address" (e.g., "Starbucks - 123 Main St")
+
+3. "latitude" and "longitude" fields: Use the EXACT coordinates from the verified place
+
+EXAMPLES OF CORRECT DESCRIPTIONS:
+✅ "Visit Starbucks on Main Street and ask for a custom drink"
+✅ "Go to Target on University Boulevard and request a manager discount"
+✅ "Ask baristas at Dunkin' Donuts on Oak Avenue for free samples"
+
+EXAMPLES OF INCORRECT DESCRIPTIONS (DO NOT DO THIS):
+❌ "Visit Starbucks at 123 Main St (GPS: 35.3088, -80.7506)"
+❌ "Go to Target (Coordinates: 35.3088457, -80.7506283)"
+❌ "Visit locations at 35.123, -80.456"
+
+REMEMBER: Coordinates go ONLY in latitude/longitude JSON fields, NEVER in the description text!`
       : userLocation && userLatitude && userLongitude
-      ? `\n\nLOCATION CONTEXT: User is currently at ${userLocation} (GPS: ${userLatitude}, ${userLongitude}).
+      ? `\n\nLOCATION CONTEXT: User is currently at ${userLocation}.
 CRITICAL LOCATION REQUIREMENTS:
-- Generate a quest location that is WITHIN 10 MILES (16 km) of coordinates ${userLatitude}, ${userLongitude}
-- Calculate approximate coordinates for the quest location that are near the user
-- The quest location should be accessible within 15-20 minutes by car or public transit
-- Include specific neighborhood or district names from ${userLocation}
-- Provide approximate latitude/longitude that is close to ${userLatitude}, ${userLongitude} (within 10 miles radius)`
+- Describe a general area or neighborhood name near ${userLocation}
+- DO NOT include coordinates in the description
+- Use conversational language like "Visit coffee shops in downtown" not "at 37.7749, -122.4194"
+- Provide approximate latitude/longitude in the JSON fields, but keep description readable`
       : userLocation
       ? `\n\nLOCATION CONTEXT: User is in/near ${userLocation}.
-IMPORTANT: Only suggest generic location types (coffee shops, gyms, malls) without specific coordinates since exact location is unavailable. User should find these places nearby themselves.`
+IMPORTANT: Describe generic location types (coffee shops, gyms, malls) without specific coordinates.`
       : "";
 
     const timeContext = `\n\nTIME/DATE CONTEXT:
@@ -488,7 +505,7 @@ Return a JSON object with: title (exactly 3 words), description, category, diffi
           {
             role: "system",
             content:
-              "You are a creative motivational coach creating unique rejection challenges. Each title MUST be exactly 3 words. Each challenge must be completely unique and different from previous challenges. BE EXTREMELY SPECIFIC - include concrete locations, specific types of people, specific items/services. Avoid generic phrases like 'pitch your product' or 'ask strangers'. Instead say things like 'ask baristas for a custom drink not on the menu' or 'request bookstore managers to display your handmade bookmark'. Be actionable and specific.",
+              "You are a creative motivational coach creating unique rejection challenges. Each title MUST be exactly 3 words. Each challenge must be completely unique and different from previous challenges. BE EXTREMELY SPECIFIC - include concrete locations, specific types of people, specific items/services. Avoid generic phrases like 'pitch your product' or 'ask strangers'. Instead say things like 'ask baristas for a custom drink not on the menu' or 'request bookstore managers to display your handmade bookmark'. Be actionable and specific.\n\n🚨 CRITICAL: When writing the 'description' field, NEVER include GPS coordinates like '(GPS: 35.123, -80.456)' or '(Coordinates: 35.123, -80.456)' or raw numbers like '35.3088457, -80.7506283'. Write naturally like a human would speak: 'Visit Starbucks on Main Street' not 'Visit Starbucks (GPS: 35.123, -80.456)'. Coordinates belong ONLY in the separate latitude/longitude JSON fields, NEVER in the description text.",
           },
           { role: "user", content: prompt },
         ],

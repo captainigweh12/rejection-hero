@@ -53,6 +53,7 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
   - AI receives list of actual businesses with accurate GPS coordinates
   - Quests direct you to real, existing locations near you
   - No more made-up or far away locations!
+  - **Human-readable descriptions**: Quest descriptions use place names like "Visit Starbucks on Main Street" instead of technical GPS coordinates
 - **Location-aware (10-mile radius)**:
   - Requests location permission on quest screen
   - AI generates quests ONLY within 10 miles of your current location
@@ -61,7 +62,7 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
   - "📍 Share Location" button appears if location not enabled
 - **Time-aware**: Considers current time of day (morning, afternoon, evening, night) for relevant activities
 - **Date-aware**: Adapts to weekday vs weekend and considers what businesses are open
-- **Map integration**: "📍 View on Map" button opens Google Maps with exact quest location
+- **Map integration**: "📍 View on Map" button opens Google Maps with exact quest location (using accurate coordinates from verified places)
 - **Higher creativity**: Temperature set to 0.9 for more variety
 - **Difficulty-based goals**:
   - EASY: 3-5 NOs (10 min timer)
