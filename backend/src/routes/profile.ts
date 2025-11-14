@@ -32,6 +32,7 @@ profileRouter.get("/", async (c) => {
   }
 
   const photos = profile.photos ? JSON.parse(profile.photos) : [];
+  const interests = profile.interests ? JSON.parse(profile.interests) : [];
 
   return c.json({
     id: profile.id,
@@ -41,6 +42,7 @@ profileRouter.get("/", async (c) => {
     age: profile.age,
     photos,
     avatar: profile.avatar,
+    interests,
     location: profile.location,
     latitude: profile.latitude,
     longitude: profile.longitude,
@@ -61,6 +63,7 @@ profileRouter.post("/", zValidator("json", updateProfileRequestSchema), async (c
 
   const data = c.req.valid("json");
   const photosJson = data.photos ? JSON.stringify(data.photos) : undefined;
+  const interestsJson = data.interests ? JSON.stringify(data.interests) : undefined;
 
   const profile = await db.profile.upsert({
     where: { userId: user.id },
@@ -71,6 +74,7 @@ profileRouter.post("/", zValidator("json", updateProfileRequestSchema), async (c
       age: data.age,
       photos: photosJson,
       avatar: data.avatar,
+      interests: interestsJson,
       location: data.location,
       latitude: data.latitude,
       longitude: data.longitude,
@@ -81,6 +85,7 @@ profileRouter.post("/", zValidator("json", updateProfileRequestSchema), async (c
       age: data.age,
       photos: photosJson,
       avatar: data.avatar,
+      interests: interestsJson,
       location: data.location,
       latitude: data.latitude,
       longitude: data.longitude,
@@ -88,6 +93,7 @@ profileRouter.post("/", zValidator("json", updateProfileRequestSchema), async (c
   });
 
   const photos = profile.photos ? JSON.parse(profile.photos) : [];
+  const interests = profile.interests ? JSON.parse(profile.interests) : [];
 
   return c.json({
     success: true,
@@ -99,6 +105,7 @@ profileRouter.post("/", zValidator("json", updateProfileRequestSchema), async (c
       age: profile.age,
       photos,
       avatar: profile.avatar,
+      interests,
       location: profile.location,
       latitude: profile.latitude,
       longitude: profile.longitude,

@@ -2,11 +2,12 @@ import React, { useState } from "react";
 import { View, Text, ActivityIndicator, Pressable } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { X, Check, RotateCcw, Users } from "lucide-react-native";
+import { X, Heart, Star, RotateCcw, Users } from "lucide-react-native";
 import type { BottomTabScreenProps } from "@/navigation/types";
 import { SwipeCard } from "@/components/SwipeCard";
 import { api } from "@/lib/api";
 import { useSession } from "@/lib/useSession";
+import { useTheme } from "@/contexts/ThemeContext";
 import type { GetDiscoverResponse, CreateSwipeRequest, CreateSwipeResponse } from "@/shared/contracts";
 
 type Props = BottomTabScreenProps<"SwipeTab">;
@@ -15,6 +16,7 @@ export default function SwipeScreen({ navigation }: Props) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const queryClient = useQueryClient();
   const { data: sessionData } = useSession();
+  const { colors } = useTheme();
 
   // Fetch profiles
   const { data, isLoading, error, refetch } = useQuery<GetDiscoverResponse>({
@@ -165,32 +167,66 @@ export default function SwipeScreen({ navigation }: Props) {
         />
       </View>
 
-      {/* Action Buttons */}
-      <View className="pb-8 px-12 flex-row justify-around items-center">
-        {/* No Button (Right swipe) */}
+      {/* Action Buttons - Modern Dating App Style */}
+      <View className="pb-8 px-8 flex-row justify-center items-center gap-6">
+        {/* Pass Button (X) */}
         <Pressable
           onPress={() => handleSwipe("right", currentProfile.userId)}
-          className="w-20 h-20 rounded-full items-center justify-center"
           style={{
-            backgroundColor: "rgba(126, 63, 228, 0.2)",
-            borderWidth: 2,
-            borderColor: "#7E3FE4",
+            width: 60,
+            height: 60,
+            borderRadius: 30,
+            backgroundColor: colors.card,
+            alignItems: "center",
+            justifyContent: "center",
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.3,
+            shadowRadius: 8,
+            elevation: 8,
           }}
         >
-          <X size={36} color="#7E3FE4" strokeWidth={3} />
+          <X size={32} color="#FF6B6B" strokeWidth={2.5} />
         </Pressable>
 
-        {/* Yes Button (Left swipe) */}
+        {/* Super Like Button (Star) */}
         <Pressable
           onPress={() => handleSwipe("left", currentProfile.userId)}
-          className="w-20 h-20 rounded-full items-center justify-center"
           style={{
-            backgroundColor: "rgba(0, 217, 255, 0.2)",
-            borderWidth: 2,
-            borderColor: "#00D9FF",
+            width: 70,
+            height: 70,
+            borderRadius: 35,
+            backgroundColor: "#00D9FF",
+            alignItems: "center",
+            justifyContent: "center",
+            shadowColor: "#00D9FF",
+            shadowOffset: { width: 0, height: 6 },
+            shadowOpacity: 0.5,
+            shadowRadius: 12,
+            elevation: 10,
           }}
         >
-          <Check size={36} color="#00D9FF" strokeWidth={3} />
+          <Star size={36} color="#FFFFFF" strokeWidth={2.5} fill="#FFFFFF" />
+        </Pressable>
+
+        {/* Like Button (Heart) */}
+        <Pressable
+          onPress={() => handleSwipe("left", currentProfile.userId)}
+          style={{
+            width: 60,
+            height: 60,
+            borderRadius: 30,
+            backgroundColor: colors.card,
+            alignItems: "center",
+            justifyContent: "center",
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.3,
+            shadowRadius: 8,
+            elevation: 8,
+          }}
+        >
+          <Heart size={32} color="#4CAF50" strokeWidth={2.5} fill="#4CAF50" />
         </Pressable>
       </View>
     </LinearGradient>

@@ -21,6 +21,7 @@ interface Profile {
   bio: string | null;
   age: number | null;
   photos: string[];
+  interests?: string[]; // Interest tags
   location: string | null;
   isLive: boolean;
   liveViewers: number;
@@ -191,6 +192,27 @@ export const SwipeCard: React.FC<SwipeCardProps> = ({
 
             {profile.location && (
               <Text className="text-white/70 text-sm mt-2">📍 {profile.location}</Text>
+            )}
+
+            {/* Interest Tags */}
+            {profile.interests && profile.interests.length > 0 && (
+              <View className="flex-row flex-wrap gap-2 mt-3">
+                {profile.interests.slice(0, 5).map((interest, index) => (
+                  <View
+                    key={index}
+                    style={{
+                      backgroundColor: "rgba(255, 255, 255, 0.2)",
+                      paddingHorizontal: 12,
+                      paddingVertical: 6,
+                      borderRadius: 16,
+                      borderWidth: 1,
+                      borderColor: "rgba(255, 255, 255, 0.3)",
+                    }}
+                  >
+                    <Text className="text-white text-sm font-medium">{interest}</Text>
+                  </View>
+                ))}
+              </View>
             )}
           </View>
         </View>

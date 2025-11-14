@@ -83,6 +83,7 @@ model Profile {
   age         Int?
   photos      String?
   avatar      String?  // AI-generated or uploaded avatar URL
+  interests   String?  // JSON array of interest tags
   location    String?
   latitude    Float?
   longitude   Float?

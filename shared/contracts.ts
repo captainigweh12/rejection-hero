@@ -47,6 +47,7 @@ export const getProfileResponseSchema = z.object({
   age: z.number().nullable(),
   photos: z.array(z.string()),
   avatar: z.string().nullable(), // AI-generated or uploaded avatar URL
+  interests: z.array(z.string()).optional(), // Interest tags
   location: z.string().nullable(),
   latitude: z.number().nullable(),
   longitude: z.number().nullable(),
@@ -62,6 +63,7 @@ export const updateProfileRequestSchema = z.object({
   age: z.number().min(18).max(120).optional(),
   photos: z.array(z.string()).optional(),
   avatar: z.string().optional(), // AI-generated or uploaded avatar URL
+  interests: z.array(z.string()).optional(), // Interest tags
   location: z.string().optional(),
   latitude: z.number().optional(),
   longitude: z.number().optional(),
@@ -100,6 +102,7 @@ export const getDiscoverResponseSchema = z.object({
       bio: z.string().nullable(),
       age: z.number().nullable(),
       photos: z.array(z.string()),
+      interests: z.array(z.string()).optional(), // Interest tags
       location: z.string().nullable(),
       isLive: z.boolean(),
       liveViewers: z.number(),

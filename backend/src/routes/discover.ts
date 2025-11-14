@@ -43,6 +43,7 @@ discoverRouter.get("/", async (c) => {
     bio: profile.bio,
     age: profile.age,
     photos: profile.photos ? JSON.parse(profile.photos) : [],
+    interests: profile.interests ? JSON.parse(profile.interests) : [],
     location: profile.location,
     isLive: profile.isLive,
     liveViewers: profile.liveViewers,
