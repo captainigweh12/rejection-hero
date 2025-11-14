@@ -16,6 +16,8 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 - Tap outside to dismiss keyboard
 - 6 Categories: Sales, Social, Entrepreneurship, Dating, Confidence, Career
 - 4 Difficulty Levels: Easy, Medium, Hard, Expert
+- Auto-navigation to quest detail page after creation
+- Auto-start quest when created (if less than 2 active quests)
 - Real-time progress tracking (NOs and YESes collected)
 - Rewards: Earn XP and points based on difficulty
 - Max 2 active quests (extras go to queue)

@@ -31,14 +31,20 @@ export default function CreateQuestScreen({ navigation }: Props) {
     mutationFn: async (data: GenerateQuestRequest) => {
       return api.post<GenerateQuestResponse>("/api/quests/generate", data);
     },
-    onSuccess: () => {
+    onSuccess: async (data) => {
       queryClient.invalidateQueries({ queryKey: ["quests"] });
-      Alert.alert("Success", "Quest created! Start it from the Home screen.", [
-        {
-          text: "OK",
-          onPress: () => navigation.goBack(),
-        },
-      ]);
+
+      // Auto-start the quest if less than 2 active quests
+      try {
+        await api.post(`/api/quests/${data.userQuestId}/start`, {});
+        queryClient.invalidateQueries({ queryKey: ["quests"] });
+
+        // Navigate to the quest detail page
+        navigation.navigate("QuestDetail", { userQuestId: data.userQuestId });
+      } catch (error) {
+        // If auto-start fails (e.g., already 2 active quests), just navigate to quest detail
+        navigation.navigate("QuestDetail", { userQuestId: data.userQuestId });
+      }
     },
     onError: (error) => {
       Alert.alert("Error", error instanceof Error ? error.message : "Failed to create quest");
