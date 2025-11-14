@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Pressable, ActivityIndicator, ScrollView, Modal, Animated, Linking } from "react-native";
+import { View, Text, Pressable, ActivityIndicator, ScrollView, Modal, Animated, Linking, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, Bell, Menu as MenuIcon, Flame, Trophy, Diamond, Clock, Sparkles } from "lucide-react-native";
+import * as Location from "expo-location";
 import type { RootStackScreenProps } from "@/navigation/types";
 import { api } from "@/lib/api";
 import type {
@@ -32,6 +33,8 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
   const [timeRemaining, setTimeRemaining] = useState(300); // Will be set based on difficulty
   const [isGeneratingNext, setIsGeneratingNext] = useState(false);
   const [completionPage, setCompletionPage] = useState<"accomplishments" | "leaderboard" | "streak">("accomplishments");
+  const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number; address?: string } | null>(null);
+  const [locationPermission, setLocationPermission] = useState<boolean>(false);
 
   const { data: questsData, isLoading } = useQuery<GetUserQuestsResponse>({
     queryKey: ["quests"],
@@ -55,6 +58,32 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
   });
 
   const userQuest = questsData?.activeQuests.find((q) => q.id === currentUserQuestId);
+
+  // Request location permission on mount
+  useEffect(() => {
+    requestLocationPermission();
+  }, []);
+
+  const requestLocationPermission = async () => {
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status === "granted") {
+        setLocationPermission(true);
+        const location = await Location.getCurrentPositionAsync({});
+        const address = await Location.reverseGeocodeAsync({
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+        });
+        setUserLocation({
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+          address: address[0] ? `${address[0].city}, ${address[0].region}` : undefined,
+        });
+      }
+    } catch (error) {
+      console.error("Error requesting location:", error);
+    }
+  };
 
   // Save quest data before it gets removed from active quests
   useEffect(() => {
@@ -189,6 +218,9 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
     generateNextMutation.mutate({
       category: savedQuestData.quest.category,
       difficulty: nextDifficulty,
+      userLocation: userLocation?.address,
+      userLatitude: userLocation?.latitude,
+      userLongitude: userLocation?.longitude,
     });
   };
 
@@ -567,7 +599,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
               </Pressable>
 
               {/* View on Map Button */}
-              {displayQuest.quest.latitude && displayQuest.quest.longitude && (
+              {displayQuest.quest.latitude && displayQuest.quest.longitude ? (
                 <Pressable
                   onPress={() => {
                     const url = `https://www.google.com/maps/search/?api=1&query=${displayQuest.quest.latitude},${displayQuest.quest.longitude}`;
@@ -594,7 +626,38 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                     </Text>
                   )}
                 </Pressable>
-              )}
+              ) : !locationPermission ? (
+                <Pressable
+                  onPress={() => {
+                    Alert.alert(
+                      "Location Access Required",
+                      "To get location-based quests within 10 miles of you, please enable location access.",
+                      [
+                        { text: "Cancel", style: "cancel" },
+                        {
+                          text: "Enable Location",
+                          onPress: requestLocationPermission,
+                        },
+                      ]
+                    );
+                  }}
+                  style={{
+                    marginTop: 16,
+                    backgroundColor: "#FFD700",
+                    paddingVertical: 12,
+                    paddingHorizontal: 20,
+                    borderRadius: 12,
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 8,
+                  }}
+                >
+                  <Text style={{ color: "#1C1C1E", fontSize: 16, fontWeight: "600" }}>
+                    📍 Share Location
+                  </Text>
+                </Pressable>
+              ) : null}
             </View>
           </View>
 
