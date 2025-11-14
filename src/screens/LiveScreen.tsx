@@ -416,7 +416,7 @@ export default function LiveScreen({ navigation }: Props) {
         <View
           style={{
             position: "absolute",
-            bottom: 0,
+            bottom: 85,
             left: 0,
             right: 0,
             maxHeight: 280,
@@ -454,7 +454,7 @@ export default function LiveScreen({ navigation }: Props) {
               backgroundColor: "rgba(0, 0, 0, 0.9)",
               paddingHorizontal: 16,
               paddingTop: 12,
-              paddingBottom: 32,
+              paddingBottom: 12,
               borderTopWidth: 1,
               borderTopColor: "rgba(255, 255, 255, 0.1)",
             }}
@@ -937,7 +937,7 @@ export default function LiveScreen({ navigation }: Props) {
         <View
           style={{
             position: "absolute",
-            bottom: 0,
+            bottom: 85,
             left: 0,
             right: 0,
             maxHeight: 280,
@@ -975,7 +975,7 @@ export default function LiveScreen({ navigation }: Props) {
               backgroundColor: "rgba(0, 0, 0, 0.9)",
               paddingHorizontal: 16,
               paddingTop: 12,
-              paddingBottom: 32,
+              paddingBottom: 12,
               borderTopWidth: 1,
               borderTopColor: "rgba(255, 255, 255, 0.1)",
             }}
