@@ -122,7 +122,10 @@ export default function ProfileScreen({ navigation }: Props) {
                 <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: "#4CAF50" }} />
                 <Text style={{ color: "#666", fontSize: 14 }}>Online</Text>
               </View>
-              <Pressable onPress={() => setShowSettings(true)}>
+              <Pressable onPress={() => {
+                console.log('[ProfileScreen] Settings cog clicked');
+                setShowSettings(true);
+              }}>
                 <Settings size={24} color="#333" />
               </Pressable>
             </View>
