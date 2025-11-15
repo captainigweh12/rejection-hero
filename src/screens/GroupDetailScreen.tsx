@@ -229,7 +229,25 @@ export default function GroupDetailScreen({ navigation, route }: Props) {
             <ArrowLeft size={24} color="white" />
           </Pressable>
           <Text style={{ fontSize: 18, fontWeight: "700", color: "white" }}>Group Details</Text>
-          <View style={{ width: 24 }} />
+          {/* Invite Button - Small Icon */}
+          {isModerator && (
+            <Pressable
+              onPress={() => setShowInviteModal(true)}
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: 16,
+                backgroundColor: "rgba(126, 63, 228, 0.2)",
+                borderWidth: 1,
+                borderColor: "#7E3FE4",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <UserPlus size={18} color="#7E3FE4" />
+            </Pressable>
+          )}
+          {!isModerator && <View style={{ width: 32 }} />}
         </View>
 
         <ScrollView showsVerticalScrollIndicator={false}>
@@ -333,8 +351,10 @@ export default function GroupDetailScreen({ navigation, route }: Props) {
               {/* Group Quests Button */}
               <Pressable
                 onPress={() => {
-                  // TODO: Navigate to group quests screen
-                  Alert.alert("Coming Soon", "Group quests are being developed!");
+                  navigation.navigate("GroupQuests", {
+                    groupId: group.id,
+                    groupName: group.name
+                  });
                 }}
                 style={{
                   backgroundColor: "rgba(0, 217, 255, 0.2)",

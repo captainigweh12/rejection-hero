@@ -29,6 +29,7 @@ export type RootStackParamList = {
   ManageCategories: undefined;
   Support: undefined;
   GroupDetail: { groupId: string };
+  GroupQuests: { groupId: string; groupName: string };
 };
 
 export type BottomTabParamList = {

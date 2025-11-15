@@ -818,3 +818,119 @@ export const getSmartQuestSuggestionsResponseSchema = z.object({
   message: z.string().optional(), // Encouraging message from AI coach
 });
 export type GetSmartQuestSuggestionsResponse = z.infer<typeof getSmartQuestSuggestionsResponseSchema>;
+
+// ==========================================
+// Group Quests Routes
+// ==========================================
+
+// GET /api/group-quests/:groupId - Get all group quests for a group
+export const getGroupQuestsResponseSchema = z.object({
+  groupQuests: z.array(
+    z.object({
+      id: z.string(),
+      groupId: z.string(),
+      assignmentType: z.enum(["all", "assigned"]),
+      createdAt: z.string(),
+      creator: z.object({
+        id: z.string(),
+        displayName: z.string(),
+        avatar: z.string().nullable(),
+      }),
+      quest: z.object({
+        id: z.string(),
+        title: z.string(),
+        description: z.string(),
+        category: z.string(),
+        difficulty: z.string(),
+        goalType: z.string(),
+        goalCount: z.number(),
+        xpReward: z.number(),
+        pointReward: z.number(),
+        location: z.string().nullable(),
+        latitude: z.number().nullable(),
+        longitude: z.number().nullable(),
+      }),
+      participants: z.array(
+        z.object({
+          id: z.string(),
+          userId: z.string(),
+          displayName: z.string(),
+          avatar: z.string().nullable(),
+          status: z.string(),
+          noCount: z.number(),
+          yesCount: z.number(),
+          actionCount: z.number(),
+          startedAt: z.string().nullable(),
+          completedAt: z.string().nullable(),
+          joinedAt: z.string(),
+        })
+      ),
+      assignedMembers: z.array(
+        z.object({
+          userId: z.string(),
+          displayName: z.string(),
+          avatar: z.string().nullable(),
+        })
+      ),
+      userParticipation: z
+        .object({
+          id: z.string(),
+          userId: z.string(),
+          status: z.string(),
+          noCount: z.number(),
+          yesCount: z.number(),
+          actionCount: z.number(),
+          startedAt: z.string().nullable(),
+          completedAt: z.string().nullable(),
+          joinedAt: z.string(),
+        })
+        .nullable(),
+    })
+  ),
+});
+export type GetGroupQuestsResponse = z.infer<typeof getGroupQuestsResponseSchema>;
+
+// POST /api/group-quests/create - Create a group quest
+export const createGroupQuestRequestSchema = z.object({
+  groupId: z.string(),
+  questId: z.string(),
+  assignmentType: z.enum(["all", "assigned"]).default("all"),
+  assignedMemberIds: z.array(z.string()).optional(),
+});
+export type CreateGroupQuestRequest = z.infer<typeof createGroupQuestRequestSchema>;
+
+export const createGroupQuestResponseSchema = z.object({
+  success: z.boolean(),
+  groupQuestId: z.string(),
+});
+export type CreateGroupQuestResponse = z.infer<typeof createGroupQuestResponseSchema>;
+
+// POST /api/group-quests/:groupQuestId/join - Join a group quest
+export const joinGroupQuestResponseSchema = z.object({
+  success: z.boolean(),
+  message: z.string(),
+});
+export type JoinGroupQuestResponse = z.infer<typeof joinGroupQuestResponseSchema>;
+
+// POST /api/group-quests/:groupQuestId/start - Start a group quest
+export const startGroupQuestResponseSchema = z.object({
+  success: z.boolean(),
+  message: z.string(),
+});
+export type StartGroupQuestResponse = z.infer<typeof startGroupQuestResponseSchema>;
+
+// POST /api/group-quests/:groupQuestId/record - Record progress
+export const recordGroupQuestProgressRequestSchema = z.object({
+  action: z.enum(["no", "yes", "complete"]),
+});
+export type RecordGroupQuestProgressRequest = z.infer<typeof recordGroupQuestProgressRequestSchema>;
+
+export const recordGroupQuestProgressResponseSchema = z.object({
+  success: z.boolean(),
+  noCount: z.number(),
+  yesCount: z.number(),
+  actionCount: z.number(),
+  isComplete: z.boolean(),
+  status: z.string(),
+});
+export type RecordGroupQuestProgressResponse = z.infer<typeof recordGroupQuestProgressResponseSchema>;

@@ -423,11 +423,32 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
       - Email includes group features (quests, live, community)
       - Join link for easy signup and group joining
     - Non-users receive signup link that auto-joins group after registration
+  - **Group Quests** 🎯 NEW & ACTIVE!:
+    - **Create Group Quests**: Members can create quests for the group
+    - **Assignment Options**:
+      - "All" mode: Anyone in the group can join the quest
+      - "Assigned" mode: Only select members can participate
+    - **Live Participation Tracking**:
+      - Real-time view of who joined each quest
+      - Progress tracking (NOs, YESes, actions completed)
+      - Status indicators: Joined, In Progress, Completed, Failed
+    - **Group Quest List Screen**:
+      - Beautiful card-based UI showing all group quests
+      - Live refresh every 5 seconds for real-time updates
+      - See all participants and their progress
+      - View completed vs active participants
+      - Quest details with rewards, difficulty, and location
+    - **Participant Features**:
+      - Join any open quest or assigned quests
+      - Track individual progress within group quests
+      - See who completed, who's in progress, and who failed
+      - Compare progress with other group members
+    - **Small Invite Icon**: Quick access to invite members (top-right corner)
   - **Group Actions**:
     - Leave group (for members)
     - Delete group (admin only, with confirmation)
     - Navigate to Group Live (coming soon)
-    - Navigate to Group Quests (coming soon)
+    - Navigate to Group Quests ✅ ACTIVE!
   - Public/private group options
   - Member count and role management
   - Beautiful 3D glassmorphism design matching app theme
@@ -1104,6 +1125,25 @@ The app features a cohesive dark theme with modern 3D-style UI elements througho
 - Role-based permissions for invites, moderation, and deletion
 - Group actions: Leave, Delete, Navigate to Group Live/Quests
 - Public/Private group privacy settings
+
+### Group Quests ✨ NEW!
+- `GET /api/group-quests/:groupId` - Get all group quests for a group
+- `POST /api/group-quests/create` - Create a group quest
+- `POST /api/group-quests/:groupQuestId/join` - Join a group quest
+- `POST /api/group-quests/:groupQuestId/start` - Start a group quest
+- `POST /api/group-quests/:groupQuestId/record` - Record progress (no/yes/complete)
+- `POST /api/group-quests/:groupQuestId/fail` - Mark quest as failed
+
+**Group Quest Features:**
+- Create quests for entire group with two assignment modes:
+  - **All**: Anyone in the group can join
+  - **Assigned**: Only specific members can participate
+- Real-time participant tracking with status updates
+- Individual progress tracking within group context
+- Live updates every 5 seconds for participant progress
+- See who completed, who's in progress, and who failed
+- Quest rewards, difficulty, and location displayed
+- Participant list with avatars and progress bars
 
 ### Shared Quests ✨ NEW!
 - `GET /api/shared-quests` - Get received quest shares

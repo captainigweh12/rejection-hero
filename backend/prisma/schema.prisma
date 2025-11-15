@@ -43,6 +43,9 @@ model User {
   Moments            Moment[]
   NotificationsSent  Notification[]      @relation("NotificationSender")
   NotificationsReceived Notification[]   @relation("NotificationReceiver")
+  GroupQuestsCreated GroupQuest[]        @relation("GroupQuestCreator")
+  GroupQuestParticipations GroupQuestParticipant[]
+  GroupQuestAssignments GroupQuestAssignment[]
 
   @@map("user")
 }
@@ -200,6 +203,7 @@ model Quest {
   UserQuests    UserQuest[]
   SharedQuests  SharedQuest[]
   QuestSuggestions QuestSuggestion[]
+  GroupQuests   GroupQuest[]
 
   @@map("quest")
 }
@@ -314,6 +318,7 @@ model Group {
   creator     User          @relation("GroupCreator", fields: [creatorId], references: [id], onDelete: Cascade)
   members     GroupMember[]
   posts       Post[]
+  groupQuests GroupQuest[]
 
   @@map("group")
 }
@@ -454,4 +459,51 @@ model Notification {
   sender      User?    @relation("NotificationSender", fields: [senderId], references: [id], onDelete: Cascade)
 
   @@map("notification")
+}
+
+model GroupQuest {
+  id          String                  @id @default(cuid())
+  groupId     String
+  questId     String
+  createdBy   String                  // User who created this group quest
+  assignmentType String               @default("all") // "all" (anyone can join) or "assigned" (specific members)
+  createdAt   DateTime                @default(now())
+  updatedAt   DateTime                @updatedAt
+  group       Group                   @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  quest       Quest                   @relation(fields: [questId], references: [id], onDelete: Cascade)
+  creator     User                    @relation("GroupQuestCreator", fields: [createdBy], references: [id], onDelete: Cascade)
+  participants GroupQuestParticipant[]
+  assignments  GroupQuestAssignment[]  // Specific member assignments
+
+  @@map("group_quest")
+}
+
+model GroupQuestParticipant {
+  id            String      @id @default(cuid())
+  groupQuestId  String
+  userId        String
+  status        String      @default("joined") // joined, in_progress, completed, failed
+  noCount       Int         @default(0)
+  yesCount      Int         @default(0)
+  actionCount   Int         @default(0)
+  startedAt     DateTime?
+  completedAt   DateTime?
+  joinedAt      DateTime    @default(now())
+  groupQuest    GroupQuest  @relation(fields: [groupQuestId], references: [id], onDelete: Cascade)
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([groupQuestId, userId])
+  @@map("group_quest_participant")
+}
+
+model GroupQuestAssignment {
+  id            String      @id @default(cuid())
+  groupQuestId  String
+  userId        String      // Assigned member
+  assignedAt    DateTime    @default(now())
+  groupQuest    GroupQuest  @relation(fields: [groupQuestId], references: [id], onDelete: Cascade)
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([groupQuestId, userId])
+  @@map("group_quest_assignment")
 }
