@@ -55,6 +55,7 @@ import type {
   GetReflectionPromptResponse,
   GetCourageBoostResponse,
   GetWeeklyForecastResponse,
+  GetProfileResponse,
 } from "@/shared/contracts";
 
 type Props = BottomTabScreenProps<"HomeTab">;
@@ -85,6 +86,14 @@ export default function HomeScreen({ navigation }: Props) {
     queryKey: ["stats"],
     queryFn: async () => {
       return api.get<GetUserStatsResponse>("/api/stats");
+    },
+    enabled: !!sessionData?.user,
+  });
+
+  const { data: profileData } = useQuery<GetProfileResponse>({
+    queryKey: ["profile"],
+    queryFn: async () => {
+      return api.get<GetProfileResponse>("/api/profile");
     },
     enabled: !!sessionData?.user,
   });
@@ -240,20 +249,29 @@ export default function HomeScreen({ navigation }: Props) {
                       backgroundColor: "#1A1A24",
                       alignItems: "center",
                       justifyContent: "center",
+                      overflow: "hidden",
                     }}
                   >
-                    <LinearGradient
-                      colors={["#FF6B35", "#FF8C61"]}
-                      style={{
-                        width: 70,
-                        height: 70,
-                        borderRadius: 35,
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <User size={36} color="#fff" strokeWidth={2.5} />
-                    </LinearGradient>
+                    {profileData?.avatar ? (
+                      <Image
+                        source={{ uri: profileData.avatar }}
+                        style={{ width: 70, height: 70, borderRadius: 35 }}
+                        resizeMode="cover"
+                      />
+                    ) : (
+                      <LinearGradient
+                        colors={["#FF6B35", "#FF8C61"]}
+                        style={{
+                          width: 70,
+                          height: 70,
+                          borderRadius: 35,
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <User size={36} color="#fff" strokeWidth={2.5} />
+                      </LinearGradient>
+                    )}
                   </View>
                 </LinearGradient>
 
@@ -1014,18 +1032,30 @@ export default function HomeScreen({ navigation }: Props) {
                   }}
                 >
                   <View style={{ flexDirection: "row", alignItems: "center", gap: 16 }}>
-                    <LinearGradient
-                      colors={["#FF6B35", "#FF8C61"]}
-                      style={{
-                        width: 64,
-                        height: 64,
-                        borderRadius: 32,
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <User size={32} color="#fff" />
-                    </LinearGradient>
+                    {profileData?.avatar ? (
+                      <Image
+                        source={{ uri: profileData.avatar }}
+                        style={{
+                          width: 64,
+                          height: 64,
+                          borderRadius: 32,
+                        }}
+                        resizeMode="cover"
+                      />
+                    ) : (
+                      <LinearGradient
+                        colors={["#FF6B35", "#FF8C61"]}
+                        style={{
+                          width: 64,
+                          height: 64,
+                          borderRadius: 32,
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <User size={32} color="#fff" />
+                      </LinearGradient>
+                    )}
                     <View style={{ flex: 1 }}>
                       <Text style={{ fontSize: 20, fontWeight: "bold", color: colors.text, marginBottom: 4 }}>
                         {sessionData?.user?.name || "Quest Warrior"}
