@@ -613,13 +613,13 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
   - **Stats Tab** 📊 FULLY ACTIVE!:
     - Detailed progress metrics (Total XP, Points, Longest Streak, Diamonds)
     - Global ranking card with golden gradient
-    - **Fear Zone Progress** 🔥 NEW & ACTIVE!:
+    - **Growth Zone Progress** 🔥 NEW & ACTIVE!:
       - **Confidence Level**: Dynamic progress bar (0-100%) with gradient colors
       - **Easy Zone** (😊 Green): Count of easy difficulty quests completed
       - **Growth Zone** (💪 Gold): Count of medium difficulty quests completed
       - **Fear Zone** (🔥 Orange): Count of hard/expert difficulty quests completed
       - Progress bars for each zone showing completion relative to 10 quest goal
-      - Motivational messages based on Fear Zone progress
+      - Motivational messages based on zone progress
       - Real-time tracking from UserStats database
   - **About Tab**: User context for AI quest personalization
 - **AI Quest Context Section** 🤖 NEW!:

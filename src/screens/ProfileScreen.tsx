@@ -745,7 +745,7 @@ export default function ProfileScreen({ navigation }: Props) {
                 </View>
               </LinearGradient>
 
-              {/* Fear Zone Progress */}
+              {/* Growth Zone Progress */}
               <View
                 style={{
                   backgroundColor: "rgba(255, 255, 255, 0.05)",
@@ -756,7 +756,7 @@ export default function ProfileScreen({ navigation }: Props) {
                 }}
               >
                 <Text style={{ fontSize: 18, fontWeight: "bold", color: "white", marginBottom: 16 }}>
-                  Fear Zone Progress
+                  Growth Zone Progress
                 </Text>
 
                 {/* Confidence Level */}
