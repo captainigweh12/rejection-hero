@@ -156,7 +156,7 @@ export default function LoginWithEmailPassword() {
         {/* Logo */}
         <View className="items-center mb-4">
           <Image
-            source={require("@/assets/rejection-hero-logo.png")}
+            source={require("../../assets/rejection-hero-logo.png")}
             style={{ width: 200, height: 200 }}
             resizeMode="contain"
           />
