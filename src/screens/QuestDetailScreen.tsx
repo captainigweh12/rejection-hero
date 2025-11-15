@@ -3,7 +3,7 @@ import { View, Text, Pressable, ActivityIndicator, ScrollView, Modal, Animated, 
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Bell, Menu as MenuIcon, Flame, Trophy, Diamond, Clock, Sparkles, Star, X } from "lucide-react-native";
+import { ArrowLeft, Bell, Menu as MenuIcon, Flame, Trophy, Diamond, Clock, Sparkles, Star, X, Video } from "lucide-react-native";
 import * as Location from "expo-location";
 import type { RootStackScreenProps } from "@/navigation/types";
 import { api } from "@/lib/api";
@@ -429,9 +429,9 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
 
   if (isLoading) {
     return (
-      <View style={{ flex: 1, backgroundColor: "#F5F5F7" }}>
+      <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
         <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-          <ActivityIndicator size="large" color="#FF6B35" />
+          <ActivityIndicator size="large" color="#7E3FE4" />
         </View>
       </View>
     );
@@ -439,15 +439,15 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
 
   if (!userQuest && !showLoading && !showCompletion) {
     return (
-      <View style={{ flex: 1, backgroundColor: "#F5F5F7" }}>
+      <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
         <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
           <View style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 32 }}>
-            <Text style={{ color: "#1C1C1E", fontSize: 20, fontWeight: "bold", marginBottom: 16 }}>
+            <Text style={{ color: "white", fontSize: 20, fontWeight: "bold", marginBottom: 16 }}>
               Quest not found
             </Text>
             <Pressable
               onPress={() => navigation.goBack()}
-              style={{ backgroundColor: "#FF6B35", paddingHorizontal: 32, paddingVertical: 16, borderRadius: 999 }}
+              style={{ backgroundColor: "#7E3FE4", paddingHorizontal: 32, paddingVertical: 16, borderRadius: 999 }}
             >
               <Text style={{ color: "white", fontWeight: "bold", fontSize: 18 }}>Go Back</Text>
             </Pressable>
@@ -462,15 +462,15 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
 
   if (!displayQuest && !isLoading) {
     return (
-      <View style={{ flex: 1, backgroundColor: "#F5F5F7" }}>
+      <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
         <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
           <View style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 32 }}>
-            <Text style={{ color: "#1C1C1E", fontSize: 20, fontWeight: "bold", marginBottom: 16 }}>
+            <Text style={{ color: "white", fontSize: 20, fontWeight: "bold", marginBottom: 16 }}>
               Quest not found
             </Text>
             <Pressable
               onPress={() => navigation.goBack()}
-              style={{ backgroundColor: "#FF6B35", paddingHorizontal: 32, paddingVertical: 16, borderRadius: 999 }}
+              style={{ backgroundColor: "#7E3FE4", paddingHorizontal: 32, paddingVertical: 16, borderRadius: 999 }}
             >
               <Text style={{ color: "white", fontWeight: "bold", fontSize: 18 }}>Go Back</Text>
             </Pressable>
@@ -489,97 +489,224 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
       : (displayQuest.actionCount / quest.goalCount) * 100;
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#F5F5F7" }}>
+    <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
       <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
-        {/* Header */}
-        <View
+        {/* Modern 3D Header with Stats */}
+        <LinearGradient
+          colors={["#1A1A24", "#0A0A0F"]}
           style={{
             paddingHorizontal: 20,
             paddingVertical: 16,
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
           }}
         >
-          {/* Stats Bar */}
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 16 }}>
-            <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-              <Flame size={20} color="#FF6B35" />
-              <Text style={{ color: "#1C1C1E", fontSize: 16, fontWeight: "600" }}>
-                {statsData?.currentStreak || 0}
-              </Text>
-            </View>
-            <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-              <Trophy size={20} color="#FFD700" />
-              <Text style={{ color: "#1C1C1E", fontSize: 16, fontWeight: "600" }}>
-                {statsData?.trophies || 0}
-              </Text>
-            </View>
-            <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-              <Diamond size={20} color="#00D9FF" />
-              <Text style={{ color: "#1C1C1E", fontSize: 16, fontWeight: "600" }}>
-                {statsData?.diamonds || 0}
-              </Text>
-            </View>
-          </View>
-
-          {/* Right side: Timer and Quit button */}
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-            {/* Timer */}
-            <View
+          <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+            {/* Back Button */}
+            <Pressable
+              onPress={() => navigation.goBack()}
               style={{
+                backgroundColor: "rgba(255, 255, 255, 0.05)",
+                paddingHorizontal: 16,
+                paddingVertical: 8,
+                borderRadius: 20,
                 flexDirection: "row",
                 alignItems: "center",
                 gap: 6,
-                backgroundColor: timeRemaining < 60 ? "#FEE2E2" : "#FFF7ED",
-                paddingHorizontal: 12,
-                paddingVertical: 6,
-                borderRadius: 12,
+                borderWidth: 1,
+                borderColor: "rgba(126, 63, 228, 0.3)",
               }}
             >
-              <Clock size={18} color={timeRemaining < 60 ? "#FF3B30" : "#FF6B35"} />
-              <Text
+              <ArrowLeft size={18} color="white" />
+              <Text style={{ color: "white", fontSize: 14, fontWeight: "600" }}>Back</Text>
+            </Pressable>
+
+            {/* Timer and Quit */}
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+              {/* Timer */}
+              <View
                 style={{
-                  color: timeRemaining < 60 ? "#FF3B30" : "#FF6B35",
-                  fontSize: 14,
-                  fontWeight: "bold",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 6,
+                  backgroundColor: timeRemaining < 60 ? "rgba(255, 59, 48, 0.1)" : "rgba(126, 63, 228, 0.1)",
+                  paddingHorizontal: 12,
+                  paddingVertical: 6,
+                  borderRadius: 12,
+                  borderWidth: 1,
+                  borderColor: timeRemaining < 60 ? "rgba(255, 59, 48, 0.3)" : "rgba(126, 63, 228, 0.3)",
                 }}
               >
-                {formatTime(timeRemaining)}
-              </Text>
+                <Clock size={16} color={timeRemaining < 60 ? "#FF3B30" : "#7E3FE4"} />
+                <Text
+                  style={{
+                    color: timeRemaining < 60 ? "#FF3B30" : "#7E3FE4",
+                    fontSize: 14,
+                    fontWeight: "bold",
+                  }}
+                >
+                  {formatTime(timeRemaining)}
+                </Text>
+              </View>
+
+              {/* Quit Button */}
+              <Pressable
+                onPress={handleQuitQuest}
+                style={{
+                  backgroundColor: "rgba(255, 59, 48, 0.1)",
+                  width: 32,
+                  height: 32,
+                  borderRadius: 16,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderWidth: 1,
+                  borderColor: "rgba(255, 59, 48, 0.3)",
+                }}
+              >
+                <X size={18} color="#FF3B30" />
+              </Pressable>
+            </View>
+          </View>
+
+          {/* Stats Bar with 3D Cards - Now Clickable */}
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+            {/* Streak - Clickable */}
+            <Pressable
+              onPress={() => navigation.navigate("GrowthAchievements")}
+              style={{
+                flex: 1,
+                backgroundColor: "rgba(255, 255, 255, 0.05)",
+                borderRadius: 12,
+                padding: 12,
+                borderWidth: 1,
+                borderColor: "rgba(255, 107, 53, 0.3)",
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 8,
+              }}
+            >
+              <View
+                style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: 18,
+                  backgroundColor: "rgba(255, 107, 53, 0.2)",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Flame size={20} color="#FF6B35" />
+              </View>
+              <View>
+                <Text style={{ color: "white", fontSize: 18, fontWeight: "bold" }}>
+                  {statsData?.currentStreak || 0}
+                </Text>
+                <Text style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: 11 }}>Streak</Text>
+              </View>
+            </Pressable>
+
+            {/* Trophy - Shows trophies count */}
+            <View
+              style={{
+                flex: 1,
+                backgroundColor: "rgba(255, 255, 255, 0.05)",
+                borderRadius: 12,
+                padding: 12,
+                borderWidth: 1,
+                borderColor: "rgba(255, 215, 0, 0.3)",
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 8,
+              }}
+            >
+              <View
+                style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: 18,
+                  backgroundColor: "rgba(255, 215, 0, 0.2)",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Trophy size={20} color="#FFD700" />
+              </View>
+              <View>
+                <Text style={{ color: "white", fontSize: 18, fontWeight: "bold" }}>
+                  {statsData?.trophies || 0}
+                </Text>
+                <Text style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: 11 }}>Trophy</Text>
+              </View>
             </View>
 
-            {/* Quit Button */}
-            <Pressable
-              onPress={handleQuitQuest}
+            {/* Diamonds */}
+            <View
               style={{
-                backgroundColor: "#EF4444",
-                width: 36,
-                height: 36,
-                borderRadius: 18,
+                flex: 1,
+                backgroundColor: "rgba(255, 255, 255, 0.05)",
+                borderRadius: 12,
+                padding: 12,
+                borderWidth: 1,
+                borderColor: "rgba(0, 217, 255, 0.3)",
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 8,
+              }}
+            >
+              <View
+                style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: 18,
+                  backgroundColor: "rgba(0, 217, 255, 0.2)",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Diamond size={20} color="#00D9FF" />
+              </View>
+              <View>
+                <Text style={{ color: "white", fontSize: 18, fontWeight: "bold" }}>
+                  {statsData?.diamonds || 0}
+                </Text>
+                <Text style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: 11 }}>Gems</Text>
+              </View>
+            </View>
+
+            {/* Go Live Button */}
+            <Pressable
+              onPress={() => navigation.navigate("Tabs", { screen: "LiveTab" })}
+              style={{
+                backgroundColor: "rgba(126, 63, 228, 0.2)",
+                borderRadius: 12,
+                padding: 12,
+                borderWidth: 1,
+                borderColor: "rgba(126, 63, 228, 0.5)",
                 alignItems: "center",
                 justifyContent: "center",
               }}
             >
-              <X size={20} color="white" />
+              <Video size={24} color="#7E3FE4" />
             </Pressable>
           </View>
-        </View>
+        </LinearGradient>
 
         {/* Progress Bar */}
-        <View style={{ paddingHorizontal: 20, marginBottom: 8 }}>
+        <View style={{ paddingHorizontal: 20, marginTop: 12, marginBottom: 8 }}>
           <View
             style={{
               height: 8,
-              backgroundColor: "#E5E7EB",
+              backgroundColor: "rgba(255, 255, 255, 0.05)",
               borderRadius: 999,
               overflow: "hidden",
+              borderWidth: 1,
+              borderColor: "rgba(126, 63, 228, 0.2)",
             }}
           >
-            <View
+            <LinearGradient
+              colors={[getCategoryColor(quest.category), getCategoryColor(quest.category) + "80"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
               style={{
                 height: "100%",
-                backgroundColor: getCategoryColor(quest.category),
                 width: `${Math.min(progress, 100)}%`,
               }}
             />
@@ -587,38 +714,20 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
         </View>
 
         <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 160 }}>
-          {/* Back Button */}
-          <View style={{ paddingHorizontal: 20, paddingVertical: 12 }}>
-            <Pressable
-              onPress={() => navigation.goBack()}
-              style={{
-                backgroundColor: "#1C1C1E",
-                paddingHorizontal: 20,
-                paddingVertical: 10,
-                borderRadius: 20,
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 8,
-                alignSelf: "flex-start",
-              }}
-            >
-              <ArrowLeft size={18} color="white" />
-              <Text style={{ color: "white", fontSize: 16, fontWeight: "600" }}>Main</Text>
-            </Pressable>
-          </View>
-
-          {/* Quest Card */}
-          <View style={{ paddingHorizontal: 20, paddingTop: 8 }}>
+          {/* Quest Card with 3D Glassmorphism Design */}
+          <View style={{ paddingHorizontal: 20, paddingTop: 16 }}>
             <View
               style={{
-                backgroundColor: "white",
+                backgroundColor: "rgba(255, 255, 255, 0.05)",
                 borderRadius: 24,
                 padding: 24,
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.1,
-                shadowRadius: 8,
-                elevation: 4,
+                borderWidth: 1,
+                borderColor: "rgba(126, 63, 228, 0.3)",
+                shadowColor: "#7E3FE4",
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.3,
+                shadowRadius: 12,
+                elevation: 8,
               }}
             >
               {/* Category & Difficulty Badges with Tap to Change */}
@@ -672,7 +781,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
               {/* Title */}
               <Text
                 style={{
-                  color: "#1C1C1E",
+                  color: "white",
                   fontSize: 28,
                   fontWeight: "bold",
                   marginBottom: 12,
@@ -685,7 +794,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
               {/* Description */}
               <Text
                 style={{
-                  color: "#666",
+                  color: "rgba(255, 255, 255, 0.7)",
                   fontSize: 16,
                   lineHeight: 24,
                   marginBottom: 20,
@@ -698,16 +807,16 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
               {/* Goal Badge */}
               <View
                 style={{
-                  backgroundColor: "#10B981",
+                  backgroundColor: "rgba(16, 185, 129, 0.2)",
                   paddingHorizontal: 20,
                   paddingVertical: 12,
                   borderRadius: 16,
                   marginBottom: 16,
                   borderWidth: 2,
-                  borderColor: "#10B981",
+                  borderColor: "rgba(16, 185, 129, 0.4)",
                 }}
               >
-                <Text style={{ color: "white", fontSize: 16, fontWeight: "700", textAlign: "center" }}>
+                <Text style={{ color: "#10B981", fontSize: 16, fontWeight: "700", textAlign: "center" }}>
                   Goal: Collect {quest.goalCount} NO&apos;s
                 </Text>
               </View>
@@ -717,24 +826,28 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                 <View
                   style={{
                     flex: 1,
-                    backgroundColor: "#FEF3C7",
+                    backgroundColor: "rgba(255, 215, 0, 0.1)",
                     paddingVertical: 12,
                     borderRadius: 12,
+                    borderWidth: 1,
+                    borderColor: "rgba(255, 215, 0, 0.3)",
                   }}
                 >
-                  <Text style={{ color: "#92400E", fontSize: 16, fontWeight: "600", textAlign: "center" }}>
+                  <Text style={{ color: "#FFD700", fontSize: 16, fontWeight: "600", textAlign: "center" }}>
                     +{quest.xpReward} XP
                   </Text>
                 </View>
                 <View
                   style={{
                     flex: 1,
-                    backgroundColor: "#FED7AA",
+                    backgroundColor: "rgba(255, 107, 53, 0.1)",
                     paddingVertical: 12,
                     borderRadius: 12,
+                    borderWidth: 1,
+                    borderColor: "rgba(255, 107, 53, 0.3)",
                   }}
                 >
-                  <Text style={{ color: "#9A3412", fontSize: 16, fontWeight: "600", textAlign: "center" }}>
+                  <Text style={{ color: "#FF6B35", fontSize: 16, fontWeight: "600", textAlign: "center" }}>
                     +{quest.pointReward} pts
                   </Text>
                 </View>
@@ -746,17 +859,19 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                 <View style={{ marginBottom: 16 }}>
                   <View
                     style={{
-                      backgroundColor: "#FEF3C7",
+                      backgroundColor: "rgba(255, 215, 0, 0.1)",
                       paddingVertical: 12,
                       borderRadius: 12,
                       flexDirection: "row",
                       alignItems: "center",
                       justifyContent: "center",
                       gap: 8,
+                      borderWidth: 1,
+                      borderColor: "rgba(255, 215, 0, 0.3)",
                     }}
                   >
-                    <Star size={20} color="#D97706" fill="#D97706" />
-                    <Text style={{ color: "#92400E", fontSize: 16, fontWeight: "700" }}>
+                    <Star size={20} color="#FFD700" fill="#FFD700" />
+                    <Text style={{ color: "#FFD700", fontSize: 16, fontWeight: "700" }}>
                       Actions: {displayQuest.actionCount}/{quest.goalCount}
                     </Text>
                   </View>
@@ -767,24 +882,28 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                   <View
                     style={{
                       flex: 1,
-                      backgroundColor: "#D1FAE5",
+                      backgroundColor: "rgba(16, 185, 129, 0.1)",
                       paddingVertical: 10,
                       borderRadius: 12,
+                      borderWidth: 1,
+                      borderColor: "rgba(16, 185, 129, 0.3)",
                     }}
                   >
-                    <Text style={{ color: "#065F46", fontSize: 15, fontWeight: "700", textAlign: "center" }}>
+                    <Text style={{ color: "#10B981", fontSize: 15, fontWeight: "700", textAlign: "center" }}>
                       NOs: {displayQuest.noCount}/{quest.goalCount}
                     </Text>
                   </View>
                   <View
                     style={{
                       flex: 1,
-                      backgroundColor: "#FEE2E2",
+                      backgroundColor: "rgba(239, 68, 68, 0.1)",
                       paddingVertical: 10,
                       borderRadius: 12,
+                      borderWidth: 1,
+                      borderColor: "rgba(239, 68, 68, 0.3)",
                     }}
                   >
-                    <Text style={{ color: "#991B1B", fontSize: 15, fontWeight: "700", textAlign: "center" }}>
+                    <Text style={{ color: "#EF4444", fontSize: 15, fontWeight: "700", textAlign: "center" }}>
                       YES: {displayQuest.yesCount}
                     </Text>
                   </View>
@@ -795,16 +914,20 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
               <View
                 style={{
                   height: 8,
-                  backgroundColor: "#E5E7EB",
+                  backgroundColor: "rgba(255, 255, 255, 0.05)",
                   borderRadius: 999,
                   overflow: "hidden",
                   marginBottom: 16,
+                  borderWidth: 1,
+                  borderColor: "rgba(126, 63, 228, 0.2)",
                 }}
               >
-                <View
+                <LinearGradient
+                  colors={["#10B981", "#059669"]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
                   style={{
                     height: "100%",
-                    backgroundColor: "#10B981",
                     width: `${Math.min(progress, 100)}%`,
                   }}
                 />
@@ -812,7 +935,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
 
               {/* See More */}
               <Pressable onPress={() => setShowMore(!showMore)}>
-                <Text style={{ color: "#00D9FF", fontSize: 16, fontWeight: "600" }}>
+                <Text style={{ color: "#7E3FE4", fontSize: 16, fontWeight: "600" }}>
                   {showMore ? "See less" : "See more"}
                 </Text>
               </Pressable>
@@ -830,7 +953,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                   }}
                   style={{
                     marginTop: 16,
-                    backgroundColor: "#00D9FF",
+                    backgroundColor: "rgba(0, 217, 255, 0.2)",
                     paddingVertical: 12,
                     paddingHorizontal: 16,
                     borderRadius: 12,
@@ -839,15 +962,17 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                     justifyContent: "center",
                     gap: 6,
                     maxWidth: "100%",
+                    borderWidth: 1,
+                    borderColor: "rgba(0, 217, 255, 0.4)",
                   }}
                 >
-                  <Text style={{ color: "white", fontSize: 16, fontWeight: "600" }}>
+                  <Text style={{ color: "#00D9FF", fontSize: 16, fontWeight: "600" }}>
                     📍 View on Map
                   </Text>
                   {displayQuest.quest.location && (
                     <Text
                       style={{
-                        color: "rgba(255, 255, 255, 0.9)",
+                        color: "rgba(0, 217, 255, 0.7)",
                         fontSize: 14,
                         flexShrink: 1,
                       }}
@@ -875,7 +1000,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                   }}
                   style={{
                     marginTop: 16,
-                    backgroundColor: "#FFD700",
+                    backgroundColor: "rgba(255, 215, 0, 0.2)",
                     paddingVertical: 12,
                     paddingHorizontal: 20,
                     borderRadius: 12,
@@ -883,9 +1008,11 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                     alignItems: "center",
                     justifyContent: "center",
                     gap: 8,
+                    borderWidth: 1,
+                    borderColor: "rgba(255, 215, 0, 0.4)",
                   }}
                 >
-                  <Text style={{ color: "#1C1C1E", fontSize: 16, fontWeight: "600" }}>
+                  <Text style={{ color: "#FFD700", fontSize: 16, fontWeight: "600" }}>
                     📍 Share Location
                   </Text>
                 </Pressable>
@@ -930,14 +1057,14 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
 
           {/* Bottom Text */}
           <View style={{ paddingHorizontal: 20, paddingTop: 16 }}>
-            <Text style={{ color: "#666", fontSize: 13, textAlign: "center", lineHeight: 18 }}>
+            <Text style={{ color: "rgba(255, 255, 255, 0.5)", fontSize: 13, textAlign: "center", lineHeight: 18 }}>
               Complete your quests in order • Friend quests can be done anytime{"\n"}
               Max 2 active quests • Extra quests go to queue
             </Text>
           </View>
         </ScrollView>
 
-        {/* Action Buttons */}
+        {/* Action Buttons with 3D Design */}
         <View
           style={{
             position: "absolute",
@@ -946,7 +1073,9 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
             right: 0,
             paddingHorizontal: 20,
             paddingVertical: 20,
-            backgroundColor: "#F5F5F7",
+            backgroundColor: "#0A0A0F",
+            borderTopWidth: 1,
+            borderTopColor: "rgba(126, 63, 228, 0.2)",
           }}
         >
           {quest.goalType === "TAKE_ACTION" ? (
@@ -955,7 +1084,6 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
               onPress={() => recordMutation.mutate({ action: "ACTION" })}
               disabled={recordMutation.isPending}
               style={{
-                backgroundColor: "#FFD700",
                 paddingVertical: 20,
                 borderRadius: 24,
                 alignItems: "center",
@@ -963,8 +1091,22 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                 opacity: recordMutation.isPending ? 0.5 : 1,
                 flexDirection: "row",
                 gap: 12,
+                overflow: "hidden",
               }}
             >
+              <LinearGradient
+                colors={["#FFD700", "#FFA500"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={{
+                  position: "absolute",
+                  left: 0,
+                  right: 0,
+                  top: 0,
+                  bottom: 0,
+                  borderRadius: 24,
+                }}
+              />
               {recordMutation.isPending ? (
                 <ActivityIndicator size="small" color="white" />
               ) : (
@@ -985,14 +1127,27 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                 disabled={recordMutation.isPending}
                 style={{
                   flex: 1,
-                  backgroundColor: "#EF4444",
                   paddingVertical: 20,
                   borderRadius: 24,
                   alignItems: "center",
                   justifyContent: "center",
                   opacity: recordMutation.isPending ? 0.5 : 1,
+                  overflow: "hidden",
                 }}
               >
+                <LinearGradient
+                  colors={["#EF4444", "#DC2626"]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={{
+                    position: "absolute",
+                    left: 0,
+                    right: 0,
+                    top: 0,
+                    bottom: 0,
+                    borderRadius: 24,
+                  }}
+                />
                 {recordMutation.isPending ? (
                   <ActivityIndicator size="small" color="white" />
                 ) : (
@@ -1006,14 +1161,27 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                 disabled={recordMutation.isPending}
                 style={{
                   flex: 1,
-                  backgroundColor: "#10B981",
                   paddingVertical: 20,
                   borderRadius: 24,
                   alignItems: "center",
                   justifyContent: "center",
                   opacity: recordMutation.isPending ? 0.5 : 1,
+                  overflow: "hidden",
                 }}
               >
+                <LinearGradient
+                  colors={["#10B981", "#059669"]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={{
+                    position: "absolute",
+                    left: 0,
+                    right: 0,
+                    top: 0,
+                    bottom: 0,
+                    borderRadius: 24,
+                  }}
+                />
                 {recordMutation.isPending ? (
                   <ActivityIndicator size="small" color="white" />
                 ) : (

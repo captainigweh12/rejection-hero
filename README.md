@@ -22,24 +22,52 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 - Rewards: Earn XP and points based on difficulty
 - Max 2 active quests (extras go to queue)
 
-**Quest Detail Experience** ✨ NEW!
-- Clean, modern UI with reduced clutter (Duolingo-inspired design)
-- **Smart countdown timer**: Adjusts based on difficulty
+**Quest Detail Experience** ✨ MODERNIZED! (3D Dark Theme Design)
+- **Modern 3D UI**: Dark gradient background (#0A0A0F to #1A1A24) with glassmorphism effects
+- **3D Stats Header** 🎨 NEW!:
+  - Redesigned header with gradient background
+  - Three clickable stat cards with 3D glass effect:
+    - **🔥 Streak**: Clickable - navigates to Growth & Achievements page
+    - **🏆 Trophy**: Shows trophy count
+    - **💎 Diamonds**: Shows diamond count
+  - Each card has icon in colored circle with label and value
+  - Semi-transparent backgrounds with colored borders
+- **Go Live Button** 📹 NEW!:
+  - Purple video camera icon button in header
+  - Quick access to Live streaming tab
+  - Matches app's premium aesthetic
+- **Smart Countdown Timer**: Adjusts based on difficulty
   - EASY: 10 minutes
   - MEDIUM: 15 minutes
   - HARD: 20 minutes
   - EXPERT: 30 minutes
-- Progress bar showing completion percentage
-- Single focused quest card with category badge
-- Large, easy-to-tap NO (green) and YES (red) buttons
-- **Quit Quest Button** 🆕: Red X button in header to end quest anytime with confirmation
-- **Quest Regeneration** 🔄 NEW!:
+  - Warning state when under 60 seconds
+- **3D Glassmorphism Quest Card** 🎨:
+  - Semi-transparent card with purple glow border
+  - Smooth gradients and shadow effects
+  - White text on dark background
+  - Enhanced category and difficulty badges
+- **Modern Progress Bar**: Gradient-filled with colored border matching theme
+- **Enhanced Action Buttons** 💫:
+  - Gradient-filled buttons with LinearGradient
+  - Gold gradient for "I Did It!" star button
+  - Green gradient for NO button
+  - Red gradient for YES button
+  - Improved visual feedback and animations
+- **Refined Color Palette**:
+  - Primary: #7E3FE4 (purple)
+  - Accent: #00D9FF (cyan)
+  - Success: #10B981 (green)
+  - Warning: #FFD700 (gold)
+  - Danger: #EF4444 (red)
+- **Quit Quest Button**: Red X button in header to end quest anytime with confirmation
+- **Quest Regeneration** 🔄:
   - Tap on category or difficulty badges to change them
   - Select new category and difficulty from dropdown modals
   - "Regenerate Quest" button appears when both are selected
-  - Instantly replaces current quest with new AI-generated quest matching your selections
+  - Instantly replaces current quest with new AI-generated quest
   - Keeps your location context for nearby places
-  - Works even when you have 2 active quests (replaces the current one)
+  - Works even when you have 2 active quests
 
 **Quest Completion Flow** ✨ ENHANCED! (Duolingo-Style Animations)
 - **Loading screen**: 2-second loading animation with pulsing trophy
