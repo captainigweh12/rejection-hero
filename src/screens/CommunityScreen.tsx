@@ -388,9 +388,9 @@ export default function CommunityScreen({ navigation }: Props) {
                   flexDirection: "row",
                   alignItems: "center",
                   justifyContent: "center",
-                  gap: 6,
-                  paddingVertical: 10,
-                  paddingHorizontal: 12,
+                  gap: 4,
+                  paddingVertical: 8,
+                  paddingHorizontal: 8,
                   borderRadius: 8,
                   backgroundColor: activeTab === tab.key ? "#7E3FE4" : "transparent",
                 }}
@@ -402,7 +402,7 @@ export default function CommunityScreen({ navigation }: Props) {
                 />
                 <Text
                   style={{
-                    fontSize: 14,
+                    fontSize: 13,
                     fontWeight: activeTab === tab.key ? "700" : "600",
                     color: activeTab === tab.key ? "white" : colors.textSecondary,
                   }}
