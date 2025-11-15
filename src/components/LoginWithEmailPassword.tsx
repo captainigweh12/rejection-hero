@@ -23,13 +23,16 @@ export default function LoginWithEmailPassword() {
 
   // Close modal when user is logged in (AuthWrapper will handle navigation)
   useEffect(() => {
-    if (session?.user) {
+    if (session?.user && !isCheckingOnboarding) {
       setIsCheckingOnboarding(true);
       setTimeout(() => {
-        navigation.goBack();
+        // Try to go back, but if we can't, AuthWrapper will handle navigation
+        if (navigation.canGoBack()) {
+          navigation.goBack();
+        }
       }, 100);
     }
-  }, [session, navigation]);
+  }, [session, navigation, isCheckingOnboarding]);
 
   const handleSignIn = async () => {
     if (!email || !password) {
