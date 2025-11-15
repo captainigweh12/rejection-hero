@@ -21,8 +21,10 @@ import { authClient } from "./authClient";
  */
 const BACKEND_URL = process.env.EXPO_PUBLIC_VIBECODE_BACKEND_URL;
 if (!BACKEND_URL) {
+  console.error("❌ BACKEND_URL is not set. Available env vars:", Object.keys(process.env).filter(k => k.includes("BACKEND")));
   throw new Error("Backend URL setup has failed. Please contact support@vibecodeapp.com for help.");
 }
+console.log("✅ API Client initialized with backend URL:", BACKEND_URL);
 
 type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 

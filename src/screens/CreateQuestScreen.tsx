@@ -34,6 +34,14 @@ export default function CreateQuestScreen({ navigation }: Props) {
 
   const queryClient = useQueryClient();
 
+  // Handle navigation to Friends screen when Send to Friends is selected
+  React.useEffect(() => {
+    if (showSendToFriends) {
+      navigation.navigate("Friends");
+      setShowSendToFriends(false);
+    }
+  }, [showSendToFriends, navigation]);
+
   const generateMutation = useMutation({
     mutationFn: async (data: GenerateQuestRequest) => {
       return api.post<GenerateQuestResponse>("/api/quests/generate", data);
@@ -459,15 +467,6 @@ export default function CreateQuestScreen({ navigation }: Props) {
         </LinearGradient>
       </View>
     );
-  }
-
-  // Send Quest to Friends Screen - Navigate to Friends screen
-  if (showSendToFriends) {
-    // Just navigate to the Friends screen instead of showing coming soon
-    navigation.navigate("Friends");
-    // Reset the state so when they come back, they see the main screen
-    setShowSendToFriends(false);
-    return null;
   }
 
   // AI Form Screen - Dark 3D Glass Theme
