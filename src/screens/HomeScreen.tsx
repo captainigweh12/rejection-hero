@@ -49,7 +49,13 @@ import { useSession } from "@/lib/useSession";
 import { authClient } from "@/lib/authClient";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useLanguage } from "@/contexts/LanguageContext";
-import type { GetUserQuestsResponse, GetUserStatsResponse } from "@/shared/contracts";
+import type {
+  GetUserQuestsResponse,
+  GetUserStatsResponse,
+  GetReflectionPromptResponse,
+  GetCourageBoostResponse,
+  GetWeeklyForecastResponse,
+} from "@/shared/contracts";
 
 type Props = BottomTabScreenProps<"HomeTab">;
 
@@ -79,6 +85,22 @@ export default function HomeScreen({ navigation }: Props) {
     queryKey: ["stats"],
     queryFn: async () => {
       return api.get<GetUserStatsResponse>("/api/stats");
+    },
+    enabled: !!sessionData?.user,
+  });
+
+  const { data: reflectionPrompt } = useQuery<GetReflectionPromptResponse>({
+    queryKey: ["reflectionPrompt"],
+    queryFn: async () => {
+      return api.get<GetReflectionPromptResponse>("/api/stats/reflection-prompt");
+    },
+    enabled: !!sessionData?.user,
+  });
+
+  const { data: weeklyForecast } = useQuery<GetWeeklyForecastResponse>({
+    queryKey: ["weeklyForecast"],
+    queryFn: async () => {
+      return api.get<GetWeeklyForecastResponse>("/api/stats/weekly-forecast");
     },
     enabled: !!sessionData?.user,
   });
@@ -352,9 +374,261 @@ export default function HomeScreen({ navigation }: Props) {
                     {(statsData?.totalXP || 0) % 100}/100 XP to Level {Math.floor((statsData?.totalXP || 0) / 100) + 2}
                   </Text>
                 </View>
+
+                {/* Confidence Meter - NEW */}
+                <View style={{ marginTop: 12 }}>
+                  <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+                    <Text style={{ color: "rgba(255, 255, 255, 0.7)", fontSize: 12, fontWeight: "600" }}>
+                      Confidence Level
+                    </Text>
+                    <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+                      <Text style={{ color: "#00D9FF", fontSize: 14, fontWeight: "bold" }}>
+                        {statsData?.confidenceLevel || 50}%
+                      </Text>
+                      {statsData?.confidenceChange !== 0 && (
+                        <View style={{ flexDirection: "row", alignItems: "center" }}>
+                          <TrendingUp size={12} color={statsData?.confidenceChange && statsData.confidenceChange > 0 ? "#4CAF50" : "#FF6B35"} />
+                          <Text
+                            style={{
+                              color: statsData?.confidenceChange && statsData.confidenceChange > 0 ? "#4CAF50" : "#FF6B35",
+                              fontSize: 11,
+                              fontWeight: "600",
+                              marginLeft: 2,
+                            }}
+                          >
+                            {statsData?.confidenceChange && statsData.confidenceChange > 0 ? "+" : ""}
+                            {statsData?.confidenceChange || 0}% this week
+                          </Text>
+                        </View>
+                      )}
+                    </View>
+                  </View>
+                  <View
+                    style={{
+                      height: 6,
+                      backgroundColor: "rgba(255, 255, 255, 0.1)",
+                      borderRadius: 3,
+                      overflow: "hidden",
+                    }}
+                  >
+                    <LinearGradient
+                      colors={["#00D9FF", "#00F5A0"]}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 0 }}
+                      style={{
+                        height: "100%",
+                        width: `${statsData?.confidenceLevel || 50}%`,
+                      }}
+                    />
+                  </View>
+                </View>
               </View>
             </View>
           </Pressable>
+
+          {/* Fear Zones Analyzer - NEW */}
+          <View style={{ paddingHorizontal: 24, marginTop: 20 }}>
+            <Text style={{ color: "white", fontSize: 18, fontWeight: "bold", marginBottom: 12 }}>
+              Fear Zones
+            </Text>
+            <View
+              style={{
+                backgroundColor: "rgba(255, 255, 255, 0.05)",
+                borderRadius: 16,
+                padding: 16,
+                borderWidth: 1,
+                borderColor: "rgba(255, 255, 255, 0.1)",
+              }}
+            >
+              <View style={{ flexDirection: "row", justifyContent: "space-between", gap: 12 }}>
+                {/* Easy Zone */}
+                <View style={{ flex: 1, alignItems: "center" }}>
+                  <View
+                    style={{
+                      width: 50,
+                      height: 50,
+                      borderRadius: 25,
+                      backgroundColor: "rgba(76, 175, 80, 0.2)",
+                      borderWidth: 2,
+                      borderColor: "#4CAF50",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      marginBottom: 8,
+                    }}
+                  >
+                    <Text style={{ color: "#4CAF50", fontSize: 20, fontWeight: "bold" }}>
+                      {statsData?.easyZoneCount || 0}
+                    </Text>
+                  </View>
+                  <View
+                    style={{
+                      width: 10,
+                      height: 10,
+                      borderRadius: 5,
+                      backgroundColor: "#4CAF50",
+                      marginBottom: 4,
+                    }}
+                  />
+                  <Text style={{ color: "rgba(255, 255, 255, 0.7)", fontSize: 11, textAlign: "center" }}>
+                    Easy Zone
+                  </Text>
+                </View>
+
+                {/* Growth Zone */}
+                <View style={{ flex: 1, alignItems: "center" }}>
+                  <View
+                    style={{
+                      width: 50,
+                      height: 50,
+                      borderRadius: 25,
+                      backgroundColor: "rgba(255, 215, 0, 0.2)",
+                      borderWidth: 2,
+                      borderColor: "#FFD700",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      marginBottom: 8,
+                    }}
+                  >
+                    <Text style={{ color: "#FFD700", fontSize: 20, fontWeight: "bold" }}>
+                      {statsData?.growthZoneCount || 0}
+                    </Text>
+                  </View>
+                  <View
+                    style={{
+                      width: 10,
+                      height: 10,
+                      borderRadius: 5,
+                      backgroundColor: "#FFD700",
+                      marginBottom: 4,
+                    }}
+                  />
+                  <Text style={{ color: "rgba(255, 255, 255, 0.7)", fontSize: 11, textAlign: "center" }}>
+                    Growth Zone
+                  </Text>
+                </View>
+
+                {/* Fear Zone */}
+                <View style={{ flex: 1, alignItems: "center" }}>
+                  <View
+                    style={{
+                      width: 50,
+                      height: 50,
+                      borderRadius: 25,
+                      backgroundColor: "rgba(255, 107, 53, 0.2)",
+                      borderWidth: 2,
+                      borderColor: "#FF6B35",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      marginBottom: 8,
+                    }}
+                  >
+                    <Text style={{ color: "#FF6B35", fontSize: 20, fontWeight: "bold" }}>
+                      {statsData?.fearZoneCount || 0}
+                    </Text>
+                  </View>
+                  <View
+                    style={{
+                      width: 10,
+                      height: 10,
+                      borderRadius: 5,
+                      backgroundColor: "#FF6B35",
+                      marginBottom: 4,
+                    }}
+                  />
+                  <Text style={{ color: "rgba(255, 255, 255, 0.7)", fontSize: 11, textAlign: "center" }}>
+                    Fear Zone
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </View>
+
+          {/* AI Reflection Prompt of the Day - NEW */}
+          {reflectionPrompt && (
+            <Pressable
+              onPress={() => navigation.navigate("JournalTab")}
+              style={{ paddingHorizontal: 24, marginTop: 20 }}
+            >
+              <LinearGradient
+                colors={["rgba(126, 63, 228, 0.3)", "rgba(255, 107, 53, 0.3)"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={{
+                  borderRadius: 16,
+                  padding: 16,
+                  borderWidth: 1,
+                  borderColor: "rgba(126, 63, 228, 0.5)",
+                }}
+              >
+                <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 8 }}>
+                  <FileText size={20} color="#7E3FE4" />
+                  <Text style={{ color: "#7E3FE4", fontSize: 14, fontWeight: "bold", marginLeft: 8 }}>
+                    Reflection of the Day
+                  </Text>
+                </View>
+                <Text style={{ color: "white", fontSize: 15, lineHeight: 22, marginBottom: 8 }}>
+                  {reflectionPrompt.prompt}
+                </Text>
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <Text style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: 12 }}>
+                    Tap to journal
+                  </Text>
+                  <ChevronRight size={16} color="rgba(255, 255, 255, 0.6)" style={{ marginLeft: 4 }} />
+                </View>
+              </LinearGradient>
+            </Pressable>
+          )}
+
+          {/* Weekly NO Forecast - NEW */}
+          {weeklyForecast && (
+            <View style={{ paddingHorizontal: 24, marginTop: 20 }}>
+              <View
+                style={{
+                  backgroundColor: "rgba(0, 217, 255, 0.1)",
+                  borderRadius: 16,
+                  padding: 16,
+                  borderWidth: 1,
+                  borderColor: "rgba(0, 217, 255, 0.3)",
+                }}
+              >
+                <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 12 }}>
+                  <Calendar size={20} color="#00D9FF" />
+                  <Text style={{ color: "#00D9FF", fontSize: 16, fontWeight: "bold", marginLeft: 8 }}>
+                    Weekly NO Forecast
+                  </Text>
+                </View>
+                <Text style={{ color: "white", fontSize: 14, lineHeight: 20, marginBottom: 12 }}>
+                  {weeklyForecast.forecast}
+                </Text>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    paddingTop: 12,
+                    borderTopWidth: 1,
+                    borderTopColor: "rgba(255, 255, 255, 0.1)",
+                  }}
+                >
+                  <View>
+                    <Text style={{ color: "rgba(255, 255, 255, 0.5)", fontSize: 11 }}>
+                      Suggested Target
+                    </Text>
+                    <Text style={{ color: "#00D9FF", fontSize: 18, fontWeight: "bold" }}>
+                      {weeklyForecast.recommendedWeeklyTarget} NOs
+                    </Text>
+                  </View>
+                  <View>
+                    <Text style={{ color: "rgba(255, 255, 255, 0.5)", fontSize: 11 }}>
+                      Trending
+                    </Text>
+                    <Text style={{ color: "#FFD700", fontSize: 14, fontWeight: "bold", textTransform: "capitalize" }}>
+                      {weeklyForecast.trendingCategory}
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            </View>
+          )}
         </View>
 
         {/* Active Quests */}

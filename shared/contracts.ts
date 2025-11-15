@@ -264,6 +264,26 @@ export const getUserStatsResponseSchema = z.object({
   totalPoints: z.number(),
   trophies: z.number(),
   diamonds: z.number(),
+
+  // Confidence & Fear Zone Tracking
+  confidenceLevel: z.number(), // 0-100 confidence percentage
+  previousConfidence: z.number(), // For calculating weekly change
+  confidenceChange: z.number(), // Calculated: confidenceLevel - previousConfidence
+
+  // Fear Zone Stats
+  easyZoneCount: z.number(), // Count of easy difficulty quests
+  growthZoneCount: z.number(), // Count of medium difficulty quests
+  fearZoneCount: z.number(), // Count of hard/extreme difficulty quests
+
+  // Activity Tracking for AI
+  lastQuestAttemptAt: z.string().nullable(),
+  lastQuestCompletedAt: z.string().nullable(),
+  questCompletionRate: z.number(), // Percentage of quests completed
+  avgQuestDifficulty: z.number(), // Average difficulty level
+
+  // Warm-up tracking
+  warmUpsCompleted: z.number(),
+  lastWarmUpAt: z.string().nullable(),
 });
 export type GetUserStatsResponse = z.infer<typeof getUserStatsResponseSchema>;
 
@@ -698,3 +718,91 @@ export const getMomentsResponseSchema = z.object({
 });
 export type GetMomentsResponse = z.infer<typeof getMomentsResponseSchema>;
 
+// ==========================================
+// AI Insights & Growth Routes
+// ==========================================
+
+// GET /api/stats/reflection-prompt - Get AI Reflection Prompt of the Day
+export const getReflectionPromptResponseSchema = z.object({
+  prompt: z.string(),
+  category: z.string(), // e.g., "reflection", "motivation", "learning"
+  date: z.string(),
+});
+export type GetReflectionPromptResponse = z.infer<typeof getReflectionPromptResponseSchema>;
+
+// GET /api/stats/courage-boost - Get random courage boost notification
+export const getCourageBoostResponseSchema = z.object({
+  message: z.string(),
+  confidence: z.number(), // Percentage boost (e.g., 23)
+  shouldShow: z.boolean(), // Whether to show the boost right now
+});
+export type GetCourageBoostResponse = z.infer<typeof getCourageBoostResponseSchema>;
+
+// GET /api/stats/weekly-forecast - Get AI prediction for the week
+export const getWeeklyForecastResponseSchema = z.object({
+  forecast: z.string(),
+  recommendedWeeklyTarget: z.number(),
+  trendingCategory: z.string(),
+  previousWeekNOs: z.number(),
+});
+export type GetWeeklyForecastResponse = z.infer<typeof getWeeklyForecastResponseSchema>;
+
+// POST /api/stats/complete-warmup - Record a warm-up action completion
+export const completeWarmupRequestSchema = z.object({
+  warmupAction: z.string(),
+});
+export type CompleteWarmupRequest = z.infer<typeof completeWarmupRequestSchema>;
+export const completeWarmupResponseSchema = z.object({
+  success: z.boolean(),
+  warmUpsCompleted: z.number(),
+  confidenceBoost: z.number(), // Small confidence increase from warm-up
+});
+export type CompleteWarmupResponse = z.infer<typeof completeWarmupResponseSchema>;
+
+// GET /api/quests/radar - Get location-based quest opportunities (NO Radar)
+export const getQuestRadarRequestSchema = z.object({
+  latitude: z.number().optional(),
+  longitude: z.number().optional(),
+  category: z.string().optional(),
+});
+export type GetQuestRadarRequest = z.infer<typeof getQuestRadarRequestSchema>;
+export const getQuestRadarResponseSchema = z.object({
+  opportunities: z.array(
+    z.object({
+      id: z.string(),
+      title: z.string(),
+      description: z.string(),
+      category: z.string(),
+      difficulty: z.string(),
+      distance: z.string().optional(), // e.g., "0.2 mi away"
+      location: z.string().optional(),
+      isLocationBased: z.boolean(),
+    })
+  ),
+});
+export type GetQuestRadarResponse = z.infer<typeof getQuestRadarResponseSchema>;
+
+// GET /api/quests/warmup - Get a warm-up action before a quest
+export const getWarmupActionResponseSchema = z.object({
+  action: z.string(),
+  description: z.string(),
+  estimatedSeconds: z.number(),
+});
+export type GetWarmupActionResponse = z.infer<typeof getWarmupActionResponseSchema>;
+
+// GET /api/quests/smart-suggestions - Get AI-adapted quest suggestions based on user behavior
+export const getSmartQuestSuggestionsResponseSchema = z.object({
+  suggestions: z.array(
+    z.object({
+      questId: z.string(),
+      title: z.string(),
+      description: z.string(),
+      category: z.string(),
+      difficulty: z.string(),
+      reason: z.string(), // Why this quest is suggested
+      adaptationType: z.string(), // e.g., "easier", "micro-task", "big-risk-upgrade"
+    })
+  ),
+  message: z.string().optional(), // Encouraging message from AI coach
+});
+export type GetSmartQuestSuggestionsResponse = z.infer<typeof getSmartQuestSuggestionsResponseSchema>;

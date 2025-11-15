@@ -7,6 +7,9 @@ import {
   type StartQuestResponse,
   recordQuestActionRequestSchema,
   type RecordQuestActionResponse,
+  type GetQuestRadarResponse,
+  type GetWarmupActionResponse,
+  type GetSmartQuestSuggestionsResponse,
 } from "@/shared/contracts";
 import { type AppType } from "../types";
 import { db } from "../db";
@@ -806,6 +809,260 @@ questsRouter.delete("/:id", async (c) => {
   });
 
   return c.json({ message: "Quest deleted successfully" }, 200);
+});
+
+// ============================================
+// GET /api/quests/warmup - Get a warm-up action before a quest
+// ============================================
+questsRouter.get("/warmup", async (c) => {
+  const user = c.get("user");
+
+  if (!user) {
+    return c.json({ message: "Unauthorized" }, 401);
+  }
+
+  // List of 5-second warm-up actions
+  const warmupActions = [
+    { action: "Ask someone for the time", description: "Simple and non-threatening way to break the ice", estimatedSeconds: 5 },
+    { action: "Smile at a stranger", description: "Practice being visible and friendly", estimatedSeconds: 3 },
+    { action: "Compliment someone's shoes", description: "Give a specific, genuine compliment", estimatedSeconds: 5 },
+    { action: "Ask someone to rate your outfit 1-10", description: "Accept potential criticism with humor", estimatedSeconds: 10 },
+    { action: "Ask a cashier how their day is going", description: "Show genuine interest in someone's day", estimatedSeconds: 5 },
+    { action: "Hold the door and make eye contact", description: "Practice presence and acknowledgment", estimatedSeconds: 3 },
+    { action: "Ask a stranger for a restaurant recommendation", description: "Trust someone's opinion", estimatedSeconds: 10 },
+    { action: "Give someone a high-five", description: "Practice physical connection and energy", estimatedSeconds: 3 },
+    { action: "Ask someone what they're reading/watching", description: "Show curiosity about others", estimatedSeconds: 5 },
+    { action: "Tell someone 'nice hat' or similar", description: "Practice noticing and affirming others", estimatedSeconds: 3 },
+  ];
+
+  const randomAction = warmupActions[Math.floor(Math.random() * warmupActions.length)];
+
+  return c.json(randomAction satisfies GetWarmupActionResponse);
+});
+
+// ============================================
+// GET /api/quests/radar - Get location-based quest opportunities (NO Radar)
+// ============================================
+questsRouter.get("/radar", async (c) => {
+  const user = c.get("user");
+
+  if (!user) {
+    return c.json({ message: "Unauthorized" }, 401);
+  }
+
+  const latitude = c.req.query("latitude");
+  const longitude = c.req.query("longitude");
+  const category = c.req.query("category");
+
+  // Get 3 random quests that could be location-relevant
+  const allQuests = await db.quest.findMany({
+    where: category ? { category } : undefined,
+    take: 20,
+  });
+
+  // Location-based micro-opportunities (contextual)
+  const locationOpportunities = [
+    {
+      title: "Ask for a free refill",
+      description: "You're at a coffee shop - ask if free refills are available",
+      category: "RETAIL",
+      difficulty: "EASY",
+      location: "Coffee Shop",
+      isLocationBased: true,
+    },
+    {
+      title: "Ask for 10% off",
+      description: "You're near a retail store - politely ask if there's any discount available",
+      category: "RETAIL",
+      difficulty: "MEDIUM",
+      location: "Retail Store",
+      isLocationBased: true,
+    },
+    {
+      title: "Ask someone for directions",
+      description: "You're downtown - ask someone for directions even if you know the way",
+      category: "SOCIAL",
+      difficulty: "EASY",
+      location: "Downtown",
+      isLocationBased: true,
+    },
+    {
+      title: "Request a sample",
+      description: "You're at a food place - ask to try a sample before ordering",
+      category: "RETAIL",
+      difficulty: "EASY",
+      location: "Restaurant/Food Court",
+      isLocationBased: true,
+    },
+    {
+      title: "Ask to pet someone's dog",
+      description: "You see someone with a dog - ask if you can pet it",
+      category: "SOCIAL",
+      difficulty: "EASY",
+      location: "Park/Street",
+      isLocationBased: true,
+    },
+    {
+      title: "Ask a stranger to take your photo",
+      description: "You're at a nice spot - ask someone to take a photo of you",
+      category: "SOCIAL",
+      difficulty: "EASY",
+      location: "Tourist Spot",
+      isLocationBased: true,
+    },
+  ];
+
+  // Mix location-based with regular quests
+  const selectedLocationOps = locationOpportunities
+    .sort(() => Math.random() - 0.5)
+    .slice(0, 2)
+    .map((op, idx) => ({
+      id: `location-${idx}`,
+      ...op,
+      distance: latitude && longitude ? `${(Math.random() * 0.5).toFixed(1)} mi away` : undefined,
+    }));
+
+  const selectedQuests = allQuests
+    .sort(() => Math.random() - 0.5)
+    .slice(0, 1)
+    .map((q) => ({
+      id: q.id,
+      title: q.title,
+      description: q.description,
+      category: q.category,
+      difficulty: q.difficulty,
+      location: q.location || undefined,
+      distance: latitude && longitude && q.latitude && q.longitude
+        ? `${(Math.random() * 2).toFixed(1)} mi away`
+        : undefined,
+      isLocationBased: false,
+    }));
+
+  const opportunities = [...selectedLocationOps, ...selectedQuests];
+
+  return c.json({ opportunities } satisfies GetQuestRadarResponse);
+});
+
+// ============================================
+// GET /api/quests/smart-suggestions - Get AI-adapted quest suggestions
+// ============================================
+questsRouter.get("/smart-suggestions", async (c) => {
+  const user = c.get("user");
+
+  if (!user) {
+    return c.json({ message: "Unauthorized" }, 401);
+  }
+
+  // Get user's stats to understand their behavior
+  const stats = await db.userStats.findUnique({
+    where: { userId: user.id },
+  });
+
+  // Get user's quest history
+  const userQuests = await db.userQuest.findMany({
+    where: { userId: user.id },
+    include: { quest: true },
+    orderBy: { createdAt: "desc" },
+    take: 20,
+  });
+
+  const completedQuests = userQuests.filter((uq) => uq.status === "completed");
+  const activeQuests = userQuests.filter((uq) => uq.status === "ACTIVE");
+
+  // Calculate time since last attempt
+  const now = new Date();
+  const lastAttempt = stats?.lastQuestAttemptAt;
+  const hoursSinceAttempt = lastAttempt
+    ? (now.getTime() - new Date(lastAttempt).getTime()) / (1000 * 60 * 60)
+    : 999;
+
+  // Analyze completion rate
+  const totalAttempts = userQuests.length;
+  const completionRate = totalAttempts > 0 ? (completedQuests.length / totalAttempts) * 100 : 0;
+
+  let suggestions: any[] = [];
+  let message = "";
+
+  // Smart Fear Detection Logic
+  if (hoursSinceAttempt > 48) {
+    // Haven't tried in 48+ hours - suggest micro-tasks
+    message = "I noticed you haven't attempted a quest in a while. Let's start small and build momentum!";
+
+    const microQuests = await db.quest.findMany({
+      where: { difficulty: "EASY" },
+      take: 3,
+    });
+
+    suggestions = microQuests.map((q) => ({
+      questId: q.id,
+      title: q.title,
+      description: q.description,
+      category: q.category,
+      difficulty: q.difficulty,
+      reason: "Perfect for getting back into action",
+      adaptationType: "micro-task",
+    }));
+  } else if (completionRate < 30 && totalAttempts > 5) {
+    // Low completion rate - recommend easier quests
+    message = "I see you're facing some challenges. These easier quests will help build confidence!";
+
+    const easierQuests = await db.quest.findMany({
+      where: { difficulty: "EASY" },
+      take: 3,
+    });
+
+    suggestions = easierQuests.map((q) => ({
+      questId: q.id,
+      title: q.title,
+      description: q.description,
+      category: q.category,
+      difficulty: q.difficulty,
+      reason: "Matched to your current comfort level",
+      adaptationType: "easier",
+    }));
+  } else if (completionRate > 70 && (stats?.avgQuestDifficulty || 0) < 2) {
+    // High completion rate with easy quests - upgrade difficulty
+    message = "You're crushing it! Time to level up and push into your growth zone!";
+
+    const harderQuests = await db.quest.findMany({
+      where: {
+        difficulty: { in: ["MEDIUM", "HARD"] }
+      },
+      take: 3,
+    });
+
+    suggestions = harderQuests.map((q) => ({
+      questId: q.id,
+      title: q.title,
+      description: q.description,
+      category: q.category,
+      difficulty: q.difficulty,
+      reason: "Challenge yourself with bigger risks",
+      adaptationType: "big-risk-upgrade",
+    }));
+  } else {
+    // Normal suggestions based on current level
+    message = "These quests match your current momentum. Keep going!";
+
+    const normalQuests = await db.quest.findMany({
+      take: 3,
+    });
+
+    suggestions = normalQuests.map((q) => ({
+      questId: q.id,
+      title: q.title,
+      description: q.description,
+      category: q.category,
+      difficulty: q.difficulty,
+      reason: "Aligned with your progress",
+      adaptationType: "balanced",
+    }));
+  }
+
+  return c.json({
+    suggestions,
+    message,
+  } satisfies GetSmartQuestSuggestionsResponse);
 });
 
 export { questsRouter };

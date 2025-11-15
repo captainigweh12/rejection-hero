@@ -4,9 +4,44 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 
 ## Features
 
-### 🏠 Home Screen ✨ ENHANCED! (Gaming-Style UI)
+### 🏠 Home Screen ✨ ENHANCED! (Gaming-Style UI with Personal Growth Dashboard)
 
-**3D Gaming Profile Card** 🎮 NEW!
+**NEW: Personal Growth Dashboard** 🎯
+- **Confidence Meter** 📊:
+  - Live updating confidence level (0-100%)
+  - Shows weekly change with trend indicator (+/- percentage)
+  - Gradient progress bar (cyan → green)
+  - Tracks confidence growth over time
+  - Updates based on quest completions and warm-ups
+
+- **Fear Zones Analyzer** 🎨:
+  - Visual breakdown of quest difficulty distribution:
+    - 🟢 **Easy Zone**: Count of easy difficulty quests completed
+    - 🟡 **Growth Zone**: Count of medium difficulty quests completed
+    - 🔴 **Fear Zone**: Count of hard/extreme difficulty quests completed
+  - Gamifies discomfort and encourages pushing boundaries
+  - Beautiful circular indicators with color-coded badges
+  - Helps users see how far they've pushed themselves
+
+- **AI Reflection Prompt of the Day** 💭:
+  - Daily inspirational reflection questions
+  - Prompts like "What did you learn from your last NO?"
+  - Tap to open journal with pre-filled prompts
+  - Rotates through 10+ carefully crafted reflection prompts
+  - Helps users process their rejection experiences
+  - Categories: reflection, motivation, learning
+
+- **Weekly NO Forecast** 📅:
+  - AI-powered prediction based on past week's behavior
+  - Personalized weekly target recommendations (30% increase suggested)
+  - Shows trending category from last week
+  - Adaptive coaching messages based on performance:
+    - Motivational push for inactive users
+    - Encouragement for consistent users
+    - Challenge upgrades for high performers
+  - Data-driven insights to maintain momentum
+
+**3D Gaming Profile Card** 🎮
 - **Avatar with Rainbow Border**: 3D gradient ring (orange → purple → cyan) around user avatar
 - **Level Badge**: Gold badge with shadow showing current level (calculated from XP)
 - **3D Stat Badges**: Three glassmorphism badges displaying:
@@ -200,6 +235,54 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 - 🏆 Trophies
 - 💎 Diamonds
 - Beautiful stats dashboard
+
+### 🤖 AI Coaching & Growth Intelligence ✨ NEW!
+
+**Smart Fear Detection**
+- **Behavioral Analysis**: AI monitors your quest activity patterns
+- **Adaptive Suggestions**:
+  - **Inactive Users (48+ hours)**: Suggests micro-tasks to rebuild momentum
+  - **Low Completion Rate (<30%)**: Recommends easier quests matched to comfort level
+  - **High Performers (>70% completion)**: Upgrades difficulty to push into growth zone
+- **Personalized Coaching Messages**: Motivational feedback based on your progress
+- **Real-time Adaptation**: Quest difficulty automatically adjusts to your courage level
+
+**NO Radar** 🎯
+- **Location-Based Opportunities**: 3 contextual challenges based on your location
+- **Smart Suggestions**:
+  - "You're at Starbucks → ask for a free refill"
+  - "You're near a retail store → ask for 10% off"
+  - "You're downtown → ask someone for directions"
+- **Mixed Feed**: Combines location-based micro-quests with regular challenges
+- **Distance Indicators**: Shows how far away opportunities are
+- **Category Filtering**: Filter opportunities by quest category
+
+**Warm-up Zone** 🔥
+- **5-Second Actions**: Quick warm-up tasks before difficult quests
+- **Brain Activation**: Prepares you for discomfort with small actions
+- **Examples**:
+  - Ask someone for the time
+  - Smile at a stranger
+  - Compliment someone's shoes
+  - Ask someone to rate your outfit 1-10
+- **Confidence Boost**: +2% confidence for each warm-up completed
+- **Progress Tracking**: Tracks total warm-ups completed
+
+**Real-Time Courage Boosts** ⚡
+- **Random Notifications**: 30% chance to show when you check
+- **Dynamic Messages**:
+  - "Confidence Surge! You're 23% more likely to get a YES right now"
+  - "Your courage is peaking! Strike while the iron's hot!"
+- **Psychological Trigger**: Creates urgency and motivation
+- **Confidence Percentage**: Shows 15-45% boost range
+- **Gamified Motivation**: Silly on purpose, but psychologically effective
+
+**Backend Intelligence**
+- **Activity Tracking**: Monitors last quest attempt, completion rates, avg difficulty
+- **Confidence Calculation**: Dynamic confidence level based on performance
+- **Fear Zone Distribution**: Automatically categorizes quests by difficulty
+- **Weekly Trend Analysis**: Identifies patterns in quest categories and success rates
+- **Adaptive Targeting**: Recommends weekly goals with 30% increase from previous week
 
 ### 👥 Community Features
 
@@ -710,15 +793,22 @@ The app features a cohesive dark theme with modern 3D-style UI elements througho
 
 ## API Endpoints
 
-### Quests
+### Stats
+- `GET /api/stats` - Get user statistics (includes confidence, fear zones, completion rates)
+- `GET /api/stats/leaderboard` - Get leaderboard rankings
+- `GET /api/stats/reflection-prompt` ✨ NEW! - Get AI reflection prompt of the day
+- `GET /api/stats/courage-boost` ✨ NEW! - Get random courage boost notification
+- `GET /api/stats/weekly-forecast` ✨ NEW! - Get AI-powered weekly NO forecast
+- `POST /api/stats/complete-warmup` ✨ NEW! - Record warm-up action completion
+
+### Quests (Enhanced)
 - `GET /api/quests` - Get user's active and queued quests
 - `POST /api/quests/generate` - Generate AI-powered quest
 - `POST /api/quests/:id/start` - Start a quest (max 2 active)
 - `POST /api/quests/:id/record` - Record NO or YES attempt
-
-### Stats
-- `GET /api/stats` - Get user statistics
-- `GET /api/stats/leaderboard` - Get leaderboard rankings
+- `GET /api/quests/warmup` ✨ NEW! - Get a 5-second warm-up action
+- `GET /api/quests/radar` ✨ NEW! - Get location-based quest opportunities (NO Radar)
+- `GET /api/quests/smart-suggestions` ✨ NEW! - Get AI-adapted quest suggestions based on behavior
 
 ### Live Streaming ✨ NEW!
 - `POST /api/live/start` - Start a live stream

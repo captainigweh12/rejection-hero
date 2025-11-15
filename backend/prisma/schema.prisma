@@ -147,6 +147,27 @@ model UserStats {
   lastActiveAt  DateTime @default(now())
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+
+  // Confidence & Fear Zone Tracking
+  confidenceLevel       Int      @default(50) // 0-100 confidence percentage
+  previousConfidence    Int      @default(50) // For calculating weekly change
+  confidenceUpdatedAt   DateTime @default(now())
+
+  // Fear Zone Stats
+  easyZoneCount         Int      @default(0) // Count of easy difficulty quests
+  growthZoneCount       Int      @default(0) // Count of medium difficulty quests
+  fearZoneCount         Int      @default(0) // Count of hard/extreme difficulty quests
+
+  // Activity Tracking for AI
+  lastQuestAttemptAt    DateTime?
+  lastQuestCompletedAt  DateTime?
+  questCompletionRate   Float    @default(0) // Percentage of quests completed
+  avgQuestDifficulty    Float    @default(1) // Average difficulty level
+
+  // Warm-up tracking
+  warmUpsCompleted      Int      @default(0)
+  lastWarmUpAt          DateTime?
+
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("user_stats")
