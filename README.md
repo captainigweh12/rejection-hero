@@ -67,14 +67,15 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 7. Real-Time Courage Boosts
 8. Warm-up Zone
 
-**Quest Queue Section** ✨ NEW!
+**Quest Queue Section** ✨ FIXED!
 - Shows all queued quests waiting to be started
 - Appears at the bottom of the home screen when quests are in queue
 - Displays quest number in queue (#1, #2, etc.)
 - Shows rewards (XP and points) for each quest
-- Tap to start quest if you have available slots
+- **Tap to view quest details** - Fixed navigation to queued quests
 - Smart queue management - automatically starts next quest when slot opens
 - Visual feedback when slots are full
+- Quest detail screen now properly handles both active and queued quests
 
 ### 🎯 No Quest System (MAIN FEATURE)
 

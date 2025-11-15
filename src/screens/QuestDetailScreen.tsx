@@ -65,7 +65,8 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
     },
   });
 
-  const userQuest = questsData?.activeQuests.find((q) => q.id === currentUserQuestId);
+  const userQuest = questsData?.activeQuests.find((q) => q.id === currentUserQuestId) ||
+                    questsData?.queuedQuests.find((q) => q.id === currentUserQuestId);
 
   // Request location permission on mount
   useEffect(() => {
