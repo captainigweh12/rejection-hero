@@ -23,12 +23,29 @@ profileRouter.get("/", async (c) => {
     return c.json({ message: "Unauthorized" }, 401);
   }
 
-  const profile = await db.profile.findUnique({
+  let profile = await db.profile.findUnique({
     where: { userId: user.id },
   });
 
+  // Auto-create profile if it doesn't exist (for OAuth users)
   if (!profile) {
-    return c.json({ message: "Profile not found" }, 404);
+    console.log(`📝 Creating default profile for user ${user.id} (${user.email})`);
+    profile = await db.profile.create({
+      data: {
+        userId: user.id,
+        displayName: user.name || user.email?.split("@")[0] || "User",
+        bio: null,
+        age: null,
+        photos: null,
+        avatar: null,
+        interests: null,
+        location: null,
+        latitude: null,
+        longitude: null,
+        isLive: false,
+        liveViewers: 0,
+      },
+    });
   }
 
   const photos = profile.photos ? JSON.parse(profile.photos) : [];
