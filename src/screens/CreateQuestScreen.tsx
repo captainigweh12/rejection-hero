@@ -3,11 +3,12 @@ import { View, Text, Pressable, ActivityIndicator, TextInput, ScrollView, Alert,
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Sparkles, X, ChevronLeft, Star, ThumbsDown, Mic, MapPin, Globe, Users } from "lucide-react-native";
+import { Sparkles, X, ChevronLeft, Star, ThumbsDown, Mic, MapPin, Globe, Users, Square } from "lucide-react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "@/navigation/types";
 import { api } from "@/lib/api";
 import type { GenerateQuestRequest, GenerateQuestResponse } from "@/shared/contracts";
+import { Audio } from "expo-av";
 
 type Props = NativeStackScreenProps<RootStackParamList, "CreateQuest">;
 
@@ -31,6 +32,8 @@ export default function CreateQuestScreen({ navigation }: Props) {
   // Custom quest form (simplified)
   const [questAction, setQuestAction] = useState("");
   const [isRecording, setIsRecording] = useState(false);
+  const [recording, setRecording] = useState<Audio.Recording | null>(null);
+  const [isTranscribing, setIsTranscribing] = useState(false);
 
   const queryClient = useQueryClient();
 
@@ -107,14 +110,76 @@ export default function CreateQuestScreen({ navigation }: Props) {
     });
   };
 
-  const handleVoiceRecording = () => {
-    Alert.alert(
-      "Voice Recording",
-      "Audio recording feature coming soon! This will allow you to describe your quest verbally and AI will transcribe it.",
-      [{ text: "OK" }]
-    );
-    // TODO: Implement expo-av audio recording
-    // Record audio -> Upload to backend -> Transcribe with OpenAI Whisper -> Fill questAction field
+  const handleVoiceRecording = async () => {
+    if (isRecording) {
+      // Stop recording
+      try {
+        if (!recording) return;
+
+        setIsRecording(false);
+        await recording.stopAndUnloadAsync();
+        const uri = recording.getURI();
+        setRecording(null);
+
+        if (!uri) {
+          Alert.alert("Error", "Failed to get recording");
+          return;
+        }
+
+        // Upload and transcribe
+        setIsTranscribing(true);
+
+        // Create form data with the audio file
+        const formData = new FormData();
+        formData.append('audio', {
+          uri,
+          type: 'audio/m4a',
+          name: 'recording.m4a',
+        } as any);
+
+        try {
+          const response = await api.post<{ transcription: string }>('/api/audio/transcribe', formData);
+
+          setQuestAction(response.transcription);
+          setIsTranscribing(false);
+        } catch (error) {
+          console.error('Transcription error:', error);
+          setIsTranscribing(false);
+          Alert.alert("Error", "Failed to transcribe audio. Please type your quest instead.");
+        }
+      } catch (error) {
+        console.error('Failed to stop recording:', error);
+        setIsRecording(false);
+        setIsTranscribing(false);
+      }
+    } else {
+      // Start recording
+      try {
+        // Request permissions
+        const permission = await Audio.requestPermissionsAsync();
+        if (!permission.granted) {
+          Alert.alert("Permission Required", "Please allow microphone access to record audio.");
+          return;
+        }
+
+        // Configure audio mode
+        await Audio.setAudioModeAsync({
+          allowsRecordingIOS: true,
+          playsInSilentModeIOS: true,
+        });
+
+        // Start recording
+        const { recording: newRecording } = await Audio.Recording.createAsync(
+          Audio.RecordingOptionsPresets.HIGH_QUALITY
+        );
+
+        setRecording(newRecording);
+        setIsRecording(true);
+      } catch (error) {
+        console.error('Failed to start recording:', error);
+        Alert.alert("Error", "Failed to start recording. Please try again.");
+      }
+    }
   };
 
   const getCategoryColor = (category: string) => {
@@ -384,23 +449,51 @@ export default function CreateQuestScreen({ navigation }: Props) {
                     {/* Voice Recording Button */}
                     <Pressable
                       onPress={handleVoiceRecording}
+                      disabled={isTranscribing}
                       style={{
                         marginTop: 16,
                         flexDirection: "row",
                         alignItems: "center",
                         justifyContent: "center",
                         gap: 8,
-                        backgroundColor: "rgba(126, 63, 228, 0.2)",
+                        backgroundColor: isRecording
+                          ? "rgba(239, 68, 68, 0.2)"
+                          : isTranscribing
+                          ? "rgba(255, 215, 0, 0.2)"
+                          : "rgba(126, 63, 228, 0.2)",
                         borderRadius: 12,
                         paddingVertical: 12,
                         borderWidth: 1,
-                        borderColor: "rgba(126, 63, 228, 0.3)",
+                        borderColor: isRecording
+                          ? "rgba(239, 68, 68, 0.3)"
+                          : isTranscribing
+                          ? "rgba(255, 215, 0, 0.3)"
+                          : "rgba(126, 63, 228, 0.3)",
+                        opacity: isTranscribing ? 0.6 : 1,
                       }}
                     >
-                      <Mic size={20} color="#A78BFA" />
-                      <Text style={{ color: "#A78BFA", fontSize: 16, fontWeight: "600" }}>
-                        Record Quest with Voice
-                      </Text>
+                      {isTranscribing ? (
+                        <>
+                          <ActivityIndicator size="small" color="#FFD700" />
+                          <Text style={{ color: "#FFD700", fontSize: 16, fontWeight: "600" }}>
+                            Transcribing...
+                          </Text>
+                        </>
+                      ) : isRecording ? (
+                        <>
+                          <Square size={20} color="#EF4444" fill="#EF4444" />
+                          <Text style={{ color: "#EF4444", fontSize: 16, fontWeight: "600" }}>
+                            Tap to Stop Recording
+                          </Text>
+                        </>
+                      ) : (
+                        <>
+                          <Mic size={20} color="#A78BFA" />
+                          <Text style={{ color: "#A78BFA", fontSize: 16, fontWeight: "600" }}>
+                            Record Quest with Voice
+                          </Text>
+                        </>
+                      )}
                     </Pressable>
                     <Text style={{ fontSize: 12, color: "rgba(255, 255, 255, 0.4)", marginTop: 8, textAlign: "center" }}>
                       AI will transcribe your audio into a quest

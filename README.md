@@ -91,10 +91,17 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
   - 🌍 **Custom Location**: Specify any place (beach, mall, airport, etc.)
   - ⭐ **No Specific Location**: Location-independent quests
   - Custom location input field when "Custom Location" is selected
-- **Custom Quest Creation** 🎯 FUNCTIONAL!:
+- **Custom Quest Creation** 🎯 FULLY FUNCTIONAL!:
   - Clean text input for quest description
   - **Create Button**: Appears when you start typing your quest
-  - **Voice Recording Button**: Record quest with voice (AI transcription coming soon)
+  - **Voice Recording Button** 🎤 NOW ACTIVE!:
+    - Tap microphone button to start recording
+    - Button turns red while recording with "Tap to Stop Recording" text
+    - Tap again to stop and automatically transcribe
+    - Shows "Transcribing..." with spinner while processing
+    - AI transcribes your voice to text and fills the quest field
+    - Uses expo-av for audio recording
+    - Backend transcription with OpenAI Whisper API
   - Purple microphone button with glass styling
   - Uses AI to generate quest from your description
   - Orange gradient create button with enhanced loading state
@@ -584,8 +591,13 @@ To enable Google sign-in, you need to configure authorized redirect URIs in your
 **Profile & Settings** ✨ FULLY REDESIGNED!
 
 **Friends & Social Features** 👥 NEW & FULLY FUNCTIONAL!
-- **Friends Screen** 🎯:
-  - **Three Tabs**: Friends list, Friend requests, Search users
+- **Friends Screen** 🎯 FIXED UI!:
+  - **Four Tabs**: Friends list, Suggested friends, Friend requests, Search users
+  - **Fixed Tab Layout** ✨ NEW!:
+    - Compact horizontal scrollable tabs with proper sizing
+    - Max height constraint prevents overly tall columns
+    - Centered alignment for clean appearance
+    - No more stretched/distorted tab buttons
   - **Friends List Tab**:
     - View all accepted friends with avatars
     - Send quests directly to friends with one tap

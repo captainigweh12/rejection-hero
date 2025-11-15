@@ -530,7 +530,8 @@ export default function FriendsScreen({ navigation }: Props) {
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ paddingHorizontal: 20, gap: 8, marginBottom: 16 }}
+            contentContainerStyle={{ paddingHorizontal: 20, gap: 8, marginBottom: 16, alignItems: "center" }}
+            style={{ maxHeight: 60 }}
           >
             <Pressable
               onPress={() => setActiveTab("friends")}
