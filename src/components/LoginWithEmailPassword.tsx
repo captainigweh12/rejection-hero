@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Alert, Pressable, Text, TextInput, View, ActivityIndicator, Image } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
-import * as WebBrowser from "expo-web-browser";
+import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import * as Haptics from "expo-haptics";
 
 import { authClient } from "@/lib/authClient";
 import { useSession } from "@/lib/useSession";
@@ -17,31 +18,35 @@ export default function LoginWithEmailPassword() {
   const [name, setName] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { data: session } = useSession();
+  const [isCheckingOnboarding, setIsCheckingOnboarding] = useState(false);
+  const { data: session, refetch } = useSession();
 
   // Check onboarding status when user is logged in
   useEffect(() => {
     const checkOnboarding = async () => {
-      if (session?.user) {
+      if (session?.user && !isCheckingOnboarding) {
+        setIsCheckingOnboarding(true);
         try {
           const response = await api.get("/api/profile");
           const profile = response as { onboardingCompleted?: boolean };
 
-          if (!profile.onboardingCompleted) {
-            // Redirect to onboarding if not completed
-            navigation.replace("Onboarding");
-          } else {
-            // Redirect to main app if onboarding is completed
-            navigation.replace("Tabs");
-          }
+          // Use setTimeout to avoid navigation during render
+          setTimeout(() => {
+            if (!profile.onboardingCompleted) {
+              navigation.replace("Onboarding");
+            } else {
+              navigation.replace("Tabs");
+            }
+          }, 100);
         } catch (error) {
           console.error("Error checking onboarding status:", error);
+          setIsCheckingOnboarding(false);
         }
       }
     };
 
     checkOnboarding();
-  }, [session, navigation]);
+  }, [session, navigation, isCheckingOnboarding]);
 
   const handleSignIn = async () => {
     if (!email || !password) {
@@ -50,6 +55,8 @@ export default function LoginWithEmailPassword() {
     }
 
     setIsLoading(true);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+
     try {
       const result = await authClient.signIn.email({
         email,
@@ -57,13 +64,16 @@ export default function LoginWithEmailPassword() {
       });
 
       if (result.error) {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
         Alert.alert("Sign In Failed", result.error.message || "Please check your credentials");
       } else {
-        Alert.alert("Success", "Signed in successfully!");
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         setEmail("");
         setPassword("");
+        await refetch();
       }
     } catch (error) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       Alert.alert("Error", "An unexpected error occurred");
       console.error(error);
     } finally {
@@ -78,6 +88,8 @@ export default function LoginWithEmailPassword() {
     }
 
     setIsLoading(true);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+
     try {
       const result = await authClient.signUp.email({
         email,
@@ -86,15 +98,18 @@ export default function LoginWithEmailPassword() {
       });
 
       if (result.error) {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
         Alert.alert("Sign Up Failed", result.error.message || "Please try again");
       } else {
-        Alert.alert("Success", "Account created successfully!");
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         setEmail("");
         setPassword("");
         setName("");
         setIsSignUp(false);
+        await refetch();
       }
     } catch (error) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       Alert.alert("Error", "An unexpected error occurred");
       console.error(error);
     } finally {
@@ -102,29 +117,22 @@ export default function LoginWithEmailPassword() {
     }
   };
 
-  const handleSignOut = async () => {
-    try {
-      await authClient.signOut();
-      Alert.alert("Success", "Signed out successfully!");
-    } catch (error) {
-      Alert.alert("Error", "Failed to sign out");
-      console.error(error);
-    }
-  };
-
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+
     try {
-      // Use Better Auth's built-in Google OAuth
       const result = await authClient.signIn.social({
         provider: "google",
         callbackURL: "vibecode://auth/callback",
       });
 
       if (result.error) {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
         Alert.alert("Error", result.error.message || "Failed to sign in with Google");
       }
     } catch (error: any) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       Alert.alert("Error", error?.message || "Failed to sign in with Google");
       console.error("Google Sign-In Error:", error);
     } finally {
@@ -132,130 +140,188 @@ export default function LoginWithEmailPassword() {
     }
   };
 
-  // If user is already logged in, show sign out button
-  if (session) {
+  // Show loading state while checking onboarding
+  if (session && isCheckingOnboarding) {
     return (
-      <KeyboardAwareScrollView>
-        <View className="w-full p-6 gap-4">
-          <View className="bg-green-50 p-4 rounded-lg border border-green-200">
-            <Text className="text-lg font-semibold mb-1">Signed in as:</Text>
-            <Text className="text-base">{session.user.name}</Text>
-            <Text className="text-sm text-gray-600">{session.user.email}</Text>
-          </View>
-          <Pressable onPress={handleSignOut} className="bg-red-500 p-4 rounded-lg items-center">
-            <Text className="text-white font-semibold text-base">Sign Out</Text>
-          </Pressable>
-        </View>
-      </KeyboardAwareScrollView>
+      <LinearGradient colors={["#0A0A0F", "#1A1A24", "#2A1A34"]} className="flex-1 items-center justify-center">
+        <ActivityIndicator size="large" color="#7E3FE4" />
+        <Text className="text-white mt-4 text-lg">Setting up your account...</Text>
+      </LinearGradient>
     );
   }
 
   return (
-    <KeyboardAwareScrollView>
-      <View className="w-full p-6 gap-4">
-        {/* Logo */}
-        <View className="items-center mb-4">
-          <Image
-            source={require("../../assets/rejection-hero-logo.png")}
-            style={{ width: 200, height: 200 }}
-            resizeMode="contain"
-          />
-        </View>
-
-        <Text className="text-2xl font-bold text-center mb-2">
-          {isSignUp ? "Create Account" : "Sign In"}
-        </Text>
-
-        {isSignUp && (
-          <View>
-            <Text className="text-sm font-medium mb-2 text-gray-700">Name</Text>
-            <TextInput
-              value={name}
-              onChangeText={setName}
-              placeholder="Enter your name"
-              placeholderTextColor="#9CA3AF"
-              className="border border-gray-300 rounded-lg p-4 bg-white"
-              autoCapitalize="words"
-              editable={!isLoading}
+    <LinearGradient colors={["#0A0A0F", "#1A1A24", "#2A1A34"]} className="flex-1">
+      <KeyboardAwareScrollView
+        contentContainerStyle={{ flexGrow: 1 }}
+        showsVerticalScrollIndicator={false}
+      >
+        <View className="flex-1 px-6 pt-12 pb-8">
+          {/* Logo */}
+          <View className="items-center mb-8">
+            <Image
+              source={require("../../assets/rejection-hero-logo.png")}
+              style={{ width: 180, height: 180 }}
+              resizeMode="contain"
             />
+            <Text className="text-white text-3xl font-bold mt-4">Rejection Hero</Text>
+            <Text className="text-white/60 text-base mt-2">Embrace Your No's</Text>
           </View>
-        )}
 
-        <View>
-          <Text className="text-sm font-medium mb-2 text-gray-700">Email</Text>
-          <TextInput
-            value={email}
-            onChangeText={setEmail}
-            placeholder="Enter your email"
-            placeholderTextColor="#9CA3AF"
-            keyboardType="email-address"
-            autoCapitalize="none"
-            className="border border-gray-300 rounded-lg p-4 bg-white"
-            editable={!isLoading}
-          />
-        </View>
+          {/* Form Container */}
+          <View
+            className="rounded-3xl p-6 mb-6"
+            style={{
+              backgroundColor: "rgba(255, 255, 255, 0.05)",
+              borderWidth: 1,
+              borderColor: "rgba(126, 63, 228, 0.3)",
+            }}
+          >
+            <Text className="text-2xl font-bold text-white text-center mb-6">
+              {isSignUp ? "Create Account" : "Welcome Back"}
+            </Text>
 
-        <View>
-          <Text className="text-sm font-medium mb-2 text-gray-700">Password</Text>
-          <TextInput
-            value={password}
-            onChangeText={setPassword}
-            placeholder="Enter your password"
-            placeholderTextColor="#9CA3AF"
-            secureTextEntry
-            className="border border-gray-300 rounded-lg p-4 bg-white"
-            editable={!isLoading}
-          />
-        </View>
+            {isSignUp && (
+              <View className="mb-4">
+                <Text className="text-sm font-medium mb-2 text-white/80">Name</Text>
+                <View
+                  className="rounded-xl p-4"
+                  style={{
+                    backgroundColor: "rgba(255, 255, 255, 0.05)",
+                    borderWidth: 1,
+                    borderColor: "rgba(126, 63, 228, 0.2)",
+                  }}
+                >
+                  <TextInput
+                    value={name}
+                    onChangeText={setName}
+                    placeholder="Enter your name"
+                    placeholderTextColor="rgba(255, 255, 255, 0.4)"
+                    className="text-white text-base"
+                    autoCapitalize="words"
+                    editable={!isLoading}
+                  />
+                </View>
+              </View>
+            )}
 
-        <Pressable
-          onPress={isSignUp ? handleSignUp : handleSignIn}
-          disabled={isLoading}
-          className={`p-4 rounded-lg items-center ${isLoading ? "bg-blue-300" : "bg-blue-500"}`}
-        >
-          <Text className="text-white font-semibold text-base">
-            {isLoading ? "Loading..." : isSignUp ? "Sign Up" : "Sign In"}
-          </Text>
-        </Pressable>
+            <View className="mb-4">
+              <Text className="text-sm font-medium mb-2 text-white/80">Email</Text>
+              <View
+                className="rounded-xl p-4"
+                style={{
+                  backgroundColor: "rgba(255, 255, 255, 0.05)",
+                  borderWidth: 1,
+                  borderColor: "rgba(126, 63, 228, 0.2)",
+                }}
+              >
+                <TextInput
+                  value={email}
+                  onChangeText={setEmail}
+                  placeholder="Enter your email"
+                  placeholderTextColor="rgba(255, 255, 255, 0.4)"
+                  className="text-white text-base"
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  editable={!isLoading}
+                />
+              </View>
+            </View>
 
-        <View className="flex-row items-center gap-4 my-4">
-          <View className="flex-1 h-px bg-gray-300" />
-          <Text className="text-gray-500 text-sm">OR</Text>
-          <View className="flex-1 h-px bg-gray-300" />
-        </View>
+            <View className="mb-6">
+              <Text className="text-sm font-medium mb-2 text-white/80">Password</Text>
+              <View
+                className="rounded-xl p-4"
+                style={{
+                  backgroundColor: "rgba(255, 255, 255, 0.05)",
+                  borderWidth: 1,
+                  borderColor: "rgba(126, 63, 228, 0.2)",
+                }}
+              >
+                <TextInput
+                  value={password}
+                  onChangeText={setPassword}
+                  placeholder="Enter your password"
+                  placeholderTextColor="rgba(255, 255, 255, 0.4)"
+                  className="text-white text-base"
+                  secureTextEntry
+                  editable={!isLoading}
+                />
+              </View>
+            </View>
 
-        <Pressable
-          onPress={handleGoogleSignIn}
-          disabled={isLoading}
-          className="p-4 rounded-lg items-center flex-row justify-center gap-3"
-          style={{
-            backgroundColor: "#fff",
-            borderWidth: 1,
-            borderColor: "#E5E7EB",
-          }}
-        >
-          {isLoading ? (
-            <ActivityIndicator size="small" color="#FF6B35" />
-          ) : (
-            <>
-              <Text className="text-2xl">🔍</Text>
-              <Text className="text-gray-700 font-semibold text-base">
+            {/* Sign In/Up Button */}
+            <Pressable
+              onPress={isSignUp ? handleSignUp : handleSignIn}
+              disabled={isLoading}
+              className="rounded-2xl overflow-hidden mb-4"
+            >
+              <LinearGradient
+                colors={["#7E3FE4", "#FF6B35"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                className="py-4 items-center"
+              >
+                {isLoading ? (
+                  <ActivityIndicator color="white" />
+                ) : (
+                  <Text className="text-white font-bold text-lg">
+                    {isSignUp ? "Create Account" : "Sign In"}
+                  </Text>
+                )}
+              </LinearGradient>
+            </Pressable>
+
+            {/* Toggle Sign Up/Sign In */}
+            <Pressable
+              onPress={() => {
+                setIsSignUp(!isSignUp);
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              }}
+              disabled={isLoading}
+              className="py-2"
+            >
+              <Text className="text-white/70 text-center">
+                {isSignUp ? "Already have an account? " : "Don't have an account? "}
+                <Text className="text-purple-400 font-semibold">
+                  {isSignUp ? "Sign In" : "Sign Up"}
+                </Text>
+              </Text>
+            </Pressable>
+          </View>
+
+          {/* Divider */}
+          <View className="flex-row items-center mb-6">
+            <View className="flex-1 h-px bg-white/20" />
+            <Text className="text-white/50 mx-4">OR</Text>
+            <View className="flex-1 h-px bg-white/20" />
+          </View>
+
+          {/* Google Sign In Button */}
+          <Pressable
+            onPress={handleGoogleSignIn}
+            disabled={isLoading}
+            className="rounded-2xl overflow-hidden"
+            style={{
+              backgroundColor: "rgba(255, 255, 255, 0.1)",
+              borderWidth: 1,
+              borderColor: "rgba(255, 255, 255, 0.2)",
+            }}
+          >
+            <View className="py-4 flex-row items-center justify-center">
+              <Text className="text-4xl mr-3">🔍</Text>
+              <Text className="text-white font-semibold text-base">
                 Continue with Google
               </Text>
-            </>
-          )}
-        </Pressable>
+            </View>
+          </Pressable>
 
-        <Pressable
-          onPress={() => setIsSignUp(!isSignUp)}
-          disabled={isLoading}
-          className="items-center"
-        >
-          <Text className="text-blue-500 text-sm">
-            {isSignUp ? "Already have an account? Sign In" : "Don't have an account? Sign Up"}
+          {/* Footer */}
+          <Text className="text-white/40 text-xs text-center mt-8">
+            By continuing, you agree to our Terms of Service and Privacy Policy
           </Text>
-        </Pressable>
-      </View>
-    </KeyboardAwareScrollView>
+        </View>
+      </KeyboardAwareScrollView>
+    </LinearGradient>
   );
 }
