@@ -24,6 +24,7 @@ import postsRouter from "./routes/posts";
 import momentsRouter from "./routes/moments";
 import { notificationsRouter } from "./routes/notifications";
 import { gohighlevelRouter } from "./routes/gohighlevel";
+import { supportRouter } from "./routes/support";
 import { type AppType } from "./types";
 
 // AppType context adds user and session to the context, will be null if the user or session is null
@@ -108,6 +109,9 @@ app.route("/api/notifications", notificationsRouter);
 
 console.log("📧 Mounting GoHighLevel routes at /api/gohighlevel");
 app.route("/api/gohighlevel", gohighlevelRouter);
+
+console.log("🎫 Mounting support routes at /api/support");
+app.route("/api/support", supportRouter);
 
 // Health check endpoint
 // Used by load balancers and monitoring tools to verify service is running

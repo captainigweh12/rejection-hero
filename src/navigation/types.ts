@@ -27,6 +27,7 @@ export type RootStackParamList = {
   QuestCalendar: undefined;
   InviteWarriors: undefined;
   ManageCategories: undefined;
+  Support: undefined;
 };
 
 export type BottomTabParamList = {

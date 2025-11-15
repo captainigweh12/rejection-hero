@@ -1215,6 +1215,48 @@ export default function HomeScreen({ navigation }: Props) {
                       <ChevronRight size={20} color="rgba(255, 255, 255, 0.5)" />
                     </Pressable>
 
+                    {/* Support */}
+                    <Pressable
+                      onPress={() => {
+                        setShowMenu(false);
+                        navigation.navigate("Support");
+                      }}
+                      style={{
+                        backgroundColor: "rgba(255, 255, 255, 0.05)",
+                        borderRadius: 16,
+                        padding: 16,
+                        flexDirection: "row",
+                        alignItems: "center",
+                        borderWidth: 1,
+                        borderColor: "rgba(76, 175, 80, 0.3)",
+                        shadowColor: "#4CAF50",
+                        shadowOffset: { width: 0, height: 2 },
+                        shadowOpacity: 0.2,
+                        shadowRadius: 4,
+                        elevation: 3,
+                      }}
+                    >
+                      <View
+                        style={{
+                          width: 48,
+                          height: 48,
+                          borderRadius: 24,
+                          backgroundColor: "rgba(76, 175, 80, 0.2)",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          marginRight: 16,
+                          borderWidth: 2,
+                          borderColor: "rgba(76, 175, 80, 0.4)",
+                        }}
+                      >
+                        <HelpCircle size={24} color="#4CAF50" />
+                      </View>
+                      <Text style={{ fontSize: 16, color: "white", fontWeight: "600", flex: 1 }}>
+                        Support
+                      </Text>
+                      <ChevronRight size={20} color="rgba(255, 255, 255, 0.5)" />
+                    </Pressable>
+
                     {/* Invite Warriors */}
                     <Pressable
                       onPress={() => {
