@@ -39,7 +39,7 @@ export default function SendQuestToFriendScreen({ navigation, route }: Props) {
         activeQuests: UserQuest[];
         queuedQuests: UserQuest[];
         completedQuests: UserQuest[];
-      }>("api/quests");
+      }>("/api/quests");
       return response;
     },
   });
@@ -50,7 +50,7 @@ export default function SendQuestToFriendScreen({ navigation, route }: Props) {
       if (!selectedQuestId) {
         throw new Error("Please select a quest");
       }
-      return api.post("api/shared-quests/share", {
+      return api.post("/api/shared-quests/share", {
         friendId,
         questId: selectedQuestId,
         message: message.trim() || undefined,

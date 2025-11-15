@@ -175,3 +175,5 @@ Failed to find Response internal state key
 --> GET /api/messages/conversations [32m200[0m 6ms
 --> GET /api/groups [32m200[0m 9ms
 --> GET /api/posts/feed [32m200[0m 14ms
+<-- GET /api/notifications/unread-count
+--> GET /api/notifications/unread-count [32m200[0m 2ms

@@ -399,11 +399,18 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
   - Public/private group options
   - Member count and role management
   - Leave groups or delete (if creator)
-- **Quest Sharing**:
-  - Share any quest with your friends
-  - Friends can accept or decline shared quests
-  - Optional message when sharing
-  - Accepted quests automatically added to friend's queue
+- **Quest Sharing** 🎁 FULLY ENABLED!:
+  - **Share Button** on every friend card in Community and Friends screens
+  - **Quest Selection Screen**:
+    - Browse all active, queued, and recently completed quests
+    - Beautiful card-based UI with category colors
+    - Difficulty badges (Easy, Medium, Hard, Expert)
+    - Shows XP and point rewards
+    - Select any quest to share
+  - **Optional Message**: Add a personal note when sharing
+  - **Friend Acceptance**: Friends receive shared quest in their inbox
+  - **Auto-Queue**: Accepted quests automatically added to friend's queue
+  - **Purple Share Icon** for easy identification
   - Only friends can share quests with each other
 - **Beautiful Modern UI**:
   - Card-based design with smooth animations

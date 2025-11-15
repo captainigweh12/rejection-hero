@@ -171,9 +171,8 @@ export default function CommunityScreen({ navigation }: Props) {
     Alert.alert("Coming Soon", "Chat screen is being developed!");
   };
 
-  const handleShareQuest = (friendId: string) => {
-    // TODO: Navigate to quest sharing screen when created
-    Alert.alert("Coming Soon", "Quest sharing is being developed!");
+  const handleShareQuest = (friendId: string, friendName: string) => {
+    navigation.navigate("SendQuestToFriend", { friendId, friendName });
   };
 
   const handleOpenConversation = (userId: string) => {
@@ -594,7 +593,7 @@ export default function CommunityScreen({ navigation }: Props) {
                           <MessageCircle size={18} color="#00D9FF" />
                         </Pressable>
                         <Pressable
-                          onPress={() => handleShareQuest(friend.id)}
+                          onPress={() => handleShareQuest(friend.id, friend.displayName)}
                           style={{
                             width: 40,
                             height: 40,
