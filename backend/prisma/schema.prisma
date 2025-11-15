@@ -35,6 +35,8 @@ model User {
   GroupsCreated      Group[]             @relation("GroupCreator")
   SharedQuests       SharedQuest[]
   QuestSuggestions   QuestSuggestion[]
+  JournalEntries     JournalEntry[]
+  GrowthAchievements GrowthAchievement[]
 
   @@map("user")
 }
@@ -307,4 +309,33 @@ model SharedQuest {
   quest      Quest    @relation(fields: [questId], references: [id], onDelete: Cascade)
 
   @@map("shared_quest")
+}
+
+model JournalEntry {
+  id                String             @id @default(cuid())
+  userId            String
+  audioUrl          String?            // URL to the stored audio recording
+  audioTranscript   String?            // AI transcription of the audio
+  aiSummary         String             // AI-generated summary
+  userEditedSummary String?            // User's modified version of the summary
+  outcome           String             // YES, NO, ACTIVITY
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievements      GrowthAchievement[]
+
+  @@map("journal_entry")
+}
+
+model GrowthAchievement {
+  id             String        @id @default(cuid())
+  userId         String
+  journalEntryId String
+  type           String        // Type of achievement: "gold_star", "bronze_star", "silver_star"
+  description    String        // Description of what was achieved
+  earnedAt       DateTime      @default(now())
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  journalEntry   JournalEntry  @relation(fields: [journalEntryId], references: [id], onDelete: Cascade)
+
+  @@map("growth_achievement")
 }

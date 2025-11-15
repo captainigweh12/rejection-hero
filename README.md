@@ -240,6 +240,35 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 - **COMMUNITY**: Groups, Manage Categories, Explore World
 - Log out and version display
 
+**Journal & Growth Tracking** ✨ NEW!
+- **Voice Recording Journal**:
+  - Record audio reflections about rejection experiences
+  - Tap-to-record interface with microphone button
+  - AI-powered transcription using OpenAI Whisper
+  - Automatic AI summarization of journal entries
+  - Edit AI summaries before saving
+  - Recent entries displayed with outcome badges
+- **Outcome Tracking**:
+  - **Yes**: Track when people say yes to your requests
+  - **No**: Track rejection experiences (the core of growth!)
+  - **Activity**: Track completed actions and milestones
+  - Visual cards with color-coded icons for each outcome
+- **Growth Achievements System** 🌟:
+  - Earn gold stars for every journal entry
+  - Automatic achievement generation on save
+  - Track total achievements, gold/silver/bronze stars
+  - View achievement history with linked journal entries
+  - Beautiful stats dashboard showing progress
+  - Each achievement includes timestamp and description
+- **Growth & Achievements Page**:
+  - Comprehensive stats overview with star counts
+  - Visual achievement cards with star badges
+  - Filter by outcome type (Yes/No/Activity)
+  - View journal entry summaries with each achievement
+  - Track growth over time
+- **Bottom Tab Navigation**: Dedicated Journal tab for quick access
+- **AI Integration**: Requires OPENAI_API_KEY for transcription and summarization
+
 **Profile & Settings** ✨ FULLY REDESIGNED!
 
 **Gaming-Style Profile Page** 🎮 ENHANCED!
@@ -430,7 +459,7 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 - **Prisma ORM**: Type-safe database access
 - **SQLite**: Local database (migrating to Supabase)
 - **Better Auth**: Authentication with email/password and Google OAuth
-- **OpenAI API**: AI quest generation
+- **OpenAI API**: AI quest generation, Whisper transcription, text summarization
 - **Resend API**: Email functionality
 - **Google Maps API**: Location services
 - **Daily.co API**: Live streaming infrastructure (optional)
@@ -455,6 +484,14 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 - **Group** ✨ NEW!: Facebook-style groups with privacy settings
 - **GroupMember** ✨ NEW!: Group memberships with roles (admin/moderator/member)
 - **SharedQuest** ✨ NEW!: Quest sharing between friends with status tracking
+- **JournalEntry** ✨ NEW!: Voice-recorded journal entries with AI transcription
+  - Audio URL and transcript storage
+  - AI-generated summaries with user edit capability
+  - Outcome tracking (YES/NO/ACTIVITY)
+- **GrowthAchievement** ✨ NEW!: Achievement system for tracking progress
+  - Achievement types (gold_star, silver_star, bronze_star)
+  - Links to journal entries
+  - Automatic generation on journal entry creation
 
 ## Design
 
@@ -605,6 +642,13 @@ The app features a cohesive dark theme with modern 3D-style UI elements througho
 - `POST /api/shared-quests/share` - Share a quest with a friend
 - `POST /api/shared-quests/:id/accept` - Accept shared quest
 - `POST /api/shared-quests/:id/decline` - Decline shared quest
+
+### Journal ✨ NEW!
+- `POST /api/journal/transcribe` - Transcribe audio to text with AI summarization
+- `POST /api/journal` - Create journal entry with achievement
+- `GET /api/journal` - Get all journal entries with achievements
+- `PUT /api/journal/:id` - Update journal entry summary
+- `GET /api/journal/achievements` - Get all growth achievements with stats
 
 ### Profile
 - `GET /api/profile` - Get current user's profile

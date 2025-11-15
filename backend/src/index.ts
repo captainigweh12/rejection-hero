@@ -19,6 +19,7 @@ import { friendsRouter } from "./routes/friends";
 import { messagesRouter } from "./routes/messages";
 import { groupsRouter } from "./routes/groups";
 import { sharedQuestsRouter } from "./routes/sharedQuests";
+import journalRouter from "./routes/journal";
 import { type AppType } from "./types";
 
 // AppType context adds user and session to the context, will be null if the user or session is null
@@ -89,6 +90,9 @@ app.route("/api/groups", groupsRouter);
 console.log("🎁 Mounting shared quests routes at /api/shared-quests");
 app.route("/api/shared-quests", sharedQuestsRouter);
 
+console.log("📓 Mounting journal routes at /api/journal");
+app.route("/api/journal", journalRouter);
+
 // Health check endpoint
 // Used by load balancers and monitoring tools to verify service is running
 app.get("/health", (c) => {
@@ -119,6 +123,7 @@ serve({ fetch: app.fetch, port: Number(env.PORT) }, () => {
   console.log("  💬 Messages:     GET/POST /api/messages");
   console.log("  🏘️  Groups:       GET/POST /api/groups");
   console.log("  🎁 SharedQuests: GET/POST /api/shared-quests");
+  console.log("  📓 Journal:      GET/POST /api/journal");
   console.log("  💚 Health:       GET /health");
   console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
 });

@@ -431,3 +431,101 @@ export const respondToSuggestionResponseSchema = z.object({
 });
 export type RespondToSuggestionResponse = z.infer<typeof respondToSuggestionResponseSchema>;
 
+// ==========================================
+// Journal Routes
+// ==========================================
+
+// POST /api/journal/transcribe - Transcribe audio to text
+export const transcribeAudioRequestSchema = z.object({
+  audioBase64: z.string(), // Base64 encoded audio
+});
+export type TranscribeAudioRequest = z.infer<typeof transcribeAudioRequestSchema>;
+export const transcribeAudioResponseSchema = z.object({
+  transcript: z.string(),
+  summary: z.string(),
+});
+export type TranscribeAudioResponse = z.infer<typeof transcribeAudioResponseSchema>;
+
+// POST /api/journal - Create journal entry
+export const createJournalEntryRequestSchema = z.object({
+  audioUrl: z.string().optional(),
+  audioTranscript: z.string().optional(),
+  aiSummary: z.string(),
+  userEditedSummary: z.string().optional(),
+  outcome: z.enum(["YES", "NO", "ACTIVITY"]),
+});
+export type CreateJournalEntryRequest = z.infer<typeof createJournalEntryRequestSchema>;
+export const createJournalEntryResponseSchema = z.object({
+  id: z.string(),
+  achievement: z.object({
+    id: z.string(),
+    type: z.string(),
+    description: z.string(),
+    earnedAt: z.string(),
+  }),
+});
+export type CreateJournalEntryResponse = z.infer<typeof createJournalEntryResponseSchema>;
+
+// GET /api/journal - Get all journal entries
+export const getJournalEntriesResponseSchema = z.object({
+  entries: z.array(
+    z.object({
+      id: z.string(),
+      audioUrl: z.string().nullable(),
+      audioTranscript: z.string().nullable(),
+      aiSummary: z.string(),
+      userEditedSummary: z.string().nullable(),
+      outcome: z.string(),
+      createdAt: z.string(),
+      updatedAt: z.string(),
+      achievements: z.array(
+        z.object({
+          id: z.string(),
+          type: z.string(),
+          description: z.string(),
+          earnedAt: z.string(),
+        })
+      ),
+    })
+  ),
+});
+export type GetJournalEntriesResponse = z.infer<typeof getJournalEntriesResponseSchema>;
+
+// PUT /api/journal/:id - Update journal entry summary
+export const updateJournalEntryRequestSchema = z.object({
+  userEditedSummary: z.string(),
+  outcome: z.enum(["YES", "NO", "ACTIVITY"]).optional(),
+});
+export type UpdateJournalEntryRequest = z.infer<typeof updateJournalEntryRequestSchema>;
+export const updateJournalEntryResponseSchema = z.object({
+  id: z.string(),
+  userEditedSummary: z.string(),
+});
+export type UpdateJournalEntryResponse = z.infer<typeof updateJournalEntryResponseSchema>;
+
+// GET /api/journal/achievements - Get all growth achievements
+export const getGrowthAchievementsResponseSchema = z.object({
+  achievements: z.array(
+    z.object({
+      id: z.string(),
+      type: z.string(),
+      description: z.string(),
+      earnedAt: z.string(),
+      journalEntry: z.object({
+        id: z.string(),
+        aiSummary: z.string(),
+        userEditedSummary: z.string().nullable(),
+        outcome: z.string(),
+        createdAt: z.string(),
+      }),
+    })
+  ),
+  stats: z.object({
+    totalAchievements: z.number(),
+    goldStars: z.number(),
+    silverStars: z.number(),
+    bronzeStars: z.number(),
+  }),
+});
+export type GetGrowthAchievementsResponse = z.infer<typeof getGrowthAchievementsResponseSchema>;
+

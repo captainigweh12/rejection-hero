@@ -19,6 +19,7 @@ export type RootStackParamList = {
   Settings: undefined;
   LanguageSelection: undefined;
   SearchUsers: undefined;
+  GrowthAchievements: undefined;
 };
 
 export type BottomTabParamList = {
@@ -26,6 +27,7 @@ export type BottomTabParamList = {
   SwipeTab: undefined;
   MatchesTab: undefined;
   LiveTab: undefined;
+  JournalTab: undefined;
   MapTab: undefined;
   ProfileTab: undefined;
 };

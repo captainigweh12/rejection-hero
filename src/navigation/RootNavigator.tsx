@@ -3,7 +3,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { BlurView } from "expo-blur";
 import * as Haptics from "expo-haptics";
-import { Home, Heart, Users, Video, Map, User } from "lucide-react-native";
+import { Home, Heart, Users, Video, Map, User, BookOpen } from "lucide-react-native";
 import { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -15,6 +15,7 @@ import MatchesScreen from "@/screens/MatchesScreen";
 import LiveScreen from "@/screens/LiveScreen";
 import MapScreen from "@/screens/MapScreen";
 import ProfileScreen from "@/screens/ProfileScreen";
+import JournalScreen from "@/screens/JournalScreen";
 import LoginModalScreen from "@/screens/LoginModalScreen";
 import EditProfileScreen from "@/screens/EditProfileScreen";
 import QuestDetailScreen from "@/screens/QuestDetailScreen";
@@ -22,6 +23,7 @@ import CreateQuestScreen from "@/screens/CreateQuestScreen";
 import SettingsScreen from "@/screens/SettingsScreen";
 import LanguageSelectionScreen from "@/screens/LanguageSelectionScreen";
 import SearchUsersScreen from "@/screens/SearchUsersScreen";
+import GrowthAchievementsScreen from "@/screens/GrowthAchievementsScreen";
 import { useSession } from "@/lib/useSession";
 
 /**
@@ -72,6 +74,11 @@ const RootNavigator = () => {
         <RootStack.Screen
           name="SearchUsers"
           component={SearchUsersScreen}
+          options={{ headerShown: false }}
+        />
+        <RootStack.Screen
+          name="GrowthAchievements"
+          component={GrowthAchievementsScreen}
           options={{ headerShown: false }}
         />
       </RootStack.Navigator>
@@ -154,6 +161,14 @@ const BottomTabNavigator = () => {
         options={{
           title: "Live",
           tabBarIcon: ({ color, size }) => <Video size={size} color={color} />,
+        }}
+      />
+      <BottomTab.Screen
+        name="JournalTab"
+        component={JournalScreen}
+        options={{
+          title: "Journal",
+          tabBarIcon: ({ color, size }) => <BookOpen size={size} color={color} />,
         }}
       />
       <BottomTab.Screen
