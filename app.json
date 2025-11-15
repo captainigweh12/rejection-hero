@@ -10,7 +10,17 @@
     "ios": {
       "bundleIdentifier": "com.vibecode.goforno",
       "supportsTablet": true,
+      "config": {
+        "googleMobileAdsAppId": "ca-app-pub-xxxxxxxxxxxxxxxx~yyyyyyyyyy"
+      },
       "infoPlist": {
+        "CFBundleURLTypes": [
+          {
+            "CFBundleURLSchemes": ["com.googleusercontent.apps.94427138884-vp4hj04sfr29fndq917iau9alpiv52e6"],
+            "CFBundleTypeRole": "Editor",
+            "CFBundleURLName": "GoogleOAuth"
+          }
+        ],
         "NSLocationWhenInUseUsageDescription": "We need your location to show you nearby rejection challenges and help you discover quests in your area.",
         "NSLocationAlwaysAndWhenInUseUsageDescription": "We need your location to show you nearby rejection challenges and help you discover quests in your area.",
         "NSAppTransportSecurity": {
