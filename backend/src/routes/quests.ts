@@ -10,6 +10,7 @@ import {
 } from "@/shared/contracts";
 import { type AppType } from "../types";
 import { db } from "../db";
+import { checkFullQuestSafety, checkQuestSafetyWithAI } from "../utils/safetyFilter";
 
 const questsRouter = new Hono<AppType>();
 
@@ -623,7 +624,7 @@ Return a JSON object with: title (exactly 3 words), description, category, diffi
           {
             role: "system",
             content:
-              "You are a creative motivational coach creating unique rejection challenges. Each title MUST be exactly 3 words. Each challenge must be completely unique and different from previous challenges. BE EXTREMELY SPECIFIC - include concrete locations, specific types of people, specific items/services. Avoid generic phrases like 'pitch your product' or 'ask strangers'. Instead say things like 'ask baristas for a custom drink not on the menu' or 'request bookstore managers to display your handmade bookmark'. Be actionable and specific.\n\n🚨 CRITICAL RULES:\n1. When writing the 'description' field, NEVER include GPS coordinates like '(GPS: 35.123, -80.456)' or '(Coordinates: 35.123, -80.456)' or raw numbers like '35.3088457, -80.7506283'. Write naturally like a human would speak: 'Visit Starbucks on Main Street' not 'Visit Starbucks (GPS: 35.123, -80.456)'. Coordinates belong ONLY in the separate latitude/longitude JSON fields, NEVER in the description text.\n\n2. GOAL COUNT RULE: If the quest requires visiting ONE SPECIFIC LOCATION and asking front desk/receptionist/manager, SET goalCount to 1. Examples: 'Visit Hilton Hotel and ask front desk for free upgrade' = goalCount: 1. 'Go to Planet Fitness and ask manager for free membership' = goalCount: 1. For quests visiting multiple locations, use normal counts.",
+              "You are a creative motivational coach creating unique rejection challenges. Each title MUST be exactly 3 words. Each challenge must be completely unique and different from previous challenges. BE EXTREMELY SPECIFIC - include concrete locations, specific types of people, specific items/services. Avoid generic phrases like 'pitch your product' or 'ask strangers'. Instead say things like 'ask baristas for a custom drink not on the menu' or 'request bookstore managers to display your handmade bookmark'. Be actionable and specific.\n\n🚨 CRITICAL RULES:\n1. When writing the 'description' field, NEVER include GPS coordinates like '(GPS: 35.123, -80.456)' or '(Coordinates: 35.123, -80.456)' or raw numbers like '35.3088457, -80.7506283'. Write naturally like a human would speak: 'Visit Starbucks on Main Street' not 'Visit Starbucks (GPS: 35.123, -80.456)'. Coordinates belong ONLY in the separate latitude/longitude JSON fields, NEVER in the description text.\n\n2. GOAL COUNT RULE: If the quest requires visiting ONE SPECIFIC LOCATION and asking front desk/receptionist/manager, SET goalCount to 1. Examples: 'Visit Hilton Hotel and ask front desk for free upgrade' = goalCount: 1. 'Go to Planet Fitness and ask manager for free membership' = goalCount: 1. For quests visiting multiple locations, use normal counts.\n\n🛡️ SAFETY REQUIREMENTS (CRITICAL - READ CAREFULLY):\nYou MUST NEVER create quests that:\n- Involve physical harm, violence, or danger to self or others\n- Involve illegal activities (theft, vandalism, trespassing, drug use, etc.)\n- Involve sexual harassment, unwanted touching, or inappropriate behavior\n- Involve dangerous driving, drunk driving, or reckless behavior\n- Involve dangerous locations (highways, train tracks, cliffs, roofs)\n- Involve weapons, fire, or explosive materials\n- Could lead to arrest, injury, or death\n- Involve stalking, threatening, or intimidating behavior\n- Involve excessive alcohol consumption or substance abuse\n\nONLY create quests that are:\n- Safe and legal\n- Respectful and appropriate\n- About overcoming social fears (rejection, embarrassment)\n- Focused on asking for things, pitching ideas, or making requests\n- About building confidence through harmless social interactions\n- Positive actions that help personal growth\n\nIf the user's prompt contains unsafe content, CREATE A SAFE ALTERNATIVE instead that achieves a similar confidence-building goal.",
           },
           { role: "user", content: prompt },
         ],
@@ -649,6 +650,35 @@ Return a JSON object with: title (exactly 3 words), description, category, diffi
     }
 
     const questData = JSON.parse(data.choices[0].message.content);
+
+    // SAFETY CHECK: Verify quest content is safe
+    const safetyCheck = checkFullQuestSafety(
+      questData.title,
+      questData.description,
+      customPrompt || ""
+    );
+
+    if (!safetyCheck.isSafe) {
+      console.error("Unsafe quest generated, rejecting:", safetyCheck.reason);
+      throw new Error(
+        safetyCheck.reason ||
+          "This quest contains unsafe content. Please try a different challenge that focuses on building confidence through safe, respectful social interactions."
+      );
+    }
+
+    // Additional AI-powered safety check using OpenAI Moderation API
+    const aiSafetyCheck = await checkQuestSafetyWithAI(
+      `${questData.title}. ${questData.description}`,
+      OPENAI_API_KEY
+    );
+
+    if (!aiSafetyCheck.isSafe) {
+      console.error("Quest flagged by AI moderation:", aiSafetyCheck.reason);
+      throw new Error(
+        aiSafetyCheck.reason ||
+          "This quest was flagged by our safety system. Please try a different challenge."
+      );
+    }
 
     // Ensure title is 3 words
     const titleWords = questData.title.split(" ");
