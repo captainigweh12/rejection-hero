@@ -97,7 +97,12 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
   - **Voice Recording Button**: Record quest with voice (AI transcription coming soon)
   - Purple microphone button with glass styling
   - Uses AI to generate quest from your description
-  - Orange gradient create button with loading state
+  - Orange gradient create button with enhanced loading state
+- **Enhanced Loading States** ✨ FIXED!:
+  - Bold white text with dark text shadows for maximum visibility
+  - Clear feedback: "Generating Your Quest..." with spinner
+  - No more invisible loading states on dark backgrounds
+  - Consistent styling across all create buttons
 - **AI Generation Features**:
   - 6 Categories: Sales, Social, Entrepreneurship, Dating, Confidence, Career
   - 4 Difficulty Levels: Easy, Medium, Hard, Expert

@@ -450,12 +450,30 @@ export default function CreateQuestScreen({ navigation }: Props) {
                     {generateMutation.isPending ? (
                       <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
                         <ActivityIndicator size="small" color="white" />
-                        <Text style={{ color: "white", fontWeight: "bold", fontSize: 18 }}>
-                          Creating Quest...
+                        <Text
+                          style={{
+                            color: "white",
+                            fontWeight: "bold",
+                            fontSize: 18,
+                            textShadowColor: "rgba(0, 0, 0, 0.75)",
+                            textShadowOffset: { width: 0, height: 2 },
+                            textShadowRadius: 4,
+                          }}
+                        >
+                          Creating Your Quest...
                         </Text>
                       </View>
                     ) : (
-                      <Text style={{ color: "white", fontWeight: "bold", fontSize: 18 }}>
+                      <Text
+                        style={{
+                          color: "white",
+                          fontWeight: "bold",
+                          fontSize: 18,
+                          textShadowColor: "rgba(0, 0, 0, 0.5)",
+                          textShadowOffset: { width: 0, height: 1 },
+                          textShadowRadius: 3,
+                        }}
+                      >
                         Create Quest
                       </Text>
                     )}
@@ -983,12 +1001,30 @@ export default function CreateQuestScreen({ navigation }: Props) {
               {generateMutation.isPending ? (
                 <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
                   <ActivityIndicator size="small" color="white" />
-                  <Text style={{ color: "white", fontWeight: "bold", fontSize: 18 }}>
-                    Generating...
+                  <Text
+                    style={{
+                      color: "white",
+                      fontWeight: "bold",
+                      fontSize: 18,
+                      textShadowColor: "rgba(0, 0, 0, 0.75)",
+                      textShadowOffset: { width: 0, height: 2 },
+                      textShadowRadius: 4,
+                    }}
+                  >
+                    Generating Your Quest...
                   </Text>
                 </View>
               ) : (
-                <Text style={{ color: "white", fontWeight: "bold", fontSize: 18 }}>
+                <Text
+                  style={{
+                    color: "white",
+                    fontWeight: "bold",
+                    fontSize: 18,
+                    textShadowColor: "rgba(0, 0, 0, 0.5)",
+                    textShadowOffset: { width: 0, height: 1 },
+                    textShadowRadius: 3,
+                  }}
+                >
                   Create Quest with AI
                 </Text>
               )}
