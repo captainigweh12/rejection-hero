@@ -79,21 +79,39 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 
 ### 🎯 No Quest System (MAIN FEATURE)
 
-**AI-Generated Challenges**
-- Modern, light-themed Create Quest interface with keyboard handling
-- Two creation options: Generate with AI or Create Custom Quest
-- Beautiful gradient "Generate with AI" card
-- Custom quest form with action, description, and minimum NOs fields
-- AI generation with category and difficulty selection
-- KeyboardAvoidingView for smooth keyboard interactions
-- Tap outside to dismiss keyboard
-- 6 Categories: Sales, Social, Entrepreneurship, Dating, Confidence, Career
-- 4 Difficulty Levels: Easy, Medium, Hard, Expert
+**Create Quest Screen** ✨ FULLY REDESIGNED! (Modern Dark 3D Glass UI)
+- **Dark Gradient Background**: Consistent theme (#0A0A0F → #1A1A24 → #2A1A34) matching HomeScreen
+- **3D Glassmorphism Design**: Semi-transparent cards with colored borders and glow effects
+- **Two Creation Options**:
+  - 💜 **Generate with AI**: Purple gradient card with sparkle icon
+  - 🟠 **Create Custom Quest**: Glass card with star icon (coming soon)
+- **Location Options** 🗺️ NEW!:
+  - 📍 **Use My Location**: Find quests within 10 miles (default)
+  - 🌍 **Custom Location**: Specify any place (beach, mall, airport, etc.)
+  - ⭐ **No Specific Location**: Location-independent quests
+  - Custom location input field when "Custom Location" is selected
+- **Simplified Custom Quest Form** 🎙️ NEW!:
+  - Clean text input for quest description
+  - **Voice Recording Button**: Record quest with voice (AI transcription coming soon)
+  - Purple microphone button with glass styling
+  - Placeholder for future audio → quest transcription feature
+- **AI Generation Features**:
+  - 6 Categories: Sales, Social, Entrepreneurship, Dating, Confidence, Career
+  - 4 Difficulty Levels: Easy, Medium, Hard, Expert
+  - Quest Type Selection: Rejection Challenge or Action Challenge
+  - Personal Context input for tailored quests
+  - Location preferences integrated into AI prompt
+- **Modern UI Elements**:
+  - Colored category and difficulty badges with 3D effect
+  - Icon-based location type cards with checkmarks
+  - Smooth keyboard handling and dismissal
+  - Fixed bottom button with gradient when enabled
+  - Glass-style input fields with subtle borders
 - Auto-navigation to quest detail page after creation
 - Auto-start quest when created (if you have available slots)
-- Real-time progress tracking (NOs and YESes collected)
-- Rewards: Earn XP and points based on difficulty
 - **Quest Slots**: 1 slot for your quests, 1 slot for friend quests (extras go to queue)
+
+**AI-Generated Challenges**
 
 **Quest Detail Experience** ✨ MODERNIZED! (3D Dark Theme Design)
 - **Modern 3D UI**: Dark gradient background (#0A0A0F to #1A1A24) with glassmorphism effects
