@@ -42,6 +42,7 @@ export type UploadImageResponse = z.infer<typeof uploadImageResponseSchema>;
 export const getProfileResponseSchema = z.object({
   id: z.string(),
   userId: z.string(),
+  username: z.string().nullable().optional(), // Unique username/tag name
   displayName: z.string(),
   bio: z.string().nullable(),
   age: z.number().nullable(),
@@ -61,6 +62,7 @@ export type GetProfileResponse = z.infer<typeof getProfileResponseSchema>;
 
 // POST /api/profile - Create/Update profile
 export const updateProfileRequestSchema = z.object({
+  username: z.string().min(3).max(30).regex(/^[a-zA-Z0-9_]+$/).optional(), // Username: alphanumeric + underscore only
   displayName: z.string().min(1).max(50),
   bio: z.string().max(500).optional(),
   age: z.number().min(18).max(120).optional(),

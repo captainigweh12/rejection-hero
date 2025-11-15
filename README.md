@@ -411,15 +411,18 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 - Secure email/password login with Better Auth
 - Google OAuth sign-in (Web, Android, iOS)
 - Auto-prompt for login on app startup
-- **3-Step Onboarding for New Users** ✨ NEW!
-  - Step 1: Tell us about yourself (personalization for AI)
-  - Step 2: Pick your focus areas (select categories: Sales, Social, Dating, etc.)
-  - Step 3: Set your goals (choose or write custom goals)
+- **3-Step Onboarding for ALL Users** ✨ UPDATED!
+  - **Step 1:** Create unique username (@tag) + Tell us about yourself
+    - Username validation (3-30 chars, alphanumeric + underscore)
+    - Real-time preview with @ symbol
+    - Used across app for mentions, profiles, leaderboards
+  - **Step 2:** Pick your focus areas (select categories: Sales, Social, Dating, etc.)
+  - **Step 3:** Set your goals (choose or write custom goals)
   - Beautiful dark theme with 3D glassmorphism design
-  - Auto-redirect for new users (email & OAuth)
-  - Existing users skip onboarding automatically
+  - **ALL users see onboarding** (new AND existing users who haven't completed it)
+  - Username stored as unique identifier
   - Answers stored for AI quest generation
-  - Can update anytime in Profile → About tab
+  - Can update username and answers in Profile → About tab
 
 **Map & Location Features**
 - Google Maps integration with real-time location tracking

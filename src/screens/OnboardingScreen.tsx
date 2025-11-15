@@ -36,7 +36,8 @@ export default function OnboardingScreen() {
   const [currentStep, setCurrentStep] = useState<OnboardingStep>(1);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Step 1: About You
+  // Step 1: About You & Username
+  const [username, setUsername] = useState("");
   const [aboutYou, setAboutYou] = useState("");
 
   // Step 2: Select Categories (interests)
@@ -66,9 +67,19 @@ export default function OnboardingScreen() {
 
   const handleNext = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    if (currentStep === 1 && aboutYou.trim().length < 10) {
-      Alert.alert("Tell us about yourself", "Please write at least 10 characters about yourself.");
-      return;
+    if (currentStep === 1) {
+      if (!username.trim() || username.trim().length < 3) {
+        Alert.alert("Username Required", "Please enter a username (at least 3 characters).");
+        return;
+      }
+      if (!/^[a-zA-Z0-9_]+$/.test(username.trim())) {
+        Alert.alert("Invalid Username", "Username can only contain letters, numbers, and underscores.");
+        return;
+      }
+      if (aboutYou.trim().length < 10) {
+        Alert.alert("Tell us about yourself", "Please write at least 10 characters about yourself.");
+        return;
+      }
     }
     if (currentStep === 2 && selectedCategories.length === 0) {
       Alert.alert("Select Categories", "Please select at least one category you're interested in.");
@@ -112,11 +123,13 @@ export default function OnboardingScreen() {
         .join(", ");
 
       // Update profile with onboarding data
-      await api.post("/profile", {
-        displayName: session?.user?.name || "User",
+      await api.post("/api/profile", {
+        username: username.trim().toLowerCase(),
+        displayName: session?.user?.name || username.trim(),
         interests: selectedCategories,
         userContext: aboutYou.trim(),
         userGoals: goalsText,
+        onboardingCompleted: true,
       });
 
       // Navigate to home (main menu)
@@ -167,6 +180,37 @@ export default function OnboardingScreen() {
         <Text className="text-3xl font-bold text-white text-center mb-2">Welcome to Go for No!</Text>
         <Text className="text-base text-white/70 text-center px-4">
           Let&apos;s personalize your rejection journey
+        </Text>
+      </View>
+
+      <View className="mt-6">
+        <Text className="text-lg font-semibold text-white mb-3">Create your username</Text>
+        <Text className="text-sm text-white/60 mb-3">
+          Choose a unique username that others will see. Use only letters, numbers, and underscores.
+        </Text>
+        <View
+          className="rounded-2xl p-4"
+          style={{
+            backgroundColor: "rgba(255, 255, 255, 0.05)",
+            borderWidth: 1,
+            borderColor: "rgba(126, 63, 228, 0.3)",
+          }}
+        >
+          <View className="flex-row items-center">
+            <Text className="text-white/60 text-lg mr-1">@</Text>
+            <TextInput
+              value={username}
+              onChangeText={setUsername}
+              placeholder="warrior_123"
+              placeholderTextColor="rgba(255, 255, 255, 0.4)"
+              className="text-white text-base flex-1"
+              autoCapitalize="none"
+              autoCorrect={false}
+            />
+          </View>
+        </View>
+        <Text className="text-xs text-white/40 mt-2">
+          {username.length > 0 ? `@${username}` : "Your unique tag"}
         </Text>
       </View>
 

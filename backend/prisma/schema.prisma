@@ -92,6 +92,7 @@ model Verification {
 model Profile {
   id          String   @id @default(cuid())
   userId      String   @unique
+  username    String?  @unique // Unique username/tag name (e.g., @johndoe)
   displayName String
   bio         String?
   age         Int?

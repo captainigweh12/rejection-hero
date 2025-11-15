@@ -57,6 +57,7 @@ profileRouter.get("/", async (c) => {
   return c.json({
     id: profile.id,
     userId: profile.userId,
+    username: profile.username,
     displayName: profile.displayName,
     bio: profile.bio,
     age: profile.age,
@@ -92,6 +93,7 @@ profileRouter.post("/", zValidator("json", updateProfileRequestSchema), async (c
     where: { userId: user.id },
     create: {
       userId: user.id,
+      username: data.username,
       displayName: data.displayName,
       bio: data.bio,
       age: data.age,
@@ -106,6 +108,7 @@ profileRouter.post("/", zValidator("json", updateProfileRequestSchema), async (c
       onboardingCompleted: data.onboardingCompleted ?? false,
     },
     update: {
+      username: data.username,
       displayName: data.displayName,
       bio: data.bio,
       age: data.age,
@@ -129,6 +132,7 @@ profileRouter.post("/", zValidator("json", updateProfileRequestSchema), async (c
     profile: {
       id: profile.id,
       userId: profile.userId,
+      username: profile.username,
       displayName: profile.displayName,
       bio: profile.bio,
       age: profile.age,
