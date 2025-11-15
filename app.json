@@ -8,6 +8,7 @@
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "ios": {
+      "bundleIdentifier": "com.vibecode.goforno",
       "supportsTablet": true,
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "We need your location to show you nearby rejection challenges and help you discover quests in your area.",
@@ -29,6 +30,7 @@
       }
     },
     "android": {
+      "package": "com.vibecode.goforno",
       "edgeToEdgeEnabled": true,
       "usesCleartextTraffic": true,
       "permissions": [
