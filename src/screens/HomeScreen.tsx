@@ -1219,7 +1219,7 @@ export default function HomeScreen({ navigation }: Props) {
                     <Pressable
                       onPress={() => {
                         setShowMenu(false);
-                        // TODO: Navigate to Invite Warriors screen
+                        navigation.navigate("InviteWarriors");
                       }}
                       style={{
                         backgroundColor: "rgba(255, 255, 255, 0.05)",
@@ -1396,7 +1396,7 @@ export default function HomeScreen({ navigation }: Props) {
                     <Pressable
                       onPress={() => {
                         setShowMenu(false);
-                        // TODO: Navigate to Manage Categories screen
+                        navigation.navigate("ManageCategories");
                       }}
                       style={{
                         backgroundColor: "rgba(255, 255, 255, 0.05)",

@@ -25,6 +25,8 @@ export type RootStackParamList = {
   SendQuestToFriend: { friendId: string; friendName: string };
   Notifications: undefined;
   QuestCalendar: undefined;
+  InviteWarriors: undefined;
+  ManageCategories: undefined;
 };
 
 export type BottomTabParamList = {

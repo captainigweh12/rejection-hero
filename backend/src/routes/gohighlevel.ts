@@ -7,6 +7,7 @@ import {
   sendEmail,
   createOrUpdateContact,
   getWelcomeEmailHTML,
+  getInviteEmailHTML,
 } from "../services/gohighlevel";
 
 const app = new Hono<AppType>();
@@ -164,6 +165,81 @@ app.post("/sync-stats", async (c) => {
     return c.json(
       {
         error: "Failed to sync stats to GoHighLevel",
+        details: error instanceof Error ? error.message : String(error),
+      },
+      500
+    );
+  }
+});
+
+/**
+ * POST /api/gohighlevel/send-invite
+ * Send an invite email to a friend via GoHighLevel
+ */
+app.post("/send-invite", async (c) => {
+  const user = c.get("user");
+  if (!user) {
+    return c.json({ error: "Unauthorized" }, 401);
+  }
+
+  try {
+    const body = await c.req.json();
+    const { email, name, inviterName } = body;
+
+    if (!email || !name) {
+      return c.json({ error: "Email and name are required" }, 400);
+    }
+
+    // Create or update contact in GoHighLevel
+    const contactResult = await createOrUpdateContact({
+      email,
+      name,
+      tags: ["invited", "rejection-hero"],
+      customFields: [
+        { key: "invited_by", field_value: inviterName || user.name || "Unknown" },
+        { key: "invite_status", field_value: "pending" },
+      ],
+    });
+
+    if (!contactResult.success || !contactResult.contactId) {
+      return c.json(
+        {
+          error: "Failed to create contact in GoHighLevel",
+          details: contactResult.error,
+        },
+        500
+      );
+    }
+
+    // Send invite email
+    const inviteEmailHTML = getInviteEmailHTML(name, inviterName || user.name || "A friend");
+    const emailResult = await sendEmail(
+      contactResult.contactId,
+      `${inviterName || user.name} invited you to join Rejection Hero!`,
+      inviteEmailHTML,
+      "noreply@rejectionhero.com"
+    );
+
+    if (!emailResult.success) {
+      return c.json(
+        {
+          error: "Failed to send invite email",
+          details: emailResult.error,
+        },
+        500
+      );
+    }
+
+    return c.json({
+      success: true,
+      message: "Invite sent successfully",
+      contactId: contactResult.contactId,
+    });
+  } catch (error) {
+    console.error("❌ Error sending invite:", error);
+    return c.json(
+      {
+        error: "Failed to send invite",
         details: error instanceof Error ? error.message : String(error),
       },
       500

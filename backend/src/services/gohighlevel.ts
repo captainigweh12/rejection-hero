@@ -270,6 +270,151 @@ export function getWelcomeEmailHTML(userName: string): string {
 }
 
 /**
+ * Get invite email HTML template
+ */
+export function getInviteEmailHTML(inviteeName: string, inviterName: string): string {
+  const appUrl = "com.vibecode.goforno://home"; // Deep link to app
+
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <style>
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+          line-height: 1.6;
+          color: #333;
+          max-width: 600px;
+          margin: 0 auto;
+          padding: 0;
+          background-color: #f4f4f4;
+        }
+        .email-container {
+          background-color: #ffffff;
+          margin: 20px auto;
+          border-radius: 10px;
+          overflow: hidden;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+          background: linear-gradient(135deg, #FF6B35 0%, #0099FF 100%);
+          color: white;
+          padding: 40px 20px;
+          text-align: center;
+        }
+        .logo {
+          max-width: 150px;
+          margin-bottom: 20px;
+        }
+        .header h1 {
+          margin: 0;
+          font-size: 32px;
+          font-weight: bold;
+        }
+        .header p {
+          margin: 10px 0 0;
+          font-size: 18px;
+          opacity: 0.9;
+        }
+        .content {
+          padding: 40px 30px;
+        }
+        .content h2 {
+          color: #FF6B35;
+          font-size: 24px;
+          margin-top: 0;
+        }
+        .cta-button {
+          display: inline-block;
+          background: linear-gradient(135deg, #FF6B35 0%, #FF8C61 100%);
+          color: white;
+          padding: 16px 40px;
+          text-decoration: none;
+          border-radius: 8px;
+          font-weight: bold;
+          font-size: 18px;
+          margin: 20px 0;
+          box-shadow: 0 4px 6px rgba(255, 107, 53, 0.3);
+        }
+        .feature-box {
+          background: #f8f9fa;
+          border-left: 4px solid #FF6B35;
+          padding: 15px 20px;
+          margin: 15px 0;
+          border-radius: 4px;
+        }
+        .footer {
+          background: #f8f9fa;
+          padding: 20px;
+          text-align: center;
+          font-size: 12px;
+          color: #666;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="email-container">
+        <div class="header">
+          <img src="https://raw.githubusercontent.com/yourusername/rejection-hero/main/logo.png" alt="Rejection Hero Logo" class="logo">
+          <h1>Rejection Hero</h1>
+          <p>Embrace Your NO's</p>
+        </div>
+
+        <div class="content">
+          <h2>Hey ${inviteeName}! 👋</h2>
+
+          <p><strong>${inviterName}</strong> thinks you'd be perfect for <strong>Rejection Hero</strong> - an app that helps you turn rejection into your greatest advantage!</p>
+
+          <p>Join ${inviterName} and thousands of others who are:</p>
+
+          <div class="feature-box">
+            <strong>🎯 Conquering Fear</strong><br>
+            Face rejection head-on through gamified challenges and quests
+          </div>
+
+          <div class="feature-box">
+            <strong>💪 Building Confidence</strong><br>
+            Track your progress and celebrate every NO as a victory
+          </div>
+
+          <div class="feature-box">
+            <strong>🏆 Achieving Goals</strong><br>
+            Turn rejection into fuel for success in sales, dating, career, and life
+          </div>
+
+          <div class="feature-box">
+            <strong>👥 Growing Together</strong><br>
+            Connect with ${inviterName} and a community of warriors
+          </div>
+
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${appUrl}" class="cta-button">Join Rejection Hero</a>
+          </div>
+
+          <p>Every successful person has faced rejection. The difference? <strong>They embraced it.</strong></p>
+
+          <p><strong>Remember:</strong> Your biggest breakthrough could be just one NO away!</p>
+
+          <p>
+            See you in the app,<br>
+            <strong>The Rejection Hero Team</strong>
+          </p>
+        </div>
+
+        <div class="footer">
+          <p><strong>Rejection Hero</strong> - Embrace Your NO's</p>
+          <p>You received this invitation from ${inviterName}.</p>
+          <p>© ${new Date().getFullYear()} Rejection Hero. All rights reserved.</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+}
+
+/**
  * Sync user to GoHighLevel and send welcome email
  * Called automatically when a new user signs up
  */
