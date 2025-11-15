@@ -7,14 +7,14 @@ $ prisma generate
 Environment variables loaded from .env
 Prisma schema loaded from prisma/schema.prisma
 
-✔ Generated Prisma Client (v6.17.1) to ./generated/prisma in 277ms
+✔ Generated Prisma Client (v6.17.1) to ./generated/prisma in 301ms
 
 Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
 
-Tip: Want to turn off tips and other hints? https://pris.ly/tip-4-nohints
+Tip: Need your database queries to be 1000x faster? Accelerate offers you that and more: https://pris.ly/tip-2-accelerate
 
 
-Checked 760 installs across 702 packages (no changes) [1.68s]
+Checked 760 installs across 702 packages (no changes) [1.66s]
 Starting server in dev mode with hot reload...
 $ NODE_ENV=development bun run --hot src/index.ts
 Failed to find Response internal state key
@@ -180,51 +180,103 @@ Failed to find Response internal state key
 --> GET /api/auth/get-session [32m200[0m 11ms
 <-- GET /api/profile
 --> GET /api/profile [32m200[0m 3ms
-<-- GET /api/stats
-<-- GET /api/stats/reflection-prompt
 <-- GET /api/quests
 <-- GET /api/stats/weekly-forecast
---> GET /api/stats/reflection-prompt [32m200[0m 8ms
---> GET /api/stats [32m200[0m 10ms
---> GET /api/quests [32m200[0m 9ms
---> GET /api/stats/weekly-forecast [32m200[0m 8ms
+<-- GET /api/stats
+<-- GET /api/stats/reflection-prompt
+--> GET /api/quests [32m200[0m 5ms
+--> GET /api/stats/reflection-prompt [32m200[0m 5ms
+--> GET /api/stats [32m200[0m 8ms
+--> GET /api/stats/weekly-forecast [32m200[0m 10ms
 <-- GET /api/profile
 <-- GET /api/stats
 --> GET /api/profile [32m200[0m 4ms
 --> GET /api/stats [32m200[0m 3ms
-<-- POST /api/auth/sign-out
---> POST /api/auth/sign-out [32m200[0m 8ms
 <-- GET /api/auth/get-session
---> GET /api/auth/get-session [32m200[0m 1ms
-<-- POST /api/auth/sign-in/social
---> POST /api/auth/sign-in/social [32m200[0m 9ms
-<-- GET /api/auth/get-session
---> GET /api/auth/get-session [32m200[0m 1ms
-<-- GET /api/auth/expo-authorization-proxy
---> GET /api/auth/expo-authorization-proxy [36m302[0m 3ms
-<-- GET /api/auth/callback/google
---> GET /api/auth/callback/google [36m302[0m 109ms
+--> GET /api/auth/get-session [32m200[0m 4ms
+<-- GET /api/quests
+<-- GET /api/profile
+--> GET /api/quests [32m200[0m 4ms
+--> GET /api/profile [32m200[0m 3ms
+<-- GET /api/stats
+--> GET /api/stats [32m200[0m 4ms
+<-- GET /api/stats/reflection-prompt
+<-- GET /api/stats/weekly-forecast
+--> GET /api/stats/reflection-prompt [32m200[0m 2ms
+--> GET /api/stats/weekly-forecast [32m200[0m 2ms
+<-- GET /api/stats
+<-- GET /api/profile
+--> GET /api/stats [32m200[0m 3ms
+--> GET /api/profile [32m200[0m 2ms
+<-- GET /api/journal
+--> GET /api/journal [32m200[0m 3ms
+<-- GET /api/quests
+<-- GET /api/live/active
+--> GET /api/quests [32m200[0m 3ms
+--> GET /api/live/active [32m200[0m 4ms
+<-- GET /api/stats
+--> GET /api/stats [32m200[0m 2ms
+<-- GET /api/moments
+<-- GET /api/friends/requests
+--> GET /api/friends/requests [32m200[0m 2ms
+--> GET /api/moments [32m200[0m 4ms
+<-- GET /api/groups
+<-- GET /api/posts/feed
+<-- GET /api/friends
+<-- GET /api/messages/conversations
+--> GET /api/groups [32m200[0m 9ms
+--> GET /api/friends [32m200[0m 7ms
+--> GET /api/messages/conversations [32m200[0m 8ms
+--> GET /api/posts/feed [32m200[0m 10ms
+<-- GET /api/live/active
+--> GET /api/live/active [32m200[0m 4ms
+<-- GET /api/live/active
+--> GET /api/live/active [32m200[0m 3ms
+<-- GET /api/live/active
+--> GET /api/live/active [32m200[0m 3ms
+<-- GET /api/live/active
+--> GET /api/live/active [32m200[0m 3ms
+<-- GET /api/live/active
+--> GET /api/live/active [32m200[0m 3ms
+<-- GET /api/live/active
+--> GET /api/live/active [32m200[0m 3ms
+<-- GET /api/live/active
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/live/active
+--> GET /api/live/active [32m200[0m 3ms
+<-- GET /api/live/active
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/live/active
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/live/active
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/live/active
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/live/active
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/live/active
+--> GET /api/live/active [32m200[0m 3ms
+<-- GET /api/live/active
+--> GET /api/live/active [32m200[0m 3ms
+<-- GET /api/live/active
+--> GET /api/live/active [32m200[0m 3ms
+<-- GET /api/live/active
+--> GET /api/live/active [32m200[0m 3ms
+<-- GET /api/live/active
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/live/active
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/live/active
+--> GET /api/live/active [32m200[0m 3ms
 <-- GET /api/auth/get-session
 --> GET /api/auth/get-session [32m200[0m 3ms
-<-- GET /api/quests
+<-- GET /api/stats/reflection-prompt
+--> GET /api/stats/reflection-prompt [32m200[0m 2ms
 <-- GET /api/stats/weekly-forecast
---> GET /api/quests [32m200[0m 4ms
+<-- GET /api/stats
+--> GET /api/stats [32m200[0m 3ms
 --> GET /api/stats/weekly-forecast [32m200[0m 3ms
 <-- GET /api/profile
---> GET /api/profile [32m200[0m 4ms
-<-- GET /api/stats
-<-- GET /api/stats/reflection-prompt
---> GET /api/stats/reflection-prompt [32m200[0m 1ms
---> GET /api/stats [32m200[0m 2ms
-<-- GET /api/messages/conversations
-<-- GET /api/moments
---> GET /api/messages/conversations [32m200[0m 5ms
---> GET /api/moments [32m200[0m 6ms
-<-- GET /api/posts/feed
-<-- GET /api/groups
-<-- GET /api/friends/requests
-<-- GET /api/friends
---> GET /api/posts/feed [32m200[0m 6ms
---> GET /api/friends [32m200[0m 5ms
---> GET /api/friends/requests [32m200[0m 7ms
---> GET /api/groups [32m200[0m 7ms
+--> GET /api/profile [32m200[0m 2ms
+<-- GET /api/quests
+--> GET /api/quests [32m200[0m 1ms
