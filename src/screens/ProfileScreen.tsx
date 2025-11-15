@@ -166,17 +166,16 @@ export default function ProfileScreen({ navigation }: Props) {
   const xpProgress = ((statsData?.totalXP || 0) % 100) / 100;
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
-      <LinearGradient colors={["#0A0A0F", "#1A1A24", "#2A1A34"]} style={{ flex: 1 }}>
-        <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
-          <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 100 }}>
-            {/* Hero Header with Gradient */}
-            <LinearGradient
-              colors={["#7E3FE4", "#C45FD4", "#5B8DEF"]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={{ paddingBottom: 80, paddingTop: 20 }}
-            >
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
+        <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 100 }}>
+          {/* Hero Header with Gradient */}
+          <LinearGradient
+            colors={["#7E3FE4", "#9D5FE4", "#B85FD4"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={{ paddingBottom: 80, paddingTop: 20 }}
+          >
               {/* Settings Button */}
             <View style={{ paddingHorizontal: 20, alignItems: "flex-end", marginBottom: 20 }}>
               <Pressable
@@ -570,6 +569,7 @@ export default function ProfileScreen({ navigation }: Props) {
                 </Text>
                 <View style={{ gap: 12 }}>
                   <Pressable
+                    onPress={() => navigation.navigate("Tabs", { screen: "HomeTab" })}
                     style={{
                       flexDirection: "row",
                       alignItems: "center",
@@ -596,6 +596,7 @@ export default function ProfileScreen({ navigation }: Props) {
                     </Text>
                   </Pressable>
                   <Pressable
+                    onPress={() => Alert.alert("Coming Soon", "Achievements feature is being developed!")}
                     style={{
                       flexDirection: "row",
                       alignItems: "center",
@@ -949,7 +950,6 @@ export default function ProfileScreen({ navigation }: Props) {
           )}
         </ScrollView>
       </SafeAreaView>
-      </LinearGradient>
 
       {/* Avatar Modal */}
       <Modal visible={showAvatarModal} transparent animationType="slide">

@@ -218,6 +218,14 @@ export default function CommunityScreen({ navigation }: Props) {
             <Text style={{ fontSize: 32, fontWeight: "bold", color: "white" }}>Community</Text>
             <View style={{ flexDirection: "row", gap: 12 }}>
               <Pressable
+                onPress={() => {
+                  // Scroll to friend requests section if there are any
+                  if (requests.length > 0) {
+                    setActiveTab("friends");
+                  } else {
+                    Alert.alert("No Notifications", "You don't have any friend requests at the moment.");
+                  }
+                }}
                 style={{
                   width: 40,
                   height: 40,
@@ -249,7 +257,7 @@ export default function CommunityScreen({ navigation }: Props) {
               </Pressable>
               <Pressable
                 onPress={() => {
-                  // TODO: Navigate to search screen
+                  navigation.navigate("SearchUsers");
                 }}
                 style={{
                   width: 40,
