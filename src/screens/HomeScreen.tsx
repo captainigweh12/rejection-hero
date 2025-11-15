@@ -171,10 +171,10 @@ export default function HomeScreen({ navigation }: Props) {
             <Zap size={48} color="#FF6B35" fill="#FF6B35" />
           </View>
           <Text className="text-white text-3xl font-bold mb-4 text-center">
-            Welcome to Go for No!
+            Welcome to Rejection Hero!
           </Text>
           <Text className="text-white/70 text-lg text-center mb-8">
-            Transform rejection into growth. Start your journey to overcome fear and build
+            Transform rejection into growth. Start your epic journey to overcome fear and build
             unstoppable confidence.
           </Text>
           <Pressable
@@ -200,7 +200,25 @@ export default function HomeScreen({ navigation }: Props) {
         {/* Gaming-Style Header with Profile */}
         <View style={{ paddingHorizontal: 24, paddingTop: 16, paddingBottom: 12 }}>
           <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-            <Text style={{ color: "white", fontSize: 24, fontWeight: "bold" }}>Go for No</Text>
+            {/* Modern Gaming Logo with Gradient */}
+            <LinearGradient
+              colors={["#FF6B35", "#FFD700", "#00D9FF"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={{ borderRadius: 12, padding: 2 }}
+            >
+              <View style={{ backgroundColor: "#0A0A0F", borderRadius: 10, paddingHorizontal: 12, paddingVertical: 6 }}>
+                <Text style={{
+                  color: "white",
+                  fontSize: 20,
+                  fontWeight: "900",
+                  letterSpacing: 1,
+                  textTransform: "uppercase"
+                }}>
+                  REJECTION HERO
+                </Text>
+              </View>
+            </LinearGradient>
             <View style={{ flexDirection: "row", alignItems: "center", gap: 16 }}>
               <Pressable>
                 <Bell size={24} color="#fff" />
