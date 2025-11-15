@@ -216,7 +216,10 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 
 **Map & Location Features**
 - Google Maps integration with real-time location tracking
-- Location permission handling
+- **iOS & Android location permissions properly configured**:
+  - iOS: NSLocationWhenInUseUsageDescription and NSLocationAlwaysAndWhenInUseUsageDescription set
+  - Android: ACCESS_FINE_LOCATION and ACCESS_COARSE_LOCATION permissions added
+- Location permission handling with user-friendly error messages
 - Recenter map to current location
 - Create location-based quests
 - Discover nearby quest opportunities (coming soon)

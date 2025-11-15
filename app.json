@@ -10,6 +10,8 @@
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "We need your location to show you nearby rejection challenges and help you discover quests in your area.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "We need your location to show you nearby rejection challenges and help you discover quests in your area.",
         "NSAppTransportSecurity": {
           "NSAllowsArbitraryLoads": true,
           "NSExceptionDomains": {
@@ -28,7 +30,11 @@
     },
     "android": {
       "edgeToEdgeEnabled": true,
-      "usesCleartextTraffic": true
+      "usesCleartextTraffic": true,
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION"
+      ]
     }
   }
 }
