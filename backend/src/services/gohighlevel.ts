@@ -44,11 +44,32 @@ export async function createOrUpdateContact(contact: GoHighLevelContact) {
     });
 
     if (!response.ok) {
-      const error = await response.text();
-      console.error("❌ [GoHighLevel] API Error:", error);
+      const errorText = await response.text();
+      console.error("❌ [GoHighLevel] API Error:", errorText);
+
+      // Handle duplicate contact error - extract existing contact ID
+      if (response.status === 400 && errorText.includes("duplicated contacts")) {
+        try {
+          const errorData = JSON.parse(errorText);
+          const existingContactId = errorData.meta?.contactId;
+
+          if (existingContactId) {
+            console.log("ℹ️ [GoHighLevel] Contact already exists, using existing ID:", existingContactId);
+            return {
+              success: true,
+              contactId: existingContactId,
+              data: { contact: { id: existingContactId } },
+              isDuplicate: true
+            };
+          }
+        } catch (parseError) {
+          console.error("❌ [GoHighLevel] Failed to parse duplicate contact error");
+        }
+      }
+
       return {
         success: false,
-        error: `GoHighLevel API failed: ${response.status} - ${error}`,
+        error: `GoHighLevel API failed: ${response.status} - ${errorText}`,
         contactId: null
       };
     }
