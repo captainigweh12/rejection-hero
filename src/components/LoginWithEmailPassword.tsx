@@ -21,32 +21,15 @@ export default function LoginWithEmailPassword() {
   const [isCheckingOnboarding, setIsCheckingOnboarding] = useState(false);
   const { data: session, refetch } = useSession();
 
-  // Check onboarding status when user is logged in
+  // Close modal when user is logged in (AuthWrapper will handle navigation)
   useEffect(() => {
-    const checkOnboarding = async () => {
-      if (session?.user && !isCheckingOnboarding) {
-        setIsCheckingOnboarding(true);
-        try {
-          const response = await api.get("/api/profile");
-          const profile = response as { onboardingCompleted?: boolean };
-
-          // Use setTimeout to avoid navigation during render
-          setTimeout(() => {
-            if (!profile.onboardingCompleted) {
-              navigation.replace("Onboarding");
-            } else {
-              navigation.replace("Tabs");
-            }
-          }, 100);
-        } catch (error) {
-          console.error("Error checking onboarding status:", error);
-          setIsCheckingOnboarding(false);
-        }
-      }
-    };
-
-    checkOnboarding();
-  }, [session, navigation, isCheckingOnboarding]);
+    if (session?.user) {
+      setIsCheckingOnboarding(true);
+      setTimeout(() => {
+        navigation.goBack();
+      }, 100);
+    }
+  }, [session, navigation]);
 
   const handleSignIn = async () => {
     if (!email || !password) {
@@ -165,7 +148,7 @@ export default function LoginWithEmailPassword() {
               resizeMode="contain"
             />
             <Text className="text-white text-3xl font-bold mt-4">Rejection Hero</Text>
-            <Text className="text-white/60 text-base mt-2">Embrace Your No's</Text>
+            <Text className="text-white/60 text-base mt-2">Embrace Your Journey</Text>
           </View>
 
           {/* Form Container */}

@@ -318,4 +318,75 @@ friendsRouter.get("/search", async (c) => {
   return c.json({ users });
 });
 
+// ============================================
+// GET /api/friends/recommendations - Get friend recommendations
+// ============================================
+friendsRouter.get("/recommendations", async (c) => {
+  const user = c.get("user");
+
+  if (!user) {
+    return c.json({ message: "Unauthorized" }, 401);
+  }
+
+  // Get user's profile to understand their interests
+  const userProfile = await db.profile.findUnique({
+    where: { userId: user.id },
+  });
+
+  // Get existing friendships to exclude
+  const friendships = await db.friendship.findMany({
+    where: {
+      OR: [
+        { initiatorId: user.id },
+        { receiverId: user.id },
+      ],
+    },
+  });
+
+  const friendUserIds = friendships.map((f) =>
+    f.initiatorId === user.id ? f.receiverId : f.initiatorId
+  );
+
+  // Find profiles with similar interests or nearby location
+  const recommendations = await db.profile.findMany({
+    where: {
+      AND: [
+        { userId: { not: user.id } }, // Exclude current user
+        { userId: { notIn: friendUserIds } }, // Exclude existing friends
+        { onboardingCompleted: true }, // Only show users who completed onboarding
+      ],
+    },
+    include: {
+      user: true,
+    },
+    take: 10,
+    orderBy: {
+      createdAt: "desc", // Prioritize newer users
+    },
+  });
+
+  const users = recommendations.map((profile) => {
+    const interests = profile.interests ? JSON.parse(profile.interests) : [];
+    const userInterests = userProfile?.interests ? JSON.parse(userProfile.interests) : [];
+
+    // Calculate interest match score
+    const sharedInterests = interests.filter((i: string) => userInterests.includes(i));
+    const matchScore = sharedInterests.length;
+
+    return {
+      id: profile.userId,
+      email: profile.user.email,
+      displayName: profile.displayName,
+      avatar: profile.avatar,
+      bio: profile.bio,
+      interests,
+      sharedInterests,
+      matchScore,
+      location: profile.location,
+    };
+  }).sort((a, b) => b.matchScore - a.matchScore); // Sort by match score
+
+  return c.json({ recommendations: users });
+});
+
 export { friendsRouter };

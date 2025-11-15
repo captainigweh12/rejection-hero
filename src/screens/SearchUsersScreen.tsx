@@ -25,7 +25,7 @@ export default function SearchUsersScreen({ navigation }: Props) {
 
   const sendFriendRequestMutation = useMutation({
     mutationFn: async (userId: string) => {
-      return api.post("/api/friends/request", { friendId: userId });
+      return api.post("/api/friends/request", { userId });
     },
     onSuccess: () => {
       Alert.alert("Success", "Friend request sent!");

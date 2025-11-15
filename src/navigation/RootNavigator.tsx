@@ -136,9 +136,9 @@ function AuthWrapper() {
           navigation.navigate("LoginModalScreen");
         }, 100);
       } else if (profile && !profile.onboardingCompleted) {
-        // Redirect to onboarding if user hasn't completed it
+        // Replace with onboarding if user hasn't completed it
         setTimeout(() => {
-          navigation.navigate("Onboarding");
+          navigation.replace("Onboarding");
         }, 100);
       }
     }
