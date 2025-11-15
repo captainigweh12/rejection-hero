@@ -5,6 +5,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, Bell, Menu as MenuIcon, Flame, Trophy, Diamond, Clock, Sparkles, Star, X, Video } from "lucide-react-native";
 import * as Location from "expo-location";
+import * as Haptics from "expo-haptics";
 import type { RootStackScreenProps } from "@/navigation/types";
 import { api } from "@/lib/api";
 import type {
@@ -190,6 +191,9 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
       queryClient.invalidateQueries({ queryKey: ["stats"] });
 
       if (data.completed) {
+        // Trigger success haptic feedback
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+
         // Refresh leaderboard data
         queryClient.invalidateQueries({ queryKey: ["leaderboard"] });
 

@@ -126,6 +126,7 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
   - Green gradient for NO button
   - Red gradient for YES button
   - Improved visual feedback and animations
+  - **Haptic Feedback** 📳: Success vibration when quest is completed
 - **Refined Color Palette**:
   - Primary: #7E3FE4 (purple)
   - Accent: #00D9FF (cyan)
