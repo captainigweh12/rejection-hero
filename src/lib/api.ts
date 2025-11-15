@@ -95,8 +95,11 @@ const fetchFn = async <T>(path: string, options: FetchOptions): Promise<T> => {
     // The response is cast to the expected type T for type safety
     return response.json() as Promise<T>;
   } catch (error: any) {
-    // Enhanced error logging for debugging
-    console.error(`[API Error] ${method} ${path}:`, error);
+    // Enhanced error logging for debugging - but skip 400 errors (validation errors)
+    const is400Error = error.message && error.message.includes('400 bad request');
+    if (!is400Error) {
+      console.error(`[API Error] ${method} ${path}:`, error);
+    }
 
     // Check for network-specific errors
     if (error.message && error.message.includes('Network request failed')) {

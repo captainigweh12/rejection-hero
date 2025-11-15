@@ -178,17 +178,41 @@ questsRouter.post("/:id/start", async (c) => {
   const userQuestId = c.req.param("id");
   const skipLimitCheck = c.req.query("skipLimitCheck") === "true"; // Allow bypassing limit for regeneration
 
-  // Check active quests limit (max 2) - skip if this is a regeneration
+  // Get the quest to check if it's from a friend
+  const userQuestToStart = await db.userQuest.findUnique({
+    where: { id: userQuestId },
+    include: { quest: true },
+  });
+
+  if (!userQuestToStart) {
+    return c.json({ message: "Quest not found" }, 404);
+  }
+
+  // Check active quests limit - NEW LOGIC: 1 slot for user quests, 1 slot for friend quests
   if (!skipLimitCheck) {
-    const activeCount = await db.userQuest.count({
+    const activeQuests = await db.userQuest.findMany({
       where: {
         userId: user.id,
         status: "ACTIVE",
       },
     });
 
-    if (activeCount >= 2) {
-      return c.json({ message: "Maximum 2 active quests allowed" }, 400);
+    // Count active user quests (not from friends)
+    const activeUserQuests = activeQuests.filter((q) => !q.isFromFriend);
+    // Count active friend quests
+    const activeFriendQuests = activeQuests.filter((q) => q.isFromFriend);
+
+    // Check if the appropriate slot is full
+    if (userQuestToStart.isFromFriend) {
+      // This is a friend quest, check friend quest slot
+      if (activeFriendQuests.length >= 1) {
+        return c.json({ message: "Friend quest slot is full. Complete your active friend quest first." }, 400);
+      }
+    } else {
+      // This is a user quest, check user quest slot
+      if (activeUserQuests.length >= 1) {
+        return c.json({ message: "Your quest slot is full. Complete your active quest first." }, 400);
+      }
     }
   }
 

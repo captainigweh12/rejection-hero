@@ -210,6 +210,8 @@ model UserQuest {
   completedAt DateTime?
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
+  isFromFriend Boolean     @default(false) // Track if quest came from a friend
+  sharedById  String?      // ID of friend who shared this quest
   LiveStreams LiveStream[]
   quest       Quest        @relation(fields: [questId], references: [id], onDelete: Cascade)
   user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)

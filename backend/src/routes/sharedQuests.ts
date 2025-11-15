@@ -156,23 +156,30 @@ sharedQuestsRouter.post("/:id/accept", async (c) => {
     return c.json({ success: true, message: "Quest already in your list" });
   }
 
-  // Get active quests count
-  const activeCount = await db.userQuest.count({
+  // Get active quests - check slots separately
+  const activeQuests = await db.userQuest.findMany({
     where: {
       userId: user.id,
       status: "ACTIVE",
     },
   });
 
-  // Create user quest (ACTIVE if less than 2 active, otherwise QUEUED)
-  const status = activeCount < 2 ? "ACTIVE" : "QUEUED";
+  // Count active user quests and friend quests
+  const activeUserQuests = activeQuests.filter((q) => !q.isFromFriend);
+  const activeFriendQuests = activeQuests.filter((q) => q.isFromFriend);
 
+  // Determine status - friend quest uses friend slot (1 slot)
+  const status = activeFriendQuests.length < 1 ? "ACTIVE" : "QUEUED";
+
+  // Create user quest marked as from friend
   await db.userQuest.create({
     data: {
       userId: user.id,
       questId: sharedQuest.questId,
       status,
       startedAt: status === "ACTIVE" ? new Date() : null,
+      isFromFriend: true, // Mark as friend quest
+      sharedById: sharedQuest.senderId, // Track who shared it
     },
   });
 
