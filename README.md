@@ -988,6 +988,30 @@ The app features a cohesive dark theme with modern 3D-style UI elements througho
 - User data synced to GoHighLevel on account creation
 - Contact custom fields include: username, userId, totalXP, currentStreak, level
 
+### Support System ✨ NEW!
+- `POST /api/support/create-ticket` - Submit support ticket with GoHighLevel integration
+
+**Support Features:**
+- User-friendly support ticket form with 6 categories (Bug, Feature, Account, Payment, Technical, Other)
+- Automatic tagging in GoHighLevel ("support", "needs-assistance", category-specific tags)
+- Confirmation email sent to user via GoHighLevel
+- Custom fields track latest ticket, category, and status
+- Full two-way communication via GoHighLevel
+- Accessible from hamburger menu → Support
+
+### Categories ✨ NEW!
+- `GET /api/categories` - Get all categories (default + custom)
+- `POST /api/categories` - Create custom category
+- `PUT /api/categories/:id` - Update custom category
+- `DELETE /api/categories/:id` - Delete custom category
+
+**Category Features:**
+- 6 default categories: Sales, Social, Entrepreneurship, Dating, Confidence, Career
+- Each category has: name, description, color, isCustom flag
+- Users can create custom categories (with unique IDs)
+- Cannot modify or delete default categories
+- Custom categories for personalized quest organization
+
 ### Stats
 - `GET /api/stats` - Get user statistics (includes confidence, fear zones, completion rates)
 - `GET /api/stats/leaderboard` - Get leaderboard rankings
