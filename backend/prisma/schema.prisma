@@ -41,6 +41,8 @@ model User {
   PostLikes          PostLike[]
   PostComments       PostComment[]
   Moments            Moment[]
+  NotificationsSent  Notification[]      @relation("NotificationSender")
+  NotificationsReceived Notification[]   @relation("NotificationReceiver")
 
   @@map("user")
 }
@@ -436,4 +438,20 @@ model Moment {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("moment")
+}
+
+model Notification {
+  id          String   @id @default(cuid())
+  userId      String   // User receiving the notification
+  senderId    String?  // User who triggered the notification (optional)
+  type        String   // FRIEND_REQUEST, FRIEND_ACCEPTED, QUEST_SHARED, QUEST_COMPLETED, etc.
+  title       String
+  message     String
+  read        Boolean  @default(false)
+  data        String?  // JSON data for navigation/actions
+  createdAt   DateTime @default(now())
+  user        User     @relation("NotificationReceiver", fields: [userId], references: [id], onDelete: Cascade)
+  sender      User?    @relation("NotificationSender", fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@map("notification")
 }

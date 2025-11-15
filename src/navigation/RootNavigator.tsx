@@ -27,6 +27,7 @@ import SearchUsersScreen from "@/screens/SearchUsersScreen";
 import GrowthAchievementsScreen from "@/screens/GrowthAchievementsScreen";
 import FriendsScreen from "@/screens/FriendsScreen";
 import SendQuestToFriendScreen from "@/screens/SendQuestToFriendScreen";
+import NotificationsScreen from "@/screens/NotificationsScreen";
 import { useSession } from "@/lib/useSession";
 import { api } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
@@ -99,6 +100,11 @@ const RootNavigator = () => {
         <RootStack.Screen
           name="Onboarding"
           component={OnboardingScreen}
+          options={{ headerShown: false }}
+        />
+        <RootStack.Screen
+          name="Notifications"
+          component={NotificationsScreen}
           options={{ headerShown: false }}
         />
       </RootStack.Navigator>

@@ -145,6 +145,23 @@ friendsRouter.post("/request", zValidator("json", sendRequestSchema), async (c) 
     },
   });
 
+  // Get sender's profile for notification
+  const senderProfile = await db.profile.findUnique({
+    where: { userId: user.id },
+  });
+
+  // Create notification for the receiver
+  await db.notification.create({
+    data: {
+      userId: userId,
+      senderId: user.id,
+      type: "FRIEND_REQUEST",
+      title: "New Friend Request",
+      message: `${senderProfile?.displayName || user.email?.split("@")[0] || "Someone"} sent you a friend request`,
+      data: JSON.stringify({ friendshipId: friendship.id }),
+    },
+  });
+
   return c.json({ success: true, friendshipId: friendship.id });
 });
 
@@ -178,6 +195,23 @@ friendsRouter.post("/accept/:id", async (c) => {
   await db.friendship.update({
     where: { id: friendshipId },
     data: { status: "ACCEPTED" },
+  });
+
+  // Get accepter's profile for notification
+  const accepterProfile = await db.profile.findUnique({
+    where: { userId: user.id },
+  });
+
+  // Create notification for the initiator
+  await db.notification.create({
+    data: {
+      userId: friendship.initiatorId,
+      senderId: user.id,
+      type: "FRIEND_ACCEPTED",
+      title: "Friend Request Accepted",
+      message: `${accepterProfile?.displayName || user.email?.split("@")[0] || "Someone"} accepted your friend request`,
+      data: JSON.stringify({ friendshipId: friendship.id, userId: user.id }),
+    },
   });
 
   return c.json({ success: true, message: "Friend request accepted" });

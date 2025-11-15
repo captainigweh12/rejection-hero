@@ -85,6 +85,16 @@ export default function CommunityScreen({ navigation }: Props) {
     enabled: !!sessionData?.user,
   });
 
+  // Fetch unread notification count
+  const { data: notificationsCount } = useQuery({
+    queryKey: ["notifications-count"],
+    queryFn: async () => {
+      return api.get<{ count: number }>("/api/notifications/unread-count");
+    },
+    enabled: !!sessionData?.user,
+    refetchInterval: 30000, // Refetch every 30 seconds
+  });
+
   // Fetch conversations
   const { data: conversationsData, isLoading: conversationsLoading } = useQuery({
     queryKey: ["conversations"],
@@ -207,6 +217,7 @@ export default function CommunityScreen({ navigation }: Props) {
 
   const friends = friendsData?.friends || [];
   const requests = requestsData?.requests || [];
+  const unreadCount = notificationsCount?.count || 0;
   const conversations = conversationsData?.conversations || [];
   const myGroups = groupsData?.myGroups || [];
   const discoverGroups = groupsData?.discoverGroups || [];
@@ -221,12 +232,8 @@ export default function CommunityScreen({ navigation }: Props) {
             <View style={{ flexDirection: "row", gap: 12 }}>
               <Pressable
                 onPress={() => {
-                  // Scroll to friend requests section if there are any
-                  if (requests.length > 0) {
-                    setActiveTab("friends");
-                  } else {
-                    Alert.alert("No Notifications", "You don't have any friend requests at the moment.");
-                  }
+                  // Navigate to notifications screen
+                  navigation.navigate("Notifications" as any);
                 }}
                 style={{
                   width: 40,
@@ -239,7 +246,7 @@ export default function CommunityScreen({ navigation }: Props) {
                 }}
               >
                 <Bell size={20} color="white" />
-                {requests.length > 0 && (
+                {unreadCount > 0 && (
                   <View
                     style={{
                       position: "absolute",
@@ -253,7 +260,7 @@ export default function CommunityScreen({ navigation }: Props) {
                       justifyContent: "center",
                     }}
                   >
-                    <Text style={{ color: "white", fontSize: 10, fontWeight: "bold" }}>{requests.length}</Text>
+                    <Text style={{ color: "white", fontSize: 10, fontWeight: "bold" }}>{unreadCount}</Text>
                   </View>
                 )}
               </Pressable>

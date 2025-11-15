@@ -345,10 +345,31 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
   - Search for users by name or email
   - Send friend requests directly from search results
   - Modern card-based search results UI
-- **Notifications Bell** 🔔 NEW!:
-  - Red badge shows count of pending friend requests
-  - Tap to view friend requests in Friends tab
-  - Alert notification when no requests pending
+- **Notifications Bell** 🔔 ENHANCED!:
+  - Real-time notification badge with unread count
+  - Auto-refreshes every 30 seconds
+  - Tap to open full Notifications screen
+  - Shows all notification types (friend requests, acceptances, etc.)
+- **Notifications System** 🎯 NEW!:
+  - **Dedicated Notifications Screen**:
+    - Beautiful gradient UI matching app design
+    - Unread notifications highlighted with purple glow
+    - Time stamps (just now, 5m ago, 2h ago, etc.)
+    - Swipe to delete individual notifications
+    - "Mark all as read" bulk action
+  - **Notification Types**:
+    - 🔔 **Friend Requests**: Accept/decline directly from notification
+    - ✅ **Friend Accepted**: See when someone accepts your request
+    - More types coming soon (quest shares, achievements, etc.)
+  - **Interactive Actions**:
+    - Accept/decline friend requests inline
+    - Tap notification to navigate to relevant screen
+    - Auto-marks as read when tapped
+    - Haptic feedback on all interactions
+  - **Real-time Updates**:
+    - Notifications sent instantly when actions occur
+    - Badge updates automatically
+    - Invalidates related queries for fresh data
 - **Friend System** 👥 ENHANCED!:
   - **Four Tabs**: Friends, Suggested, Requests, Search
   - **Friend Recommendations** 🎯 NEW!:
