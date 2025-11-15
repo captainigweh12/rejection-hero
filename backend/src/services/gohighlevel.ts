@@ -46,15 +46,32 @@ export async function createOrUpdateContact(contact: GoHighLevelContact) {
     if (!response.ok) {
       const error = await response.text();
       console.error("❌ [GoHighLevel] API Error:", error);
-      throw new Error(`GoHighLevel API failed: ${response.status} - ${error}`);
+      return {
+        success: false,
+        error: `GoHighLevel API failed: ${response.status} - ${error}`,
+        contactId: null
+      };
     }
 
     const data = await response.json();
     console.log("✅ [GoHighLevel] Contact created/updated successfully");
-    return data;
+    console.log("📋 [GoHighLevel] Contact data:", JSON.stringify(data, null, 2));
+
+    // Extract contact ID from response
+    const contactId = data.contact?.id || data.id || null;
+
+    return {
+      success: true,
+      contactId,
+      data
+    };
   } catch (error) {
     console.error("❌ [GoHighLevel] Error creating/updating contact:", error);
-    throw error;
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : String(error),
+      contactId: null
+    };
   }
 }
 
@@ -89,15 +106,24 @@ export async function sendEmail(
     if (!response.ok) {
       const error = await response.text();
       console.error("❌ [GoHighLevel] Email API Error:", error);
-      throw new Error(`GoHighLevel Email API failed: ${response.status} - ${error}`);
+      return {
+        success: false,
+        error: `GoHighLevel Email API failed: ${response.status} - ${error}`
+      };
     }
 
     const data = await response.json();
     console.log("✅ [GoHighLevel] Email sent successfully");
-    return data;
+    return {
+      success: true,
+      data
+    };
   } catch (error) {
     console.error("❌ [GoHighLevel] Error sending email:", error);
-    throw error;
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : String(error)
+    };
   }
 }
 
