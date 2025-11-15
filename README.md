@@ -240,9 +240,10 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 - **COMMUNITY**: Groups, Manage Categories, Explore World
 - Log out and version display
 
-**Social Feed System** ✨ NEW!
+**Social Feed System** ✨ ENHANCED!
 - **Facebook-Style Posts**:
   - Create text posts with optional images (up to 4 images per post)
+  - **Camera Support**: Take photos directly from the app or select from gallery
   - Privacy settings: Public, Friends Only, or Groups Only
   - Like and comment on posts
   - Real-time feed updates
@@ -260,24 +261,34 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
   - User avatars and display names
   - Timestamp with "time ago" display
   - Group post indicators
-- **Moments (Stories)** 📸:
+- **Moments (Stories)** 📸 ENHANCED!:
   - Instagram-style 24-hour stories
+  - **Camera Support**: Take photos directly or select from gallery
   - Horizontal scrollable moments bar at top of feed
   - View friends' moments in fullscreen viewer
   - Navigate between multiple moments
   - Automatic expiration after 24 hours
-  - Create moments with images
   - Purple ring indicator for new moments
 - **Community Tab Integration**:
   - Four tabs: Feed, Friends, Messages, Groups
   - Feed tab shows social posts and moments
   - Seamless integration with existing community features
-- **Create Post Modal**:
+- **Create Post Modal** ✨ FIXED!:
+  - **SafeArea Optimized**: Proper top and bottom safe area handling
   - Full-screen modal for creating posts
   - Text input with character counter
-  - Image picker for multiple photos
+  - **Gallery Button**: Pick multiple photos from device
+  - **Camera Button**: Take photos directly in the app
   - Privacy selector with icons
   - Preview selected images before posting
+  - Remove individual images before posting
+- **Create Moment Modal** ✨ FIXED!:
+  - **SafeArea Optimized**: Proper top and bottom safe area handling
+  - Full-screen moment creation interface
+  - **Gallery Button**: Select photos from device
+  - **Camera Button**: Take photos with camera
+  - Photo preview before sharing
+  - Change or remove photo before posting
 - **Interactive Features**:
   - Pull-to-refresh for new content
   - Infinite scroll support

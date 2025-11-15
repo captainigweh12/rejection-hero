@@ -13,7 +13,7 @@ import {
   Image,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Plus, X, Image as ImageIcon, Globe, Users, Lock } from "lucide-react-native";
+import { Plus, X, Image as ImageIcon, Globe, Users, Lock, Camera } from "lucide-react-native";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
 import { api } from "@/lib/api";
@@ -164,10 +164,48 @@ export default function FeedScreen() {
     }
   };
 
+  const handleTakePhoto = async () => {
+    // Request camera permissions
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== "granted") {
+      Alert.alert("Permission Required", "Camera permission is required to take photos.");
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 0.8,
+      allowsEditing: true,
+    });
+
+    if (!result.canceled && result.assets[0]) {
+      setSelectedImages([...selectedImages, result.assets[0].uri]);
+    }
+  };
+
   const handlePickMomentImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       quality: 0.8,
+    });
+
+    if (!result.canceled && result.assets[0]) {
+      setMomentImage(result.assets[0].uri);
+    }
+  };
+
+  const handleTakeMomentPhoto = async () => {
+    // Request camera permissions
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== "granted") {
+      Alert.alert("Permission Required", "Camera permission is required to take photos.");
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 0.8,
+      allowsEditing: true,
     });
 
     if (!result.canceled && result.assets[0]) {
@@ -361,7 +399,7 @@ export default function FeedScreen() {
         onRequestClose={() => setShowCreatePost(false)}
       >
         <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
-          <SafeAreaView edges={["top"]} style={{ flex: 1 }}>
+          <SafeAreaView edges={["top", "bottom"]} style={{ flex: 1 }}>
             {/* Header */}
             <View
               style={{
@@ -483,22 +521,42 @@ export default function FeedScreen() {
               )}
 
               {/* Add Images Button */}
-              <TouchableOpacity
-                onPress={handlePickImage}
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  padding: 16,
-                  borderRadius: 8,
-                  backgroundColor: "rgba(255, 255, 255, 0.05)",
-                  borderWidth: 1,
-                  borderColor: "rgba(126, 63, 228, 0.2)",
-                  marginTop: 16,
-                }}
-              >
-                <ImageIcon size={20} color="#7E3FE4" />
-                <Text style={{ color: "white", marginLeft: 12 }}>Add Photos</Text>
-              </TouchableOpacity>
+              <View style={{ flexDirection: "row", gap: 12, marginTop: 16 }}>
+                <TouchableOpacity
+                  onPress={handlePickImage}
+                  style={{
+                    flex: 1,
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: 16,
+                    borderRadius: 8,
+                    backgroundColor: "rgba(255, 255, 255, 0.05)",
+                    borderWidth: 1,
+                    borderColor: "rgba(126, 63, 228, 0.2)",
+                  }}
+                >
+                  <ImageIcon size={20} color="#7E3FE4" />
+                  <Text style={{ color: "white", marginLeft: 12 }}>Gallery</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={handleTakePhoto}
+                  style={{
+                    flex: 1,
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: 16,
+                    borderRadius: 8,
+                    backgroundColor: "rgba(255, 255, 255, 0.05)",
+                    borderWidth: 1,
+                    borderColor: "rgba(126, 63, 228, 0.2)",
+                  }}
+                >
+                  <Camera size={20} color="#7E3FE4" />
+                  <Text style={{ color: "white", marginLeft: 12 }}>Camera</Text>
+                </TouchableOpacity>
+              </View>
             </ScrollView>
           </SafeAreaView>
         </View>
@@ -511,7 +569,7 @@ export default function FeedScreen() {
         onRequestClose={() => setShowCreateMoment(false)}
       >
         <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
-          <SafeAreaView edges={["top"]} style={{ flex: 1 }}>
+          <SafeAreaView edges={["top", "bottom"]} style={{ flex: 1 }}>
             <View
               style={{
                 flexDirection: "row",
@@ -542,48 +600,101 @@ export default function FeedScreen() {
 
             <View style={{ flex: 1, alignItems: "center", justifyContent: "center", padding: 16 }}>
               {momentImage ? (
-                <Image
-                  source={{ uri: momentImage }}
-                  style={{ width: "100%", height: "80%", borderRadius: 12 }}
-                  resizeMode="contain"
-                />
+                <>
+                  <Image
+                    source={{ uri: momentImage }}
+                    style={{ width: "100%", height: "70%", borderRadius: 12 }}
+                    resizeMode="contain"
+                  />
+                  <View style={{ flexDirection: "row", gap: 12, marginTop: 20 }}>
+                    <TouchableOpacity
+                      onPress={handlePickMomentImage}
+                      style={{
+                        paddingHorizontal: 24,
+                        paddingVertical: 12,
+                        borderRadius: 8,
+                        backgroundColor: "rgba(126, 63, 228, 0.2)",
+                        borderWidth: 1,
+                        borderColor: "#7E3FE4",
+                      }}
+                    >
+                      <Text style={{ color: "#7E3FE4", fontWeight: "600" }}>Change Photo</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => setMomentImage(null)}
+                      style={{
+                        paddingHorizontal: 24,
+                        paddingVertical: 12,
+                        borderRadius: 8,
+                        backgroundColor: "rgba(255, 59, 48, 0.2)",
+                        borderWidth: 1,
+                        borderColor: "#FF3B30",
+                      }}
+                    >
+                      <Text style={{ color: "#FF3B30", fontWeight: "600" }}>Remove</Text>
+                    </TouchableOpacity>
+                  </View>
+                </>
               ) : (
-                <TouchableOpacity
-                  onPress={handlePickMomentImage}
-                  style={{
-                    width: 200,
-                    height: 200,
-                    borderRadius: 100,
-                    backgroundColor: "rgba(126, 63, 228, 0.2)",
-                    borderWidth: 2,
-                    borderColor: "#7E3FE4",
-                    borderStyle: "dashed",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <ImageIcon size={48} color="#7E3FE4" />
-                  <Text style={{ color: "white", marginTop: 12, fontSize: 16 }}>
-                    Add Photo
-                  </Text>
-                </TouchableOpacity>
-              )}
-
-              {momentImage && (
-                <TouchableOpacity
-                  onPress={() => setMomentImage(null)}
-                  style={{
-                    marginTop: 20,
-                    paddingHorizontal: 24,
-                    paddingVertical: 12,
-                    borderRadius: 8,
-                    backgroundColor: "rgba(255, 59, 48, 0.2)",
-                    borderWidth: 1,
-                    borderColor: "#FF3B30",
-                  }}
-                >
-                  <Text style={{ color: "#FF3B30", fontWeight: "600" }}>Remove Photo</Text>
-                </TouchableOpacity>
+                <>
+                  <View
+                    style={{
+                      width: 200,
+                      height: 200,
+                      borderRadius: 100,
+                      backgroundColor: "rgba(126, 63, 228, 0.2)",
+                      borderWidth: 2,
+                      borderColor: "#7E3FE4",
+                      borderStyle: "dashed",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      marginBottom: 24,
+                    }}
+                  >
+                    <ImageIcon size={48} color="#7E3FE4" />
+                    <Text style={{ color: "white", marginTop: 12, fontSize: 16 }}>
+                      Add Photo
+                    </Text>
+                  </View>
+                  <View style={{ flexDirection: "row", gap: 12 }}>
+                    <TouchableOpacity
+                      onPress={handlePickMomentImage}
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        paddingHorizontal: 24,
+                        paddingVertical: 12,
+                        borderRadius: 8,
+                        backgroundColor: "rgba(126, 63, 228, 0.2)",
+                        borderWidth: 1,
+                        borderColor: "#7E3FE4",
+                      }}
+                    >
+                      <ImageIcon size={20} color="#7E3FE4" />
+                      <Text style={{ color: "white", marginLeft: 8, fontWeight: "600" }}>
+                        Gallery
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={handleTakeMomentPhoto}
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        paddingHorizontal: 24,
+                        paddingVertical: 12,
+                        borderRadius: 8,
+                        backgroundColor: "rgba(126, 63, 228, 0.2)",
+                        borderWidth: 1,
+                        borderColor: "#7E3FE4",
+                      }}
+                    >
+                      <Camera size={20} color="#7E3FE4" />
+                      <Text style={{ color: "white", marginLeft: 8, fontWeight: "600" }}>
+                        Camera
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </>
               )}
             </View>
           </SafeAreaView>
