@@ -394,13 +394,22 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
   - Last message preview with timestamps
   - Message read/unread tracking
   - Tap to open chat screen (coming soon)
-- **Groups (Facebook-style)**:
+- **Groups (Facebook-style)** ✨ ENHANCED!:
   - **My Groups**: Groups you've joined with role badges (admin/moderator/member)
   - **Discover Groups**: Browse and join public groups
-  - Create new groups with custom names, descriptions, and cover images
+  - **Create Group Modal** 🆕 ACTIVE!:
+    - Tap "Create Group" button to open beautiful modal
+    - Enter group name (required, max 50 chars)
+    - Add description (optional, max 200 chars)
+    - Choose privacy: Public (anyone can find/join) or Private (members only)
+    - Visual privacy cards with Globe/Lock icons
+    - "New" button in My Groups header for quick access
+    - Keyboard-aware modal with smooth animations
+    - Form validation and loading states
   - Public/private group options
   - Member count and role management
   - Leave groups or delete (if creator)
+  - Beautiful 3D glassmorphism design matching app theme
 - **Quest Sharing** 🎁 FULLY ENABLED!:
   - **Share Button** on every friend card in Community and Friends screens
   - **Quest Selection Screen**:

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, ScrollView, Pressable, TextInput, ActivityIndicator, Image, Alert } from "react-native";
+import { View, Text, ScrollView, Pressable, TextInput, ActivityIndicator, Image, Alert, Modal, KeyboardAvoidingView, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -14,7 +14,10 @@ import {
   Share2,
   TrendingUp,
   X,
-  Home
+  Home,
+  Plus,
+  Globe,
+  Lock
 } from "lucide-react-native";
 import type { BottomTabScreenProps } from "@/navigation/types";
 import { api } from "@/lib/api";
@@ -66,6 +69,12 @@ export default function CommunityScreen({ navigation }: Props) {
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState<"feed" | "friends" | "messages" | "groups">("feed");
+
+  // Create Group modal state
+  const [showCreateGroupModal, setShowCreateGroupModal] = useState(false);
+  const [groupName, setGroupName] = useState("");
+  const [groupDescription, setGroupDescription] = useState("");
+  const [groupPrivacy, setGroupPrivacy] = useState<"PUBLIC" | "PRIVATE">("PUBLIC");
 
   // Fetch friends
   const { data: friendsData, isLoading: friendsLoading } = useQuery({
@@ -153,6 +162,24 @@ export default function CommunityScreen({ navigation }: Props) {
     },
   });
 
+  // Create group mutation
+  const createGroupMutation = useMutation({
+    mutationFn: async (data: { name: string; description: string; isPublic: boolean }) => {
+      return api.post("/api/groups/create", data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["groups"] });
+      setShowCreateGroupModal(false);
+      setGroupName("");
+      setGroupDescription("");
+      setGroupPrivacy("PUBLIC");
+      Alert.alert("Success", "Group created successfully!");
+    },
+    onError: (error: any) => {
+      Alert.alert("Error", error.message || "Failed to create group");
+    },
+  });
+
   // Handler functions
   const handleAcceptFriend = (requestId: string) => {
     acceptFriendMutation.mutate(requestId);
@@ -183,6 +210,19 @@ export default function CommunityScreen({ navigation }: Props) {
   const handleOpenGroup = (groupId: string) => {
     // TODO: Navigate to group detail screen when created
     Alert.alert("Coming Soon", "Group detail screen is being developed!");
+  };
+
+  const handleCreateGroup = () => {
+    if (!groupName.trim()) {
+      Alert.alert("Error", "Please enter a group name");
+      return;
+    }
+
+    createGroupMutation.mutate({
+      name: groupName.trim(),
+      description: groupDescription.trim(),
+      isPublic: groupPrivacy === "PUBLIC",
+    });
   };
 
   if (!sessionData?.user) {
@@ -714,13 +754,30 @@ export default function CommunityScreen({ navigation }: Props) {
 
           {/* Groups Tab */}
           {activeTab === "groups" && (
-            <View style={{ paddingHorizontal: 20 }}>
+            <View style={{ paddingHorizontal: 20, position: "relative" }}>
               {/* My Groups */}
               {myGroups.length > 0 && (
                 <View style={{ marginBottom: 24 }}>
-                  <Text style={{ fontSize: 18, fontWeight: "bold", color: "white", marginBottom: 12 }}>
-                    My Groups ({myGroups.length})
-                  </Text>
+                  <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                    <Text style={{ fontSize: 18, fontWeight: "bold", color: "white" }}>
+                      My Groups ({myGroups.length})
+                    </Text>
+                    <Pressable
+                      onPress={() => setShowCreateGroupModal(true)}
+                      style={{
+                        backgroundColor: "#7E3FE4",
+                        paddingHorizontal: 16,
+                        paddingVertical: 8,
+                        borderRadius: 20,
+                        flexDirection: "row",
+                        alignItems: "center",
+                        gap: 6,
+                      }}
+                    >
+                      <Plus size={16} color="white" />
+                      <Text style={{ color: "white", fontSize: 14, fontWeight: "700" }}>New</Text>
+                    </Pressable>
+                  </View>
                   {myGroups.map((group) => (
                     <Pressable
                       key={group.id}
@@ -786,6 +843,28 @@ export default function CommunityScreen({ navigation }: Props) {
                   <Text style={{ fontSize: 16, color: "rgba(255, 255, 255, 0.6)", marginTop: 16, textAlign: "center" }}>
                     No groups to discover. Create your own!
                   </Text>
+                  {/* Create Group Button */}
+                  <Pressable
+                    onPress={() => setShowCreateGroupModal(true)}
+                    style={{
+                      marginTop: 20,
+                      backgroundColor: "#7E3FE4",
+                      paddingHorizontal: 24,
+                      paddingVertical: 12,
+                      borderRadius: 24,
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 8,
+                      shadowColor: "#7E3FE4",
+                      shadowOffset: { width: 0, height: 4 },
+                      shadowOpacity: 0.3,
+                      shadowRadius: 8,
+                      elevation: 5,
+                    }}
+                  >
+                    <Plus size={20} color="white" />
+                    <Text style={{ color: "white", fontSize: 16, fontWeight: "700" }}>Create Group</Text>
+                  </Pressable>
                 </View>
               ) : (
                 discoverGroups.map((group) => (
@@ -852,6 +931,217 @@ export default function CommunityScreen({ navigation }: Props) {
           </ScrollView>
         )}
       </SafeAreaView>
+
+      {/* Create Group Modal */}
+      <Modal
+        visible={showCreateGroupModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowCreateGroupModal(false)}
+      >
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={{ flex: 1 }}
+        >
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: "rgba(0, 0, 0, 0.8)",
+              justifyContent: "flex-end",
+            }}
+          >
+            <Pressable
+              style={{ flex: 1 }}
+              onPress={() => setShowCreateGroupModal(false)}
+            />
+            <View
+              style={{
+                backgroundColor: "#1A1A24",
+                borderTopLeftRadius: 24,
+                borderTopRightRadius: 24,
+                paddingTop: 20,
+                paddingBottom: 40,
+                paddingHorizontal: 20,
+                maxHeight: "80%",
+              }}
+            >
+              {/* Header */}
+              <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
+                <Text style={{ fontSize: 24, fontWeight: "bold", color: "white" }}>Create Group</Text>
+                <Pressable
+                  onPress={() => setShowCreateGroupModal(false)}
+                  style={{
+                    width: 36,
+                    height: 36,
+                    borderRadius: 18,
+                    backgroundColor: "rgba(255, 255, 255, 0.1)",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <X size={20} color="white" />
+                </Pressable>
+              </View>
+
+              <ScrollView showsVerticalScrollIndicator={false}>
+                {/* Group Name Input */}
+                <View style={{ marginBottom: 20 }}>
+                  <Text style={{ fontSize: 14, fontWeight: "600", color: "rgba(255, 255, 255, 0.8)", marginBottom: 8 }}>
+                    Group Name *
+                  </Text>
+                  <TextInput
+                    value={groupName}
+                    onChangeText={setGroupName}
+                    placeholder="Enter group name"
+                    placeholderTextColor="rgba(255, 255, 255, 0.4)"
+                    style={{
+                      backgroundColor: "rgba(255, 255, 255, 0.05)",
+                      borderRadius: 12,
+                      padding: 16,
+                      color: "white",
+                      fontSize: 16,
+                      borderWidth: 1,
+                      borderColor: "rgba(126, 63, 228, 0.3)",
+                    }}
+                    maxLength={50}
+                  />
+                </View>
+
+                {/* Group Description Input */}
+                <View style={{ marginBottom: 20 }}>
+                  <Text style={{ fontSize: 14, fontWeight: "600", color: "rgba(255, 255, 255, 0.8)", marginBottom: 8 }}>
+                    Description
+                  </Text>
+                  <TextInput
+                    value={groupDescription}
+                    onChangeText={setGroupDescription}
+                    placeholder="What's your group about?"
+                    placeholderTextColor="rgba(255, 255, 255, 0.4)"
+                    multiline
+                    numberOfLines={4}
+                    textAlignVertical="top"
+                    style={{
+                      backgroundColor: "rgba(255, 255, 255, 0.05)",
+                      borderRadius: 12,
+                      padding: 16,
+                      color: "white",
+                      fontSize: 16,
+                      borderWidth: 1,
+                      borderColor: "rgba(126, 63, 228, 0.3)",
+                      minHeight: 100,
+                    }}
+                    maxLength={200}
+                  />
+                </View>
+
+                {/* Privacy Selection */}
+                <View style={{ marginBottom: 24 }}>
+                  <Text style={{ fontSize: 14, fontWeight: "600", color: "rgba(255, 255, 255, 0.8)", marginBottom: 12 }}>
+                    Privacy
+                  </Text>
+                  <View style={{ gap: 12 }}>
+                    {/* Public Option */}
+                    <Pressable
+                      onPress={() => setGroupPrivacy("PUBLIC")}
+                      style={{
+                        backgroundColor: groupPrivacy === "PUBLIC" ? "rgba(126, 63, 228, 0.2)" : "rgba(255, 255, 255, 0.05)",
+                        borderRadius: 12,
+                        padding: 16,
+                        borderWidth: 2,
+                        borderColor: groupPrivacy === "PUBLIC" ? "#7E3FE4" : "rgba(126, 63, 228, 0.3)",
+                        flexDirection: "row",
+                        alignItems: "center",
+                      }}
+                    >
+                      <View
+                        style={{
+                          width: 48,
+                          height: 48,
+                          borderRadius: 24,
+                          backgroundColor: "rgba(0, 217, 255, 0.2)",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          marginRight: 12,
+                        }}
+                      >
+                        <Globe size={24} color="#00D9FF" />
+                      </View>
+                      <View style={{ flex: 1 }}>
+                        <Text style={{ fontSize: 16, fontWeight: "700", color: "white", marginBottom: 4 }}>
+                          Public
+                        </Text>
+                        <Text style={{ fontSize: 13, color: "rgba(255, 255, 255, 0.6)" }}>
+                          Anyone can find and join
+                        </Text>
+                      </View>
+                    </Pressable>
+
+                    {/* Private Option */}
+                    <Pressable
+                      onPress={() => setGroupPrivacy("PRIVATE")}
+                      style={{
+                        backgroundColor: groupPrivacy === "PRIVATE" ? "rgba(126, 63, 228, 0.2)" : "rgba(255, 255, 255, 0.05)",
+                        borderRadius: 12,
+                        padding: 16,
+                        borderWidth: 2,
+                        borderColor: groupPrivacy === "PRIVATE" ? "#7E3FE4" : "rgba(126, 63, 228, 0.3)",
+                        flexDirection: "row",
+                        alignItems: "center",
+                      }}
+                    >
+                      <View
+                        style={{
+                          width: 48,
+                          height: 48,
+                          borderRadius: 24,
+                          backgroundColor: "rgba(255, 107, 53, 0.2)",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          marginRight: 12,
+                        }}
+                      >
+                        <Lock size={24} color="#FF6B35" />
+                      </View>
+                      <View style={{ flex: 1 }}>
+                        <Text style={{ fontSize: 16, fontWeight: "700", color: "white", marginBottom: 4 }}>
+                          Private
+                        </Text>
+                        <Text style={{ fontSize: 13, color: "rgba(255, 255, 255, 0.6)" }}>
+                          Only members can see group
+                        </Text>
+                      </View>
+                    </Pressable>
+                  </View>
+                </View>
+
+                {/* Create Button */}
+                <Pressable
+                  onPress={handleCreateGroup}
+                  disabled={createGroupMutation.isPending || !groupName.trim()}
+                  style={{
+                    backgroundColor: !groupName.trim() ? "rgba(126, 63, 228, 0.3)" : "#7E3FE4",
+                    paddingVertical: 16,
+                    borderRadius: 24,
+                    alignItems: "center",
+                    opacity: createGroupMutation.isPending ? 0.7 : 1,
+                    shadowColor: "#7E3FE4",
+                    shadowOffset: { width: 0, height: 4 },
+                    shadowOpacity: 0.3,
+                    shadowRadius: 8,
+                    elevation: 5,
+                  }}
+                >
+                  {createGroupMutation.isPending ? (
+                    <ActivityIndicator size="small" color="white" />
+                  ) : (
+                    <Text style={{ color: "white", fontSize: 18, fontWeight: "700" }}>Create Group</Text>
+                  )}
+                </Pressable>
+              </ScrollView>
+            </View>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
     </View>
   );
 }
