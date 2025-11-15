@@ -394,7 +394,7 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
   - Last message preview with timestamps
   - Message read/unread tracking
   - Tap to open chat screen (coming soon)
-- **Groups (Facebook-style)** ✨ ENHANCED!:
+- **Groups (Facebook-style)** ✨ FULLY ENHANCED!:
   - **My Groups**: Groups you've joined with role badges (admin/moderator/member)
   - **Discover Groups**: Browse and join public groups
   - **Create Group Modal** 🆕 ACTIVE!:
@@ -406,9 +406,30 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
     - "New" button in My Groups header for quick access
     - Keyboard-aware modal with smooth animations
     - Form validation and loading states
+  - **Group Detail Screen** 🆕 ACTIVE!:
+    - Full member list with avatars and role badges (Admin/Moderator/Member)
+    - Group info: name, description, cover image, privacy status
+    - Member count and join dates displayed
+    - Role-based permissions (Admin/Moderator/Member)
+    - Beautiful 3D glassmorphism design
+  - **Invite Members** 📧 ACTIVE!:
+    - Admins and moderators can invite external users via email
+    - Email input with validation
+    - Optional personal message with invitation
+    - **GoHighLevel Integration**:
+      - Creates contact in CRM with "group-invite" tag
+      - Tracks invited_by, invited_to_group, invite_date
+      - Sends beautiful HTML invitation email
+      - Email includes group features (quests, live, community)
+      - Join link for easy signup and group joining
+    - Non-users receive signup link that auto-joins group after registration
+  - **Group Actions**:
+    - Leave group (for members)
+    - Delete group (admin only, with confirmation)
+    - Navigate to Group Live (coming soon)
+    - Navigate to Group Quests (coming soon)
   - Public/private group options
   - Member count and role management
-  - Leave groups or delete (if creator)
   - Beautiful 3D glassmorphism design matching app theme
 - **Quest Sharing** 🎁 FULLY ENABLED!:
   - **Share Button** on every friend card in Community and Friends screens
@@ -1063,13 +1084,26 @@ The app features a cohesive dark theme with modern 3D-style UI elements througho
 - `POST /api/messages/send` - Send a message to a user
 - `DELETE /api/messages/:messageId` - Delete your own message
 
-### Groups ✨ NEW!
+### Groups ✨ FULLY ENHANCED!
 - `GET /api/groups` - Get user's groups and discover public groups
 - `GET /api/groups/:groupId` - Get group details with members
 - `POST /api/groups/create` - Create a new group
 - `POST /api/groups/:groupId/join` - Join a public group
 - `POST /api/groups/:groupId/leave` - Leave a group
+- `POST /api/groups/:groupId/invite` 🆕 - Invite external users via email (admins/moderators only)
 - `DELETE /api/groups/:groupId` - Delete a group (creator only)
+
+**Group Features:**
+- Full member management with role badges (Admin/Moderator/Member)
+- Group detail screen with member list, stats, and actions
+- **Email invitations via GoHighLevel**:
+  - Send beautiful HTML invitation emails
+  - Track invited users in CRM with tags
+  - Custom fields: invited_by, invited_to_group, invite_date
+  - Join link for easy signup and auto-group-join
+- Role-based permissions for invites, moderation, and deletion
+- Group actions: Leave, Delete, Navigate to Group Live/Quests
+- Public/Private group privacy settings
 
 ### Shared Quests ✨ NEW!
 - `GET /api/shared-quests` - Get received quest shares

@@ -32,6 +32,7 @@ import QuestCalendarScreen from "@/screens/QuestCalendarScreen";
 import InviteWarriorsScreen from "@/screens/InviteWarriorsScreen";
 import ManageCategoriesScreen from "@/screens/ManageCategoriesScreen";
 import SupportScreen from "@/screens/SupportScreen";
+import GroupDetailScreen from "@/screens/GroupDetailScreen";
 import { useSession } from "@/lib/useSession";
 import { api } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
@@ -129,6 +130,11 @@ const RootNavigator = () => {
         <RootStack.Screen
           name="Support"
           component={SupportScreen}
+          options={{ headerShown: false }}
+        />
+        <RootStack.Screen
+          name="GroupDetail"
+          component={GroupDetailScreen}
           options={{ headerShown: false }}
         />
       </RootStack.Navigator>

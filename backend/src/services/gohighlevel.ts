@@ -566,3 +566,186 @@ export async function updateUserStatsInGoHighLevel(
     return { success: false, error };
   }
 }
+
+/**
+ * Generate HTML for group invitation email
+ */
+export function getGroupInviteEmailHTML(
+  groupName: string,
+  inviterName: string,
+  inviteMessage: string,
+  joinLink: string
+) {
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>You're Invited to Join ${groupName}</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #0A0A0F 0%, #1A1A24 50%, #2A1A34 100%);
+      color: #ffffff;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+    .card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(126, 63, 228, 0.3);
+      border-radius: 16px;
+      padding: 40px;
+      backdrop-filter: blur(10px);
+    }
+    .logo {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .logo-text {
+      font-size: 32px;
+      font-weight: bold;
+      background: linear-gradient(135deg, #7E3FE4 0%, #00D9FF 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    h1 {
+      font-size: 28px;
+      font-weight: bold;
+      margin: 0 0 20px 0;
+      text-align: center;
+    }
+    .group-name {
+      color: #7E3FE4;
+      font-weight: bold;
+    }
+    .message-box {
+      background: rgba(126, 63, 228, 0.1);
+      border-left: 4px solid #7E3FE4;
+      border-radius: 8px;
+      padding: 16px;
+      margin: 24px 0;
+    }
+    .inviter {
+      color: #00D9FF;
+      font-weight: 600;
+    }
+    .cta-button {
+      display: inline-block;
+      background: linear-gradient(135deg, #7E3FE4 0%, #5E1FA8 100%);
+      color: white;
+      text-decoration: none;
+      padding: 16px 40px;
+      border-radius: 24px;
+      font-weight: bold;
+      font-size: 18px;
+      text-align: center;
+      margin: 30px 0;
+      box-shadow: 0 4px 12px rgba(126, 63, 228, 0.4);
+    }
+    .button-container {
+      text-align: center;
+    }
+    .features {
+      margin: 30px 0;
+    }
+    .feature {
+      display: flex;
+      align-items: start;
+      margin: 16px 0;
+      gap: 12px;
+    }
+    .feature-icon {
+      width: 24px;
+      height: 24px;
+      background: rgba(0, 217, 255, 0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 14px;
+    }
+    p {
+      line-height: 1.6;
+      color: rgba(255, 255, 255, 0.9);
+      margin: 0 0 16px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="logo">
+        <div class="logo-text">🎯 Rejection Hero</div>
+      </div>
+
+      <h1>You're Invited!</h1>
+
+      <p style="text-align: center; font-size: 18px;">
+        <span class="inviter">${inviterName}</span> has invited you to join
+        <span class="group-name">${groupName}</span>
+      </p>
+
+      ${inviteMessage ? `
+      <div class="message-box">
+        <p style="margin: 0; font-style: italic;">"${inviteMessage}"</p>
+      </div>
+      ` : ''}
+
+      <div class="features">
+        <div class="feature">
+          <div class="feature-icon">🎮</div>
+          <div>
+            <strong>Complete Group Quests</strong><br/>
+            Take on rejection challenges together and support each other's growth
+          </div>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">📹</div>
+          <div>
+            <strong>Group Live Streaming</strong><br/>
+            Watch and encourage members as they complete quests in real-time
+          </div>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">👥</div>
+          <div>
+            <strong>Community Support</strong><br/>
+            Connect with like-minded warriors pushing past their comfort zones
+          </div>
+        </div>
+      </div>
+
+      <div class="button-container">
+        <a href="${joinLink}" class="cta-button">Join Group</a>
+      </div>
+
+      <p style="text-align: center; font-size: 14px; color: rgba(255, 255, 255, 0.6);">
+        Don't have an account? Clicking the button above will guide you through signing up!
+      </p>
+
+      <div class="footer">
+        <p>This is an automated invitation from Rejection Hero</p>
+        <p>Turn rejection into your superpower 💪</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+`;
+}

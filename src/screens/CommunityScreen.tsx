@@ -208,8 +208,7 @@ export default function CommunityScreen({ navigation }: Props) {
   };
 
   const handleOpenGroup = (groupId: string) => {
-    // TODO: Navigate to group detail screen when created
-    Alert.alert("Coming Soon", "Group detail screen is being developed!");
+    navigation.navigate("GroupDetail", { groupId });
   };
 
   const handleCreateGroup = () => {

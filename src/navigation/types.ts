@@ -28,6 +28,7 @@ export type RootStackParamList = {
   InviteWarriors: undefined;
   ManageCategories: undefined;
   Support: undefined;
+  GroupDetail: { groupId: string };
 };
 
 export type BottomTabParamList = {
