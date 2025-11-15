@@ -20,6 +20,8 @@ import { messagesRouter } from "./routes/messages";
 import { groupsRouter } from "./routes/groups";
 import { sharedQuestsRouter } from "./routes/sharedQuests";
 import journalRouter from "./routes/journal";
+import postsRouter from "./routes/posts";
+import momentsRouter from "./routes/moments";
 import { type AppType } from "./types";
 
 // AppType context adds user and session to the context, will be null if the user or session is null
@@ -92,6 +94,12 @@ app.route("/api/shared-quests", sharedQuestsRouter);
 
 console.log("📓 Mounting journal routes at /api/journal");
 app.route("/api/journal", journalRouter);
+
+console.log("📝 Mounting posts routes at /api/posts");
+app.route("/api/posts", postsRouter);
+
+console.log("⏰ Mounting moments routes at /api/moments");
+app.route("/api/moments", momentsRouter);
 
 // Health check endpoint
 // Used by load balancers and monitoring tools to verify service is running
