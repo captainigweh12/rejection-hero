@@ -205,7 +205,11 @@ export default function JournalScreen({ navigation }: Props) {
   return (
     <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
       <SafeAreaView edges={["top"]} style={{ flex: 1 }}>
-        <ScrollView className="flex-1 px-4">
+        <ScrollView
+          className="flex-1 px-4"
+          contentContainerStyle={{ paddingBottom: 100 }}
+          showsVerticalScrollIndicator={false}
+        >
           {/* Header */}
           <View className="py-6">
             <Text className="text-3xl font-bold text-white">Journal</Text>
@@ -334,17 +338,59 @@ export default function JournalScreen({ navigation }: Props) {
               </Text>
 
               <View className="gap-3">
-                {/* YES */}
+                {/* YES - Red (they said yes, but this is a rejection challenge app) */}
                 <TouchableOpacity
                   onPress={() => setSelectedOutcome("YES")}
                   style={{
                     backgroundColor:
                       selectedOutcome === "YES"
-                        ? "rgba(76, 175, 80, 0.2)"
+                        ? "rgba(255, 59, 48, 0.2)"
                         : "rgba(255, 255, 255, 0.03)",
                     borderWidth: 2,
                     borderColor:
                       selectedOutcome === "YES"
+                        ? "#FF3B30"
+                        : "rgba(126, 63, 228, 0.2)",
+                    borderRadius: 12,
+                    padding: 16,
+                    flexDirection: "row",
+                    alignItems: "center",
+                  }}
+                >
+                  <View
+                    style={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: 20,
+                      backgroundColor: "rgba(255, 59, 48, 0.2)",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      marginRight: 12,
+                    }}
+                  >
+                    <CheckCircle size={24} color="#FF3B30" />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text className="text-white font-semibold text-base">
+                      Yes
+                    </Text>
+                    <Text className="text-white/60 text-sm">
+                      They said yes!
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+
+                {/* NO - Green (got a NO, which is growth!) */}
+                <TouchableOpacity
+                  onPress={() => setSelectedOutcome("NO")}
+                  style={{
+                    backgroundColor:
+                      selectedOutcome === "NO"
+                        ? "rgba(76, 175, 80, 0.2)"
+                        : "rgba(255, 255, 255, 0.03)",
+                    borderWidth: 2,
+                    borderColor:
+                      selectedOutcome === "NO"
                         ? "#4CAF50"
                         : "rgba(126, 63, 228, 0.2)",
                     borderRadius: 12,
@@ -364,49 +410,7 @@ export default function JournalScreen({ navigation }: Props) {
                       marginRight: 12,
                     }}
                   >
-                    <CheckCircle size={24} color="#4CAF50" />
-                  </View>
-                  <View style={{ flex: 1 }}>
-                    <Text className="text-white font-semibold text-base">
-                      Yes
-                    </Text>
-                    <Text className="text-white/60 text-sm">
-                      They said yes!
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-
-                {/* NO */}
-                <TouchableOpacity
-                  onPress={() => setSelectedOutcome("NO")}
-                  style={{
-                    backgroundColor:
-                      selectedOutcome === "NO"
-                        ? "rgba(255, 107, 53, 0.2)"
-                        : "rgba(255, 255, 255, 0.03)",
-                    borderWidth: 2,
-                    borderColor:
-                      selectedOutcome === "NO"
-                        ? "#FF6B35"
-                        : "rgba(126, 63, 228, 0.2)",
-                    borderRadius: 12,
-                    padding: 16,
-                    flexDirection: "row",
-                    alignItems: "center",
-                  }}
-                >
-                  <View
-                    style={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: 20,
-                      backgroundColor: "rgba(255, 107, 53, 0.2)",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      marginRight: 12,
-                    }}
-                  >
-                    <XCircle size={24} color="#FF6B35" />
+                    <XCircle size={24} color="#4CAF50" />
                   </View>
                   <View style={{ flex: 1 }}>
                     <Text className="text-white font-semibold text-base">
@@ -515,10 +519,10 @@ export default function JournalScreen({ navigation }: Props) {
                   <View className="flex-row items-center justify-between mb-2">
                     <View className="flex-row items-center">
                       {entry.outcome === "YES" && (
-                        <CheckCircle size={20} color="#4CAF50" />
+                        <CheckCircle size={20} color="#FF3B30" />
                       )}
                       {entry.outcome === "NO" && (
-                        <XCircle size={20} color="#FF6B35" />
+                        <XCircle size={20} color="#4CAF50" />
                       )}
                       {entry.outcome === "ACTIVITY" && (
                         <Activity size={20} color="#00D9FF" />

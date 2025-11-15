@@ -219,10 +219,10 @@ export default function GrowthAchievementsScreen({ navigation }: Props) {
               >
                 <View className="flex-row items-center mb-2">
                   {achievement.journalEntry.outcome === "YES" && (
-                    <CheckCircle size={16} color="#4CAF50" />
+                    <CheckCircle size={16} color="#FF3B30" />
                   )}
                   {achievement.journalEntry.outcome === "NO" && (
-                    <XCircle size={16} color="#FF6B35" />
+                    <XCircle size={16} color="#4CAF50" />
                   )}
                   {achievement.journalEntry.outcome === "ACTIVITY" && (
                     <Activity size={16} color="#00D9FF" />
