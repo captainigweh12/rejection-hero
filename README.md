@@ -448,6 +448,23 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 - Secure email/password login with Better Auth
 - Google OAuth sign-in (Web, Android, iOS)
 - Auto-prompt for login on app startup
+
+**Google OAuth Setup** 🔐:
+To enable Google sign-in, you need to configure authorized redirect URIs in your Google Cloud Console:
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Navigate to APIs & Services > Credentials
+3. Find your OAuth 2.0 Client ID (94427138884-cc2db90qkmg6dfshccce94ffmt5rpla0)
+4. Add these **Authorized redirect URIs**:
+   - `https://preview-ugdfgagtcpqe.share.sandbox.dev/api/auth/callback/google` (Backend callback)
+   - `vibecode://auth/callback` (Mobile app callback)
+5. Save changes and wait 5-10 minutes for Google to propagate the changes
+
+**Current Backend URL**: `https://preview-ugdfgagtcpqe.share.sandbox.dev`
+
+**Troubleshooting**:
+- If Google sign-in fails, verify the redirect URIs match exactly in Google Cloud Console
+- Backend server automatically uses the BACKEND_URL environment variable
+- The callback URL must match: `{BACKEND_URL}/api/auth/callback/google`
 - **3-Step Onboarding for ALL Users** ✨ UPDATED!
   - **Step 1:** Create unique username (@tag) + Tell us about yourself
     - Username validation (3-30 chars, alphanumeric + underscore)
