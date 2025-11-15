@@ -169,60 +169,30 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
   - Keeps your location context for nearby places
   - Works even when you have active quests
 
-**Quest Completion Flow** ✨ ENHANCED! (3D Glassmorphism Design with FIXED Visibility)
+**Quest Completion Flow** ✨ SIMPLIFIED! (Single Page with Clear Visibility)
 - **Dark Gradient Background**: Beautiful gradient from #0A0A0F → #1A1A24 → #2A1A34 (consistent with app theme)
-- **3D Glassmorphism Cards** 🎨 UPDATED!:
+- **3D Glassmorphism Cards** 🎨:
   - Semi-transparent backgrounds: rgba(255, 255, 255, 0.05)
   - Colored borders with purple/orange glow effects matching theme
   - Enhanced shadow effects for depth
   - Premium dark theme matching the homepage and profile
-- **FIXED Text Visibility** ✨ NEW!:
-  - All text now uses bright white (#FFFFFF) for maximum contrast
+- **FIXED Text Visibility** ✨:
+  - All text uses bright white (#FFFFFF) for maximum contrast
   - Dark text shadows on all text for readability on any background
-  - Colored glows on numbers (orange, purple, cyan) for premium feel
-  - No more invisible text on dark gradients
+  - Colored glows on numbers (gold, orange) for premium feel
   - Increased font sizes for better readability
 - **Loading screen**: 2-second loading animation with pulsing trophy
 - **Smooth animations** 🎨:
   - Floating confetti particles with random colors, sizes, and rotation
   - Bounce and scale animations on all elements
-  - Smooth fade and slide transitions between pages
   - Trophy with rotation and bounce effect
-  - Flame icon with pulsing glow
   - Card elements slide up with staggered timing
   - Golden glowing shadows on icons
-- **Sequential completion pages** (tap to advance through each):
-  - **Page 1 - Accomplishments**: 3D glassmorphism card with dark gradient background
-    - Gradient stat cards for XP and Points earned (bright white text with colored shadows)
-    - Glassmorphism cards for Total XP and Total Points (bright white with colored glows)
-    - Semi-transparent with colored borders and glow effects
-    - "Tap to continue" fully visible
-  - **Page 2 - Leaderboard** 🎨 UPDATED!: Purple theme matching app design
-    - Purple gradient trophy icon (#7E3FE4 → #A78BFA)
-    - "Leaderboard Position" title in bright white
-    - Your rank in huge bright white text with purple glow shadow
-    - "out of X warriors" clearly visible in white
-    - Top 5 warriors list in glassmorphism card
-    - "Tap to continue" fully visible
-    - 3D glassmorphism rank card with purple glow
-    - Dark themed list with white text
-    - Current user highlighted with orange accent
-    - Consistent color scheme with app theme
-  - **Page 3 - Streak** 🎨 UPDATED with FIXED Visibility!: Orange/coral theme for fire aesthetic
-    - Orange gradient flame icon (#FF6B35 → #FF8C61) with glow
-    - Streak number in huge bright white text with orange glow shadow
-    - "day streak" in bright white with dark shadow for contrast
-    - 3D glassmorphism card with orange border glow
-    - "Generating your next challenge..." in bright white with shadow
-    - "Tap to start next quest" fully visible in white
-    - Enhanced loading state for next quest generation
-- **Auto-generation**: Automatically creates next harder quest when you tap on streak page
-- Progressive difficulty: EASY → MEDIUM → HARD → EXPERT
-- Smooth spring physics and bounce animations throughout
-- Visual feedback while generating next quest
-- Each page is tap-to-advance for intuitive flow
-- **Smart quest limit handling**: Properly handles the 2-quest active limit when auto-generating next quest
-- User-friendly error messages if quest limit is reached
+- **Single Accomplishments Page**:
+  - Shows XP and Points earned with bright white text and colored shadows
+  - Displays Total XP and Total Points with enhanced contrast
+  - "Tap to continue" button returns you to home screen
+  - Clean, simple completion flow - no more multi-page confusion
 
 **AI Quest Generation** ✨ ENHANCED! (Context-Aware & Location-Based with Google Maps)
 - **Personal Context** 🎯:

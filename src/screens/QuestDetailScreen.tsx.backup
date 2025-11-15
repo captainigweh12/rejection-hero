@@ -1550,6 +1550,384 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
               </Animated.View>
             )}
 
+            {/* Page 2: Leaderboard */}
+            {completionPage === "leaderboard" && (
+              <Animated.View
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  paddingHorizontal: 32,
+                  opacity: pageTransitionAnim,
+                  transform: [
+                    {
+                      translateY: pageTransitionAnim.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [50, 0],
+                      }),
+                    },
+                  ],
+                }}
+              >
+                {/* Trophy Icon with pulse */}
+                <Animated.View
+                  style={{
+                    marginBottom: 32,
+                    transform: [
+                      {
+                        scale: pageTransitionAnim.interpolate({
+                          inputRange: [0, 0.5, 1],
+                          outputRange: [0.5, 1.1, 1],
+                        }),
+                      },
+                    ],
+                  }}
+                >
+                  <LinearGradient
+                    colors={["#7E3FE4", "#A78BFA"]}
+                    style={{
+                      width: 100,
+                      height: 100,
+                      borderRadius: 50,
+                      alignItems: "center",
+                      justifyContent: "center",
+                      shadowColor: "#7E3FE4",
+                      shadowOffset: { width: 0, height: 0 },
+                      shadowOpacity: 0.6,
+                      shadowRadius: 15,
+                      elevation: 8,
+                    }}
+                  >
+                    <Trophy size={50} color="white" />
+                  </LinearGradient>
+                </Animated.View>
+
+                {/* Title */}
+                <Animated.Text
+                  style={{
+                    fontSize: 32,
+                    fontWeight: "bold",
+                    color: "#FFFFFF",
+                    marginBottom: 48,
+                    textAlign: "center",
+                    opacity: pageTransitionAnim,
+                    textShadowColor: "rgba(0, 0, 0, 0.7)",
+                    textShadowOffset: { width: 0, height: 2 },
+                    textShadowRadius: 6,
+                  }}
+                >
+                  Leaderboard Position
+                </Animated.Text>
+
+                {/* User Position with bounce - 3D Glassmorphism */}
+                <Animated.View
+                  style={{
+                    width: "100%",
+                    backgroundColor: "rgba(255, 255, 255, 0.05)",
+                    borderRadius: 24,
+                    padding: 32,
+                    alignItems: "center",
+                    marginBottom: 24,
+                    borderWidth: 2,
+                    borderColor: "rgba(126, 63, 228, 0.3)",
+                    shadowColor: "#7E3FE4",
+                    shadowOffset: { width: 0, height: 8 },
+                    shadowOpacity: 0.4,
+                    shadowRadius: 16,
+                    elevation: 8,
+                    opacity: pageTransitionAnim,
+                    transform: [
+                      {
+                        scale: pageTransitionAnim.interpolate({
+                          inputRange: [0, 0.8, 1],
+                          outputRange: [0.8, 1.05, 1],
+                        }),
+                      },
+                    ],
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 72,
+                      fontWeight: "bold",
+                      color: "#FFFFFF",
+                      textShadowColor: "rgba(126, 63, 228, 0.8)",
+                      textShadowOffset: { width: 0, height: 4 },
+                      textShadowRadius: 12,
+                    }}
+                  >
+                    #{leaderboardData?.currentUserRank || "-"}
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: 18,
+                      color: "#FFFFFF",
+                      marginTop: 8,
+                      fontWeight: "600",
+                      textShadowColor: "rgba(0, 0, 0, 0.7)",
+                      textShadowOffset: { width: 0, height: 2 },
+                      textShadowRadius: 4,
+                    }}
+                  >
+                    out of {leaderboardData?.totalUsers || 0} warriors
+                  </Text>
+                </Animated.View>
+
+                {/* Top Users - Glassmorphism List */}
+                {leaderboardData?.leaderboard && leaderboardData.leaderboard.length > 0 && (
+                  <Animated.View
+                    style={{
+                      width: "100%",
+                      backgroundColor: "rgba(255, 255, 255, 0.05)",
+                      borderRadius: 20,
+                      padding: 20,
+                      maxHeight: 250,
+                      borderWidth: 1,
+                      borderColor: "rgba(255, 255, 255, 0.1)",
+                      opacity: pageTransitionAnim,
+                      transform: [
+                        {
+                          translateY: pageTransitionAnim.interpolate({
+                            inputRange: [0, 1],
+                            outputRange: [30, 0],
+                          }),
+                        },
+                      ],
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontSize: 16,
+                        fontWeight: "bold",
+                        color: "white",
+                        marginBottom: 12,
+                      }}
+                    >
+                      Top Warriors
+                    </Text>
+                    <ScrollView>
+                      {leaderboardData.leaderboard.slice(0, 5).map((user) => (
+                        <View
+                          key={user.userId}
+                          style={{
+                            flexDirection: "row",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            paddingVertical: 10,
+                            borderBottomWidth: 1,
+                            borderBottomColor: "rgba(255, 255, 255, 0.1)",
+                            backgroundColor: user.isCurrentUser ? "rgba(255, 107, 53, 0.15)" : "transparent",
+                            paddingHorizontal: user.isCurrentUser ? 12 : 0,
+                            borderRadius: user.isCurrentUser ? 12 : 0,
+                            marginBottom: user.isCurrentUser ? 4 : 0,
+                            borderWidth: user.isCurrentUser ? 1 : 0,
+                            borderColor: user.isCurrentUser ? "rgba(255, 107, 53, 0.3)" : "transparent",
+                          }}
+                        >
+                          <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+                            <Text
+                              style={{
+                                fontSize: 18,
+                                fontWeight: "bold",
+                                color: user.rank <= 3 ? "#FFD700" : "rgba(255, 255, 255, 0.6)",
+                                width: 30,
+                              }}
+                            >
+                              #{user.rank}
+                            </Text>
+                            <Text
+                              style={{
+                                fontSize: 16,
+                                color: "white",
+                                fontWeight: user.isCurrentUser ? "bold" : "normal",
+                              }}
+                            >
+                              {user.userName}
+                            </Text>
+                          </View>
+                          <Text style={{ fontSize: 16, fontWeight: "600", color: "#A78BFA" }}>
+                            {user.totalXP} XP
+                          </Text>
+                        </View>
+                      ))}
+                    </ScrollView>
+                  </Animated.View>
+                )}
+
+                {/* Tap to continue */}
+                <Animated.Text
+                  style={{
+                    marginTop: 32,
+                    fontSize: 18,
+                    color: "#FFFFFF",
+                    fontWeight: "600",
+                    textAlign: "center",
+                    opacity: pageTransitionAnim,
+                    textShadowColor: "rgba(0, 0, 0, 0.8)",
+                    textShadowOffset: { width: 0, height: 2 },
+                    textShadowRadius: 6,
+                  }}
+                >
+                  Tap to continue
+                </Animated.Text>
+              </Animated.View>
+            )}
+
+            {/* Page 3: Streak */}
+            {completionPage === "streak" && (
+              <Animated.View
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  paddingHorizontal: 32,
+                  opacity: pageTransitionAnim,
+                  transform: [
+                    {
+                      translateY: pageTransitionAnim.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [50, 0],
+                      }),
+                    },
+                  ],
+                }}
+              >
+                {/* Flame Icon with flicker animation */}
+                <Animated.View
+                  style={{
+                    marginBottom: 48,
+                    transform: [
+                      {
+                        scale: pageTransitionAnim.interpolate({
+                          inputRange: [0, 0.5, 1],
+                          outputRange: [0.5, 1.15, 1],
+                        }),
+                      },
+                    ],
+                  }}
+                >
+                  <LinearGradient
+                    colors={["#FF6B35", "#FF8C61"]}
+                    style={{
+                      width: 140,
+                      height: 140,
+                      borderRadius: 70,
+                      alignItems: "center",
+                      justifyContent: "center",
+                      shadowColor: "#FF6B35",
+                      shadowOffset: { width: 0, height: 0 },
+                      shadowOpacity: 0.7,
+                      shadowRadius: 20,
+                      elevation: 10,
+                    }}
+                  >
+                    <Flame size={80} color="white" />
+                  </LinearGradient>
+                </Animated.View>
+
+                {/* Streak Number with bounce - 3D Glassmorphism */}
+                <Animated.View
+                  style={{
+                    backgroundColor: "rgba(255, 255, 255, 0.05)",
+                    borderRadius: 24,
+                    padding: 40,
+                    alignItems: "center",
+                    width: "100%",
+                    borderWidth: 2,
+                    borderColor: "rgba(255, 107, 53, 0.3)",
+                    shadowColor: "#FF6B35",
+                    shadowOffset: { width: 0, height: 8 },
+                    shadowOpacity: 0.4,
+                    shadowRadius: 16,
+                    elevation: 8,
+                    opacity: pageTransitionAnim,
+                    transform: [
+                      {
+                        scale: pageTransitionAnim.interpolate({
+                          inputRange: [0, 0.7, 1],
+                          outputRange: [0.8, 1.1, 1],
+                        }),
+                      },
+                    ],
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 80,
+                      fontWeight: "bold",
+                      color: "#FFFFFF",
+                      textShadowColor: "rgba(255, 107, 53, 0.8)",
+                      textShadowOffset: { width: 0, height: 4 },
+                      textShadowRadius: 12,
+                    }}
+                  >
+                    {statsData?.currentStreak || 1}
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: 24,
+                      color: "#FFFFFF",
+                      fontWeight: "600",
+                      textShadowColor: "rgba(0, 0, 0, 0.7)",
+                      textShadowOffset: { width: 0, height: 2 },
+                      textShadowRadius: 4,
+                    }}
+                  >
+                    day streak
+                  </Text>
+                </Animated.View>
+
+                {/* Generating Next Quest */}
+                {isGeneratingNext ? (
+                  <Animated.View
+                    style={{
+                      marginTop: 48,
+                      backgroundColor: "rgba(255, 255, 255, 0.05)",
+                      borderRadius: 20,
+                      padding: 24,
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 16,
+                      width: "100%",
+                      borderWidth: 1,
+                      borderColor: "rgba(255, 255, 255, 0.1)",
+                      opacity: pageTransitionAnim,
+                    }}
+                  >
+                    <ActivityIndicator size="large" color="#FF6B35" />
+                    <Text
+                      style={{
+                        color: "#FFFFFF",
+                        fontSize: 18,
+                        fontWeight: "700",
+                        flex: 1,
+                        textShadowColor: "rgba(0, 0, 0, 0.8)",
+                        textShadowOffset: { width: 0, height: 2 },
+                        textShadowRadius: 6,
+                      }}
+                    >
+                      Generating your next challenge...
+                    </Text>
+                  </Animated.View>
+                ) : (
+                  <Animated.Text
+                    style={{
+                      marginTop: 48,
+                      fontSize: 18,
+                      color: "#FFFFFF",
+                      fontWeight: "600",
+                      textAlign: "center",
+                      opacity: pageTransitionAnim,
+                      textShadowColor: "rgba(0, 0, 0, 0.8)",
+                      textShadowOffset: { width: 0, height: 2 },
+                      textShadowRadius: 6,
+                    }}
+                  >
+                    Tap to start next quest
+                  </Animated.Text>
+                )}
+              </Animated.View>
+            )}
           </SafeAreaView>
         </Pressable>
         </LinearGradient>
