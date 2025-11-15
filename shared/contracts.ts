@@ -53,6 +53,9 @@ export const getProfileResponseSchema = z.object({
   longitude: z.number().nullable(),
   isLive: z.boolean(),
   liveViewers: z.number(),
+  userContext: z.string().nullable().optional(), // About you - for AI
+  userGoals: z.string().nullable().optional(), // User's goals - for AI
+  onboardingCompleted: z.boolean().optional(), // Track onboarding completion
 });
 export type GetProfileResponse = z.infer<typeof getProfileResponseSchema>;
 
@@ -67,6 +70,9 @@ export const updateProfileRequestSchema = z.object({
   location: z.string().optional(),
   latitude: z.number().optional(),
   longitude: z.number().optional(),
+  userContext: z.string().optional(), // About you - for AI quest generation
+  userGoals: z.string().optional(), // User's goals - for AI quest generation
+  onboardingCompleted: z.boolean().optional(), // Mark onboarding as completed
 });
 export type UpdateProfileRequest = z.infer<typeof updateProfileRequestSchema>;
 export const updateProfileResponseSchema = z.object({

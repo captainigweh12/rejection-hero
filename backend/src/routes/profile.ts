@@ -44,6 +44,9 @@ profileRouter.get("/", async (c) => {
         longitude: null,
         isLive: false,
         liveViewers: 0,
+        userContext: null,
+        userGoals: null,
+        onboardingCompleted: false,
       },
     });
   }
@@ -65,6 +68,9 @@ profileRouter.get("/", async (c) => {
     longitude: profile.longitude,
     isLive: profile.isLive,
     liveViewers: profile.liveViewers,
+    userContext: profile.userContext,
+    userGoals: profile.userGoals,
+    onboardingCompleted: profile.onboardingCompleted,
   } satisfies GetProfileResponse);
 });
 
@@ -95,6 +101,9 @@ profileRouter.post("/", zValidator("json", updateProfileRequestSchema), async (c
       location: data.location,
       latitude: data.latitude,
       longitude: data.longitude,
+      userContext: data.userContext,
+      userGoals: data.userGoals,
+      onboardingCompleted: data.onboardingCompleted ?? false,
     },
     update: {
       displayName: data.displayName,
@@ -106,6 +115,9 @@ profileRouter.post("/", zValidator("json", updateProfileRequestSchema), async (c
       location: data.location,
       latitude: data.latitude,
       longitude: data.longitude,
+      userContext: data.userContext,
+      userGoals: data.userGoals,
+      onboardingCompleted: data.onboardingCompleted,
     },
   });
 
@@ -128,6 +140,9 @@ profileRouter.post("/", zValidator("json", updateProfileRequestSchema), async (c
       longitude: profile.longitude,
       isLive: profile.isLive,
       liveViewers: profile.liveViewers,
+      userContext: profile.userContext,
+      userGoals: profile.userGoals,
+      onboardingCompleted: profile.onboardingCompleted,
     },
   } satisfies UpdateProfileResponse);
 });

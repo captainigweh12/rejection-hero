@@ -17,6 +17,7 @@ import MapScreen from "@/screens/MapScreen";
 import ProfileScreen from "@/screens/ProfileScreen";
 import JournalScreen from "@/screens/JournalScreen";
 import LoginModalScreen from "@/screens/LoginModalScreen";
+import OnboardingScreen from "@/screens/OnboardingScreen";
 import EditProfileScreen from "@/screens/EditProfileScreen";
 import QuestDetailScreen from "@/screens/QuestDetailScreen";
 import CreateQuestScreen from "@/screens/CreateQuestScreen";
@@ -27,6 +28,8 @@ import GrowthAchievementsScreen from "@/screens/GrowthAchievementsScreen";
 import FriendsScreen from "@/screens/FriendsScreen";
 import SendQuestToFriendScreen from "@/screens/SendQuestToFriendScreen";
 import { useSession } from "@/lib/useSession";
+import { api } from "@/lib/api";
+import { useQuery } from "@tanstack/react-query";
 
 /**
  * RootStackNavigator
@@ -93,6 +96,11 @@ const RootNavigator = () => {
           component={SendQuestToFriendScreen}
           options={{ headerShown: false }}
         />
+        <RootStack.Screen
+          name="Onboarding"
+          component={OnboardingScreen}
+          options={{ headerShown: false }}
+        />
       </RootStack.Navigator>
     </>
   );
@@ -101,23 +109,40 @@ const RootNavigator = () => {
 /**
  * AuthWrapper
  * Checks if user is logged in on app startup and opens login modal if not
+ * Also checks if user has completed onboarding and redirects if needed
  */
 function AuthWrapper() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { data: sessionData, isPending } = useSession();
   const [hasChecked, setHasChecked] = useState(false);
 
+  // Fetch user profile to check onboarding status
+  const { data: profile } = useQuery({
+    queryKey: ["profile"],
+    queryFn: async () => {
+      const response = await api.get("/profile");
+      return response as { onboardingCompleted?: boolean };
+    },
+    enabled: !!sessionData?.user,
+  });
+
   useEffect(() => {
     if (!isPending && !hasChecked) {
       setHasChecked(true);
+
       if (!sessionData?.user) {
         // Open login modal on first launch if not authenticated
         setTimeout(() => {
           navigation.navigate("LoginModalScreen");
         }, 100);
+      } else if (profile && !profile.onboardingCompleted) {
+        // Redirect to onboarding if user hasn't completed it
+        setTimeout(() => {
+          navigation.navigate("Onboarding");
+        }, 100);
       }
     }
-  }, [sessionData, isPending, hasChecked, navigation]);
+  }, [sessionData, isPending, hasChecked, navigation, profile]);
 
   return null;
 }
