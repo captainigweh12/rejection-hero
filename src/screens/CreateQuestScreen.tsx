@@ -3,7 +3,7 @@ import { View, Text, Pressable, ActivityIndicator, TextInput, ScrollView, Alert,
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Sparkles, X, ChevronLeft, Star, ThumbsDown, Mic, MapPin, Globe } from "lucide-react-native";
+import { Sparkles, X, ChevronLeft, Star, ThumbsDown, Mic, MapPin, Globe, Users } from "lucide-react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "@/navigation/types";
 import { api } from "@/lib/api";
@@ -20,6 +20,7 @@ type LocationType = "CURRENT" | "CUSTOM" | "NONE";
 export default function CreateQuestScreen({ navigation }: Props) {
   const [showAIForm, setShowAIForm] = useState(false);
   const [showCustomForm, setShowCustomForm] = useState(false);
+  const [showSendToFriends, setShowSendToFriends] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedDifficulty, setSelectedDifficulty] = useState<string | null>(null);
   const [selectedQuestType, setSelectedQuestType] = useState<QuestType>("REJECTION");
@@ -83,6 +84,21 @@ export default function CreateQuestScreen({ navigation }: Props) {
     });
   };
 
+  const handleCreateCustomQuest = async () => {
+    if (!questAction.trim()) {
+      Alert.alert("Missing Info", "Please describe your quest");
+      return;
+    }
+
+    // Use the generate API with custom prompt to create the quest
+    generateMutation.mutate({
+      category: "CONFIDENCE",
+      difficulty: "MEDIUM",
+      customPrompt: questAction,
+      preferredQuestType: "ACTION",
+    });
+  };
+
   const handleVoiceRecording = () => {
     Alert.alert(
       "Voice Recording",
@@ -116,7 +132,7 @@ export default function CreateQuestScreen({ navigation }: Props) {
   };
 
   // Main selection screen - Dark 3D Glass Theme
-  if (!showAIForm && !showCustomForm) {
+  if (!showAIForm && !showCustomForm && !showSendToFriends) {
     return (
       <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
         <LinearGradient colors={["#0A0A0F", "#1A1A24", "#2A1A34"]} style={{ flex: 1 }}>
@@ -228,6 +244,43 @@ export default function CreateQuestScreen({ navigation }: Props) {
                       </Text>
                       <Text style={{ fontSize: 14, color: "rgba(255, 255, 255, 0.6)" }}>
                         Design your own challenge
+                      </Text>
+                    </View>
+                  </View>
+                </Pressable>
+              </View>
+
+              {/* Send Quest to Friends Card - 3D Glassmorphism */}
+              <View style={{ paddingHorizontal: 24, marginBottom: 20 }}>
+                <Pressable
+                  onPress={() => setShowSendToFriends(true)}
+                  style={{
+                    backgroundColor: "rgba(255, 255, 255, 0.05)",
+                    borderRadius: 24,
+                    padding: 24,
+                    borderWidth: 1,
+                    borderColor: "rgba(255, 255, 255, 0.1)",
+                  }}
+                >
+                  <View style={{ flexDirection: "row", alignItems: "center", gap: 16 }}>
+                    <View
+                      style={{
+                        width: 60,
+                        height: 60,
+                        borderRadius: 30,
+                        backgroundColor: "rgba(0, 217, 255, 0.2)",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Users size={28} color="#00D9FF" />
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ fontSize: 22, fontWeight: "bold", color: "white", marginBottom: 4 }}>
+                        Send Quest to Friends
+                      </Text>
+                      <Text style={{ fontSize: 14, color: "rgba(255, 255, 255, 0.6)" }}>
+                        Challenge your friends
                       </Text>
                     </View>
                   </View>
@@ -345,24 +398,183 @@ export default function CreateQuestScreen({ navigation }: Props) {
                       AI will transcribe your audio into a quest
                     </Text>
                   </View>
-
-                  {/* Coming Soon Notice */}
-                  <View
-                    style={{
-                      backgroundColor: "rgba(255, 215, 0, 0.1)",
-                      borderRadius: 16,
-                      padding: 16,
-                      borderWidth: 1,
-                      borderColor: "rgba(255, 215, 0, 0.3)",
-                    }}
-                  >
-                    <Text style={{ color: "#FFD700", fontSize: 14, textAlign: "center" }}>
-                      💡 Custom quests coming soon! For now, use &ldquo;Generate with AI&rdquo; for fully functional quests.
-                    </Text>
-                  </View>
                 </ScrollView>
               </TouchableWithoutFeedback>
+
+              {/* Create Button - Fixed at bottom - Only show when text is entered */}
+              {questAction.trim().length > 0 && (
+                <View
+                  style={{
+                    position: "absolute",
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    paddingHorizontal: 24,
+                    paddingTop: 16,
+                    paddingBottom: 32,
+                    backgroundColor: "#0A0A0F",
+                    borderTopWidth: 1,
+                    borderTopColor: "rgba(255, 255, 255, 0.1)",
+                  }}
+                >
+                  <Pressable
+                    onPress={handleCreateCustomQuest}
+                    disabled={generateMutation.isPending}
+                    style={{
+                      paddingVertical: 16,
+                      borderRadius: 16,
+                      alignItems: "center",
+                      overflow: "hidden",
+                    }}
+                  >
+                    <LinearGradient
+                      colors={generateMutation.isPending ? ["#666", "#666"] : ["#FF6B35", "#FF8C61"]}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 0 }}
+                      style={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                      }}
+                    />
+                    {generateMutation.isPending ? (
+                      <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                        <ActivityIndicator size="small" color="white" />
+                        <Text style={{ color: "white", fontWeight: "bold", fontSize: 18 }}>
+                          Creating Quest...
+                        </Text>
+                      </View>
+                    ) : (
+                      <Text style={{ color: "white", fontWeight: "bold", fontSize: 18 }}>
+                        Create Quest
+                      </Text>
+                    )}
+                  </Pressable>
+                </View>
+              )}
             </KeyboardAvoidingView>
+          </SafeAreaView>
+        </LinearGradient>
+      </View>
+    );
+  }
+
+  // Send Quest to Friends Screen
+  if (showSendToFriends) {
+    return (
+      <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
+        <LinearGradient colors={["#0A0A0F", "#1A1A24", "#2A1A34"]} style={{ flex: 1 }}>
+          <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
+            {/* Header */}
+            <View
+              style={{
+                paddingHorizontal: 20,
+                paddingVertical: 16,
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Pressable
+                onPress={() => setShowSendToFriends(false)}
+                style={{ position: "absolute", left: 20 }}
+              >
+                <ChevronLeft size={28} color="white" />
+              </Pressable>
+              <Text style={{ fontSize: 20, fontWeight: "bold", color: "white" }}>
+                Send to Friends
+              </Text>
+            </View>
+
+            <ScrollView
+              style={{ flex: 1 }}
+              contentContainerStyle={{ padding: 24, paddingBottom: 40 }}
+            >
+              {/* Icon */}
+              <View style={{ alignItems: "center", marginVertical: 32 }}>
+                <LinearGradient
+                  colors={["#00D9FF", "#00A8CC"]}
+                  style={{
+                    width: 100,
+                    height: 100,
+                    borderRadius: 50,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    shadowColor: "#00D9FF",
+                    shadowOffset: { width: 0, height: 0 },
+                    shadowOpacity: 0.6,
+                    shadowRadius: 20,
+                    elevation: 10,
+                  }}
+                >
+                  <Users size={50} color="white" />
+                </LinearGradient>
+                <Text style={{ fontSize: 24, fontWeight: "bold", color: "white", marginTop: 20 }}>
+                  Challenge Your Friends
+                </Text>
+                <Text style={{ fontSize: 16, color: "rgba(255, 255, 255, 0.6)", textAlign: "center", marginTop: 8 }}>
+                  Share quests and compete together
+                </Text>
+              </View>
+
+              {/* Coming Soon Notice */}
+              <View
+                style={{
+                  backgroundColor: "rgba(0, 217, 255, 0.1)",
+                  borderRadius: 20,
+                  padding: 24,
+                  borderWidth: 1,
+                  borderColor: "rgba(0, 217, 255, 0.3)",
+                }}
+              >
+                <Text style={{ color: "#00D9FF", fontSize: 18, fontWeight: "bold", textAlign: "center", marginBottom: 12 }}>
+                  Coming Soon!
+                </Text>
+                <Text style={{ color: "rgba(255, 255, 255, 0.8)", fontSize: 15, textAlign: "center", lineHeight: 22 }}>
+                  Friend challenges are being built! Soon you&rsquo;ll be able to send custom quests to your friends and see who can complete them first.
+                </Text>
+              </View>
+
+              {/* Feature List */}
+              <View style={{ marginTop: 32, gap: 16 }}>
+                <Text style={{ fontSize: 18, fontWeight: "bold", color: "white", marginBottom: 8 }}>
+                  What&rsquo;s Coming:
+                </Text>
+
+                {[
+                  { icon: "🎯", title: "Challenge Friends", desc: "Send custom quests to specific friends" },
+                  { icon: "🏆", title: "Compete Together", desc: "See who completes challenges first" },
+                  { icon: "💬", title: "Share Results", desc: "Compare scores and celebrate wins" },
+                  { icon: "🎊", title: "Group Challenges", desc: "Create team quests for multiple friends" },
+                ].map((feature, idx) => (
+                  <View
+                    key={idx}
+                    style={{
+                      backgroundColor: "rgba(255, 255, 255, 0.05)",
+                      borderRadius: 16,
+                      padding: 16,
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 16,
+                      borderWidth: 1,
+                      borderColor: "rgba(255, 255, 255, 0.1)",
+                    }}
+                  >
+                    <Text style={{ fontSize: 32 }}>{feature.icon}</Text>
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ fontSize: 16, fontWeight: "bold", color: "white", marginBottom: 4 }}>
+                        {feature.title}
+                      </Text>
+                      <Text style={{ fontSize: 14, color: "rgba(255, 255, 255, 0.6)" }}>
+                        {feature.desc}
+                      </Text>
+                    </View>
+                  </View>
+                ))}
+              </View>
+            </ScrollView>
           </SafeAreaView>
         </LinearGradient>
       </View>
