@@ -7,14 +7,14 @@ $ prisma generate
 Environment variables loaded from .env
 Prisma schema loaded from prisma/schema.prisma
 
-✔ Generated Prisma Client (v6.17.1) to ./generated/prisma in 362ms
+✔ Generated Prisma Client (v6.17.1) to ./generated/prisma in 236ms
 
 Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
 
-Tip: Want to turn off tips and other hints? https://pris.ly/tip-4-nohints
+Tip: Interested in query caching in just a few lines of code? Try Accelerate today! https://pris.ly/tip-3-accelerate
 
 
-Checked 760 installs across 702 packages (no changes) [1.77s]
+Checked 760 installs across 702 packages (no changes) [1.55s]
 Starting server in dev mode with hot reload...
 $ NODE_ENV=development bun run --hot src/index.ts
 Failed to find Response internal state key
@@ -66,6 +66,7 @@ Failed to find Response internal state key
   💚 Health:       GET /health
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+error: Cannot find module '../generated/prisma' from '/home/user/workspace/backend/src/db.ts'
 Failed to find Response internal state key
 ✅ Environment variables validated successfully
 🔐 [Auth] Initializing Better Auth...
@@ -91,45 +92,29 @@ Failed to find Response internal state key
 🏘️  Mounting groups routes at /api/groups
 🎁 Mounting shared quests routes at /api/shared-quests
 ⚙️  Starting server...
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📍 Environment: development
-🚀 Server is running on port 3000
-🔗 Base URL: http://localhost:3000
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-📚 Available endpoints:
-  🔐 Auth:         /api/auth/*
-  📤 Upload:       POST /api/upload/image
-  📝 Sample:       GET/POST /api/sample
-  👤 Profile:      GET/POST /api/profile
-  🔍 Discover:     GET /api/discover
-  👆 Swipe:        POST /api/swipe
-  💕 Matches:      GET /api/matches
-  🎯 Quests:       GET/POST /api/quests
-  📊 Stats:        GET /api/stats
-  📹 Live:         GET/POST /api/live
-  👥 Friends:      GET/POST /api/friends
-  💬 Messages:     GET/POST /api/messages
-  🏘️  Groups:       GET/POST /api/groups
-  🎁 SharedQuests: GET/POST /api/shared-quests
-  💚 Health:       GET /health
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
 <-- GET /api/auth/get-session
 --> GET /api/auth/get-session [32m200[0m 11ms
 <-- GET /api/quests
---> GET /api/quests [32m200[0m 5ms
+--> GET /api/quests [32m200[0m 4ms
 <-- GET /api/stats
 --> GET /api/stats [32m200[0m 2ms
-<-- GET /api/profile
-<-- GET /api/stats
---> GET /api/profile [32m200[0m 4ms
---> GET /api/stats [32m200[0m 5ms
-<-- GET /api/messages/conversations
-<-- GET /api/friends/requests
---> GET /api/messages/conversations [32m200[0m 5ms
---> GET /api/friends/requests [32m200[0m 5ms
-<-- GET /api/groups
 <-- GET /api/friends
---> GET /api/friends [32m200[0m 3ms
---> GET /api/groups [32m200[0m 5ms
+<-- GET /api/friends/requests
+--> GET /api/friends/requests [32m200[0m 4ms
+--> GET /api/friends [32m200[0m 5ms
+<-- GET /api/groups
+<-- GET /api/messages/conversations
+--> GET /api/messages/conversations [32m200[0m 4ms
+--> GET /api/groups [32m200[0m 4ms
+<-- GET /api/stats
+<-- GET /api/profile
+--> GET /api/stats [32m200[0m 4ms
+--> GET /api/profile [32m200[0m 3ms
+<-- POST /api/profile/generate-avatar
+🎨 Generating AI avatar with prompt: Epic gaming character avatar, futuristic warrior, neon colors, purple and orange glow, cyberpunk style, professional game character portrait. Square composition, centered, suitable for profile picture. No text or watermarks.
+✅ Avatar generated successfully: https://oaidalleapiprodscus.blob.core.windows.net/private/org-jdr5vFDku87EJnQDwH0mvzHA/user-11t2zrBKGXhVgELCbCQNjquS/img-nQBhYVGqDr3yUuHyv6RooJlI.png?st=2025-11-14T23%3A29%3A52Z&se=2025-11-15T01%3A29%3A52Z&sp=r&sv=2024-08-04&sr=b&rscd=inline&rsct=image/png&skoid=cc612491-d948-4d2e-9821-2683df3719f5&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-11-14T09%3A48%3A13Z&ske=2025-11-15T09%3A48%3A13Z&sks=b&skv=2024-08-04&sig=wp8Yl0O4F5k1mQBwTxDdNFVJB1NIYM0cRxcpf609eyg%3D
+--> POST /api/profile/generate-avatar [32m200[0m 12s
+<-- POST /api/profile
+--> POST /api/profile [32m200[0m 4ms
+<-- GET /api/profile
+--> GET /api/profile [32m200[0m 2ms
