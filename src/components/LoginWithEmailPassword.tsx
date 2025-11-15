@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Alert, Pressable, Text, TextInput, View, ActivityIndicator } from "react-native";
+import { Alert, Pressable, Text, TextInput, View, ActivityIndicator, Image } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import * as WebBrowser from "expo-web-browser";
 import { useNavigation } from "@react-navigation/native";
@@ -153,6 +153,15 @@ export default function LoginWithEmailPassword() {
   return (
     <KeyboardAwareScrollView>
       <View className="w-full p-6 gap-4">
+        {/* Logo */}
+        <View className="items-center mb-4">
+          <Image
+            source={require("@/assets/rejection-hero-logo.png")}
+            style={{ width: 200, height: 200 }}
+            resizeMode="contain"
+          />
+        </View>
+
         <Text className="text-2xl font-bold text-center mb-2">
           {isSignUp ? "Create Account" : "Sign In"}
         </Text>
