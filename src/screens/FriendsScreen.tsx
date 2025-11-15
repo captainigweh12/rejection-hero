@@ -60,7 +60,7 @@ export default function FriendsScreen({ navigation }: Props) {
   const { data: friendsData, isLoading: friendsLoading, refetch: refetchFriends } = useQuery({
     queryKey: ["friends"],
     queryFn: async () => {
-      const response = await api.get<{ friends: Friend[] }>("api/friends");
+      const response = await api.get<{ friends: Friend[] }>("/api/friends");
       return response;
     },
     retry: 3,
@@ -72,7 +72,7 @@ export default function FriendsScreen({ navigation }: Props) {
   const { data: requestsData, isLoading: requestsLoading, refetch: refetchRequests } = useQuery({
     queryKey: ["friend-requests"],
     queryFn: async () => {
-      const response = await api.get<{ requests: FriendRequest[] }>("api/friends/requests");
+      const response = await api.get<{ requests: FriendRequest[] }>("/api/friends/requests");
       return response;
     },
     retry: 3,
@@ -84,7 +84,7 @@ export default function FriendsScreen({ navigation }: Props) {
   const { data: recommendationsData, isLoading: recommendationsLoading, refetch: refetchRecommendations } = useQuery({
     queryKey: ["friend-recommendations"],
     queryFn: async () => {
-      const response = await api.get<{ recommendations: Recommendation[] }>("api/friends/recommendations");
+      const response = await api.get<{ recommendations: Recommendation[] }>("/api/friends/recommendations");
       return response;
     },
     retry: 3,
@@ -99,7 +99,7 @@ export default function FriendsScreen({ navigation }: Props) {
       if (!searchQuery || searchQuery.length < 2) {
         return { users: [] };
       }
-      const response = await api.get<{ users: SearchResult[] }>(`api/friends/search?query=${encodeURIComponent(searchQuery)}`);
+      const response = await api.get<{ users: SearchResult[] }>(`/api/friends/search?query=${encodeURIComponent(searchQuery)}`);
       return response;
     },
     enabled: searchQuery.length >= 2,
@@ -108,7 +108,7 @@ export default function FriendsScreen({ navigation }: Props) {
   // Send friend request mutation
   const sendRequestMutation = useMutation({
     mutationFn: async (userId: string) => {
-      return api.post("api/friends/request", { userId });
+      return api.post("/api/friends/request", { userId });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user-search"] });
@@ -122,7 +122,7 @@ export default function FriendsScreen({ navigation }: Props) {
   // Accept friend request mutation
   const acceptRequestMutation = useMutation({
     mutationFn: async (requestId: string) => {
-      return api.post(`api/friends/accept/${requestId}`, {});
+      return api.post(`/api/friends/accept/${requestId}`, {});
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["friend-requests"] });
@@ -137,7 +137,7 @@ export default function FriendsScreen({ navigation }: Props) {
   // Decline friend request mutation
   const declineRequestMutation = useMutation({
     mutationFn: async (requestId: string) => {
-      return api.post(`api/friends/decline/${requestId}`, {});
+      return api.post(`/api/friends/decline/${requestId}`, {});
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["friend-requests"] });

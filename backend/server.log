@@ -7,14 +7,14 @@ $ prisma generate
 Environment variables loaded from .env
 Prisma schema loaded from prisma/schema.prisma
 
-✔ Generated Prisma Client (v6.17.1) to ./generated/prisma in 355ms
+✔ Generated Prisma Client (v6.17.1) to ./generated/prisma in 323ms
 
 Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
 
-Tip: Want to turn off tips and other hints? https://pris.ly/tip-4-nohints
+Tip: Need your database queries to be 1000x faster? Accelerate offers you that and more: https://pris.ly/tip-2-accelerate
 
 
-Checked 760 installs across 702 packages (no changes) [1.72s]
+Checked 760 installs across 702 packages (no changes) [1.60s]
 Starting server in dev mode with hot reload...
 $ NODE_ENV=development bun run --hot src/index.ts
 Failed to find Response internal state key
@@ -44,6 +44,7 @@ Failed to find Response internal state key
 📓 Mounting journal routes at /api/journal
 📝 Mounting posts routes at /api/posts
 ⏰ Mounting moments routes at /api/moments
+🔔 Mounting notifications routes at /api/notifications
 ⚙️  Starting server...
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📍 Environment: development
@@ -67,10 +68,10 @@ Failed to find Response internal state key
   🏘️  Groups:       GET/POST /api/groups
   🎁 SharedQuests: GET/POST /api/shared-quests
   📓 Journal:      GET/POST /api/journal
+  🔔 Notifications: GET /api/notifications
   💚 Health:       GET /health
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-error: Cannot find module '../generated/prisma' from '/home/user/workspace/backend/src/db.ts'
 Failed to find Response internal state key
 ✅ Environment variables validated successfully
 🔐 [Auth] Initializing Better Auth...
@@ -98,188 +99,77 @@ Failed to find Response internal state key
 📓 Mounting journal routes at /api/journal
 📝 Mounting posts routes at /api/posts
 ⏰ Mounting moments routes at /api/moments
+🔔 Mounting notifications routes at /api/notifications
 ⚙️  Starting server...
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📍 Environment: development
+🚀 Server is running on port 3000
+🔗 Base URL: http://localhost:3000
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📚 Available endpoints:
+  🔐 Auth:         /api/auth/*
+  📤 Upload:       POST /api/upload/image
+  📝 Sample:       GET/POST /api/sample
+  👤 Profile:      GET/POST /api/profile
+  🔍 Discover:     GET /api/discover
+  👆 Swipe:        POST /api/swipe
+  💕 Matches:      GET /api/matches
+  🎯 Quests:       GET/POST /api/quests
+  📊 Stats:        GET /api/stats
+  📹 Live:         GET/POST /api/live
+  👥 Friends:      GET/POST /api/friends
+  💬 Messages:     GET/POST /api/messages
+  🏘️  Groups:       GET/POST /api/groups
+  🎁 SharedQuests: GET/POST /api/shared-quests
+  📓 Journal:      GET/POST /api/journal
+  🔔 Notifications: GET /api/notifications
+  💚 Health:       GET /health
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 <-- GET /api/auth/get-session
 --> GET /api/auth/get-session [32m200[0m 12ms
+<-- GET /api/stats
+--> GET /api/stats [32m200[0m 4ms
 <-- GET /api/profile
 --> GET /api/profile [32m200[0m 3ms
-<-- GET /api/stats/reflection-prompt
-<-- GET /api/stats
---> GET /api/stats/reflection-prompt [32m200[0m 4ms
-<-- GET /api/quests
 <-- GET /api/stats/weekly-forecast
---> GET /api/stats [32m200[0m 7ms
---> GET /api/quests [32m200[0m 8ms
---> GET /api/stats/weekly-forecast [32m200[0m 9ms
-Failed to find Response internal state key
-✅ Environment variables validated successfully
-🔐 [Auth] Initializing Better Auth...
-✅ [Auth] Better Auth initialized
-🔗 [Auth] Base URL: https://preview-csuipnvqjxpr.share.sandbox.dev
-🌐 [Auth] Trusted origins: vibecode://, http://localhost:3000, http://localhost:8081, https://preview-csuipnvqjxpr.share.sandbox.dev
-🔑 [Auth] Google OAuth: Enabled
-📁 [Upload] Uploads directory exists: /home/user/workspace/backend/uploads
-🔧 Initializing Hono application...
-🔐 Mounting Better Auth handler at /api/auth/*
-📁 Serving static files from uploads/ directory
-📤 Mounting upload routes at /api/upload
-📝 Mounting sample routes at /api/sample
-👤 Mounting profile routes at /api/profile
-🔍 Mounting discover routes at /api/discover
-👆 Mounting swipe routes at /api/swipe
-💕 Mounting matches routes at /api/matches
-🎯 Mounting quests routes at /api/quests
-📊 Mounting stats routes at /api/stats
-📹 Mounting live routes at /api/live
-👥 Mounting friends routes at /api/friends
-💬 Mounting messages routes at /api/messages
-🏘️  Mounting groups routes at /api/groups
-🎁 Mounting shared quests routes at /api/shared-quests
-📓 Mounting journal routes at /api/journal
-📝 Mounting posts routes at /api/posts
-⏰ Mounting moments routes at /api/moments
-⚙️  Starting server...
-Failed to find Response internal state key
-✅ Environment variables validated successfully
-🔐 [Auth] Initializing Better Auth...
-✅ [Auth] Better Auth initialized
-🔗 [Auth] Base URL: https://preview-csuipnvqjxpr.share.sandbox.dev
-🌐 [Auth] Trusted origins: vibecode://, http://localhost:3000, http://localhost:8081, https://preview-csuipnvqjxpr.share.sandbox.dev
-🔑 [Auth] Google OAuth: Enabled
-📁 [Upload] Uploads directory exists: /home/user/workspace/backend/uploads
-🔧 Initializing Hono application...
-🔐 Mounting Better Auth handler at /api/auth/*
-📁 Serving static files from uploads/ directory
-📤 Mounting upload routes at /api/upload
-📝 Mounting sample routes at /api/sample
-👤 Mounting profile routes at /api/profile
-🔍 Mounting discover routes at /api/discover
-👆 Mounting swipe routes at /api/swipe
-💕 Mounting matches routes at /api/matches
-🎯 Mounting quests routes at /api/quests
-📊 Mounting stats routes at /api/stats
-📹 Mounting live routes at /api/live
-👥 Mounting friends routes at /api/friends
-💬 Mounting messages routes at /api/messages
-🏘️  Mounting groups routes at /api/groups
-🎁 Mounting shared quests routes at /api/shared-quests
-📓 Mounting journal routes at /api/journal
-📝 Mounting posts routes at /api/posts
-⏰ Mounting moments routes at /api/moments
-⚙️  Starting server...
-Failed to find Response internal state key
-✅ Environment variables validated successfully
-🔐 [Auth] Initializing Better Auth...
-✅ [Auth] Better Auth initialized
-🔗 [Auth] Base URL: https://preview-csuipnvqjxpr.share.sandbox.dev
-🌐 [Auth] Trusted origins: vibecode://, http://localhost:3000, http://localhost:8081, https://preview-csuipnvqjxpr.share.sandbox.dev
-🔑 [Auth] Google OAuth: Enabled
-📁 [Upload] Uploads directory exists: /home/user/workspace/backend/uploads
-🔧 Initializing Hono application...
-🔐 Mounting Better Auth handler at /api/auth/*
-📁 Serving static files from uploads/ directory
-📤 Mounting upload routes at /api/upload
-📝 Mounting sample routes at /api/sample
-👤 Mounting profile routes at /api/profile
-🔍 Mounting discover routes at /api/discover
-👆 Mounting swipe routes at /api/swipe
-💕 Mounting matches routes at /api/matches
-🎯 Mounting quests routes at /api/quests
-📊 Mounting stats routes at /api/stats
-📹 Mounting live routes at /api/live
-👥 Mounting friends routes at /api/friends
-💬 Mounting messages routes at /api/messages
-🏘️  Mounting groups routes at /api/groups
-🎁 Mounting shared quests routes at /api/shared-quests
-📓 Mounting journal routes at /api/journal
-📝 Mounting posts routes at /api/posts
-⏰ Mounting moments routes at /api/moments
-🔔 Mounting notifications routes at /api/notifications
-⚙️  Starting server...
-Failed to find Response internal state key
-✅ Environment variables validated successfully
-🔐 [Auth] Initializing Better Auth...
-✅ [Auth] Better Auth initialized
-🔗 [Auth] Base URL: https://preview-csuipnvqjxpr.share.sandbox.dev
-🌐 [Auth] Trusted origins: vibecode://, http://localhost:3000, http://localhost:8081, https://preview-csuipnvqjxpr.share.sandbox.dev
-🔑 [Auth] Google OAuth: Enabled
-📁 [Upload] Uploads directory exists: /home/user/workspace/backend/uploads
-🔧 Initializing Hono application...
-🔐 Mounting Better Auth handler at /api/auth/*
-📁 Serving static files from uploads/ directory
-📤 Mounting upload routes at /api/upload
-📝 Mounting sample routes at /api/sample
-👤 Mounting profile routes at /api/profile
-🔍 Mounting discover routes at /api/discover
-👆 Mounting swipe routes at /api/swipe
-💕 Mounting matches routes at /api/matches
-🎯 Mounting quests routes at /api/quests
-📊 Mounting stats routes at /api/stats
-📹 Mounting live routes at /api/live
-👥 Mounting friends routes at /api/friends
-💬 Mounting messages routes at /api/messages
-🏘️  Mounting groups routes at /api/groups
-🎁 Mounting shared quests routes at /api/shared-quests
-📓 Mounting journal routes at /api/journal
-📝 Mounting posts routes at /api/posts
-⏰ Mounting moments routes at /api/moments
-🔔 Mounting notifications routes at /api/notifications
-⚙️  Starting server...
-Failed to find Response internal state key
-✅ Environment variables validated successfully
-🔐 [Auth] Initializing Better Auth...
-✅ [Auth] Better Auth initialized
-🔗 [Auth] Base URL: https://preview-csuipnvqjxpr.share.sandbox.dev
-🌐 [Auth] Trusted origins: vibecode://, http://localhost:3000, http://localhost:8081, https://preview-csuipnvqjxpr.share.sandbox.dev
-🔑 [Auth] Google OAuth: Enabled
-📁 [Upload] Uploads directory exists: /home/user/workspace/backend/uploads
-🔧 Initializing Hono application...
-🔐 Mounting Better Auth handler at /api/auth/*
-📁 Serving static files from uploads/ directory
-📤 Mounting upload routes at /api/upload
-📝 Mounting sample routes at /api/sample
-👤 Mounting profile routes at /api/profile
-🔍 Mounting discover routes at /api/discover
-👆 Mounting swipe routes at /api/swipe
-💕 Mounting matches routes at /api/matches
-🎯 Mounting quests routes at /api/quests
-📊 Mounting stats routes at /api/stats
-📹 Mounting live routes at /api/live
-👥 Mounting friends routes at /api/friends
-💬 Mounting messages routes at /api/messages
-🏘️  Mounting groups routes at /api/groups
-🎁 Mounting shared quests routes at /api/shared-quests
-📓 Mounting journal routes at /api/journal
-📝 Mounting posts routes at /api/posts
-⏰ Mounting moments routes at /api/moments
-🔔 Mounting notifications routes at /api/notifications
-⚙️  Starting server...
-Failed to find Response internal state key
-✅ Environment variables validated successfully
-🔐 [Auth] Initializing Better Auth...
-✅ [Auth] Better Auth initialized
-🔗 [Auth] Base URL: https://preview-csuipnvqjxpr.share.sandbox.dev
-🌐 [Auth] Trusted origins: vibecode://, http://localhost:3000, http://localhost:8081, https://preview-csuipnvqjxpr.share.sandbox.dev
-🔑 [Auth] Google OAuth: Enabled
-📁 [Upload] Uploads directory exists: /home/user/workspace/backend/uploads
-🔧 Initializing Hono application...
-🔐 Mounting Better Auth handler at /api/auth/*
-📁 Serving static files from uploads/ directory
-📤 Mounting upload routes at /api/upload
-📝 Mounting sample routes at /api/sample
-👤 Mounting profile routes at /api/profile
-🔍 Mounting discover routes at /api/discover
-👆 Mounting swipe routes at /api/swipe
-💕 Mounting matches routes at /api/matches
-🎯 Mounting quests routes at /api/quests
-📊 Mounting stats routes at /api/stats
-📹 Mounting live routes at /api/live
-👥 Mounting friends routes at /api/friends
-💬 Mounting messages routes at /api/messages
-🏘️  Mounting groups routes at /api/groups
-🎁 Mounting shared quests routes at /api/shared-quests
-📓 Mounting journal routes at /api/journal
-📝 Mounting posts routes at /api/posts
-⏰ Mounting moments routes at /api/moments
-🔔 Mounting notifications routes at /api/notifications
-⚙️  Starting server...
+<-- GET /api/stats/reflection-prompt
+<-- GET /api/quests
+--> GET /api/stats/reflection-prompt [32m200[0m 6ms
+--> GET /api/stats/weekly-forecast [32m200[0m 12ms
+--> GET /api/quests [32m200[0m 12ms
+<-- GET /api/friends
+<-- GET /api/posts/feed
+--> GET /api/friends [32m200[0m 4ms
+--> GET /api/posts/feed [32m200[0m 5ms
+<-- GET /api/groups
+<-- GET /api/friends/requests
+<-- GET /api/moments
+<-- GET /api/notifications/unread-count
+<-- GET /api/messages/conversations
+--> GET /api/groups [32m200[0m 5ms
+--> GET /api/friends/requests [32m200[0m 7ms
+--> GET /api/notifications/unread-count [32m200[0m 6ms
+--> GET /api/messages/conversations [32m200[0m 7ms
+--> GET /api/moments [32m200[0m 8ms
+<-- GET /api/friends/search
+--> GET /api/friends/search [32m200[0m 4ms
+<-- POST /api/friends/request
+--> POST /api/friends/request [33m400[0m 7ms
+<-- GET /api/notifications
+--> GET /api/notifications [32m200[0m 2ms
+<-- GET /api/profile
+<-- GET /api/stats
+--> GET /api/stats [32m200[0m 3ms
+--> GET /api/profile [32m200[0m 4ms
+<-- GET /api/notifications/unread-count
+--> GET /api/notifications/unread-count [32m200[0m 2ms
+<-- GET /api/notifications/unread-count
+--> GET /api/notifications/unread-count [32m200[0m 2ms
+<-- GET /api/friends
+<-- GET /api/friends/requests
+--> GET /api/friends [32m200[0m 14ms
+--> GET /api/friends/requests [32m200[0m 13ms
+<-- GET /api/friends/recommendations
+--> GET /api/friends/recommendations [32m200[0m 28ms
