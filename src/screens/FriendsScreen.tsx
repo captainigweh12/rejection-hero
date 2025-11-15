@@ -51,6 +51,9 @@ export default function FriendsScreen({ navigation }: Props) {
       const response = await api.get<{ friends: Friend[] }>("api/friends");
       return response;
     },
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+    staleTime: 30000,
   });
 
   // Fetch friend requests
@@ -60,6 +63,9 @@ export default function FriendsScreen({ navigation }: Props) {
       const response = await api.get<{ requests: FriendRequest[] }>("api/friends/requests");
       return response;
     },
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+    staleTime: 30000,
   });
 
   // Search users

@@ -104,8 +104,15 @@ const fetchFn = async <T>(path: string, options: FetchOptions): Promise<T> => {
     }
 
     // Check for network-specific errors
-    if (error.message && error.message.includes('Network request failed')) {
-      throw new Error(`Network error: Unable to connect to backend at ${BACKEND_URL}. Please check your connection.`);
+    if (error.message) {
+      if (error.message.includes('Network request failed')) {
+        throw new Error(`Network error: Unable to connect to backend. Please check your connection.`);
+      }
+      if (error.message.includes('hostname could not be found') || error.message.includes('fetch failed')) {
+        // This is a DNS/hostname resolution error - likely temporary
+        // The error will be caught by React Query retry logic
+        throw new Error(`Connection error: Unable to reach the server. Retrying...`);
+      }
     }
 
     // Re-throw the error so the calling code can handle it appropriately

@@ -542,7 +542,8 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
     - View user profiles, avatars, and bios
   - **Modern 3D Glass UI**: Dark gradient theme matching app aesthetic
   - **Pull-to-refresh**: Refresh friends and requests lists
-  - **Real-time Updates**: React Query for instant data updates
+  - **Real-time Updates**: React Query with smart retry logic
+  - **Robust Error Handling**: Automatic retry on network errors (3 attempts with exponential backoff)
 - **Send Quest to Friends** 🎮:
   - Select any quest (active, queued, or completed) to share
   - Add optional personal message (up to 500 characters)
