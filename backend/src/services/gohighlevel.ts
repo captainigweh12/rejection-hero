@@ -15,7 +15,7 @@ interface GoHighLevelContact {
   email: string;
   phone?: string;
   tags?: string[];
-  customField?: Record<string, string>;
+  customFields?: Array<{ key: string; field_value: string }>;
   locationId?: string;
 }
 
@@ -215,11 +215,11 @@ export async function syncNewUserToGoHighLevel(
       name: name,
       email: email,
       tags: ["Go for No User", "New User", "App User"],
-      customField: {
-        username: username || "",
-        userId: userId,
-        signupDate: new Date().toISOString(),
-      },
+      customFields: [
+        { key: "username", field_value: username || "" },
+        { key: "userId", field_value: userId },
+        { key: "signupDate", field_value: new Date().toISOString() },
+      ],
     };
 
     const ghlContact = await createOrUpdateContact(contact);
@@ -230,15 +230,19 @@ export async function syncNewUserToGoHighLevel(
       return { success: false };
     }
 
-    // Send welcome email
-    const emailHTML = getWelcomeEmailHTML(firstName);
-    await sendEmail(
-      contactId,
-      "Welcome to Go for No! 🎯",
-      emailHTML
-    );
+    // Send welcome email (optional - requires email scope)
+    try {
+      const emailHTML = getWelcomeEmailHTML(firstName);
+      await sendEmail(
+        contactId,
+        "Welcome to Go for No! 🎯",
+        emailHTML
+      );
+      console.log("✅ [GoHighLevel] User synced and welcome email sent!");
+    } catch (emailError) {
+      console.log("⚠️ [GoHighLevel] User synced but email sending failed (scope permission needed):", emailError);
+    }
 
-    console.log("✅ [GoHighLevel] User synced and welcome email sent!");
     return { success: true, contactId };
   } catch (error) {
     console.error("❌ [GoHighLevel] Error syncing new user:", error);
@@ -274,13 +278,13 @@ export async function updateUserStatsInGoHighLevel(
       name: name,
       email: email,
       tags: ["Go for No User", "Active User"],
-      customField: {
-        totalXP: stats.totalXP.toString(),
-        currentStreak: stats.currentStreak.toString(),
-        totalPoints: stats.totalPoints.toString(),
-        level: stats.level.toString(),
-        lastUpdated: new Date().toISOString(),
-      },
+      customFields: [
+        { key: "totalXP", field_value: stats.totalXP.toString() },
+        { key: "currentStreak", field_value: stats.currentStreak.toString() },
+        { key: "totalPoints", field_value: stats.totalPoints.toString() },
+        { key: "level", field_value: stats.level.toString() },
+        { key: "lastUpdated", field_value: new Date().toISOString() },
+      ],
     };
 
     await createOrUpdateContact(contact);

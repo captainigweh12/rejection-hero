@@ -1125,9 +1125,13 @@ See `ENV_SETUP.md` for complete environment variable setup guide.
 
 7. **GoHighLevel API** ✅ CONFIGURED!
    - API Key: `pit-ca134c24-5db3-47a0-9ea7-7292fdf2e7e6`
-   - Automatically syncs user data and sends welcome emails
+   - Location ID: `5vDQKirnGk3E91LagT6j`
+   - **Status**: ✅ Contacts syncing successfully
+   - **Note**: Email sending requires additional API scope permissions
+   - Automatically syncs user data to GoHighLevel on account creation
    - Updates contact information with user stats and progress
-   - Backend environment variable: `GOHIGHLEVEL_API_KEY`
+   - Backend environment variables: `GOHIGHLEVEL_API_KEY`, `GOHIGHLEVEL_LOCATION_ID`
+   - **To enable email sending**: Add `conversations.message.write` and `conversations.write` scopes to your API key in GoHighLevel settings
 
 ### Test the App
 
