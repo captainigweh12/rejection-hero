@@ -240,6 +240,50 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 - **COMMUNITY**: Groups, Manage Categories, Explore World
 - Log out and version display
 
+**Social Feed System** ✨ NEW!
+- **Facebook-Style Posts**:
+  - Create text posts with optional images (up to 4 images per post)
+  - Privacy settings: Public, Friends Only, or Groups Only
+  - Like and comment on posts
+  - Real-time feed updates
+  - Delete your own posts
+  - Scrollable feed with pull-to-refresh
+- **Privacy & Filtering**:
+  - PUBLIC: Everyone can see
+  - FRIENDS: Only accepted friends can see
+  - GROUPS: Only group members can see
+  - Smart feed filtering based on privacy settings and friendships
+- **Post Features**:
+  - Multiple image uploads per post
+  - Like counter with heart animation
+  - Comment section with expandable view
+  - User avatars and display names
+  - Timestamp with "time ago" display
+  - Group post indicators
+- **Moments (Stories)** 📸:
+  - Instagram-style 24-hour stories
+  - Horizontal scrollable moments bar at top of feed
+  - View friends' moments in fullscreen viewer
+  - Navigate between multiple moments
+  - Automatic expiration after 24 hours
+  - Create moments with images
+  - Purple ring indicator for new moments
+- **Community Tab Integration**:
+  - Four tabs: Feed, Friends, Messages, Groups
+  - Feed tab shows social posts and moments
+  - Seamless integration with existing community features
+- **Create Post Modal**:
+  - Full-screen modal for creating posts
+  - Text input with character counter
+  - Image picker for multiple photos
+  - Privacy selector with icons
+  - Preview selected images before posting
+- **Interactive Features**:
+  - Pull-to-refresh for new content
+  - Infinite scroll support
+  - Real-time like/comment updates
+  - Optimistic UI updates
+
 **Journal & Growth Tracking** ✨ NEW!
 - **Voice Recording Journal**:
   - Record audio reflections about rejection experiences
@@ -249,9 +293,9 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
   - Edit AI summaries before saving
   - Recent entries displayed with outcome badges
 - **Outcome Tracking**:
-  - **Yes**: Track when people say yes to your requests
-  - **No**: Track rejection experiences (the core of growth!)
-  - **Activity**: Track completed actions and milestones
+  - **Yes**: Track when people say yes to your requests (Red color)
+  - **No**: Track rejection experiences - the core of growth! (Green color)
+  - **Activity**: Track completed actions and milestones (Blue color)
   - Visual cards with color-coded icons for each outcome
 - **Growth Achievements System** 🌟:
   - Earn gold stars for every journal entry
@@ -649,6 +693,19 @@ The app features a cohesive dark theme with modern 3D-style UI elements througho
 - `GET /api/journal` - Get all journal entries with achievements
 - `PUT /api/journal/:id` - Update journal entry summary
 - `GET /api/journal/achievements` - Get all growth achievements with stats
+
+### Posts & Social Feed ✨ NEW!
+- `GET /api/posts/feed` - Get privacy-filtered feed of posts (PUBLIC, FRIENDS, GROUPS)
+- `POST /api/posts` - Create new post with images and privacy settings
+- `POST /api/posts/:id/like` - Like a post
+- `DELETE /api/posts/:id/like` - Unlike a post
+- `POST /api/posts/:id/comments` - Add comment to post
+- `DELETE /api/posts/:id` - Delete your own post
+
+### Moments (Stories) ✨ NEW!
+- `GET /api/moments` - Get active moments (24-hour stories) grouped by user
+- `POST /api/moments` - Create new moment (auto-expires in 24 hours)
+- `DELETE /api/moments/:id` - Delete your own moment
 
 ### Profile
 - `GET /api/profile` - Get current user's profile

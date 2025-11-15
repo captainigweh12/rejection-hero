@@ -13,13 +13,15 @@ import {
   Group,
   Share2,
   TrendingUp,
-  X
+  X,
+  Home
 } from "lucide-react-native";
 import type { BottomTabScreenProps } from "@/navigation/types";
 import { api } from "@/lib/api";
 import { useSession } from "@/lib/useSession";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useLanguage } from "@/contexts/LanguageContext";
+import FeedScreen from "./FeedScreen";
 
 type Props = BottomTabScreenProps<"SwipeTab">;
 
@@ -63,7 +65,7 @@ export default function CommunityScreen({ navigation }: Props) {
   const { t } = useLanguage();
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeTab, setActiveTab] = useState<"friends" | "messages" | "groups">("friends");
+  const [activeTab, setActiveTab] = useState<"feed" | "friends" | "messages" | "groups">("feed");
 
   // Fetch friends
   const { data: friendsData, isLoading: friendsLoading } = useQuery({
@@ -373,6 +375,7 @@ export default function CommunityScreen({ navigation }: Props) {
             }}
           >
             {[
+              { key: "feed" as const, label: "Feed", icon: Home },
               { key: "friends" as const, label: "Friends", icon: Users },
               { key: "messages" as const, label: "Messages", icon: MessageCircle },
               { key: "groups" as const, label: "Groups", icon: Group },
@@ -412,9 +415,12 @@ export default function CommunityScreen({ navigation }: Props) {
         </View>
 
         {/* Content */}
-        <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 100 }}>
-          {/* Friends Tab */}
-          {activeTab === "friends" && (
+        {activeTab === "feed" ? (
+          <FeedScreen />
+        ) : (
+          <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 100 }}>
+            {/* Friends Tab */}
+            {activeTab === "friends" && (
             <View style={{ paddingHorizontal: 20 }}>
               {/* Friend Requests */}
               {requests.length > 0 && (
@@ -837,7 +843,8 @@ export default function CommunityScreen({ navigation }: Props) {
               )}
             </View>
           )}
-        </ScrollView>
+          </ScrollView>
+        )}
       </SafeAreaView>
     </View>
   );
