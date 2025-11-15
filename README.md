@@ -4,6 +4,25 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 
 ## Features
 
+### 🏠 Home Screen ✨ ENHANCED! (Gaming-Style UI)
+
+**3D Gaming Profile Card** 🎮 NEW!
+- **Avatar with Rainbow Border**: 3D gradient ring (orange → purple → cyan) around user avatar
+- **Level Badge**: Gold badge with shadow showing current level (calculated from XP)
+- **3D Stat Badges**: Three glassmorphism badges displaying:
+  - 🔥 **Streak**: Fire icon with current streak count
+  - 🏆 **Trophy**: Trophy icon with trophy count
+  - 💎 **Diamonds**: Diamond icon with gems count
+- **XP Progress Bar**: Gradient-filled bar (purple → cyan) showing progress to next level
+- **Level System**: Level = (Total XP / 100) + 1
+- **Clickable Profile**: Tap card to navigate to profile page
+- Gaming aesthetic with shadows, borders, and gradient effects
+
+**My Active Quests Section**
+- Section header: "My Active Quests"
+- Shows all active quests with progress
+- Quest cards with category, difficulty, and completion tracking
+
 ### 🎯 No Quest System (MAIN FEATURE)
 
 **AI-Generated Challenges**

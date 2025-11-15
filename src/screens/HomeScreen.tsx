@@ -9,6 +9,8 @@ import {
   Animated,
   Switch,
   Alert,
+  Image,
+  TextInput,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
@@ -37,6 +39,9 @@ import {
   Video,
   ChevronRight,
   Shield,
+  MessageCircle,
+  Heart,
+  Send,
 } from "lucide-react-native";
 import type { BottomTabScreenProps } from "@/navigation/types";
 import { api } from "@/lib/api";
@@ -56,6 +61,9 @@ export default function HomeScreen({ navigation }: Props) {
   const [showSettings, setShowSettings] = useState(false);
   const [darkMode, setDarkMode] = useState(true);
   const [questReminders, setQuestReminders] = useState(false);
+  const [selectedFriendQuest, setSelectedFriendQuest] = useState<any>(null);
+  const [supportMessage, setSupportMessage] = useState("");
+  const [showFriendsQuests, setShowFriendsQuests] = useState(true);
 
   console.log("[HomeScreen] Rendering - User logged in:", !!sessionData?.user);
 
@@ -157,37 +165,203 @@ export default function HomeScreen({ navigation }: Props) {
       <LinearGradient colors={["#0A0A0F", "#1A1A24", "#2A1A34"]} style={{ flex: 1 }}>
         <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
           <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 96 }}>
-        {/* Header */}
-        <View style={{ paddingTop: 16, paddingBottom: 8, paddingHorizontal: 24, flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-          <Text style={{ color: "white", fontSize: 24, fontWeight: "bold" }}>Go for No</Text>
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 16 }}>
-            <Pressable>
-              <Bell size={24} color="#fff" />
-            </Pressable>
-            <Pressable onPress={() => setShowMenu(true)}>
-              <Menu size={24} color="#fff" />
-            </Pressable>
+        {/* Gaming-Style Header with Profile */}
+        <View style={{ paddingHorizontal: 24, paddingTop: 16, paddingBottom: 12 }}>
+          <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+            <Text style={{ color: "white", fontSize: 24, fontWeight: "bold" }}>Go for No</Text>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 16 }}>
+              <Pressable>
+                <Bell size={24} color="#fff" />
+              </Pressable>
+              <Pressable onPress={() => setShowMenu(true)}>
+                <Menu size={24} color="#fff" />
+              </Pressable>
+            </View>
           </View>
-        </View>
 
-        {/* Stats Bar */}
-        <View style={{ paddingHorizontal: 24, paddingVertical: 16, flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-            <Flame size={20} color="#FF6B35" />
-            <Text style={{ color: "white", fontSize: 18, fontWeight: "bold" }}>{statsData?.currentStreak || 0}</Text>
-          </View>
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-            <Trophy size={20} color="#FFD700" />
-            <Text style={{ color: "white", fontSize: 18, fontWeight: "bold" }}>{statsData?.trophies || 0}</Text>
-          </View>
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-            <Diamond size={20} color="#00D9FF" />
-            <Text style={{ color: "white", fontSize: 18, fontWeight: "bold" }}>{statsData?.diamonds || 0}</Text>
-          </View>
+          {/* Gaming Profile Card */}
+          <Pressable
+            onPress={() => navigation.navigate("ProfileTab")}
+            style={{
+              backgroundColor: "rgba(255, 255, 255, 0.05)",
+              borderRadius: 20,
+              padding: 16,
+              borderWidth: 2,
+              borderColor: "rgba(126, 63, 228, 0.4)",
+              shadowColor: "#7E3FE4",
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.3,
+              shadowRadius: 8,
+              elevation: 6,
+            }}
+          >
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 16 }}>
+              {/* 3D Avatar with Level Badge */}
+              <View style={{ position: "relative" }}>
+                <LinearGradient
+                  colors={["#FF6B35", "#7E3FE4", "#00D9FF"]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={{
+                    width: 80,
+                    height: 80,
+                    borderRadius: 40,
+                    padding: 3,
+                  }}
+                >
+                  <View
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      borderRadius: 37,
+                      backgroundColor: "#1A1A24",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <LinearGradient
+                      colors={["#FF6B35", "#FF8C61"]}
+                      style={{
+                        width: 70,
+                        height: 70,
+                        borderRadius: 35,
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <User size={36} color="#fff" strokeWidth={2.5} />
+                    </LinearGradient>
+                  </View>
+                </LinearGradient>
+
+                {/* Level Badge */}
+                <View
+                  style={{
+                    position: "absolute",
+                    bottom: -4,
+                    right: -4,
+                    backgroundColor: "#FFD700",
+                    borderRadius: 12,
+                    paddingHorizontal: 8,
+                    paddingVertical: 4,
+                    borderWidth: 2,
+                    borderColor: "#1A1A24",
+                    shadowColor: "#FFD700",
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.6,
+                    shadowRadius: 4,
+                    elevation: 4,
+                  }}
+                >
+                  <Text style={{ color: "#000", fontSize: 12, fontWeight: "bold" }}>
+                    {Math.floor((statsData?.totalXP || 0) / 100) + 1}
+                  </Text>
+                </View>
+              </View>
+
+              {/* User Info & Stats */}
+              <View style={{ flex: 1 }}>
+                <Text style={{ color: "white", fontSize: 20, fontWeight: "bold", marginBottom: 4 }}>
+                  {sessionData?.user?.name || "Quest Warrior"}
+                </Text>
+
+                {/* 3D Stats Row */}
+                <View style={{ flexDirection: "row", gap: 8 }}>
+                  {/* Streak */}
+                  <View
+                    style={{
+                      backgroundColor: "rgba(255, 107, 53, 0.2)",
+                      borderRadius: 12,
+                      paddingHorizontal: 10,
+                      paddingVertical: 6,
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 4,
+                      borderWidth: 1,
+                      borderColor: "rgba(255, 107, 53, 0.4)",
+                    }}
+                  >
+                    <Flame size={16} color="#FF6B35" fill="#FF6B35" />
+                    <Text style={{ color: "#FF6B35", fontSize: 14, fontWeight: "bold" }}>
+                      {statsData?.currentStreak || 0}
+                    </Text>
+                  </View>
+
+                  {/* Trophy */}
+                  <View
+                    style={{
+                      backgroundColor: "rgba(255, 215, 0, 0.2)",
+                      borderRadius: 12,
+                      paddingHorizontal: 10,
+                      paddingVertical: 6,
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 4,
+                      borderWidth: 1,
+                      borderColor: "rgba(255, 215, 0, 0.4)",
+                    }}
+                  >
+                    <Trophy size={16} color="#FFD700" fill="#FFD700" />
+                    <Text style={{ color: "#FFD700", fontSize: 14, fontWeight: "bold" }}>
+                      {statsData?.trophies || 0}
+                    </Text>
+                  </View>
+
+                  {/* Diamonds */}
+                  <View
+                    style={{
+                      backgroundColor: "rgba(0, 217, 255, 0.2)",
+                      borderRadius: 12,
+                      paddingHorizontal: 10,
+                      paddingVertical: 6,
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 4,
+                      borderWidth: 1,
+                      borderColor: "rgba(0, 217, 255, 0.4)",
+                    }}
+                  >
+                    <Diamond size={16} color="#00D9FF" fill="#00D9FF" />
+                    <Text style={{ color: "#00D9FF", fontSize: 14, fontWeight: "bold" }}>
+                      {statsData?.diamonds || 0}
+                    </Text>
+                  </View>
+                </View>
+
+                {/* XP Progress Bar */}
+                <View style={{ marginTop: 8 }}>
+                  <View
+                    style={{
+                      height: 6,
+                      backgroundColor: "rgba(255, 255, 255, 0.1)",
+                      borderRadius: 3,
+                      overflow: "hidden",
+                    }}
+                  >
+                    <LinearGradient
+                      colors={["#7E3FE4", "#00D9FF"]}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 0 }}
+                      style={{
+                        height: "100%",
+                        width: `${((statsData?.totalXP || 0) % 100)}%`,
+                      }}
+                    />
+                  </View>
+                  <Text style={{ color: "rgba(255, 255, 255, 0.5)", fontSize: 10, marginTop: 2 }}>
+                    {(statsData?.totalXP || 0) % 100}/100 XP to Level {Math.floor((statsData?.totalXP || 0) / 100) + 2}
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </Pressable>
         </View>
 
         {/* Active Quests */}
-        <View style={{ paddingHorizontal: 24, paddingVertical: 16 }}>
+        <View style={{ paddingHorizontal: 24, paddingVertical: 8 }}>
+          <Text style={{ color: "white", fontSize: 20, fontWeight: "bold", marginBottom: 12 }}>
+            My Active Quests
+          </Text>
           {questsLoading ? (
             <View style={{ alignItems: "center", paddingVertical: 32 }}>
               <ActivityIndicator size="large" color="#FF6B35" />
