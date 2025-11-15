@@ -529,3 +529,172 @@ export const getGrowthAchievementsResponseSchema = z.object({
 });
 export type GetGrowthAchievementsResponse = z.infer<typeof getGrowthAchievementsResponseSchema>;
 
+// ==========================================
+// Posts Routes
+// ==========================================
+
+// POST /api/posts - Create a new post
+export const createPostRequestSchema = z.object({
+  content: z.string().min(1),
+  privacy: z.enum(["PUBLIC", "FRIENDS", "GROUPS"]),
+  groupId: z.string().optional(),
+  imageUrls: z.array(z.string()).optional(),
+});
+export type CreatePostRequest = z.infer<typeof createPostRequestSchema>;
+export const createPostResponseSchema = z.object({
+  id: z.string(),
+  content: z.string(),
+  privacy: z.string(),
+  groupId: z.string().nullable(),
+  createdAt: z.string(),
+  user: z.object({
+    id: z.string(),
+    name: z.string().nullable(),
+    avatar: z.string().nullable(),
+  }),
+  images: z.array(
+    z.object({
+      id: z.string(),
+      imageUrl: z.string(),
+      order: z.number(),
+    })
+  ),
+});
+export type CreatePostResponse = z.infer<typeof createPostResponseSchema>;
+
+// GET /api/posts/feed - Get posts feed (with privacy filtering)
+export const getPostsFeedResponseSchema = z.object({
+  posts: z.array(
+    z.object({
+      id: z.string(),
+      content: z.string(),
+      privacy: z.string(),
+      groupId: z.string().nullable(),
+      createdAt: z.string(),
+      updatedAt: z.string(),
+      user: z.object({
+        id: z.string(),
+        name: z.string().nullable(),
+        email: z.string(),
+        avatar: z.string().nullable(),
+      }),
+      group: z
+        .object({
+          id: z.string(),
+          name: z.string(),
+        })
+        .nullable(),
+      images: z.array(
+        z.object({
+          id: z.string(),
+          imageUrl: z.string(),
+          order: z.number(),
+        })
+      ),
+      likes: z.array(
+        z.object({
+          id: z.string(),
+          userId: z.string(),
+          createdAt: z.string(),
+        })
+      ),
+      comments: z.array(
+        z.object({
+          id: z.string(),
+          content: z.string(),
+          createdAt: z.string(),
+          user: z.object({
+            id: z.string(),
+            name: z.string().nullable(),
+            avatar: z.string().nullable(),
+          }),
+        })
+      ),
+      likeCount: z.number(),
+      commentCount: z.number(),
+      isLikedByCurrentUser: z.boolean(),
+    })
+  ),
+});
+export type GetPostsFeedResponse = z.infer<typeof getPostsFeedResponseSchema>;
+
+// POST /api/posts/:id/like - Like a post
+export const likePostResponseSchema = z.object({
+  success: z.boolean(),
+  likeCount: z.number(),
+});
+export type LikePostResponse = z.infer<typeof likePostResponseSchema>;
+
+// DELETE /api/posts/:id/like - Unlike a post
+export const unlikePostResponseSchema = z.object({
+  success: z.boolean(),
+  likeCount: z.number(),
+});
+export type UnlikePostResponse = z.infer<typeof unlikePostResponseSchema>;
+
+// POST /api/posts/:id/comment - Comment on a post
+export const addCommentRequestSchema = z.object({
+  content: z.string().min(1),
+});
+export type AddCommentRequest = z.infer<typeof addCommentRequestSchema>;
+export const addCommentResponseSchema = z.object({
+  id: z.string(),
+  content: z.string(),
+  createdAt: z.string(),
+  user: z.object({
+    id: z.string(),
+    name: z.string().nullable(),
+    avatar: z.string().nullable(),
+  }),
+});
+export type AddCommentResponse = z.infer<typeof addCommentResponseSchema>;
+
+// DELETE /api/posts/:id - Delete a post
+export const deletePostResponseSchema = z.object({
+  success: z.boolean(),
+});
+export type DeletePostResponse = z.infer<typeof deletePostResponseSchema>;
+
+// ==========================================
+// Moments (Stories) Routes
+// ==========================================
+
+// POST /api/moments - Create a moment/story
+export const createMomentRequestSchema = z.object({
+  imageUrl: z.string().optional(),
+  videoUrl: z.string().optional(),
+  content: z.string().optional(),
+});
+export type CreateMomentRequest = z.infer<typeof createMomentRequestSchema>;
+export const createMomentResponseSchema = z.object({
+  id: z.string(),
+  imageUrl: z.string().nullable(),
+  videoUrl: z.string().nullable(),
+  content: z.string().nullable(),
+  expiresAt: z.string(),
+  createdAt: z.string(),
+});
+export type CreateMomentResponse = z.infer<typeof createMomentResponseSchema>;
+
+// GET /api/moments - Get active moments from friends
+export const getMomentsResponseSchema = z.object({
+  moments: z.array(
+    z.object({
+      userId: z.string(),
+      userName: z.string().nullable(),
+      userAvatar: z.string().nullable(),
+      moments: z.array(
+        z.object({
+          id: z.string(),
+          imageUrl: z.string().nullable(),
+          videoUrl: z.string().nullable(),
+          content: z.string().nullable(),
+          expiresAt: z.string(),
+          createdAt: z.string(),
+        })
+      ),
+    })
+  ),
+});
+export type GetMomentsResponse = z.infer<typeof getMomentsResponseSchema>;
+
