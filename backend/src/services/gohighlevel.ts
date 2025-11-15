@@ -4,15 +4,19 @@
  */
 
 const GOHIGHLEVEL_API_KEY = process.env.GOHIGHLEVEL_API_KEY || "pit-ca134c24-5db3-47a0-9ea7-7292fdf2e7e6";
-const GOHIGHLEVEL_BASE_URL = "https://rest.gohighlevel.com/v1";
+const GOHIGHLEVEL_LOCATION_ID = process.env.GOHIGHLEVEL_LOCATION_ID || "";
+const GOHIGHLEVEL_BASE_URL = "https://services.leadconnectorhq.com";
+const GOHIGHLEVEL_API_VERSION = "2021-07-28";
 
 interface GoHighLevelContact {
   firstName?: string;
   lastName?: string;
+  name?: string;
   email: string;
   phone?: string;
   tags?: string[];
-  customFields?: Record<string, string>;
+  customField?: Record<string, string>;
+  locationId?: string;
 }
 
 /**
@@ -21,20 +25,28 @@ interface GoHighLevelContact {
 export async function createOrUpdateContact(contact: GoHighLevelContact) {
   try {
     console.log("📧 [GoHighLevel] Creating/updating contact:", contact.email);
+    console.log("📍 [GoHighLevel] Location ID:", GOHIGHLEVEL_LOCATION_ID || "NOT SET");
+
+    // Add location ID to contact
+    const contactWithLocation = {
+      ...contact,
+      locationId: GOHIGHLEVEL_LOCATION_ID,
+    };
 
     const response = await fetch(`${GOHIGHLEVEL_BASE_URL}/contacts/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${GOHIGHLEVEL_API_KEY}`,
         "Content-Type": "application/json",
+        "Version": GOHIGHLEVEL_API_VERSION,
       },
-      body: JSON.stringify(contact),
+      body: JSON.stringify(contactWithLocation),
     });
 
     if (!response.ok) {
       const error = await response.text();
       console.error("❌ [GoHighLevel] API Error:", error);
-      throw new Error(`GoHighLevel API failed: ${response.status}`);
+      throw new Error(`GoHighLevel API failed: ${response.status} - ${error}`);
     }
 
     const data = await response.json();
@@ -52,7 +64,8 @@ export async function createOrUpdateContact(contact: GoHighLevelContact) {
 export async function sendEmail(
   contactId: string,
   subject: string,
-  htmlBody: string
+  htmlBody: string,
+  fromEmail?: string
 ) {
   try {
     console.log("📧 [GoHighLevel] Sending email to contact:", contactId);
@@ -62,19 +75,21 @@ export async function sendEmail(
       headers: {
         "Authorization": `Bearer ${GOHIGHLEVEL_API_KEY}`,
         "Content-Type": "application/json",
+        "Version": GOHIGHLEVEL_API_VERSION,
       },
       body: JSON.stringify({
         type: "Email",
         contactId: contactId,
         subject: subject,
         html: htmlBody,
+        emailFrom: fromEmail || "noreply@goforno.com",
       }),
     });
 
     if (!response.ok) {
       const error = await response.text();
       console.error("❌ [GoHighLevel] Email API Error:", error);
-      throw new Error(`GoHighLevel Email API failed: ${response.status}`);
+      throw new Error(`GoHighLevel Email API failed: ${response.status} - ${error}`);
     }
 
     const data = await response.json();
@@ -197,9 +212,10 @@ export async function syncNewUserToGoHighLevel(
     const contact: GoHighLevelContact = {
       firstName: firstName,
       lastName: lastName,
+      name: name,
       email: email,
       tags: ["Go for No User", "New User", "App User"],
-      customFields: {
+      customField: {
         username: username || "",
         userId: userId,
         signupDate: new Date().toISOString(),
@@ -207,7 +223,7 @@ export async function syncNewUserToGoHighLevel(
     };
 
     const ghlContact = await createOrUpdateContact(contact);
-    const contactId = ghlContact.contact?.id;
+    const contactId = ghlContact.contact?.id || ghlContact.id;
 
     if (!contactId) {
       console.error("❌ [GoHighLevel] Failed to get contact ID");
@@ -255,9 +271,10 @@ export async function updateUserStatsInGoHighLevel(
     const contact: GoHighLevelContact = {
       firstName: firstName,
       lastName: lastName,
+      name: name,
       email: email,
       tags: ["Go for No User", "Active User"],
-      customFields: {
+      customField: {
         totalXP: stats.totalXP.toString(),
         currentStreak: stats.currentStreak.toString(),
         totalPoints: stats.totalPoints.toString(),
