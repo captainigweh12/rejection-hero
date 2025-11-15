@@ -146,6 +146,11 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
   - Smooth gradients and shadow effects
   - White text on dark background
   - Enhanced category and difficulty badges
+- **Real-Time Count Updates** ✨ FIXED!:
+  - YES/NO counts now update immediately when you tap the buttons
+  - Progress bar updates instantly as you collect responses
+  - Fixed: Changed from invalidateQueries to refetchQueries for instant UI updates
+  - No more delayed count updates
 - **Modern Progress Bar**: Gradient-filled with colored border matching theme
 - **Enhanced Action Buttons** 💫:
   - Gradient-filled buttons with LinearGradient

@@ -187,9 +187,10 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
         data
       );
     },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["quests"] });
-      queryClient.invalidateQueries({ queryKey: ["stats"] });
+    onSuccess: async (data) => {
+      // Refetch quests and stats immediately to update counts
+      await queryClient.refetchQueries({ queryKey: ["quests"] });
+      await queryClient.refetchQueries({ queryKey: ["stats"] });
 
       if (data.completed) {
         // Trigger success haptic feedback
