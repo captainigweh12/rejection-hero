@@ -1193,15 +1193,18 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
         </View>
       </SafeAreaView>
 
-      {/* Completion Modal - Sequential Pages with Duolingo-style Animations */}
+      {/* Completion Modal - Sequential Pages with 3D Glassmorphism Design */}
       <Modal visible={showCompletion} transparent animationType="fade" onRequestClose={() => {}}>
-        <Pressable
-          onPress={handleNextPage}
-          style={{
-            flex: 1,
-            backgroundColor: "#58CC02",
-          }}
+        <LinearGradient
+          colors={["#0A0A0F", "#1A1A24", "#2A1A34"]}
+          style={{ flex: 1 }}
         >
+          <Pressable
+            onPress={handleNextPage}
+            style={{
+              flex: 1,
+            }}
+          >
           <SafeAreaView style={{ flex: 1 }}>
             {/* Floating Confetti Particles */}
             {confettiAnims.map((anim, index) => {
@@ -1346,18 +1349,20 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                   You collected {completionData?.noCount} NOs!
                 </Animated.Text>
 
-                {/* Accomplishments Card with slide up */}
+                {/* Accomplishments Card with slide up - 3D Glassmorphism */}
                 <Animated.View
                   style={{
                     width: "100%",
-                    backgroundColor: "white",
+                    backgroundColor: "rgba(255, 255, 255, 0.05)",
                     borderRadius: 24,
                     padding: 24,
-                    shadowColor: "#000",
-                    shadowOffset: { width: 0, height: 4 },
-                    shadowOpacity: 0.2,
-                    shadowRadius: 10,
-                    elevation: 5,
+                    borderWidth: 2,
+                    borderColor: "rgba(126, 63, 228, 0.3)",
+                    shadowColor: "#7E3FE4",
+                    shadowOffset: { width: 0, height: 8 },
+                    shadowOpacity: 0.4,
+                    shadowRadius: 16,
+                    elevation: 8,
                     opacity: celebrationAnim,
                     transform: [
                       {
@@ -1373,7 +1378,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                     style={{
                       fontSize: 20,
                       fontWeight: "bold",
-                      color: "#1C1C1E",
+                      color: "white",
                       marginBottom: 24,
                       textAlign: "center",
                     }}
@@ -1381,67 +1386,75 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                     Accomplishments
                   </Text>
 
-                  {/* XP & Points Earned */}
+                  {/* XP & Points Earned - Gradient Cards */}
                   <View style={{ flexDirection: "row", gap: 16, marginBottom: 16 }}>
-                    <View
+                    <LinearGradient
+                      colors={["rgba(255, 215, 0, 0.15)", "rgba(255, 165, 0, 0.15)"]}
                       style={{
                         flex: 1,
-                        backgroundColor: "#FEF3C7",
                         paddingVertical: 16,
                         borderRadius: 16,
                         alignItems: "center",
+                        borderWidth: 1,
+                        borderColor: "rgba(255, 215, 0, 0.3)",
                       }}
                     >
-                      <Text style={{ color: "#92400E", fontSize: 24, fontWeight: "bold" }}>
+                      <Text style={{ color: "#FFD700", fontSize: 24, fontWeight: "bold" }}>
                         +{savedQuestData?.quest.xpReward || 0}
                       </Text>
-                      <Text style={{ color: "#92400E", fontSize: 14 }}>XP</Text>
-                    </View>
-                    <View
+                      <Text style={{ color: "#FFA500", fontSize: 14 }}>XP</Text>
+                    </LinearGradient>
+                    <LinearGradient
+                      colors={["rgba(255, 107, 53, 0.15)", "rgba(255, 140, 66, 0.15)"]}
                       style={{
                         flex: 1,
-                        backgroundColor: "#FED7AA",
                         paddingVertical: 16,
                         borderRadius: 16,
                         alignItems: "center",
+                        borderWidth: 1,
+                        borderColor: "rgba(255, 107, 53, 0.3)",
                       }}
                     >
-                      <Text style={{ color: "#9A3412", fontSize: 24, fontWeight: "bold" }}>
+                      <Text style={{ color: "#FF8C42", fontSize: 24, fontWeight: "bold" }}>
                         +{savedQuestData?.quest.pointReward || 0}
                       </Text>
-                      <Text style={{ color: "#9A3412", fontSize: 14 }}>Points</Text>
-                    </View>
+                      <Text style={{ color: "#FF6B35", fontSize: 14 }}>Points</Text>
+                    </LinearGradient>
                   </View>
 
-                  {/* Total Stats */}
+                  {/* Total Stats - Glassmorphism Cards */}
                   <View style={{ flexDirection: "row", gap: 16 }}>
                     <View
                       style={{
                         flex: 1,
-                        backgroundColor: "#F5F5F7",
+                        backgroundColor: "rgba(126, 63, 228, 0.1)",
                         paddingVertical: 16,
                         borderRadius: 16,
                         alignItems: "center",
+                        borderWidth: 1,
+                        borderColor: "rgba(126, 63, 228, 0.3)",
                       }}
                     >
-                      <Text style={{ color: "#7E3FE4", fontSize: 24, fontWeight: "bold" }}>
+                      <Text style={{ color: "#A78BFA", fontSize: 24, fontWeight: "bold" }}>
                         {statsData?.totalXP || 0}
                       </Text>
-                      <Text style={{ color: "#666", fontSize: 14 }}>Total XP</Text>
+                      <Text style={{ color: "rgba(255, 255, 255, 0.7)", fontSize: 14 }}>Total XP</Text>
                     </View>
                     <View
                       style={{
                         flex: 1,
-                        backgroundColor: "#F5F5F7",
+                        backgroundColor: "rgba(0, 217, 255, 0.1)",
                         paddingVertical: 16,
                         borderRadius: 16,
                         alignItems: "center",
+                        borderWidth: 1,
+                        borderColor: "rgba(0, 217, 255, 0.3)",
                       }}
                     >
-                      <Text style={{ color: "#FF6B35", fontSize: 24, fontWeight: "bold" }}>
+                      <Text style={{ color: "#00D9FF", fontSize: 24, fontWeight: "bold" }}>
                         {statsData?.totalPoints || 0}
                       </Text>
-                      <Text style={{ color: "#666", fontSize: 14 }}>Total Points</Text>
+                      <Text style={{ color: "rgba(255, 255, 255, 0.7)", fontSize: 14 }}>Total Points</Text>
                     </View>
                   </View>
                 </Animated.View>
@@ -1527,20 +1540,22 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                   Leaderboard Position
                 </Animated.Text>
 
-                {/* User Position with bounce */}
+                {/* User Position with bounce - 3D Glassmorphism */}
                 <Animated.View
                   style={{
                     width: "100%",
-                    backgroundColor: "white",
+                    backgroundColor: "rgba(255, 255, 255, 0.05)",
                     borderRadius: 24,
                     padding: 32,
                     alignItems: "center",
                     marginBottom: 24,
-                    shadowColor: "#000",
-                    shadowOffset: { width: 0, height: 4 },
-                    shadowOpacity: 0.2,
-                    shadowRadius: 10,
-                    elevation: 5,
+                    borderWidth: 2,
+                    borderColor: "rgba(14, 165, 233, 0.3)",
+                    shadowColor: "#0EA5E9",
+                    shadowOffset: { width: 0, height: 8 },
+                    shadowOpacity: 0.4,
+                    shadowRadius: 16,
+                    elevation: 8,
                     opacity: pageTransitionAnim,
                     transform: [
                       {
@@ -1552,23 +1567,25 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                     ],
                   }}
                 >
-                  <Text style={{ fontSize: 72, fontWeight: "bold", color: "#0C4A6E" }}>
+                  <Text style={{ fontSize: 72, fontWeight: "bold", color: "#0EA5E9" }}>
                     #{leaderboardData?.currentUserRank || "-"}
                   </Text>
-                  <Text style={{ fontSize: 16, color: "#0369A1", marginTop: 8 }}>
+                  <Text style={{ fontSize: 16, color: "#67E8F9", marginTop: 8 }}>
                     out of {leaderboardData?.totalUsers || 0} warriors
                   </Text>
                 </Animated.View>
 
-                {/* Top Users */}
+                {/* Top Users - Glassmorphism List */}
                 {leaderboardData?.leaderboard && leaderboardData.leaderboard.length > 0 && (
                   <Animated.View
                     style={{
                       width: "100%",
-                      backgroundColor: "rgba(255, 255, 255, 0.95)",
+                      backgroundColor: "rgba(255, 255, 255, 0.05)",
                       borderRadius: 20,
                       padding: 20,
                       maxHeight: 250,
+                      borderWidth: 1,
+                      borderColor: "rgba(255, 255, 255, 0.1)",
                       opacity: pageTransitionAnim,
                       transform: [
                         {
@@ -1584,7 +1601,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                       style={{
                         fontSize: 16,
                         fontWeight: "bold",
-                        color: "#1C1C1E",
+                        color: "white",
                         marginBottom: 12,
                       }}
                     >
@@ -1600,11 +1617,13 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                             alignItems: "center",
                             paddingVertical: 10,
                             borderBottomWidth: 1,
-                            borderBottomColor: "#E5E7EB",
-                            backgroundColor: user.isCurrentUser ? "#FFF7ED" : "transparent",
+                            borderBottomColor: "rgba(255, 255, 255, 0.1)",
+                            backgroundColor: user.isCurrentUser ? "rgba(255, 107, 53, 0.15)" : "transparent",
                             paddingHorizontal: user.isCurrentUser ? 12 : 0,
                             borderRadius: user.isCurrentUser ? 12 : 0,
                             marginBottom: user.isCurrentUser ? 4 : 0,
+                            borderWidth: user.isCurrentUser ? 1 : 0,
+                            borderColor: user.isCurrentUser ? "rgba(255, 107, 53, 0.3)" : "transparent",
                           }}
                         >
                           <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
@@ -1612,7 +1631,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                               style={{
                                 fontSize: 18,
                                 fontWeight: "bold",
-                                color: user.rank <= 3 ? "#FFD700" : "#666",
+                                color: user.rank <= 3 ? "#FFD700" : "rgba(255, 255, 255, 0.6)",
                                 width: 30,
                               }}
                             >
@@ -1621,14 +1640,14 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                             <Text
                               style={{
                                 fontSize: 16,
-                                color: "#1C1C1E",
+                                color: "white",
                                 fontWeight: user.isCurrentUser ? "bold" : "normal",
                               }}
                             >
                               {user.userName}
                             </Text>
                           </View>
-                          <Text style={{ fontSize: 16, fontWeight: "600", color: "#7E3FE4" }}>
+                          <Text style={{ fontSize: 16, fontWeight: "600", color: "#A78BFA" }}>
                             {user.totalXP} XP
                           </Text>
                         </View>
@@ -1704,19 +1723,21 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                   </LinearGradient>
                 </Animated.View>
 
-                {/* Streak Number with bounce */}
+                {/* Streak Number with bounce - 3D Glassmorphism */}
                 <Animated.View
                   style={{
-                    backgroundColor: "white",
+                    backgroundColor: "rgba(255, 255, 255, 0.05)",
                     borderRadius: 24,
                     padding: 40,
                     alignItems: "center",
                     width: "100%",
-                    shadowColor: "#000",
-                    shadowOffset: { width: 0, height: 4 },
-                    shadowOpacity: 0.2,
-                    shadowRadius: 10,
-                    elevation: 5,
+                    borderWidth: 2,
+                    borderColor: "rgba(255, 107, 53, 0.3)",
+                    shadowColor: "#FF6B35",
+                    shadowOffset: { width: 0, height: 8 },
+                    shadowOpacity: 0.4,
+                    shadowRadius: 16,
+                    elevation: 8,
                     opacity: pageTransitionAnim,
                     transform: [
                       {
@@ -1728,10 +1749,10 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                     ],
                   }}
                 >
-                  <Text style={{ fontSize: 80, fontWeight: "bold", color: "#FF6B35" }}>
+                  <Text style={{ fontSize: 80, fontWeight: "bold", color: "#FF8C42" }}>
                     {statsData?.currentStreak || 1}
                   </Text>
-                  <Text style={{ fontSize: 24, color: "#92400E", fontWeight: "600" }}>
+                  <Text style={{ fontSize: 24, color: "#FFB380", fontWeight: "600" }}>
                     day streak
                   </Text>
                 </Animated.View>
@@ -1741,18 +1762,20 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                   <Animated.View
                     style={{
                       marginTop: 48,
-                      backgroundColor: "rgba(255, 255, 255, 0.95)",
+                      backgroundColor: "rgba(255, 255, 255, 0.05)",
                       borderRadius: 20,
                       padding: 24,
                       flexDirection: "row",
                       alignItems: "center",
                       gap: 16,
                       width: "100%",
+                      borderWidth: 1,
+                      borderColor: "rgba(255, 255, 255, 0.1)",
                       opacity: pageTransitionAnim,
                     }}
                   >
                     <ActivityIndicator size="large" color="#FF6B35" />
-                    <Text style={{ color: "#1C1C1E", fontSize: 16, fontWeight: "600", flex: 1 }}>
+                    <Text style={{ color: "white", fontSize: 16, fontWeight: "600", flex: 1 }}>
                       Generating your next challenge...
                     </Text>
                   </Animated.View>
@@ -1773,6 +1796,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
             )}
           </SafeAreaView>
         </Pressable>
+        </LinearGradient>
       </Modal>
 
       {/* Loading Screen Modal */}

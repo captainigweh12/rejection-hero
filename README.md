@@ -88,20 +88,34 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
   - Keeps your location context for nearby places
   - Works even when you have 2 active quests
 
-**Quest Completion Flow** ✨ ENHANCED! (Duolingo-Style Animations)
+**Quest Completion Flow** ✨ ENHANCED! (3D Glassmorphism Design)
+- **Dark Gradient Background**: Beautiful gradient from #0A0A0F → #1A1A24 → #2A1A34 (replaces bright green)
+- **3D Glassmorphism Cards** 🎨 NEW!:
+  - Semi-transparent backgrounds: rgba(255, 255, 255, 0.05)
+  - Colored borders with glow effects
+  - Enhanced shadow effects for depth
+  - Premium dark theme matching the homepage
 - **Loading screen**: 2-second loading animation with pulsing trophy
-- **Duolingo-style animations** 🎨 NEW!:
+- **Smooth animations** 🎨:
   - Floating confetti particles with random colors, sizes, and rotation
   - Bounce and scale animations on all elements
   - Smooth fade and slide transitions between pages
   - Trophy with rotation and bounce effect
   - Flame icon with pulsing glow
   - Card elements slide up with staggered timing
-  - Golden glowing shadows on icons (Duolingo aesthetic)
+  - Golden glowing shadows on icons
 - **Sequential completion pages** (tap to advance through each):
-  - **Page 1 - Accomplishments**: Full-screen green background showing XP/Points earned and total stats
+  - **Page 1 - Accomplishments**: 3D glassmorphism card with dark gradient background
+    - Gradient stat cards for XP and Points earned (gold/orange theme)
+    - Glassmorphism cards for Total XP and Total Points (purple/cyan theme)
+    - Semi-transparent with colored borders and glow effects
   - **Page 2 - Leaderboard**: Shows your rank and top 5 warriors with their XP
+    - 3D glassmorphism rank card with blue glow
+    - Dark themed list with white text
+    - Current user highlighted with orange accent
   - **Page 3 - Streak**: Large streak display with fire icon
+    - 3D glassmorphism card with orange/red border glow
+    - Enhanced loading state for next quest generation
 - **Auto-generation**: Automatically creates next harder quest when you tap on streak page
 - Progressive difficulty: EASY → MEDIUM → HARD → EXPERT
 - Smooth spring physics and bounce animations throughout
