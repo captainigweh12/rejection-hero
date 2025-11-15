@@ -53,13 +53,23 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 - **Clickable Profile**: Tap card to navigate to profile page
 - Gaming aesthetic with shadows, borders, and gradient effects
 
-**My Active Quests Section**
-- Section header: "My Active Quests"
-- Shows all active quests with progress
-- Quest cards with category, difficulty, and completion tracking
+**Layout Order** 📋:
+1. 3D Gaming Profile Card (with stats and XP bar)
+2. **My Active Quests Section** - Positioned right after profile card
+   - Section header: "My Active Quests"
+   - Shows all active quests with progress
+   - Quest cards with category, difficulty, and completion tracking
+   - Empty state with "Create Quest" button if no active quests
+3. Fear Zones Analyzer - Shows quest difficulty distribution
+4. AI Reflection Prompt of the Day
+5. Weekly NO Forecast
+6. Smart Fear Detection & NO Radar
+7. Real-Time Courage Boosts
+8. Warm-up Zone
 
 **Quest Queue Section** ✨ NEW!
 - Shows all queued quests waiting to be started
+- Appears at the bottom of the home screen when quests are in queue
 - Displays quest number in queue (#1, #2, etc.)
 - Shows rewards (XP and points) for each quest
 - Tap to start quest if you have available slots
