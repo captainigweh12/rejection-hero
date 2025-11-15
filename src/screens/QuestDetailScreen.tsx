@@ -160,7 +160,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
           );
           // Navigate back to home to see the queued quest
           setShowCompletion(false);
-          navigation.goBack();
+          navigation.navigate("Tabs", { screen: "HomeTab" });
         } else {
           Alert.alert(
             "Quest Created",
@@ -168,7 +168,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
             [{ text: "OK", style: "default" }]
           );
           setShowCompletion(false);
-          navigation.goBack();
+          navigation.navigate("Tabs", { screen: "HomeTab" });
         }
       }
     },
