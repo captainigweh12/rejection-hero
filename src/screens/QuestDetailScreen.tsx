@@ -404,7 +404,10 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
         {
           text: "End Quest",
           style: "destructive",
-          onPress: () => navigation.goBack(),
+          onPress: () => {
+            console.log("Ending quest and navigating back");
+            navigation.goBack();
+          },
         },
       ]
     );
@@ -554,19 +557,22 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
 
               {/* Quit Button */}
               <Pressable
-                onPress={handleQuitQuest}
-                style={{
-                  backgroundColor: "rgba(255, 59, 48, 0.1)",
-                  width: 32,
-                  height: 32,
-                  borderRadius: 16,
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  handleQuitQuest();
+                }}
+                style={({ pressed }) => ({
+                  backgroundColor: pressed ? "rgba(255, 59, 48, 0.2)" : "rgba(255, 59, 48, 0.1)",
+                  width: 40,
+                  height: 40,
+                  borderRadius: 20,
                   alignItems: "center",
                   justifyContent: "center",
                   borderWidth: 1,
                   borderColor: "rgba(255, 59, 48, 0.3)",
-                }}
+                })}
               >
-                <X size={18} color="#FF3B30" />
+                <X size={20} color="#FF3B30" />
               </Pressable>
             </View>
           </View>
