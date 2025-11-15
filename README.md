@@ -1005,9 +1005,18 @@ See `ENV_SETUP.md` for complete environment variable setup guide.
 
 ### Required APIs
 
-1. **Google OAuth (Authentication)**
-   - Add via ENV tab: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`
-   - Frontend: `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID`, `EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID`, `EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID`
+1. **Google OAuth (Authentication)** ✅ CONFIGURED!
+   - **Backend Environment Variables:**
+     - `GOOGLE_CLIENT_ID`: `94427138884-cc2db90qkmg6dfshccce94ffmt5rpla0.apps.googleusercontent.com`
+     - `GOOGLE_CLIENT_SECRET`: `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`
+   - **Frontend Environment Variables:**
+     - `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID`: `94427138884-cc2db90qkmg6dfshccce94ffmt5rpla0.apps.googleusercontent.com`
+     - `EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID`: `94427138884-vp4hj04sfr29fndq917iau9alpiv52e6.apps.googleusercontent.com`
+     - `EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID`: (Generate with EAS when ready)
+   - **Web Domain:** `rejectionhero.com`
+   - **Bundle IDs:**
+     - iOS: `com.vibecode.goforno`
+     - Android: `com.vibecode.goforno`
 
 2. **Google Maps API**
    - Add via ENV tab: `GOOGLE_MAPS_API_KEY`
