@@ -744,6 +744,201 @@ export default function ProfileScreen({ navigation }: Props) {
                   </View>
                 </View>
               </LinearGradient>
+
+              {/* Fear Zone Progress */}
+              <View
+                style={{
+                  backgroundColor: "rgba(255, 255, 255, 0.05)",
+                  borderRadius: 16,
+                  padding: 20,
+                  borderWidth: 1,
+                  borderColor: "rgba(126, 63, 228, 0.3)",
+                }}
+              >
+                <Text style={{ fontSize: 18, fontWeight: "bold", color: "white", marginBottom: 16 }}>
+                  Fear Zone Progress
+                </Text>
+
+                {/* Confidence Level */}
+                <View style={{ marginBottom: 24 }}>
+                  <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                    <Text style={{ fontSize: 14, color: "rgba(255, 255, 255, 0.6)", fontWeight: "600" }}>
+                      Confidence Level
+                    </Text>
+                    <Text style={{ fontSize: 20, fontWeight: "bold", color: "#FFD700" }}>
+                      {statsData?.confidenceLevel || 50}%
+                    </Text>
+                  </View>
+                  <View
+                    style={{
+                      height: 12,
+                      backgroundColor: "rgba(255, 255, 255, 0.1)",
+                      borderRadius: 6,
+                      overflow: "hidden",
+                    }}
+                  >
+                    <LinearGradient
+                      colors={["#FF6B35", "#FFD700", "#4CAF50"]}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 0 }}
+                      style={{
+                        width: `${statsData?.confidenceLevel || 50}%`,
+                        height: "100%",
+                      }}
+                    />
+                  </View>
+                  <Text style={{ fontSize: 12, color: "rgba(255, 255, 255, 0.4)", marginTop: 6 }}>
+                    Keep pushing your limits to increase confidence
+                  </Text>
+                </View>
+
+                {/* Zone Distribution */}
+                <View style={{ gap: 16 }}>
+                  {/* Easy Zone */}
+                  <View>
+                    <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                      <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                        <View
+                          style={{
+                            width: 32,
+                            height: 32,
+                            borderRadius: 16,
+                            backgroundColor: "rgba(76, 175, 80, 0.2)",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <Text style={{ fontSize: 16 }}>😊</Text>
+                        </View>
+                        <Text style={{ fontSize: 14, color: "rgba(255, 255, 255, 0.8)", fontWeight: "600" }}>
+                          Easy Zone
+                        </Text>
+                      </View>
+                      <Text style={{ fontSize: 16, fontWeight: "bold", color: "#4CAF50" }}>
+                        {statsData?.easyZoneCount || 0}
+                      </Text>
+                    </View>
+                    <View
+                      style={{
+                        height: 6,
+                        backgroundColor: "rgba(255, 255, 255, 0.05)",
+                        borderRadius: 3,
+                        overflow: "hidden",
+                      }}
+                    >
+                      <View
+                        style={{
+                          width: `${Math.min(((statsData?.easyZoneCount || 0) / 10) * 100, 100)}%`,
+                          height: "100%",
+                          backgroundColor: "#4CAF50",
+                        }}
+                      />
+                    </View>
+                  </View>
+
+                  {/* Growth Zone */}
+                  <View>
+                    <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                      <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                        <View
+                          style={{
+                            width: 32,
+                            height: 32,
+                            borderRadius: 16,
+                            backgroundColor: "rgba(255, 215, 0, 0.2)",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <Text style={{ fontSize: 16 }}>💪</Text>
+                        </View>
+                        <Text style={{ fontSize: 14, color: "rgba(255, 255, 255, 0.8)", fontWeight: "600" }}>
+                          Growth Zone
+                        </Text>
+                      </View>
+                      <Text style={{ fontSize: 16, fontWeight: "bold", color: "#FFD700" }}>
+                        {statsData?.growthZoneCount || 0}
+                      </Text>
+                    </View>
+                    <View
+                      style={{
+                        height: 6,
+                        backgroundColor: "rgba(255, 255, 255, 0.05)",
+                        borderRadius: 3,
+                        overflow: "hidden",
+                      }}
+                    >
+                      <View
+                        style={{
+                          width: `${Math.min(((statsData?.growthZoneCount || 0) / 10) * 100, 100)}%`,
+                          height: "100%",
+                          backgroundColor: "#FFD700",
+                        }}
+                      />
+                    </View>
+                  </View>
+
+                  {/* Fear Zone */}
+                  <View>
+                    <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                      <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                        <View
+                          style={{
+                            width: 32,
+                            height: 32,
+                            borderRadius: 16,
+                            backgroundColor: "rgba(255, 107, 53, 0.2)",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <Text style={{ fontSize: 16 }}>🔥</Text>
+                        </View>
+                        <Text style={{ fontSize: 14, color: "rgba(255, 255, 255, 0.8)", fontWeight: "600" }}>
+                          Fear Zone
+                        </Text>
+                      </View>
+                      <Text style={{ fontSize: 16, fontWeight: "bold", color: "#FF6B35" }}>
+                        {statsData?.fearZoneCount || 0}
+                      </Text>
+                    </View>
+                    <View
+                      style={{
+                        height: 6,
+                        backgroundColor: "rgba(255, 255, 255, 0.05)",
+                        borderRadius: 3,
+                        overflow: "hidden",
+                      }}
+                    >
+                      <View
+                        style={{
+                          width: `${Math.min(((statsData?.fearZoneCount || 0) / 10) * 100, 100)}%`,
+                          height: "100%",
+                          backgroundColor: "#FF6B35",
+                        }}
+                      />
+                    </View>
+                  </View>
+                </View>
+
+                {/* Motivational Message */}
+                <View
+                  style={{
+                    marginTop: 20,
+                    padding: 16,
+                    backgroundColor: "rgba(126, 63, 228, 0.1)",
+                    borderRadius: 12,
+                    borderWidth: 1,
+                    borderColor: "rgba(126, 63, 228, 0.3)",
+                  }}
+                >
+                  <Text style={{ fontSize: 13, color: "rgba(255, 255, 255, 0.7)", lineHeight: 20, textAlign: "center" }}>
+                    {(statsData?.fearZoneCount || 0) > (statsData?.easyZoneCount || 0)
+                      ? "🚀 Amazing! You're crushing your fears and growing every day!"
+                      : "💡 Challenge yourself more! The Fear Zone is where real growth happens."}
+                  </Text>
+                </View>
+              </View>
             </View>
           )}
 
