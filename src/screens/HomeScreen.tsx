@@ -106,6 +106,7 @@ export default function HomeScreen({ navigation }: Props) {
   });
 
   const activeQuests = questsData?.activeQuests || [];
+  const queuedQuests = questsData?.queuedQuests || [];
 
   const handleLogout = async () => {
     Alert.alert(
@@ -787,10 +788,137 @@ export default function HomeScreen({ navigation }: Props) {
           )}
         </View>
 
+        {/* Queued Quests Section */}
+        {queuedQuests.length > 0 && (
+          <View style={{ paddingHorizontal: 24, paddingTop: 24 }}>
+            <Text style={{ color: "white", fontSize: 20, fontWeight: "bold", marginBottom: 12 }}>
+              Quest Queue
+            </Text>
+            {queuedQuests.map((userQuest, index) => {
+              const quest = userQuest.quest;
+              return (
+                <Pressable
+                  key={userQuest.id}
+                  onPress={() => {
+                    // Allow user to start queued quest if they have less than 2 active quests
+                    if (activeQuests.length < 2) {
+                      navigation.navigate("QuestDetail", { userQuestId: userQuest.id });
+                    } else {
+                      Alert.alert(
+                        "Quest Queue",
+                        "You already have 2 active quests. Complete one to start this queued quest.",
+                        [{ text: "OK" }]
+                      );
+                    }
+                  }}
+                  style={{
+                    backgroundColor: "rgba(255, 255, 255, 0.03)",
+                    borderRadius: 20,
+                    padding: 16,
+                    marginBottom: 12,
+                    borderWidth: 1,
+                    borderColor: "rgba(255, 255, 255, 0.1)",
+                  }}
+                >
+                  <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+                    <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                      <View
+                        style={{
+                          backgroundColor: "rgba(255, 215, 0, 0.2)",
+                          paddingHorizontal: 12,
+                          paddingVertical: 6,
+                          borderRadius: 8,
+                        }}
+                      >
+                        <Text style={{ color: "#FFD700", fontSize: 12, fontWeight: "600" }}>
+                          #{index + 1} IN QUEUE
+                        </Text>
+                      </View>
+                      <View
+                        style={{
+                          backgroundColor: `${getDifficultyColor(quest.difficulty)}20`,
+                          paddingHorizontal: 12,
+                          paddingVertical: 6,
+                          borderRadius: 8,
+                        }}
+                      >
+                        <Text
+                          style={{
+                            color: getDifficultyColor(quest.difficulty),
+                            fontSize: 12,
+                            fontWeight: "600",
+                          }}
+                        >
+                          {quest.difficulty}
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+
+                  <Text style={{ color: "white", fontSize: 18, fontWeight: "bold", marginBottom: 8 }}>
+                    {quest.title}
+                  </Text>
+                  <Text style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: 14, marginBottom: 12 }}>
+                    {quest.description}
+                  </Text>
+
+                  {/* Rewards */}
+                  <View style={{ flexDirection: "row", gap: 12 }}>
+                    <View
+                      style={{
+                        flex: 1,
+                        backgroundColor: "rgba(255, 107, 53, 0.2)",
+                        paddingHorizontal: 12,
+                        paddingVertical: 8,
+                        borderRadius: 12,
+                      }}
+                    >
+                      <Text style={{ color: "#FF6B35", textAlign: "center", fontWeight: "600" }}>
+                        +{quest.xpReward} XP
+                      </Text>
+                    </View>
+                    <View
+                      style={{
+                        flex: 1,
+                        backgroundColor: "rgba(255, 215, 0, 0.2)",
+                        paddingHorizontal: 12,
+                        paddingVertical: 8,
+                        borderRadius: 12,
+                      }}
+                    >
+                      <Text style={{ color: "#FFD700", textAlign: "center", fontWeight: "600" }}>
+                        +{quest.pointReward} pts
+                      </Text>
+                    </View>
+                  </View>
+
+                  {activeQuests.length < 2 && (
+                    <View
+                      style={{
+                        marginTop: 12,
+                        paddingTop: 12,
+                        borderTopWidth: 1,
+                        borderTopColor: "rgba(255, 255, 255, 0.1)",
+                      }}
+                    >
+                      <Text style={{ color: "#00D9FF", fontSize: 12, textAlign: "center" }}>
+                        Tap to start this quest
+                      </Text>
+                    </View>
+                  )}
+                </Pressable>
+              );
+            })}
+          </View>
+        )}
+
         {/* Note about active quests */}
-        <View className="px-6">
+        <View className="px-6 pt-4">
           <Text className="text-white/50 text-xs text-center">
-            Max 2 active quests • Extra quests go to queue
+            1 slot for your quests • 1 slot for friend quests
+          </Text>
+          <Text className="text-white/50 text-xs text-center mt-1">
+            Complete quests to unlock new ones from the queue
           </Text>
         </View>
       </ScrollView>

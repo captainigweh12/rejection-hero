@@ -58,6 +58,14 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 - Shows all active quests with progress
 - Quest cards with category, difficulty, and completion tracking
 
+**Quest Queue Section** ✨ NEW!
+- Shows all queued quests waiting to be started
+- Displays quest number in queue (#1, #2, etc.)
+- Shows rewards (XP and points) for each quest
+- Tap to start quest if you have available slots
+- Smart queue management - automatically starts next quest when slot opens
+- Visual feedback when slots are full
+
 ### 🎯 No Quest System (MAIN FEATURE)
 
 **AI-Generated Challenges**
@@ -71,10 +79,10 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 - 6 Categories: Sales, Social, Entrepreneurship, Dating, Confidence, Career
 - 4 Difficulty Levels: Easy, Medium, Hard, Expert
 - Auto-navigation to quest detail page after creation
-- Auto-start quest when created (if less than 2 active quests)
+- Auto-start quest when created (if you have available slots)
 - Real-time progress tracking (NOs and YESes collected)
 - Rewards: Earn XP and points based on difficulty
-- Max 2 active quests (extras go to queue)
+- **Quest Slots**: 1 slot for your quests, 1 slot for friend quests (extras go to queue)
 
 **Quest Detail Experience** ✨ MODERNIZED! (3D Dark Theme Design)
 - **Modern 3D UI**: Dark gradient background (#0A0A0F to #1A1A24) with glassmorphism effects
@@ -121,7 +129,7 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
   - "Regenerate Quest" button appears when both are selected
   - Instantly replaces current quest with new AI-generated quest
   - Keeps your location context for nearby places
-  - Works even when you have 2 active quests
+  - Works even when you have active quests
 
 **Quest Completion Flow** ✨ ENHANCED! (3D Glassmorphism Design)
 - **Dark Gradient Background**: Beautiful gradient from #0A0A0F → #1A1A24 → #2A1A34 (replaces bright green)
@@ -941,7 +949,7 @@ See `ENV_SETUP.md` for complete environment variable setup guide.
 
 ## Notes
 
-- **Max Active Quests**: 2 at a time, extras go to queue
+- **Max Active Quests**: 1 slot for your quests, 1 slot for friend quests (extras go to queue)
 - **AI Generation**: Requires `OPENAI_API_KEY` (optional)
 - **Rewards Formula**: XP = (goalCount × 10 × difficulty) + 50
 - **Swipe Logic**: RIGHT = No, LEFT = Yes (inverted)

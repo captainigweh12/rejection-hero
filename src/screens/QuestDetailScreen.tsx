@@ -1058,8 +1058,8 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
           {/* Bottom Text */}
           <View style={{ paddingHorizontal: 20, paddingTop: 16 }}>
             <Text style={{ color: "rgba(255, 255, 255, 0.5)", fontSize: 13, textAlign: "center", lineHeight: 18 }}>
-              Complete your quests in order • Friend quests can be done anytime{"\n"}
-              Max 2 active quests • Extra quests go to queue
+              1 slot for your quests • 1 slot for friend quests{"\n"}
+              Complete quests to unlock new ones from the queue
             </Text>
           </View>
         </ScrollView>
