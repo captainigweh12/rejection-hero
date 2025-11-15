@@ -120,7 +120,7 @@ function AuthWrapper() {
   const { data: profile } = useQuery({
     queryKey: ["profile"],
     queryFn: async () => {
-      const response = await api.get("/profile");
+      const response = await api.get("/api/profile");
       return response as { onboardingCompleted?: boolean };
     },
     enabled: !!sessionData?.user,
