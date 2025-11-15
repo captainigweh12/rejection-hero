@@ -246,12 +246,12 @@ export default function LoginWithEmailPassword() {
                 colors={["#7E3FE4", "#FF6B35"]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
-                className="py-4 items-center"
+                className="py-4 items-center justify-center"
               >
                 {isLoading ? (
                   <ActivityIndicator color="white" />
                 ) : (
-                  <Text className="text-white font-bold text-lg">
+                  <Text className="text-white font-bold text-lg text-center">
                     {isSignUp ? "Create Account" : "Sign In"}
                   </Text>
                 )}
