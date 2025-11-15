@@ -169,13 +169,19 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
   - Keeps your location context for nearby places
   - Works even when you have active quests
 
-**Quest Completion Flow** ✨ ENHANCED! (3D Glassmorphism Design)
+**Quest Completion Flow** ✨ ENHANCED! (3D Glassmorphism Design with FIXED Visibility)
 - **Dark Gradient Background**: Beautiful gradient from #0A0A0F → #1A1A24 → #2A1A34 (consistent with app theme)
 - **3D Glassmorphism Cards** 🎨 UPDATED!:
   - Semi-transparent backgrounds: rgba(255, 255, 255, 0.05)
   - Colored borders with purple/orange glow effects matching theme
   - Enhanced shadow effects for depth
   - Premium dark theme matching the homepage and profile
+- **FIXED Text Visibility** ✨ NEW!:
+  - All text now uses bright white (#FFFFFF) for maximum contrast
+  - Dark text shadows on all text for readability on any background
+  - Colored glows on numbers (orange, purple, cyan) for premium feel
+  - No more invisible text on dark gradients
+  - Increased font sizes for better readability
 - **Loading screen**: 2-second loading animation with pulsing trophy
 - **Smooth animations** 🎨:
   - Floating confetti particles with random colors, sizes, and rotation
@@ -187,19 +193,28 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
   - Golden glowing shadows on icons
 - **Sequential completion pages** (tap to advance through each):
   - **Page 1 - Accomplishments**: 3D glassmorphism card with dark gradient background
-    - Gradient stat cards for XP and Points earned (gold/orange theme)
-    - Glassmorphism cards for Total XP and Total Points (purple/cyan theme)
+    - Gradient stat cards for XP and Points earned (bright white text with colored shadows)
+    - Glassmorphism cards for Total XP and Total Points (bright white with colored glows)
     - Semi-transparent with colored borders and glow effects
+    - "Tap to continue" fully visible
   - **Page 2 - Leaderboard** 🎨 UPDATED!: Purple theme matching app design
     - Purple gradient trophy icon (#7E3FE4 → #A78BFA)
+    - "Leaderboard Position" title in bright white
+    - Your rank in huge bright white text with purple glow shadow
+    - "out of X warriors" clearly visible in white
+    - Top 5 warriors list in glassmorphism card
+    - "Tap to continue" fully visible
     - 3D glassmorphism rank card with purple glow
     - Dark themed list with white text
     - Current user highlighted with orange accent
     - Consistent color scheme with app theme
-  - **Page 3 - Streak** 🎨 UPDATED!: Orange/coral theme for fire aesthetic
-    - Orange gradient flame icon (#FF6B35 → #FF8C61)
+  - **Page 3 - Streak** 🎨 UPDATED with FIXED Visibility!: Orange/coral theme for fire aesthetic
+    - Orange gradient flame icon (#FF6B35 → #FF8C61) with glow
+    - Streak number in huge bright white text with orange glow shadow
+    - "day streak" in bright white with dark shadow for contrast
     - 3D glassmorphism card with orange border glow
-    - Orange text colors (#FF6B35, #FF8C61) matching the flame theme
+    - "Generating your next challenge..." in bright white with shadow
+    - "Tap to start next quest" fully visible in white
     - Enhanced loading state for next quest generation
 - **Auto-generation**: Automatically creates next harder quest when you tap on streak page
 - Progressive difficulty: EASY → MEDIUM → HARD → EXPERT

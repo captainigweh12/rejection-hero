@@ -1410,10 +1410,30 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                         borderColor: "rgba(255, 215, 0, 0.3)",
                       }}
                     >
-                      <Text style={{ color: "#FFD700", fontSize: 24, fontWeight: "bold" }}>
+                      <Text
+                        style={{
+                          color: "#FFFFFF",
+                          fontSize: 28,
+                          fontWeight: "bold",
+                          textShadowColor: "rgba(255, 215, 0, 0.8)",
+                          textShadowOffset: { width: 0, height: 3 },
+                          textShadowRadius: 8,
+                        }}
+                      >
                         +{savedQuestData?.quest.xpReward || 0}
                       </Text>
-                      <Text style={{ color: "#FFA500", fontSize: 14 }}>XP</Text>
+                      <Text
+                        style={{
+                          color: "#FFFFFF",
+                          fontSize: 16,
+                          fontWeight: "600",
+                          textShadowColor: "rgba(0, 0, 0, 0.7)",
+                          textShadowOffset: { width: 0, height: 1 },
+                          textShadowRadius: 3,
+                        }}
+                      >
+                        XP
+                      </Text>
                     </LinearGradient>
                     <LinearGradient
                       colors={["rgba(255, 107, 53, 0.15)", "rgba(255, 140, 66, 0.15)"]}
@@ -1426,10 +1446,30 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                         borderColor: "rgba(255, 107, 53, 0.3)",
                       }}
                     >
-                      <Text style={{ color: "#FF8C42", fontSize: 24, fontWeight: "bold" }}>
+                      <Text
+                        style={{
+                          color: "#FFFFFF",
+                          fontSize: 28,
+                          fontWeight: "bold",
+                          textShadowColor: "rgba(255, 107, 53, 0.8)",
+                          textShadowOffset: { width: 0, height: 3 },
+                          textShadowRadius: 8,
+                        }}
+                      >
                         +{savedQuestData?.quest.pointReward || 0}
                       </Text>
-                      <Text style={{ color: "#FF6B35", fontSize: 14 }}>Points</Text>
+                      <Text
+                        style={{
+                          color: "#FFFFFF",
+                          fontSize: 16,
+                          fontWeight: "600",
+                          textShadowColor: "rgba(0, 0, 0, 0.7)",
+                          textShadowOffset: { width: 0, height: 1 },
+                          textShadowRadius: 3,
+                        }}
+                      >
+                        Points
+                      </Text>
                     </LinearGradient>
                   </View>
 
@@ -1446,10 +1486,30 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                         borderColor: "rgba(126, 63, 228, 0.3)",
                       }}
                     >
-                      <Text style={{ color: "#A78BFA", fontSize: 24, fontWeight: "bold" }}>
+                      <Text
+                        style={{
+                          color: "#FFFFFF",
+                          fontSize: 28,
+                          fontWeight: "bold",
+                          textShadowColor: "rgba(126, 63, 228, 0.8)",
+                          textShadowOffset: { width: 0, height: 3 },
+                          textShadowRadius: 8,
+                        }}
+                      >
                         {statsData?.totalXP || 0}
                       </Text>
-                      <Text style={{ color: "rgba(255, 255, 255, 0.7)", fontSize: 14 }}>Total XP</Text>
+                      <Text
+                        style={{
+                          color: "#FFFFFF",
+                          fontSize: 16,
+                          fontWeight: "600",
+                          textShadowColor: "rgba(0, 0, 0, 0.7)",
+                          textShadowOffset: { width: 0, height: 1 },
+                          textShadowRadius: 3,
+                        }}
+                      >
+                        Total XP
+                      </Text>
                     </View>
                     <View
                       style={{
@@ -1462,10 +1522,30 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                         borderColor: "rgba(0, 217, 255, 0.3)",
                       }}
                     >
-                      <Text style={{ color: "#00D9FF", fontSize: 24, fontWeight: "bold" }}>
+                      <Text
+                        style={{
+                          color: "#FFFFFF",
+                          fontSize: 28,
+                          fontWeight: "bold",
+                          textShadowColor: "rgba(0, 217, 255, 0.8)",
+                          textShadowOffset: { width: 0, height: 3 },
+                          textShadowRadius: 8,
+                        }}
+                      >
                         {statsData?.totalPoints || 0}
                       </Text>
-                      <Text style={{ color: "rgba(255, 255, 255, 0.7)", fontSize: 14 }}>Total Points</Text>
+                      <Text
+                        style={{
+                          color: "#FFFFFF",
+                          fontSize: 16,
+                          fontWeight: "600",
+                          textShadowColor: "rgba(0, 0, 0, 0.7)",
+                          textShadowOffset: { width: 0, height: 1 },
+                          textShadowRadius: 3,
+                        }}
+                      >
+                        Total Points
+                      </Text>
                     </View>
                   </View>
                 </Animated.View>
@@ -1474,10 +1554,14 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                 <Animated.Text
                   style={{
                     marginTop: 32,
-                    fontSize: 16,
-                    color: "rgba(255, 255, 255, 0.8)",
+                    fontSize: 18,
+                    color: "#FFFFFF",
+                    fontWeight: "600",
                     textAlign: "center",
                     opacity: celebrationAnim,
+                    textShadowColor: "rgba(0, 0, 0, 0.8)",
+                    textShadowOffset: { width: 0, height: 2 },
+                    textShadowRadius: 6,
                   }}
                 >
                   Tap to continue
@@ -1542,10 +1626,13 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                   style={{
                     fontSize: 32,
                     fontWeight: "bold",
-                    color: "white",
+                    color: "#FFFFFF",
                     marginBottom: 48,
                     textAlign: "center",
                     opacity: pageTransitionAnim,
+                    textShadowColor: "rgba(0, 0, 0, 0.7)",
+                    textShadowOffset: { width: 0, height: 2 },
+                    textShadowRadius: 6,
                   }}
                 >
                   Leaderboard Position
@@ -1578,10 +1665,29 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                     ],
                   }}
                 >
-                  <Text style={{ fontSize: 72, fontWeight: "bold", color: "#7E3FE4" }}>
+                  <Text
+                    style={{
+                      fontSize: 72,
+                      fontWeight: "bold",
+                      color: "#FFFFFF",
+                      textShadowColor: "rgba(126, 63, 228, 0.8)",
+                      textShadowOffset: { width: 0, height: 4 },
+                      textShadowRadius: 12,
+                    }}
+                  >
                     #{leaderboardData?.currentUserRank || "-"}
                   </Text>
-                  <Text style={{ fontSize: 16, color: "#A78BFA", marginTop: 8 }}>
+                  <Text
+                    style={{
+                      fontSize: 18,
+                      color: "#FFFFFF",
+                      marginTop: 8,
+                      fontWeight: "600",
+                      textShadowColor: "rgba(0, 0, 0, 0.7)",
+                      textShadowOffset: { width: 0, height: 2 },
+                      textShadowRadius: 4,
+                    }}
+                  >
                     out of {leaderboardData?.totalUsers || 0} warriors
                   </Text>
                 </Animated.View>
@@ -1671,10 +1777,14 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                 <Animated.Text
                   style={{
                     marginTop: 32,
-                    fontSize: 16,
-                    color: "rgba(255, 255, 255, 0.8)",
+                    fontSize: 18,
+                    color: "#FFFFFF",
+                    fontWeight: "600",
                     textAlign: "center",
                     opacity: pageTransitionAnim,
+                    textShadowColor: "rgba(0, 0, 0, 0.8)",
+                    textShadowOffset: { width: 0, height: 2 },
+                    textShadowRadius: 6,
                   }}
                 >
                   Tap to continue
@@ -1760,10 +1870,28 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                     ],
                   }}
                 >
-                  <Text style={{ fontSize: 80, fontWeight: "bold", color: "#FF6B35" }}>
+                  <Text
+                    style={{
+                      fontSize: 80,
+                      fontWeight: "bold",
+                      color: "#FFFFFF",
+                      textShadowColor: "rgba(255, 107, 53, 0.8)",
+                      textShadowOffset: { width: 0, height: 4 },
+                      textShadowRadius: 12,
+                    }}
+                  >
                     {statsData?.currentStreak || 1}
                   </Text>
-                  <Text style={{ fontSize: 24, color: "#FF8C61", fontWeight: "600" }}>
+                  <Text
+                    style={{
+                      fontSize: 24,
+                      color: "#FFFFFF",
+                      fontWeight: "600",
+                      textShadowColor: "rgba(0, 0, 0, 0.7)",
+                      textShadowOffset: { width: 0, height: 2 },
+                      textShadowRadius: 4,
+                    }}
+                  >
                     day streak
                   </Text>
                 </Animated.View>
@@ -1786,7 +1914,17 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                     }}
                   >
                     <ActivityIndicator size="large" color="#FF6B35" />
-                    <Text style={{ color: "white", fontSize: 16, fontWeight: "600", flex: 1 }}>
+                    <Text
+                      style={{
+                        color: "#FFFFFF",
+                        fontSize: 18,
+                        fontWeight: "700",
+                        flex: 1,
+                        textShadowColor: "rgba(0, 0, 0, 0.8)",
+                        textShadowOffset: { width: 0, height: 2 },
+                        textShadowRadius: 6,
+                      }}
+                    >
                       Generating your next challenge...
                     </Text>
                   </Animated.View>
@@ -1794,10 +1932,14 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                   <Animated.Text
                     style={{
                       marginTop: 48,
-                      fontSize: 16,
-                      color: "rgba(255, 255, 255, 0.8)",
+                      fontSize: 18,
+                      color: "#FFFFFF",
+                      fontWeight: "600",
                       textAlign: "center",
                       opacity: pageTransitionAnim,
+                      textShadowColor: "rgba(0, 0, 0, 0.8)",
+                      textShadowOffset: { width: 0, height: 2 },
+                      textShadowRadius: 6,
                     }}
                   >
                     Tap to start next quest
