@@ -24,6 +24,8 @@ import SettingsScreen from "@/screens/SettingsScreen";
 import LanguageSelectionScreen from "@/screens/LanguageSelectionScreen";
 import SearchUsersScreen from "@/screens/SearchUsersScreen";
 import GrowthAchievementsScreen from "@/screens/GrowthAchievementsScreen";
+import FriendsScreen from "@/screens/FriendsScreen";
+import SendQuestToFriendScreen from "@/screens/SendQuestToFriendScreen";
 import { useSession } from "@/lib/useSession";
 
 /**
@@ -79,6 +81,16 @@ const RootNavigator = () => {
         <RootStack.Screen
           name="GrowthAchievements"
           component={GrowthAchievementsScreen}
+          options={{ headerShown: false }}
+        />
+        <RootStack.Screen
+          name="Friends"
+          component={FriendsScreen}
+          options={{ headerShown: false }}
+        />
+        <RootStack.Screen
+          name="SendQuestToFriend"
+          component={SendQuestToFriendScreen}
           options={{ headerShown: false }}
         />
       </RootStack.Navigator>

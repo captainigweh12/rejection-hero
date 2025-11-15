@@ -461,124 +461,13 @@ export default function CreateQuestScreen({ navigation }: Props) {
     );
   }
 
-  // Send Quest to Friends Screen
+  // Send Quest to Friends Screen - Navigate to Friends screen
   if (showSendToFriends) {
-    return (
-      <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
-        <LinearGradient colors={["#0A0A0F", "#1A1A24", "#2A1A34"]} style={{ flex: 1 }}>
-          <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
-            {/* Header */}
-            <View
-              style={{
-                paddingHorizontal: 20,
-                paddingVertical: 16,
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <Pressable
-                onPress={() => setShowSendToFriends(false)}
-                style={{ position: "absolute", left: 20 }}
-              >
-                <ChevronLeft size={28} color="white" />
-              </Pressable>
-              <Text style={{ fontSize: 20, fontWeight: "bold", color: "white" }}>
-                Send to Friends
-              </Text>
-            </View>
-
-            <ScrollView
-              style={{ flex: 1 }}
-              contentContainerStyle={{ padding: 24, paddingBottom: 40 }}
-            >
-              {/* Icon */}
-              <View style={{ alignItems: "center", marginVertical: 32 }}>
-                <LinearGradient
-                  colors={["#00D9FF", "#00A8CC"]}
-                  style={{
-                    width: 100,
-                    height: 100,
-                    borderRadius: 50,
-                    alignItems: "center",
-                    justifyContent: "center",
-                    shadowColor: "#00D9FF",
-                    shadowOffset: { width: 0, height: 0 },
-                    shadowOpacity: 0.6,
-                    shadowRadius: 20,
-                    elevation: 10,
-                  }}
-                >
-                  <Users size={50} color="white" />
-                </LinearGradient>
-                <Text style={{ fontSize: 24, fontWeight: "bold", color: "white", marginTop: 20 }}>
-                  Challenge Your Friends
-                </Text>
-                <Text style={{ fontSize: 16, color: "rgba(255, 255, 255, 0.6)", textAlign: "center", marginTop: 8 }}>
-                  Share quests and compete together
-                </Text>
-              </View>
-
-              {/* Coming Soon Notice */}
-              <View
-                style={{
-                  backgroundColor: "rgba(0, 217, 255, 0.1)",
-                  borderRadius: 20,
-                  padding: 24,
-                  borderWidth: 1,
-                  borderColor: "rgba(0, 217, 255, 0.3)",
-                }}
-              >
-                <Text style={{ color: "#00D9FF", fontSize: 18, fontWeight: "bold", textAlign: "center", marginBottom: 12 }}>
-                  Coming Soon!
-                </Text>
-                <Text style={{ color: "rgba(255, 255, 255, 0.8)", fontSize: 15, textAlign: "center", lineHeight: 22 }}>
-                  Friend challenges are being built! Soon you&rsquo;ll be able to send custom quests to your friends and see who can complete them first.
-                </Text>
-              </View>
-
-              {/* Feature List */}
-              <View style={{ marginTop: 32, gap: 16 }}>
-                <Text style={{ fontSize: 18, fontWeight: "bold", color: "white", marginBottom: 8 }}>
-                  What&rsquo;s Coming:
-                </Text>
-
-                {[
-                  { icon: "🎯", title: "Challenge Friends", desc: "Send custom quests to specific friends" },
-                  { icon: "🏆", title: "Compete Together", desc: "See who completes challenges first" },
-                  { icon: "💬", title: "Share Results", desc: "Compare scores and celebrate wins" },
-                  { icon: "🎊", title: "Group Challenges", desc: "Create team quests for multiple friends" },
-                ].map((feature, idx) => (
-                  <View
-                    key={idx}
-                    style={{
-                      backgroundColor: "rgba(255, 255, 255, 0.05)",
-                      borderRadius: 16,
-                      padding: 16,
-                      flexDirection: "row",
-                      alignItems: "center",
-                      gap: 16,
-                      borderWidth: 1,
-                      borderColor: "rgba(255, 255, 255, 0.1)",
-                    }}
-                  >
-                    <Text style={{ fontSize: 32 }}>{feature.icon}</Text>
-                    <View style={{ flex: 1 }}>
-                      <Text style={{ fontSize: 16, fontWeight: "bold", color: "white", marginBottom: 4 }}>
-                        {feature.title}
-                      </Text>
-                      <Text style={{ fontSize: 14, color: "rgba(255, 255, 255, 0.6)" }}>
-                        {feature.desc}
-                      </Text>
-                    </View>
-                  </View>
-                ))}
-              </View>
-            </ScrollView>
-          </SafeAreaView>
-        </LinearGradient>
-      </View>
-    );
+    // Just navigate to the Friends screen instead of showing coming soon
+    navigation.navigate("Friends");
+    // Reset the state so when they come back, they see the main screen
+    setShowSendToFriends(false);
+    return null;
   }
 
   // AI Form Screen - Dark 3D Glass Theme

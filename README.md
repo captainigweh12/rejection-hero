@@ -85,25 +85,19 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 - **Three Creation Options**:
   - 💜 **Generate with AI**: Purple gradient card with sparkle icon
   - 🟠 **Create Custom Quest**: Glass card with star icon - NOW FUNCTIONAL!
-  - 💙 **Send Quest to Friends**: Cyan glass card with users icon (coming soon)
+  - 💙 **Send Quest to Friends**: Cyan glass card - NOW FUNCTIONAL! Navigates to Friends screen
 - **Location Options** 🗺️:
   - 📍 **Use My Location**: Find quests within 10 miles (default)
   - 🌍 **Custom Location**: Specify any place (beach, mall, airport, etc.)
   - ⭐ **No Specific Location**: Location-independent quests
   - Custom location input field when "Custom Location" is selected
-- **Custom Quest Creation** 🎯 NEW & FUNCTIONAL!:
+- **Custom Quest Creation** 🎯 FUNCTIONAL!:
   - Clean text input for quest description
   - **Create Button**: Appears when you start typing your quest
   - **Voice Recording Button**: Record quest with voice (AI transcription coming soon)
   - Purple microphone button with glass styling
   - Uses AI to generate quest from your description
   - Orange gradient create button with loading state
-- **Send Quest to Friends** 👥 COMING SOON!:
-  - Preview of upcoming friend challenge feature
-  - Send custom quests to specific friends
-  - Compete together and share results
-  - Group challenges for multiple friends
-  - Beautiful preview screen with feature list
 - **AI Generation Features**:
   - 6 Categories: Sales, Social, Entrepreneurship, Dating, Confidence, Career
   - 4 Difficulty Levels: Easy, Medium, Hard, Expert
@@ -527,6 +521,54 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 - **AI Integration**: Requires OPENAI_API_KEY for transcription and summarization
 
 **Profile & Settings** ✨ FULLY REDESIGNED!
+
+**Friends & Social Features** 👥 NEW & FULLY FUNCTIONAL!
+- **Friends Screen** 🎯:
+  - **Three Tabs**: Friends list, Friend requests, Search users
+  - **Friends List Tab**:
+    - View all accepted friends with avatars
+    - Send quests directly to friends with one tap
+    - See friendship start dates
+    - Quick access to send quest feature
+  - **Friend Requests Tab**:
+    - View pending friend requests received
+    - Accept or decline requests with one tap
+    - See requester profile info and bio
+    - Real-time updates on request status
+  - **Search Tab**:
+    - Search users by name or email (min 2 characters)
+    - Send friend requests to new users
+    - See friendship status (friend, pending, or none)
+    - View user profiles, avatars, and bios
+  - **Modern 3D Glass UI**: Dark gradient theme matching app aesthetic
+  - **Pull-to-refresh**: Refresh friends and requests lists
+  - **Real-time Updates**: React Query for instant data updates
+- **Send Quest to Friends** 🎮:
+  - Select any quest (active, queued, or completed) to share
+  - Add optional personal message (up to 500 characters)
+  - Beautiful quest cards with category, difficulty, and rewards
+  - Quest selection with visual feedback
+  - Send button appears when quest is selected
+  - Instant delivery to friend's quest inbox
+- **Friend Quest System**:
+  - Separate slot for friend quests (1 user slot + 1 friend slot)
+  - Accept or decline shared quests
+  - Track who shared the quest with you
+  - Compete with friends on same quests
+- **Google OAuth Integration** 🔐:
+  - Sign in with Google button on login screen
+  - Better Auth integration for seamless OAuth flow
+  - Secure authentication with expo-web-browser
+  - Auto-redirect to app after successful sign-in
+- **Profile Navigation**:
+  - Friends button (cyan) in top-right corner of profile
+  - Quick access to friends list from anywhere in app
+  - Beautiful icon design matching app theme
+- **Backend API**:
+  - Complete friends management (add, accept, decline, remove)
+  - Shared quests system with status tracking
+  - User search functionality
+  - Friend request notifications
 
 **Gaming-Style Profile Page** 🎮 ENHANCED!
 - **Modern Dark Gradient Background** 🎨 UPDATED!: Consistent dark theme (#0A0A0F → #1A1A24 → #2A1A34) matching HomeScreen

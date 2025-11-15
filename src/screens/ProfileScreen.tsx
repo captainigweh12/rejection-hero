@@ -20,6 +20,7 @@ import {
   Award,
   TrendingUp,
   Upload,
+  Users,
 } from "lucide-react-native";
 import type { BottomTabScreenProps } from "@/navigation/types";
 import { api } from "@/lib/api";
@@ -172,8 +173,23 @@ export default function ProfileScreen({ navigation }: Props) {
           <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 100 }}>
             {/* Hero Header with Gradient */}
             <View style={{ paddingBottom: 80, paddingTop: 20, paddingHorizontal: 20 }}>
-              {/* Settings Button */}
-            <View style={{ alignItems: "flex-end", marginBottom: 20 }}>
+              {/* Settings and Friends Buttons */}
+            <View style={{ flexDirection: "row", justifyContent: "flex-end", alignItems: "center", gap: 12, marginBottom: 20 }}>
+              <Pressable
+                onPress={() => navigation.navigate("Friends")}
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 20,
+                  backgroundColor: "rgba(0, 217, 255, 0.3)",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderWidth: 1,
+                  borderColor: "rgba(0, 217, 255, 0.5)",
+                }}
+              >
+                <Users size={20} color="#00D9FF" />
+              </Pressable>
               <Pressable
                 onPress={() => navigation.navigate("Settings")}
                 style={{

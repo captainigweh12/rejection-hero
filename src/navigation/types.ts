@@ -20,6 +20,8 @@ export type RootStackParamList = {
   LanguageSelection: undefined;
   SearchUsers: undefined;
   GrowthAchievements: undefined;
+  Friends: undefined;
+  SendQuestToFriend: { friendId: string; friendName: string };
 };
 
 export type BottomTabParamList = {

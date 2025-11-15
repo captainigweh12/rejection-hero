@@ -86,22 +86,18 @@ export default function LoginWithEmailPassword() {
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
     try {
-      const backendUrl = process.env.EXPO_PUBLIC_VIBECODE_BACKEND_URL;
-      const googleAuthUrl = `${backendUrl}/api/auth/google`;
+      // Use Better Auth's built-in Google OAuth
+      const result = await authClient.signIn.social({
+        provider: "google",
+        callbackURL: "vibecode://auth/callback",
+      });
 
-      const result = await WebBrowser.openAuthSessionAsync(
-        googleAuthUrl,
-        "vibecode://auth/callback"
-      );
-
-      if (result.type === "success") {
-        Alert.alert("Success", "Signed in with Google successfully!");
-      } else if (result.type === "cancel") {
-        Alert.alert("Cancelled", "Google sign-in was cancelled");
+      if (result.error) {
+        Alert.alert("Error", result.error.message || "Failed to sign in with Google");
       }
-    } catch (error) {
-      Alert.alert("Error", "Failed to sign in with Google");
-      console.error(error);
+    } catch (error: any) {
+      Alert.alert("Error", error?.message || "Failed to sign in with Google");
+      console.error("Google Sign-In Error:", error);
     } finally {
       setIsLoading(false);
     }
