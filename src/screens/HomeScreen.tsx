@@ -200,7 +200,12 @@ export default function HomeScreen({ navigation }: Props) {
         {/* Gaming-Style Header with Profile */}
         <View style={{ paddingHorizontal: 24, paddingTop: 16, paddingBottom: 12 }}>
           <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-            {/* Modern Gaming Logo with Gradient */}
+            {/* Left: Hamburger Menu */}
+            <Pressable onPress={() => setShowMenu(true)} style={{ width: 40 }}>
+              <Menu size={24} color="#fff" />
+            </Pressable>
+
+            {/* Center: Modern Gaming Logo with Gradient */}
             <LinearGradient
               colors={["#FF6B35", "#FFD700", "#00D9FF"]}
               start={{ x: 0, y: 0 }}
@@ -219,14 +224,11 @@ export default function HomeScreen({ navigation }: Props) {
                 </Text>
               </View>
             </LinearGradient>
-            <View style={{ flexDirection: "row", alignItems: "center", gap: 16 }}>
-              <Pressable>
-                <Bell size={24} color="#fff" />
-              </Pressable>
-              <Pressable onPress={() => setShowMenu(true)}>
-                <Menu size={24} color="#fff" />
-              </Pressable>
-            </View>
+
+            {/* Right: Notifications */}
+            <Pressable style={{ width: 40, alignItems: "flex-end" }}>
+              <Bell size={24} color="#fff" />
+            </Pressable>
           </View>
 
           {/* Gaming Profile Card */}
