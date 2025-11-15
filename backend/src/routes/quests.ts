@@ -91,6 +91,47 @@ questsRouter.get("/", async (c) => {
 });
 
 // ============================================
+// GET /api/quests/completed - Get user's completed quests
+// ============================================
+questsRouter.get("/completed", async (c) => {
+  const user = c.get("user");
+
+  if (!user) {
+    return c.json({ message: "Unauthorized" }, 401);
+  }
+
+  const completedUserQuests = await db.userQuest.findMany({
+    where: {
+      userId: user.id,
+      status: "COMPLETED",
+    },
+    include: {
+      quest: true,
+    },
+    orderBy: {
+      completedAt: "desc",
+    },
+  });
+
+  const quests = completedUserQuests.map((uq) => ({
+    id: uq.id,
+    completedAt: uq.completedAt?.toISOString() || "",
+    quest: {
+      title: uq.quest.title,
+      category: uq.quest.category,
+      difficulty: uq.quest.difficulty,
+      xpReward: uq.quest.xpReward,
+      pointReward: uq.quest.pointReward,
+    },
+    noCount: uq.noCount,
+    yesCount: uq.yesCount,
+    actionCount: uq.actionCount,
+  }));
+
+  return c.json({ quests });
+});
+
+// ============================================
 // POST /api/quests/generate - Generate AI quest
 // ============================================
 questsRouter.post("/generate", zValidator("json", generateQuestRequestSchema), async (c) => {

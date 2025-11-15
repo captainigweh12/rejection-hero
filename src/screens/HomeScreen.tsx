@@ -986,7 +986,7 @@ export default function HomeScreen({ navigation }: Props) {
         animationType="slide"
         onRequestClose={() => setShowMenu(false)}
       >
-        <View style={{ flex: 1, backgroundColor: "rgba(0, 0, 0, 0.5)" }}>
+        <View style={{ flex: 1, backgroundColor: "rgba(0, 0, 0, 0.7)" }}>
           <Pressable
             style={{ flex: 1 }}
             onPress={() => setShowMenu(false)}
@@ -995,561 +995,524 @@ export default function HomeScreen({ navigation }: Props) {
             style={{
               width: "85%",
               height: "100%",
-              backgroundColor: colors.background,
               position: "absolute",
               left: 0,
               top: 0,
               bottom: 0,
             }}
           >
-            <SafeAreaView style={{ flex: 1 }} edges={["top", "bottom"]}>
-              <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 20 }}>
-                {/* Header */}
-                <View
-                  style={{
-                    paddingHorizontal: 20,
-                    paddingVertical: 20,
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    borderBottomWidth: 1,
-                    borderBottomColor: colors.border,
-                  }}
-                >
-                  <Text style={{ fontSize: 32, fontWeight: "bold", color: colors.text }}>
-                    Menu
-                  </Text>
-                  <Pressable
-                    onPress={() => setShowMenu(false)}
+            <LinearGradient
+              colors={["#0A0A0F", "#1A1A24", "#2A1A34"]}
+              style={{ flex: 1 }}
+            >
+              <SafeAreaView style={{ flex: 1 }} edges={["top", "bottom"]}>
+                <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 20 }}>
+                  {/* Header with 3D Glass Effect */}
+                  <View
                     style={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: 20,
-                      backgroundColor: colors.surface,
+                      paddingHorizontal: 20,
+                      paddingVertical: 20,
+                      flexDirection: "row",
+                      justifyContent: "space-between",
                       alignItems: "center",
-                      justifyContent: "center",
+                      borderBottomWidth: 1,
+                      borderBottomColor: "rgba(126, 63, 228, 0.2)",
                     }}
                   >
-                    <X size={24} color={colors.text} />
-                  </Pressable>
-                </View>
+                    <Text style={{ fontSize: 32, fontWeight: "bold", color: "white" }}>
+                      Menu
+                    </Text>
+                    <Pressable
+                      onPress={() => setShowMenu(false)}
+                      style={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: 20,
+                        backgroundColor: "rgba(255, 255, 255, 0.1)",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        borderWidth: 1,
+                        borderColor: "rgba(255, 255, 255, 0.2)",
+                      }}
+                    >
+                      <X size={24} color="white" />
+                    </Pressable>
+                  </View>
 
-                {/* User Profile Section */}
-                <View
-                  style={{
-                    marginHorizontal: 20,
-                    marginTop: 20,
-                    padding: 20,
-                    backgroundColor: colors.card,
-                    borderRadius: 16,
-                    borderWidth: 1,
-                    borderColor: colors.border,
-                    shadowColor: colors.shadow,
-                    shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.1,
-                    shadowRadius: 4,
-                    elevation: 2,
-                  }}
-                >
-                  <View style={{ flexDirection: "row", alignItems: "center", gap: 16 }}>
-                    {profileData?.avatar ? (
-                      <Image
-                        source={{ uri: profileData.avatar }}
-                        style={{
-                          width: 64,
-                          height: 64,
-                          borderRadius: 32,
-                        }}
-                        resizeMode="cover"
-                      />
-                    ) : (
-                      <LinearGradient
-                        colors={["#FF6B35", "#FF8C61"]}
-                        style={{
-                          width: 64,
-                          height: 64,
-                          borderRadius: 32,
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
-                      >
-                        <User size={32} color="#fff" />
-                      </LinearGradient>
-                    )}
-                    <View style={{ flex: 1 }}>
-                      <Text style={{ fontSize: 20, fontWeight: "bold", color: colors.text, marginBottom: 4 }}>
-                        {sessionData?.user?.name || "Quest Warrior"}
-                      </Text>
-                      <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-                        <View
+                  {/* User Profile Section with 3D Glass Morphism */}
+                  <View
+                    style={{
+                      marginHorizontal: 20,
+                      marginTop: 20,
+                      padding: 20,
+                      backgroundColor: "rgba(255, 255, 255, 0.05)",
+                      borderRadius: 20,
+                      borderWidth: 2,
+                      borderColor: "rgba(126, 63, 228, 0.4)",
+                      shadowColor: "#7E3FE4",
+                      shadowOffset: { width: 0, height: 4 },
+                      shadowOpacity: 0.3,
+                      shadowRadius: 8,
+                      elevation: 6,
+                    }}
+                  >
+                    <View style={{ flexDirection: "row", alignItems: "center", gap: 16 }}>
+                      {profileData?.avatar ? (
+                        <Image
+                          source={{ uri: profileData.avatar }}
                           style={{
-                            backgroundColor: colors.primary + "20",
-                            paddingHorizontal: 12,
-                            paddingVertical: 4,
-                            borderRadius: 12,
+                            width: 64,
+                            height: 64,
+                            borderRadius: 32,
                           }}
-                        >
-                          <Text style={{ fontSize: 13, fontWeight: "600", color: colors.primary }}>
-                            Level {Math.floor((statsData?.totalXP || 0) / 100) + 1}
-                          </Text>
-                        </View>
-                        <View
+                          resizeMode="cover"
+                        />
+                      ) : (
+                        <LinearGradient
+                          colors={["#FF6B35", "#FF8C61"]}
                           style={{
-                            backgroundColor: colors.warning + "20",
-                            paddingHorizontal: 12,
-                            paddingVertical: 4,
-                            borderRadius: 12,
-                            flexDirection: "row",
+                            width: 64,
+                            height: 64,
+                            borderRadius: 32,
                             alignItems: "center",
-                            gap: 4,
+                            justifyContent: "center",
                           }}
                         >
-                          <Flame size={14} color={colors.warning} />
-                          <Text style={{ fontSize: 13, fontWeight: "600", color: colors.warning }}>
-                            {statsData?.currentStreak || 0}
-                          </Text>
+                          <User size={32} color="#fff" />
+                        </LinearGradient>
+                      )}
+                      <View style={{ flex: 1 }}>
+                        <Text style={{ fontSize: 20, fontWeight: "bold", color: "white", marginBottom: 4 }}>
+                          {sessionData?.user?.name || "Quest Warrior"}
+                        </Text>
+                        <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                          <View
+                            style={{
+                              backgroundColor: "rgba(126, 63, 228, 0.3)",
+                              paddingHorizontal: 12,
+                              paddingVertical: 4,
+                              borderRadius: 12,
+                              borderWidth: 1,
+                              borderColor: "rgba(126, 63, 228, 0.5)",
+                            }}
+                          >
+                            <Text style={{ fontSize: 13, fontWeight: "600", color: "#7E3FE4" }}>
+                              Level {Math.floor((statsData?.totalXP || 0) / 100) + 1}
+                            </Text>
+                          </View>
+                          <View
+                            style={{
+                              backgroundColor: "rgba(255, 215, 0, 0.3)",
+                              paddingHorizontal: 12,
+                              paddingVertical: 4,
+                              borderRadius: 12,
+                              flexDirection: "row",
+                              alignItems: "center",
+                              gap: 4,
+                              borderWidth: 1,
+                              borderColor: "rgba(255, 215, 0, 0.5)",
+                            }}
+                          >
+                            <Flame size={14} color="#FFD700" />
+                            <Text style={{ fontSize: 13, fontWeight: "600", color: "#FFD700" }}>
+                              {statsData?.currentStreak || 0}
+                            </Text>
+                          </View>
                         </View>
                       </View>
                     </View>
                   </View>
-                </View>
 
-                {/* PROFILE Section */}
-                <View style={{ paddingHorizontal: 20, paddingTop: 24, paddingBottom: 12 }}>
-                  <Text style={{ fontSize: 13, fontWeight: "700", color: colors.textSecondary, letterSpacing: 1 }}>
-                    PROFILE
-                  </Text>
-                </View>
+                  {/* PROFILE Section */}
+                  <View style={{ paddingHorizontal: 20, paddingTop: 24, paddingBottom: 12 }}>
+                    <Text style={{ fontSize: 13, fontWeight: "700", color: "rgba(255, 255, 255, 0.6)", letterSpacing: 1 }}>
+                      PROFILE
+                    </Text>
+                  </View>
 
-                <View style={{ gap: 8, paddingHorizontal: 20 }}>
-                  {/* Profile & Settings */}
-                  <Pressable
-                    onPress={() => {
-                      setShowMenu(false);
-                      navigation.navigate("ProfileTab");
-                    }}
-                    style={{
-                      backgroundColor: colors.card,
-                      borderRadius: 12,
-                      padding: 16,
-                      flexDirection: "row",
-                      alignItems: "center",
-                      borderWidth: 1,
-                      borderColor: colors.border,
-                    }}
-                  >
-                    <View
+                  <View style={{ gap: 12, paddingHorizontal: 20 }}>
+                    {/* Profile */}
+                    <Pressable
+                      onPress={() => {
+                        setShowMenu(false);
+                        navigation.navigate("ProfileTab");
+                      }}
                       style={{
-                        width: 40,
-                        height: 40,
-                        borderRadius: 20,
-                        backgroundColor: colors.surface,
+                        backgroundColor: "rgba(255, 255, 255, 0.05)",
+                        borderRadius: 16,
+                        padding: 16,
+                        flexDirection: "row",
                         alignItems: "center",
-                        justifyContent: "center",
-                        marginRight: 12,
+                        borderWidth: 1,
+                        borderColor: "rgba(255, 107, 53, 0.3)",
+                        shadowColor: "#FF6B35",
+                        shadowOffset: { width: 0, height: 2 },
+                        shadowOpacity: 0.2,
+                        shadowRadius: 4,
+                        elevation: 3,
                       }}
                     >
-                      <User size={20} color={colors.primary} />
-                    </View>
-                    <Text style={{ fontSize: 16, color: colors.text, fontWeight: "600", flex: 1 }}>
-                      Profile & Settings
-                    </Text>
-                    <ChevronRight size={20} color={colors.textSecondary} />
-                  </Pressable>
+                      <View
+                        style={{
+                          width: 48,
+                          height: 48,
+                          borderRadius: 24,
+                          backgroundColor: "rgba(255, 107, 53, 0.2)",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          marginRight: 16,
+                          borderWidth: 2,
+                          borderColor: "rgba(255, 107, 53, 0.4)",
+                        }}
+                      >
+                        <User size={24} color="#FF6B35" />
+                      </View>
+                      <Text style={{ fontSize: 16, color: "white", fontWeight: "600", flex: 1 }}>
+                        Profile
+                      </Text>
+                      <ChevronRight size={20} color="rgba(255, 255, 255, 0.5)" />
+                    </Pressable>
 
-                  {/* Settings */}
-                  <Pressable
-                    onPress={() => {
-                      setShowMenu(false);
-                      navigation.navigate("Settings");
-                    }}
-                    style={{
-                      backgroundColor: colors.card,
-                      borderRadius: 12,
-                      padding: 16,
-                      flexDirection: "row",
-                      alignItems: "center",
-                      borderWidth: 1,
-                      borderColor: colors.border,
-                    }}
-                  >
-                    <View
+                    {/* Settings */}
+                    <Pressable
+                      onPress={() => {
+                        setShowMenu(false);
+                        navigation.navigate("Settings");
+                      }}
                       style={{
-                        width: 40,
-                        height: 40,
-                        borderRadius: 20,
-                        backgroundColor: colors.surface,
+                        backgroundColor: "rgba(255, 255, 255, 0.05)",
+                        borderRadius: 16,
+                        padding: 16,
+                        flexDirection: "row",
                         alignItems: "center",
-                        justifyContent: "center",
-                        marginRight: 12,
+                        borderWidth: 1,
+                        borderColor: "rgba(0, 217, 255, 0.3)",
+                        shadowColor: "#00D9FF",
+                        shadowOffset: { width: 0, height: 2 },
+                        shadowOpacity: 0.2,
+                        shadowRadius: 4,
+                        elevation: 3,
                       }}
                     >
-                      <Settings size={20} color={colors.info} />
-                    </View>
-                    <Text style={{ fontSize: 16, color: colors.text, fontWeight: "600", flex: 1 }}>
-                      Settings
-                    </Text>
-                    <ChevronRight size={20} color={colors.textSecondary} />
-                  </Pressable>
+                      <View
+                        style={{
+                          width: 48,
+                          height: 48,
+                          borderRadius: 24,
+                          backgroundColor: "rgba(0, 217, 255, 0.2)",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          marginRight: 16,
+                          borderWidth: 2,
+                          borderColor: "rgba(0, 217, 255, 0.4)",
+                        }}
+                      >
+                        <Settings size={24} color="#00D9FF" />
+                      </View>
+                      <Text style={{ fontSize: 16, color: "white", fontWeight: "600", flex: 1 }}>
+                        Settings
+                      </Text>
+                      <ChevronRight size={20} color="rgba(255, 255, 255, 0.5)" />
+                    </Pressable>
 
-                  {/* Help & Support */}
-                  <Pressable
-                    onPress={() => setShowMenu(false)}
-                    style={{
-                      backgroundColor: colors.card,
-                      borderRadius: 12,
-                      padding: 16,
-                      flexDirection: "row",
-                      alignItems: "center",
-                      borderWidth: 1,
-                      borderColor: colors.border,
-                    }}
-                  >
-                    <View
+                    {/* Invite Warriors */}
+                    <Pressable
+                      onPress={() => {
+                        setShowMenu(false);
+                        // TODO: Navigate to Invite Warriors screen
+                      }}
                       style={{
-                        width: 40,
-                        height: 40,
-                        borderRadius: 20,
-                        backgroundColor: colors.surface,
+                        backgroundColor: "rgba(255, 255, 255, 0.05)",
+                        borderRadius: 16,
+                        padding: 16,
+                        flexDirection: "row",
                         alignItems: "center",
-                        justifyContent: "center",
-                        marginRight: 12,
+                        borderWidth: 1,
+                        borderColor: "rgba(255, 215, 0, 0.3)",
+                        shadowColor: "#FFD700",
+                        shadowOffset: { width: 0, height: 2 },
+                        shadowOpacity: 0.2,
+                        shadowRadius: 4,
+                        elevation: 3,
                       }}
                     >
-                      <HelpCircle size={20} color={colors.success} />
-                    </View>
-                    <Text style={{ fontSize: 16, color: colors.text, fontWeight: "600", flex: 1 }}>
-                      Help & Support
-                    </Text>
-                    <ChevronRight size={20} color={colors.textSecondary} />
-                  </Pressable>
+                      <View
+                        style={{
+                          width: 48,
+                          height: 48,
+                          borderRadius: 24,
+                          backgroundColor: "rgba(255, 215, 0, 0.2)",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          marginRight: 16,
+                          borderWidth: 2,
+                          borderColor: "rgba(255, 215, 0, 0.4)",
+                        }}
+                      >
+                        <UserPlus size={24} color="#FFD700" />
+                      </View>
+                      <Text style={{ fontSize: 16, color: "white", fontWeight: "600", flex: 1 }}>
+                        Invite Warriors
+                      </Text>
+                      <ChevronRight size={20} color="rgba(255, 255, 255, 0.5)" />
+                    </Pressable>
+                  </View>
 
-                  {/* Invite Warriors */}
-                  <Pressable
-                    onPress={() => setShowMenu(false)}
-                    style={{
-                      backgroundColor: colors.card,
-                      borderRadius: 12,
-                      padding: 16,
-                      flexDirection: "row",
-                      alignItems: "center",
-                      borderWidth: 1,
-                      borderColor: colors.border,
-                    }}
-                  >
-                    <View
+                  {/* ADVENTURE Section */}
+                  <View style={{ paddingHorizontal: 20, paddingTop: 24, paddingBottom: 12 }}>
+                    <Text style={{ fontSize: 13, fontWeight: "700", color: "rgba(255, 255, 255, 0.6)", letterSpacing: 1 }}>
+                      ADVENTURE
+                    </Text>
+                  </View>
+
+                  <View style={{ gap: 12, paddingHorizontal: 20 }}>
+                    {/* Quest Calendar */}
+                    <Pressable
+                      onPress={() => {
+                        setShowMenu(false);
+                        navigation.navigate("QuestCalendar");
+                      }}
                       style={{
-                        width: 40,
-                        height: 40,
-                        borderRadius: 20,
-                        backgroundColor: colors.surface,
+                        backgroundColor: "rgba(255, 255, 255, 0.05)",
+                        borderRadius: 16,
+                        padding: 16,
+                        flexDirection: "row",
                         alignItems: "center",
-                        justifyContent: "center",
-                        marginRight: 12,
+                        borderWidth: 1,
+                        borderColor: "rgba(126, 63, 228, 0.3)",
+                        shadowColor: "#7E3FE4",
+                        shadowOffset: { width: 0, height: 2 },
+                        shadowOpacity: 0.2,
+                        shadowRadius: 4,
+                        elevation: 3,
                       }}
                     >
-                      <UserPlus size={20} color={colors.warning} />
-                    </View>
-                    <Text style={{ fontSize: 16, color: colors.text, fontWeight: "600", flex: 1 }}>
-                      Invite Warriors
-                    </Text>
-                    <ChevronRight size={20} color={colors.textSecondary} />
-                  </Pressable>
-                </View>
+                      <View
+                        style={{
+                          width: 48,
+                          height: 48,
+                          borderRadius: 24,
+                          backgroundColor: "rgba(126, 63, 228, 0.2)",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          marginRight: 16,
+                          borderWidth: 2,
+                          borderColor: "rgba(126, 63, 228, 0.4)",
+                        }}
+                      >
+                        <Calendar size={24} color="#7E3FE4" />
+                      </View>
+                      <Text style={{ fontSize: 16, color: "white", fontWeight: "600", flex: 1 }}>
+                        Quest Calendar
+                      </Text>
+                      <ChevronRight size={20} color="rgba(255, 255, 255, 0.5)" />
+                    </Pressable>
 
-                {/* ADVENTURE Section */}
-                <View style={{ paddingHorizontal: 20, paddingTop: 24, paddingBottom: 12 }}>
-                  <Text style={{ fontSize: 13, fontWeight: "700", color: colors.textSecondary, letterSpacing: 1 }}>
-                    ADVENTURE
-                  </Text>
-                </View>
-
-                <View style={{ gap: 8, paddingHorizontal: 20 }}>
-                  {/* Quest Calendar */}
-                  <Pressable
-                    onPress={() => setShowMenu(false)}
-                    style={{
-                      backgroundColor: colors.card,
-                      borderRadius: 12,
-                      padding: 16,
-                      flexDirection: "row",
-                      alignItems: "center",
-                      borderWidth: 1,
-                      borderColor: colors.border,
-                    }}
-                  >
-                    <View
+                    {/* Leaderboard */}
+                    <Pressable
+                      onPress={() => {
+                        setShowMenu(false);
+                        navigation.navigate("GrowthAchievements");
+                      }}
                       style={{
-                        width: 40,
-                        height: 40,
-                        borderRadius: 20,
-                        backgroundColor: colors.surface,
+                        backgroundColor: "rgba(255, 255, 255, 0.05)",
+                        borderRadius: 16,
+                        padding: 16,
+                        flexDirection: "row",
                         alignItems: "center",
-                        justifyContent: "center",
-                        marginRight: 12,
+                        borderWidth: 1,
+                        borderColor: "rgba(255, 215, 0, 0.3)",
+                        shadowColor: "#FFD700",
+                        shadowOffset: { width: 0, height: 2 },
+                        shadowOpacity: 0.2,
+                        shadowRadius: 4,
+                        elevation: 3,
                       }}
                     >
-                      <Calendar size={20} color={colors.primary} />
-                    </View>
-                    <Text style={{ fontSize: 16, color: colors.text, fontWeight: "600", flex: 1 }}>
-                      Quest Calendar
-                    </Text>
-                    <ChevronRight size={20} color={colors.textSecondary} />
-                  </Pressable>
+                      <View
+                        style={{
+                          width: 48,
+                          height: 48,
+                          borderRadius: 24,
+                          backgroundColor: "rgba(255, 215, 0, 0.2)",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          marginRight: 16,
+                          borderWidth: 2,
+                          borderColor: "rgba(255, 215, 0, 0.4)",
+                        }}
+                      >
+                        <Trophy size={24} color="#FFD700" />
+                      </View>
+                      <Text style={{ fontSize: 16, color: "white", fontWeight: "600", flex: 1 }}>
+                        Leaderboard
+                      </Text>
+                      <ChevronRight size={20} color="rgba(255, 255, 255, 0.5)" />
+                    </Pressable>
 
-                  {/* Past Quests */}
-                  <Pressable
-                    onPress={() => setShowMenu(false)}
-                    style={{
-                      backgroundColor: colors.card,
-                      borderRadius: 12,
-                      padding: 16,
-                      flexDirection: "row",
-                      alignItems: "center",
-                      borderWidth: 1,
-                      borderColor: colors.border,
-                    }}
-                  >
-                    <View
+                    {/* Explore World */}
+                    <Pressable
+                      onPress={() => {
+                        setShowMenu(false);
+                        navigation.navigate("MapTab");
+                      }}
                       style={{
-                        width: 40,
-                        height: 40,
-                        borderRadius: 20,
-                        backgroundColor: colors.surface,
+                        backgroundColor: "rgba(255, 255, 255, 0.05)",
+                        borderRadius: 16,
+                        padding: 16,
+                        flexDirection: "row",
                         alignItems: "center",
-                        justifyContent: "center",
-                        marginRight: 12,
+                        borderWidth: 1,
+                        borderColor: "rgba(0, 217, 255, 0.3)",
+                        shadowColor: "#00D9FF",
+                        shadowOffset: { width: 0, height: 2 },
+                        shadowOpacity: 0.2,
+                        shadowRadius: 4,
+                        elevation: 3,
                       }}
                     >
-                      <FileText size={20} color={colors.info} />
-                    </View>
-                    <Text style={{ fontSize: 16, color: colors.text, fontWeight: "600", flex: 1 }}>
-                      Past Quests
-                    </Text>
-                    <ChevronRight size={20} color={colors.textSecondary} />
-                  </Pressable>
+                      <View
+                        style={{
+                          width: 48,
+                          height: 48,
+                          borderRadius: 24,
+                          backgroundColor: "rgba(0, 217, 255, 0.2)",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          marginRight: 16,
+                          borderWidth: 2,
+                          borderColor: "rgba(0, 217, 255, 0.4)",
+                        }}
+                      >
+                        <Globe size={24} color="#00D9FF" />
+                      </View>
+                      <Text style={{ fontSize: 16, color: "white", fontWeight: "600", flex: 1 }}>
+                        Explore World
+                      </Text>
+                      <ChevronRight size={20} color="rgba(255, 255, 255, 0.5)" />
+                    </Pressable>
 
-                  {/* Leaderboard */}
-                  <Pressable
-                    onPress={() => setShowMenu(false)}
-                    style={{
-                      backgroundColor: colors.card,
-                      borderRadius: 12,
-                      padding: 16,
-                      flexDirection: "row",
-                      alignItems: "center",
-                      borderWidth: 1,
-                      borderColor: colors.border,
-                    }}
-                  >
-                    <View
+                    {/* Manage Categories */}
+                    <Pressable
+                      onPress={() => {
+                        setShowMenu(false);
+                        // TODO: Navigate to Manage Categories screen
+                      }}
                       style={{
-                        width: 40,
-                        height: 40,
-                        borderRadius: 20,
-                        backgroundColor: colors.surface,
+                        backgroundColor: "rgba(255, 255, 255, 0.05)",
+                        borderRadius: 16,
+                        padding: 16,
+                        flexDirection: "row",
                         alignItems: "center",
-                        justifyContent: "center",
-                        marginRight: 12,
+                        borderWidth: 1,
+                        borderColor: "rgba(255, 107, 53, 0.3)",
+                        shadowColor: "#FF6B35",
+                        shadowOffset: { width: 0, height: 2 },
+                        shadowOpacity: 0.2,
+                        shadowRadius: 4,
+                        elevation: 3,
                       }}
                     >
-                      <Trophy size={20} color={colors.warning} />
-                    </View>
-                    <Text style={{ fontSize: 16, color: colors.text, fontWeight: "600", flex: 1 }}>
-                      Leaderboard
-                    </Text>
-                    <ChevronRight size={20} color={colors.textSecondary} />
-                  </Pressable>
+                      <View
+                        style={{
+                          width: 48,
+                          height: 48,
+                          borderRadius: 24,
+                          backgroundColor: "rgba(255, 107, 53, 0.2)",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          marginRight: 16,
+                          borderWidth: 2,
+                          borderColor: "rgba(255, 107, 53, 0.4)",
+                        }}
+                      >
+                        <FolderOpen size={24} color="#FF6B35" />
+                      </View>
+                      <Text style={{ fontSize: 16, color: "white", fontWeight: "600", flex: 1 }}>
+                        Manage Categories
+                      </Text>
+                      <ChevronRight size={20} color="rgba(255, 255, 255, 0.5)" />
+                    </Pressable>
+                  </View>
 
-                  {/* Growth & Achievements */}
-                  <Pressable
-                    onPress={() => setShowMenu(false)}
-                    style={{
-                      backgroundColor: colors.card,
-                      borderRadius: 12,
-                      padding: 16,
-                      flexDirection: "row",
-                      alignItems: "center",
-                      borderWidth: 1,
-                      borderColor: colors.border,
-                    }}
-                  >
-                    <View
+                  {/* COMMUNITY Section */}
+                  <View style={{ paddingHorizontal: 20, paddingTop: 24, paddingBottom: 12 }}>
+                    <Text style={{ fontSize: 13, fontWeight: "700", color: "rgba(255, 255, 255, 0.6)", letterSpacing: 1 }}>
+                      COMMUNITY
+                    </Text>
+                  </View>
+
+                  <View style={{ gap: 12, paddingHorizontal: 20 }}>
+                    {/* Friends */}
+                    <Pressable
+                      onPress={() => {
+                        setShowMenu(false);
+                        navigation.navigate("Friends");
+                      }}
                       style={{
-                        width: 40,
-                        height: 40,
-                        borderRadius: 20,
-                        backgroundColor: colors.surface,
+                        backgroundColor: "rgba(255, 255, 255, 0.05)",
+                        borderRadius: 16,
+                        padding: 16,
+                        flexDirection: "row",
                         alignItems: "center",
-                        justifyContent: "center",
-                        marginRight: 12,
+                        borderWidth: 1,
+                        borderColor: "rgba(126, 63, 228, 0.3)",
+                        shadowColor: "#7E3FE4",
+                        shadowOffset: { width: 0, height: 2 },
+                        shadowOpacity: 0.2,
+                        shadowRadius: 4,
+                        elevation: 3,
                       }}
                     >
-                      <TrendingUp size={20} color={colors.success} />
-                    </View>
-                    <Text style={{ fontSize: 16, color: colors.text, fontWeight: "600", flex: 1 }}>
-                      Growth & Achievements
-                    </Text>
-                    <ChevronRight size={20} color={colors.textSecondary} />
-                  </Pressable>
-                </View>
+                      <View
+                        style={{
+                          width: 48,
+                          height: 48,
+                          borderRadius: 24,
+                          backgroundColor: "rgba(126, 63, 228, 0.2)",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          marginRight: 16,
+                          borderWidth: 2,
+                          borderColor: "rgba(126, 63, 228, 0.4)",
+                        }}
+                      >
+                        <Users size={24} color="#7E3FE4" />
+                      </View>
+                      <Text style={{ fontSize: 16, color: "white", fontWeight: "600", flex: 1 }}>
+                        Friends
+                      </Text>
+                      <ChevronRight size={20} color="rgba(255, 255, 255, 0.5)" />
+                    </Pressable>
+                  </View>
 
-                {/* COMMUNITY Section */}
-                <View style={{ paddingHorizontal: 20, paddingTop: 24, paddingBottom: 12 }}>
-                  <Text style={{ fontSize: 13, fontWeight: "700", color: colors.textSecondary, letterSpacing: 1 }}>
-                    COMMUNITY
-                  </Text>
-                </View>
-
-                <View style={{ gap: 8, paddingHorizontal: 20 }}>
-                  {/* Groups */}
-                  <Pressable
-                    onPress={() => {
-                      setShowMenu(false);
-                      navigation.navigate("SwipeTab");
-                    }}
-                    style={{
-                      backgroundColor: colors.card,
-                      borderRadius: 12,
-                      padding: 16,
-                      flexDirection: "row",
-                      alignItems: "center",
-                      borderWidth: 1,
-                      borderColor: colors.border,
-                    }}
-                  >
-                    <View
+                  {/* Logout */}
+                  <View style={{ paddingHorizontal: 20, paddingTop: 32, paddingBottom: 20 }}>
+                    <Pressable
+                      onPress={handleLogout}
                       style={{
-                        width: 40,
-                        height: 40,
-                        borderRadius: 20,
-                        backgroundColor: colors.surface,
+                        backgroundColor: "rgba(255, 59, 48, 0.1)",
+                        borderRadius: 16,
+                        padding: 16,
+                        flexDirection: "row",
                         alignItems: "center",
                         justifyContent: "center",
-                        marginRight: 12,
+                        borderWidth: 1,
+                        borderColor: "rgba(255, 59, 48, 0.3)",
                       }}
                     >
-                      <Users size={20} color={colors.primary} />
-                    </View>
-                    <Text style={{ fontSize: 16, color: colors.text, fontWeight: "600", flex: 1 }}>
-                      Groups
-                    </Text>
-                    <ChevronRight size={20} color={colors.textSecondary} />
-                  </Pressable>
-
-                  {/* Manage Categories */}
-                  <Pressable
-                    onPress={() => setShowMenu(false)}
-                    style={{
-                      backgroundColor: colors.card,
-                      borderRadius: 12,
-                      padding: 16,
-                      flexDirection: "row",
-                      alignItems: "center",
-                      borderWidth: 1,
-                      borderColor: colors.border,
-                    }}
-                  >
-                    <View
-                      style={{
-                        width: 40,
-                        height: 40,
-                        borderRadius: 20,
-                        backgroundColor: colors.surface,
-                        alignItems: "center",
-                        justifyContent: "center",
-                        marginRight: 12,
-                      }}
-                    >
-                      <FolderOpen size={20} color={colors.info} />
-                    </View>
-                    <Text style={{ fontSize: 16, color: colors.text, fontWeight: "600", flex: 1 }}>
-                      Manage Categories
-                    </Text>
-                    <ChevronRight size={20} color={colors.textSecondary} />
-                  </Pressable>
-
-                  {/* Explore World */}
-                  <Pressable
-                    onPress={() => setShowMenu(false)}
-                    style={{
-                      backgroundColor: colors.card,
-                      borderRadius: 12,
-                      padding: 16,
-                      flexDirection: "row",
-                      alignItems: "center",
-                      borderWidth: 1,
-                      borderColor: colors.border,
-                    }}
-                  >
-                    <View
-                      style={{
-                        width: 40,
-                        height: 40,
-                        borderRadius: 20,
-                        backgroundColor: colors.surface,
-                        alignItems: "center",
-                        justifyContent: "center",
-                        marginRight: 12,
-                      }}
-                    >
-                      <Globe size={20} color={colors.success} />
-                    </View>
-                    <Text style={{ fontSize: 16, color: colors.text, fontWeight: "600", flex: 1 }}>
-                      Explore World
-                    </Text>
-                    <ChevronRight size={20} color={colors.textSecondary} />
-                  </Pressable>
-                </View>
-
-                {/* Log out */}
-                <View style={{ paddingHorizontal: 20, marginTop: 24 }}>
-                  <Pressable
-                    onPress={async () => {
-                      setShowMenu(false);
-                      await authClient.signOut();
-                    }}
-                    style={{
-                      backgroundColor: colors.card,
-                      borderRadius: 12,
-                      padding: 16,
-                      flexDirection: "row",
-                      alignItems: "center",
-                      borderWidth: 2,
-                      borderColor: colors.error,
-                    }}
-                  >
-                    <View
-                      style={{
-                        width: 40,
-                        height: 40,
-                        borderRadius: 20,
-                        backgroundColor: colors.error + "20",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        marginRight: 12,
-                      }}
-                    >
-                      <LogOut size={20} color={colors.error} />
-                    </View>
-                    <Text style={{ fontSize: 16, color: colors.error, fontWeight: "700", flex: 1 }}>
-                      Log out
-                    </Text>
-                  </Pressable>
-                </View>
-
-                {/* Version */}
-                <View style={{ paddingHorizontal: 20, paddingVertical: 20, alignItems: "center" }}>
-                  <Text style={{ fontSize: 12, color: colors.textSecondary, fontWeight: "500" }}>
-                    Version 1.0.0
-                  </Text>
-                </View>
-              </ScrollView>
-            </SafeAreaView>
+                      <LogOut size={20} color="#FF3B30" />
+                      <Text style={{ fontSize: 16, color: "#FF3B30", fontWeight: "600", marginLeft: 12 }}>
+                        Sign Out
+                      </Text>
+                    </Pressable>
+                  </View>
+                </ScrollView>
+              </SafeAreaView>
+            </LinearGradient>
           </View>
         </View>
       </Modal>
-
       {/* Settings Modal */}
       {showSettings && (
         <Modal

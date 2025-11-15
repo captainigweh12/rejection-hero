@@ -24,6 +24,7 @@ export type RootStackParamList = {
   Friends: undefined;
   SendQuestToFriend: { friendId: string; friendName: string };
   Notifications: undefined;
+  QuestCalendar: undefined;
 };
 
 export type BottomTabParamList = {
