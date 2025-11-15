@@ -3,7 +3,7 @@ import { View, Text, Pressable, ActivityIndicator, TextInput, ScrollView, Alert,
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Sparkles, X, ChevronLeft, Star, ThumbsDown } from "lucide-react-native";
+import { Sparkles, X, ChevronLeft, Star, ThumbsDown, Users, Send } from "lucide-react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "@/navigation/types";
 import { api } from "@/lib/api";
@@ -308,6 +308,66 @@ export default function CreateQuestScreen({ navigation }: Props) {
                   </Text>
                 </Pressable>
               </View>
+            </View>
+
+            {/* Send Quest to Friends Card */}
+            <View style={{ paddingHorizontal: 24, marginTop: 24 }}>
+              <Pressable
+                onPress={() => {
+                  // Navigate to community/friends screen where they can share quests
+                  Alert.alert(
+                    "Send Quest to Friends",
+                    "Go to the Community tab to share quests with your friends!",
+                    [
+                      { text: "Cancel", style: "cancel" },
+                      {
+                        text: "Go to Community",
+                        onPress: () => {
+                          navigation.goBack();
+                          // @ts-ignore - Navigate to community tab
+                          navigation.navigate("Tabs", { screen: "MatchesTab" });
+                        },
+                      },
+                    ]
+                  );
+                }}
+                style={{
+                  backgroundColor: "white",
+                  borderRadius: 20,
+                  padding: 24,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 20,
+                  shadowColor: "#000",
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.1,
+                  shadowRadius: 8,
+                  elevation: 4,
+                  borderWidth: 2,
+                  borderColor: "#00D9FF",
+                }}
+              >
+                <View
+                  style={{
+                    width: 60,
+                    height: 60,
+                    borderRadius: 30,
+                    backgroundColor: "#00D9FF",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Send size={28} color="white" />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontSize: 22, fontWeight: "bold", color: "#1C1C1E", marginBottom: 4 }}>
+                    Send Quest to Friends
+                  </Text>
+                  <Text style={{ fontSize: 14, color: "#666" }}>
+                    Share your active quests with friends
+                  </Text>
+                </View>
+              </Pressable>
             </View>
           </ScrollView>
         </SafeAreaView>
