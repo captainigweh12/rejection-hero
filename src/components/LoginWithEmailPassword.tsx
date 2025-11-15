@@ -1,18 +1,47 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Alert, Pressable, Text, TextInput, View, ActivityIndicator } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import * as WebBrowser from "expo-web-browser";
+import { useNavigation } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import { authClient } from "@/lib/authClient";
 import { useSession } from "@/lib/useSession";
+import { api } from "@/lib/api";
+import type { RootStackParamList } from "@/navigation/types";
 
 export default function LoginWithEmailPassword() {
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { data: session } = useSession();
+
+  // Check onboarding status when user is logged in
+  useEffect(() => {
+    const checkOnboarding = async () => {
+      if (session?.user) {
+        try {
+          const response = await api.get("/api/profile");
+          const profile = response as { onboardingCompleted?: boolean };
+
+          if (!profile.onboardingCompleted) {
+            // Redirect to onboarding if not completed
+            navigation.replace("Onboarding");
+          } else {
+            // Redirect to main app if onboarding is completed
+            navigation.replace("Tabs");
+          }
+        } catch (error) {
+          console.error("Error checking onboarding status:", error);
+        }
+      }
+    };
+
+    checkOnboarding();
+  }, [session, navigation]);
 
   const handleSignIn = async () => {
     if (!email || !password) {
