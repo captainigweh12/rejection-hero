@@ -977,6 +977,17 @@ The app features a cohesive dark theme with modern 3D-style UI elements througho
 
 ## API Endpoints
 
+### GoHighLevel Integration ✨ NEW!
+- `POST /api/gohighlevel/sync-user` - Sync user data to GoHighLevel CRM
+- `POST /api/gohighlevel/send-welcome-email` - Send welcome email via GoHighLevel
+- `POST /api/gohighlevel/sync-stats` - Sync user stats (XP, streak, points) to GoHighLevel
+- `POST /api/gohighlevel/webhook` - Receive webhooks from GoHighLevel
+
+**Automatic Features:**
+- Welcome emails sent automatically when new users sign up
+- User data synced to GoHighLevel on account creation
+- Contact custom fields include: username, userId, totalXP, currentStreak, level
+
 ### Stats
 - `GET /api/stats` - Get user statistics (includes confidence, fear zones, completion rates)
 - `GET /api/stats/leaderboard` - Get leaderboard rankings
@@ -1111,6 +1122,12 @@ See `ENV_SETUP.md` for complete environment variable setup guide.
 
 6. **Perplexity AI (Optional)**
    - Add via ENV tab: `PERPLEXITY_API_KEY`
+
+7. **GoHighLevel API** ✅ CONFIGURED!
+   - API Key: `pit-ca134c24-5db3-47a0-9ea7-7292fdf2e7e6`
+   - Automatically syncs user data and sends welcome emails
+   - Updates contact information with user stats and progress
+   - Backend environment variable: `GOHIGHLEVEL_API_KEY`
 
 ### Test the App
 

@@ -10,6 +10,7 @@ import {
 import { type AppType } from "../types";
 import { db } from "../db";
 import { env } from "../env";
+import { syncNewUserToGoHighLevel } from "../services/gohighlevel";
 
 const profileRouter = new Hono<AppType>();
 
@@ -30,10 +31,12 @@ profileRouter.get("/", async (c) => {
   // Auto-create profile if it doesn't exist (for OAuth users)
   if (!profile) {
     console.log(`📝 Creating default profile for user ${user.id} (${user.email})`);
+    const displayName = user.name || user.email?.split("@")[0] || "User";
+
     profile = await db.profile.create({
       data: {
         userId: user.id,
-        displayName: user.name || user.email?.split("@")[0] || "User",
+        displayName: displayName,
         bio: null,
         age: null,
         photos: null,
@@ -48,6 +51,16 @@ profileRouter.get("/", async (c) => {
         userGoals: null,
         onboardingCompleted: false,
       },
+    });
+
+    // Sync new user to GoHighLevel and send welcome email
+    syncNewUserToGoHighLevel(
+      user.email,
+      displayName,
+      user.id,
+      profile.username || undefined
+    ).catch(err => {
+      console.error("⚠️ Failed to sync user to GoHighLevel (non-blocking):", err);
     });
   }
 
