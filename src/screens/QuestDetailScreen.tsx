@@ -1512,14 +1512,14 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                   }}
                 >
                   <LinearGradient
-                    colors={["#0EA5E9", "#0284C7"]}
+                    colors={["#7E3FE4", "#A78BFA"]}
                     style={{
                       width: 100,
                       height: 100,
                       borderRadius: 50,
                       alignItems: "center",
                       justifyContent: "center",
-                      shadowColor: "#0EA5E9",
+                      shadowColor: "#7E3FE4",
                       shadowOffset: { width: 0, height: 0 },
                       shadowOpacity: 0.6,
                       shadowRadius: 15,
@@ -1554,8 +1554,8 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                     alignItems: "center",
                     marginBottom: 24,
                     borderWidth: 2,
-                    borderColor: "rgba(14, 165, 233, 0.3)",
-                    shadowColor: "#0EA5E9",
+                    borderColor: "rgba(126, 63, 228, 0.3)",
+                    shadowColor: "#7E3FE4",
                     shadowOffset: { width: 0, height: 8 },
                     shadowOpacity: 0.4,
                     shadowRadius: 16,
@@ -1571,10 +1571,10 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                     ],
                   }}
                 >
-                  <Text style={{ fontSize: 72, fontWeight: "bold", color: "#0EA5E9" }}>
+                  <Text style={{ fontSize: 72, fontWeight: "bold", color: "#7E3FE4" }}>
                     #{leaderboardData?.currentUserRank || "-"}
                   </Text>
-                  <Text style={{ fontSize: 16, color: "#67E8F9", marginTop: 8 }}>
+                  <Text style={{ fontSize: 16, color: "#A78BFA", marginTop: 8 }}>
                     out of {leaderboardData?.totalUsers || 0} warriors
                   </Text>
                 </Animated.View>
@@ -1709,7 +1709,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                   }}
                 >
                   <LinearGradient
-                    colors={["#FF6B35", "#FF8C42"]}
+                    colors={["#FF6B35", "#FF8C61"]}
                     style={{
                       width: 140,
                       height: 140,
@@ -1753,10 +1753,10 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                     ],
                   }}
                 >
-                  <Text style={{ fontSize: 80, fontWeight: "bold", color: "#FF8C42" }}>
+                  <Text style={{ fontSize: 80, fontWeight: "bold", color: "#FF6B35" }}>
                     {statsData?.currentStreak || 1}
                   </Text>
-                  <Text style={{ fontSize: 24, color: "#FFB380", fontWeight: "600" }}>
+                  <Text style={{ fontSize: 24, color: "#FF8C61", fontWeight: "600" }}>
                     day streak
                   </Text>
                 </Animated.View>

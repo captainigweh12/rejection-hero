@@ -143,12 +143,12 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
   - Works even when you have active quests
 
 **Quest Completion Flow** ✨ ENHANCED! (3D Glassmorphism Design)
-- **Dark Gradient Background**: Beautiful gradient from #0A0A0F → #1A1A24 → #2A1A34 (replaces bright green)
-- **3D Glassmorphism Cards** 🎨 NEW!:
+- **Dark Gradient Background**: Beautiful gradient from #0A0A0F → #1A1A24 → #2A1A34 (consistent with app theme)
+- **3D Glassmorphism Cards** 🎨 UPDATED!:
   - Semi-transparent backgrounds: rgba(255, 255, 255, 0.05)
-  - Colored borders with glow effects
+  - Colored borders with purple/orange glow effects matching theme
   - Enhanced shadow effects for depth
-  - Premium dark theme matching the homepage
+  - Premium dark theme matching the homepage and profile
 - **Loading screen**: 2-second loading animation with pulsing trophy
 - **Smooth animations** 🎨:
   - Floating confetti particles with random colors, sizes, and rotation
@@ -163,12 +163,16 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
     - Gradient stat cards for XP and Points earned (gold/orange theme)
     - Glassmorphism cards for Total XP and Total Points (purple/cyan theme)
     - Semi-transparent with colored borders and glow effects
-  - **Page 2 - Leaderboard**: Shows your rank and top 5 warriors with their XP
-    - 3D glassmorphism rank card with blue glow
+  - **Page 2 - Leaderboard** 🎨 UPDATED!: Purple theme matching app design
+    - Purple gradient trophy icon (#7E3FE4 → #A78BFA)
+    - 3D glassmorphism rank card with purple glow
     - Dark themed list with white text
     - Current user highlighted with orange accent
-  - **Page 3 - Streak**: Large streak display with fire icon
-    - 3D glassmorphism card with orange/red border glow
+    - Consistent color scheme with app theme
+  - **Page 3 - Streak** 🎨 UPDATED!: Orange/coral theme for fire aesthetic
+    - Orange gradient flame icon (#FF6B35 → #FF8C61)
+    - 3D glassmorphism card with orange border glow
+    - Orange text colors (#FF6B35, #FF8C61) matching the flame theme
     - Enhanced loading state for next quest generation
 - **Auto-generation**: Automatically creates next harder quest when you tap on streak page
 - Progressive difficulty: EASY → MEDIUM → HARD → EXPERT
@@ -497,7 +501,7 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 **Profile & Settings** ✨ FULLY REDESIGNED!
 
 **Gaming-Style Profile Page** 🎮 ENHANCED!
-- **Hero Header with Uniform Gradient** 🎨 FIXED!: Smooth purple gradient banner without color splits
+- **Modern Dark Gradient Background** 🎨 UPDATED!: Consistent dark theme (#0A0A0F → #1A1A24 → #2A1A34) matching HomeScreen
 - **Glowing Avatar** ✨:
   - Large 140x140px avatar with white border
   - Golden (#FFD700) shadow glow effect for gaming aesthetic
