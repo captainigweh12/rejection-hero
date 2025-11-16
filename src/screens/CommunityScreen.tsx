@@ -274,83 +274,6 @@ export default function CommunityScreen({ navigation }: Props) {
           <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
             <Text style={{ fontSize: 32, fontWeight: "bold", color: "white" }}>Community</Text>
             <View style={{ flexDirection: "row", gap: 12 }}>
-              {/* Friends Badge */}
-              <Pressable
-                onPress={() => setActiveTab("friends")}
-                style={{
-                  paddingHorizontal: 12,
-                  paddingVertical: 6,
-                  borderRadius: 20,
-                  backgroundColor: activeTab === "friends" ? "#7E3FE4" : "rgba(255, 255, 255, 0.05)",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 6,
-                  borderWidth: 1,
-                  borderColor: activeTab === "friends" ? "#7E3FE4" : "rgba(126, 63, 228, 0.2)",
-                }}
-              >
-                <Users size={16} color={activeTab === "friends" ? "white" : "#888"} strokeWidth={2.5} />
-                <Text style={{ color: activeTab === "friends" ? "white" : "#888", fontSize: 13, fontWeight: "600" }}>
-                  {friends.length}
-                </Text>
-              </Pressable>
-
-              {/* Messages Badge */}
-              <Pressable
-                onPress={() => setActiveTab("messages")}
-                style={{
-                  paddingHorizontal: 12,
-                  paddingVertical: 6,
-                  borderRadius: 20,
-                  backgroundColor: activeTab === "messages" ? "#00D9FF" : "rgba(255, 255, 255, 0.05)",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 6,
-                  borderWidth: 1,
-                  borderColor: activeTab === "messages" ? "#00D9FF" : "rgba(126, 63, 228, 0.2)",
-                  position: "relative",
-                }}
-              >
-                <MessageCircle size={16} color={activeTab === "messages" ? "white" : "#888"} strokeWidth={2.5} />
-                <Text style={{ color: activeTab === "messages" ? "white" : "#888", fontSize: 13, fontWeight: "600" }}>
-                  {conversations.length}
-                </Text>
-                {conversations.some(c => c.unreadCount > 0) && (
-                  <View
-                    style={{
-                      position: "absolute",
-                      top: -4,
-                      right: -4,
-                      width: 12,
-                      height: 12,
-                      borderRadius: 6,
-                      backgroundColor: "#FF3B30",
-                    }}
-                  />
-                )}
-              </Pressable>
-
-              {/* Groups Badge */}
-              <Pressable
-                onPress={() => setActiveTab("groups")}
-                style={{
-                  paddingHorizontal: 12,
-                  paddingVertical: 6,
-                  borderRadius: 20,
-                  backgroundColor: activeTab === "groups" ? "#4CAF50" : "rgba(255, 255, 255, 0.05)",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 6,
-                  borderWidth: 1,
-                  borderColor: activeTab === "groups" ? "#4CAF50" : "rgba(126, 63, 228, 0.2)",
-                }}
-              >
-                <UsersRound size={16} color={activeTab === "groups" ? "white" : "#888"} strokeWidth={2.5} />
-                <Text style={{ color: activeTab === "groups" ? "white" : "#888", fontSize: 13, fontWeight: "600" }}>
-                  {myGroups.length}
-                </Text>
-              </Pressable>
-
               {/* Notifications Bell */}
               <Pressable
                 onPress={() => {
@@ -403,6 +326,85 @@ export default function CommunityScreen({ navigation }: Props) {
                 <Search size={20} color="white" />
               </Pressable>
             </View>
+          </View>
+
+          {/* Tab Switcher Buttons */}
+          <View style={{ flexDirection: "row", gap: 8, marginBottom: 16 }}>
+            {/* Feed Tab */}
+            <Pressable
+              onPress={() => setActiveTab("feed")}
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                paddingHorizontal: 16,
+                paddingVertical: 8,
+                borderRadius: 20,
+                backgroundColor: activeTab === "feed" ? "#7E3FE4" : "rgba(255, 255, 255, 0.05)",
+                gap: 6,
+              }}
+            >
+              <Home size={18} color={activeTab === "feed" ? "white" : "#888"} strokeWidth={2.5} />
+              <Text style={{ color: activeTab === "feed" ? "white" : "#888", fontSize: 13, fontWeight: "600" }}>
+                Feed
+              </Text>
+            </Pressable>
+
+            {/* Friends Tab */}
+            <Pressable
+              onPress={() => setActiveTab("friends")}
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                paddingHorizontal: 16,
+                paddingVertical: 8,
+                borderRadius: 20,
+                backgroundColor: activeTab === "friends" ? "#7E3FE4" : "rgba(255, 255, 255, 0.05)",
+                gap: 6,
+              }}
+            >
+              <Users size={18} color={activeTab === "friends" ? "white" : "#888"} strokeWidth={2.5} />
+              <Text style={{ color: activeTab === "friends" ? "white" : "#888", fontSize: 13, fontWeight: "600" }}>
+                Friends
+              </Text>
+            </Pressable>
+
+            {/* Messages Tab */}
+            <Pressable
+              onPress={() => setActiveTab("messages")}
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                paddingHorizontal: 16,
+                paddingVertical: 8,
+                borderRadius: 20,
+                backgroundColor: activeTab === "messages" ? "#7E3FE4" : "rgba(255, 255, 255, 0.05)",
+                gap: 6,
+              }}
+            >
+              <MessageCircle size={18} color={activeTab === "messages" ? "white" : "#888"} strokeWidth={2.5} />
+              <Text style={{ color: activeTab === "messages" ? "white" : "#888", fontSize: 13, fontWeight: "600" }}>
+                Messages
+              </Text>
+            </Pressable>
+
+            {/* Groups Tab */}
+            <Pressable
+              onPress={() => setActiveTab("groups")}
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                paddingHorizontal: 16,
+                paddingVertical: 8,
+                borderRadius: 20,
+                backgroundColor: activeTab === "groups" ? "#7E3FE4" : "rgba(255, 255, 255, 0.05)",
+                gap: 6,
+              }}
+            >
+              <UsersRound size={18} color={activeTab === "groups" ? "white" : "#888"} strokeWidth={2.5} />
+              <Text style={{ color: activeTab === "groups" ? "white" : "#888", fontSize: 13, fontWeight: "600" }}>
+                Groups
+              </Text>
+            </Pressable>
           </View>
         </View>
 

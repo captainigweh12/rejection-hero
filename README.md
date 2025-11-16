@@ -1521,14 +1521,15 @@ See `ENV_SETUP.md` for complete environment variable setup guide.
     - Rounded comment bubbles with timestamps
     - Circular send button for comments
   - **Community Tab Redesign** 🎯 UPDATED!:
-    - **Badge-Based Navigation**: Compact header badges replace tab switcher
-    - Color-coded badges showing counts:
-      - Purple badge for Friends with count
-      - Cyan badge for Messages with count and unread indicator dot
-      - Green badge for Groups with count
-    - Bell icon with notification count
-    - Search icon for user search
-    - **Clean Header Design**: Minimalist layout with just Community title and action badges
+    - **Tab Switcher Navigation**: Four prominent tab buttons for easy navigation
+      - Feed tab (home icon) - Shows social feed with posts and stories
+      - Friends tab (users icon) - View friends list and manage connections
+      - Messages tab (message icon) - Access conversations
+      - Groups tab (users-round icon) - Browse and manage groups
+    - Active tab highlighted in purple (#7E3FE4)
+    - Bell icon with notification count in header
+    - Search icon for user search in header
+    - **Clean Layout**: No stat cards, just navigation tabs and content
     - **Feed Tab**: Shows only "What's on your mind?", stories, and posts
 - **Better UX**: More spacious layout, clearer hierarchy, modern glassmorphism effects
 - **Maintained App Theme**: All Facebook-inspired elements use Vibecode's purple color scheme
