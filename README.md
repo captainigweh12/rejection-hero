@@ -1457,6 +1457,17 @@ See `ENV_SETUP.md` for complete environment variable setup guide.
 
 ## Recent Updates
 
+### 2025-11-16: Fixed Moments Not Showing After Creation
+- **Issue**: Created moments were saved to database but not visible in the app
+- **Root Cause**: Local device file paths (`file:///`) were being stored instead of server URLs
+- **Fix**: Updated `FeedScreen.tsx` to upload images to server before creating moments
+- **Changes**:
+  - Modified `handleCreateMoment` to upload image via `/api/upload/image` endpoint
+  - Image is now stored on server and accessible via server URL
+  - Moments now display correctly after creation
+- **Backend**: Upload endpoint already existed and working correctly
+- **Result**: Moments now show up immediately after creation with proper image display
+
 ### 2025-11-16: AI Quest Generation on Map
 - **New Feature**: Generate AI-powered quests directly on the map within 5-mile radius
 - **Backend**: Added POST /api/quests/generate-map-quests endpoint

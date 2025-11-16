@@ -226,15 +226,48 @@ export default function FeedScreen() {
     });
   };
 
-  const handleCreateMoment = () => {
+  const handleCreateMoment = async () => {
     if (!momentImage) {
       Alert.alert("Error", "Please select an image");
       return;
     }
 
-    createMomentMutation.mutate({
-      imageUrl: momentImage,
-    });
+    try {
+      // Upload image to server first
+      const formData = new FormData();
+      const filename = momentImage.split("/").pop() || "moment.jpg";
+      const match = /\.(\w+)$/.exec(filename);
+      const type = match ? `image/${match[1]}` : "image/jpeg";
+
+      formData.append("image", {
+        uri: momentImage,
+        name: filename,
+        type,
+      } as any);
+
+      const uploadResponse = await fetch(`${process.env.EXPO_PUBLIC_VIBECODE_BACKEND_URL}/api/upload/image`, {
+        method: "POST",
+        body: formData,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      if (!uploadResponse.ok) {
+        throw new Error("Failed to upload image");
+      }
+
+      const uploadData = await uploadResponse.json();
+      const serverImageUrl = `${process.env.EXPO_PUBLIC_VIBECODE_BACKEND_URL}${uploadData.url}`;
+
+      // Now create moment with server URL
+      createMomentMutation.mutate({
+        imageUrl: serverImageUrl,
+      });
+    } catch (error) {
+      console.error("Upload error:", error);
+      Alert.alert("Error", "Failed to upload image. Please try again.");
+    }
   };
 
   const privacyIcon = (privacy: string) => {
