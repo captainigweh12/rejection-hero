@@ -684,8 +684,47 @@ To enable Google sign-in, you need to configure authorized redirect URIs in your
 - **COMMUNITY**: Groups, Manage Categories, Explore World
 - Log out and version display
 
-**Social Feed System** ✨ ENHANCED!
+**Social Feed System** ✨ ENHANCED! (Facebook-Style Redesign)
 - **Facebook-Style Posts**:
+  - **Modern Feed Header**:
+    - "vibecode" branding in purple
+    - Circular action buttons for create post and search
+    - Clean, minimalist design matching Facebook aesthetic
+  - **"What's on your mind?" Input Box**:
+    - Large user avatar (44px) with profile picture
+    - Placeholder text with photo icon
+    - Tappable card that opens create post modal
+    - Inspired by Facebook's post creation entry point
+  - **Enhanced Post Cards** (Facebook-Inspired):
+    - Larger avatars (48px) with border styling
+    - Bolder user names (17px, weight 700)
+    - Group name badges in purple
+    - Better spacing and padding (16px)
+    - Glassmorphism card design with purple borders
+  - **Facebook-Style Create Post Modal**:
+    - "Create post" header with X close button
+    - User profile section with avatar and name
+    - Compact privacy selector pills (PUBLIC/FRIENDS/GROUPS)
+    - Large text input area (18px font, 150px min height)
+    - **Bottom Action Bar** with colorful buttons:
+      - 🟢 Photo/video (green) - Gallery picker
+      - 🟠 Camera (orange) - Take photo
+      - 🔵 Tag people (blue) - Coming soon
+      - 🟡 Feeling/activity (yellow) - Coming soon
+    - Horizontal scrolling action buttons
+    - "Add to your post" section label
+  - **Enhanced Like/Comment System**:
+    - Like counter with red heart icon badge
+    - Comment count display
+    - Three-button action bar (Like, Comment, Share)
+    - Equal-width buttons with icons and labels
+    - Facebook-style button layout
+  - **Improved Comments Section**:
+    - Rounded comment bubbles (18px radius)
+    - User avatars (32px) for each comment
+    - Comment timestamp below bubble
+    - Circular send button (36px) with purple background
+    - Better spacing and typography (15px font)
   - Create text posts with optional images (up to 4 images per post)
   - **Camera Support**: Take photos directly from the app or select from gallery
   - Privacy settings: Public, Friends Only, or Groups Only
@@ -1456,6 +1495,24 @@ See `ENV_SETUP.md` for complete environment variable setup guide.
 - **Database**: Prisma migrations required for schema changes
 
 ## Recent Updates
+
+### 2025-11-16: Facebook-Style Feed Redesign 🎨
+- **Complete Feed UI Overhaul** inspired by Facebook's design:
+  - **New Header**: "vibecode" branding with circular action buttons
+  - **"What's on your mind?" Input**: Prominent entry point with user avatar
+  - **Enhanced Post Cards**: Larger avatars (48px), better typography, glassmorphism design
+  - **Redesigned Create Post Modal**:
+    - User profile section at top
+    - Inline privacy selector pills
+    - Bottom action bar with colorful buttons (Photo/video, Camera, Tag people, Feeling/activity)
+    - "Add to your post" section
+  - **Improved Interactions**:
+    - Like counter with heart icon badge
+    - Three-button action bar (Like, Comment, Share)
+    - Rounded comment bubbles with timestamps
+    - Circular send button for comments
+- **Better UX**: More spacious layout, clearer hierarchy, modern glassmorphism effects
+- **Maintained App Theme**: All Facebook-inspired elements use Vibecode's purple color scheme
 
 ### 2025-11-16: Fixed Moments Not Showing After Creation
 - **Issue**: Created moments were saved to database but not visible in the app

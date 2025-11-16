@@ -118,41 +118,45 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
   return (
     <View
       style={{
-        backgroundColor: "#1C1C1E",
-        marginBottom: 12,
-        borderRadius: 12,
+        backgroundColor: "rgba(255, 255, 255, 0.05)",
+        marginBottom: 16,
+        borderRadius: 16,
         overflow: "hidden",
+        borderWidth: 1,
+        borderColor: "rgba(126, 63, 228, 0.2)",
       }}
     >
-      {/* Header */}
+      {/* Header - Facebook Style */}
       <View
         style={{
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "space-between",
-          padding: 12,
+          padding: 16,
         }}
       >
         <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
-          {/* Avatar */}
+          {/* Avatar - Larger */}
           <View
             style={{
-              width: 40,
-              height: 40,
-              borderRadius: 20,
+              width: 48,
+              height: 48,
+              borderRadius: 24,
               backgroundColor: "#7E3FE4",
               alignItems: "center",
               justifyContent: "center",
               marginRight: 12,
+              borderWidth: 2,
+              borderColor: "rgba(126, 63, 228, 0.3)",
             }}
           >
             {post.user.avatar ? (
               <Image
                 source={{ uri: post.user.avatar }}
-                style={{ width: 40, height: 40, borderRadius: 20 }}
+                style={{ width: 48, height: 48, borderRadius: 24 }}
               />
             ) : (
-              <Text style={{ color: "white", fontSize: 16, fontWeight: "bold" }}>
+              <Text style={{ color: "white", fontSize: 20, fontWeight: "bold" }}>
                 {post.user.name?.charAt(0).toUpperCase() || "?"}
               </Text>
             )}
@@ -160,19 +164,19 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
 
           {/* User info */}
           <View style={{ flex: 1 }}>
-            <Text style={{ color: "white", fontSize: 16, fontWeight: "600" }}>
+            <Text style={{ color: "white", fontSize: 17, fontWeight: "700", marginBottom: 2 }}>
               {post.user.name || "Anonymous"}
             </Text>
             <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <Text style={{ color: "#888", fontSize: 12 }}>
+              <Text style={{ color: "#888", fontSize: 13 }}>
                 {timeAgo(post.createdAt)}
               </Text>
               {post.group && (
                 <>
-                  <Text style={{ color: "#888", fontSize: 12, marginHorizontal: 4 }}>
+                  <Text style={{ color: "#888", fontSize: 13, marginHorizontal: 4 }}>
                     •
                   </Text>
-                  <Text style={{ color: "#7E3FE4", fontSize: 12 }}>
+                  <Text style={{ color: "#7E3FE4", fontSize: 13, fontWeight: "600" }}>
                     {post.group.name}
                   </Text>
                 </>
@@ -183,15 +187,15 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
 
         {/* More options */}
         {post.user.id === currentUserId && (
-          <TouchableOpacity onPress={handleDelete}>
-            <MoreVertical size={20} color="#888" />
+          <TouchableOpacity onPress={handleDelete} style={{ padding: 4 }}>
+            <MoreVertical size={22} color="#888" />
           </TouchableOpacity>
         )}
       </View>
 
       {/* Content */}
-      <View style={{ paddingHorizontal: 12, paddingBottom: 12 }}>
-        <Text style={{ color: "white", fontSize: 15, lineHeight: 20 }}>
+      <View style={{ paddingHorizontal: 16, paddingBottom: 12 }}>
+        <Text style={{ color: "white", fontSize: 16, lineHeight: 24 }}>
           {post.content}
         </Text>
       </View>
@@ -223,7 +227,48 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
         </View>
       )}
 
-      {/* Actions */}
+      {/* Like/Comment Stats - Facebook Style */}
+      {(post.likeCount > 0 || post.commentCount > 0) && (
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            paddingHorizontal: 16,
+            paddingVertical: 10,
+            borderTopWidth: 1,
+            borderTopColor: "rgba(255, 255, 255, 0.1)",
+          }}
+        >
+          {post.likeCount > 0 && (
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <View
+                style={{
+                  width: 20,
+                  height: 20,
+                  borderRadius: 10,
+                  backgroundColor: "#FF3B30",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginRight: 6,
+                }}
+              >
+                <Heart size={12} color="white" fill="white" />
+              </View>
+              <Text style={{ color: "#888", fontSize: 14 }}>
+                {post.likeCount}
+              </Text>
+            </View>
+          )}
+          {post.commentCount > 0 && (
+            <Text style={{ color: "#888", fontSize: 14 }}>
+              {post.commentCount} {post.commentCount === 1 ? "comment" : "comments"}
+            </Text>
+          )}
+        </View>
+      )}
+
+      {/* Actions - Facebook Style */}
       <View
         style={{
           flexDirection: "row",
@@ -231,77 +276,128 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
           paddingHorizontal: 12,
           paddingVertical: 8,
           borderTopWidth: 1,
-          borderTopColor: "#2C2C2E",
+          borderTopColor: "rgba(255, 255, 255, 0.1)",
         }}
       >
         {/* Like */}
         <TouchableOpacity
           onPress={handleLike}
-          style={{ flexDirection: "row", alignItems: "center", marginRight: 20 }}
+          style={{
+            flex: 1,
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+            paddingVertical: 8,
+            borderRadius: 8,
+          }}
         >
           <Heart
-            size={20}
+            size={22}
             color={post.isLikedByCurrentUser ? "#FF3B30" : "#888"}
             fill={post.isLikedByCurrentUser ? "#FF3B30" : "none"}
+            strokeWidth={2}
           />
           <Text
             style={{
               color: post.isLikedByCurrentUser ? "#FF3B30" : "#888",
-              marginLeft: 6,
-              fontSize: 14,
+              marginLeft: 8,
+              fontSize: 15,
+              fontWeight: "600",
             }}
           >
-            {post.likeCount}
+            Like
           </Text>
         </TouchableOpacity>
 
         {/* Comment */}
         <TouchableOpacity
           onPress={() => setShowComments(!showComments)}
-          style={{ flexDirection: "row", alignItems: "center", marginRight: 20 }}
+          style={{
+            flex: 1,
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+            paddingVertical: 8,
+            borderRadius: 8,
+          }}
         >
-          <MessageCircle size={20} color="#888" />
-          <Text style={{ color: "#888", marginLeft: 6, fontSize: 14 }}>
-            {post.commentCount}
+          <MessageCircle size={22} color="#888" strokeWidth={2} />
+          <Text style={{ color: "#888", marginLeft: 8, fontSize: 15, fontWeight: "600" }}>
+            Comment
+          </Text>
+        </TouchableOpacity>
+
+        {/* Share */}
+        <TouchableOpacity
+          style={{
+            flex: 1,
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+            paddingVertical: 8,
+            borderRadius: 8,
+          }}
+        >
+          <Send size={22} color="#888" strokeWidth={2} />
+          <Text style={{ color: "#888", marginLeft: 8, fontSize: 15, fontWeight: "600" }}>
+            Share
           </Text>
         </TouchableOpacity>
       </View>
 
-      {/* Comments section */}
+      {/* Comments section - Facebook Style */}
       {showComments && (
-        <View style={{ paddingHorizontal: 12, paddingBottom: 12 }}>
+        <View style={{ paddingHorizontal: 16, paddingBottom: 16, paddingTop: 8 }}>
           {/* Comment list */}
           {post.comments.slice(0, 3).map((comment) => (
             <View
               key={comment.id}
               style={{
                 flexDirection: "row",
-                marginBottom: 8,
-                backgroundColor: "#2C2C2E",
-                borderRadius: 8,
-                padding: 8,
+                marginBottom: 12,
               }}
             >
               <View
                 style={{
-                  width: 28,
-                  height: 28,
-                  borderRadius: 14,
+                  width: 32,
+                  height: 32,
+                  borderRadius: 16,
                   backgroundColor: "#7E3FE4",
                   alignItems: "center",
                   justifyContent: "center",
-                  marginRight: 8,
+                  marginRight: 10,
                 }}
               >
-                <Text style={{ color: "white", fontSize: 12, fontWeight: "bold" }}>
-                  {comment.user.name?.charAt(0).toUpperCase() || "?"}
-                </Text>
+                {comment.user.avatar ? (
+                  <Image
+                    source={{ uri: comment.user.avatar }}
+                    style={{ width: 32, height: 32, borderRadius: 16 }}
+                  />
+                ) : (
+                  <Text style={{ color: "white", fontSize: 14, fontWeight: "bold" }}>
+                    {comment.user.name?.charAt(0).toUpperCase() || "?"}
+                  </Text>
+                )}
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={{ color: "white", fontSize: 14, fontWeight: "600" }}>
-                  {comment.user.name || "Anonymous"}
+                <View
+                  style={{
+                    backgroundColor: "rgba(255, 255, 255, 0.08)",
+                    borderRadius: 18,
+                    paddingHorizontal: 14,
+                    paddingVertical: 10,
+                  }}
+                >
+                  <Text style={{ color: "white", fontSize: 14, fontWeight: "600", marginBottom: 2 }}>
+                    {comment.user.name || "Anonymous"}
+                  </Text>
+                  <Text style={{ color: "#E0E0E0", fontSize: 15, lineHeight: 20 }}>
+                    {comment.content}
+                  </Text>
+                </View>
+                <Text style={{ color: "#666", fontSize: 12, marginTop: 4, marginLeft: 14 }}>
+                  {timeAgo(comment.createdAt)}
                 </Text>
-                <Text style={{ color: "#CCC", fontSize: 14 }}>{comment.content}</Text>
               </View>
             </View>
           ))}
@@ -314,27 +410,53 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
               marginTop: 8,
             }}
           >
-            <TextInput
-              value={commentText}
-              onChangeText={setCommentText}
-              placeholder="Write a comment..."
-              placeholderTextColor="#666"
+            <View
               style={{
-                flex: 1,
-                backgroundColor: "#2C2C2E",
-                borderRadius: 20,
-                paddingHorizontal: 16,
-                paddingVertical: 8,
-                color: "white",
-                marginRight: 8,
+                width: 32,
+                height: 32,
+                borderRadius: 16,
+                backgroundColor: "#7E3FE4",
+                alignItems: "center",
+                justifyContent: "center",
+                marginRight: 10,
               }}
-            />
-            <TouchableOpacity
-              onPress={handleComment}
-              disabled={!commentText.trim() || commentMutation.isPending}
             >
-              <Send size={20} color={commentText.trim() ? "#7E3FE4" : "#666"} />
-            </TouchableOpacity>
+              <Text style={{ color: "white", fontSize: 14, fontWeight: "bold" }}>
+                You
+              </Text>
+            </View>
+            <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
+              <TextInput
+                value={commentText}
+                onChangeText={setCommentText}
+                placeholder="Write a comment..."
+                placeholderTextColor="#666"
+                style={{
+                  flex: 1,
+                  backgroundColor: "rgba(255, 255, 255, 0.08)",
+                  borderRadius: 20,
+                  paddingHorizontal: 16,
+                  paddingVertical: 10,
+                  color: "white",
+                  fontSize: 15,
+                  marginRight: 8,
+                }}
+              />
+              <TouchableOpacity
+                onPress={handleComment}
+                disabled={!commentText.trim() || commentMutation.isPending}
+                style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: 18,
+                  backgroundColor: commentText.trim() ? "#7E3FE4" : "rgba(126, 63, 228, 0.3)",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Send size={18} color="white" />
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       )}
