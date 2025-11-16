@@ -38,6 +38,9 @@ interface AddJournalModalProps {
 
 export default function AddJournalModal({ visible, onClose, onSuccess }: AddJournalModalProps) {
   const queryClient = useQueryClient();
+
+  // State management
+  const [step, setStep] = useState<"method" | "input" | "outcome">("method");
   const [inputMode, setInputMode] = useState<"text" | "voice">("text");
   const [recording, setRecording] = useState<Audio.Recording | null>(null);
   const [isRecording, setIsRecording] = useState(false);
@@ -49,36 +52,28 @@ export default function AddJournalModal({ visible, onClose, onSuccess }: AddJour
   const [selectedOutcome, setSelectedOutcome] = useState<"YES" | "NO" | "ACTIVITY" | null>(null);
   const [recordingUri, setRecordingUri] = useState<string | null>(null);
 
-  // Define resetForm function
-  const resetForm = React.useCallback(() => {
-    console.log("[AddJournalModal] Resetting form...");
+  // Reset form when modal opens
+  React.useEffect(() => {
+    if (visible) {
+      console.log("[AddJournalModal] Modal opened - resetting to method step");
+      resetForm();
+    }
+  }, [visible]);
+
+  const resetForm = () => {
+    setStep("method");
     setInputMode("text");
+    setRecording(null);
+    setIsRecording(false);
+    setTranscribing(false);
     setRecordingUri(null);
     setTextEntry("");
     setTranscript("");
     setSummary("");
     setEditedSummary("");
     setSelectedOutcome(null);
-  }, []);
-
-  // Reset form when modal opens
-  React.useEffect(() => {
-    if (visible) {
-      console.log("[AddJournalModal] Modal opened - resetting form");
-      resetForm();
-    }
-  }, [visible, resetForm]);
-
-  // Debug: Log state changes
-  React.useEffect(() => {
-    console.log("[AddJournalModal] State:", {
-      inputMode,
-      hasSummary: !!summary,
-      hasTextEntry: !!textEntry,
-      hasTranscript: !!transcript,
-      selectedOutcome,
-    });
-  }, [inputMode, summary, textEntry, transcript, selectedOutcome]);
+    console.log("[AddJournalModal] Form reset complete");
+  };
 
   // Start recording
   const startRecording = async () => {
@@ -136,12 +131,10 @@ export default function AddJournalModal({ visible, onClose, onSuccess }: AddJour
       // Transcribe audio
       setTranscribing(true);
       try {
-        // Read audio file as base64
         const audioBase64 = await FileSystem.readAsStringAsync(uri, {
           encoding: FileSystem.EncodingType.Base64,
         });
 
-        // Send to backend for transcription
         const data = await api.post<TranscribeAudioResponse>("/api/journal/transcribe", {
           audioBase64,
         });
@@ -149,7 +142,8 @@ export default function AddJournalModal({ visible, onClose, onSuccess }: AddJour
         setTranscript(data.transcript);
         setSummary(data.summary);
         setEditedSummary(data.summary);
-        console.log("Transcription complete");
+        setStep("outcome");
+        console.log("Transcription complete, moving to outcome step");
       } catch (err) {
         console.error("Transcription error:", err);
         Alert.alert("Error", "Failed to transcribe audio. Please try again.");
@@ -171,14 +165,14 @@ export default function AddJournalModal({ visible, onClose, onSuccess }: AddJour
 
     setTranscribing(true);
     try {
-      // Use the same transcribe endpoint but with text instead of audio
       const data = await api.post<TranscribeAudioResponse>("/api/journal/transcribe", {
         text: textEntry.trim(),
       });
 
       setSummary(data.summary);
       setEditedSummary(data.summary);
-      console.log("Text processing complete");
+      setStep("outcome");
+      console.log("Text processing complete, moving to outcome step");
     } catch (err) {
       console.error("Text processing error:", err);
       Alert.alert("Error", "Failed to process text. Please try again.");
@@ -218,11 +212,13 @@ export default function AddJournalModal({ visible, onClose, onSuccess }: AddJour
 
       console.log("Journal entries refetched");
 
-      // Reset form first
-      resetForm();
-
       // Close modal
       onClose();
+
+      // Reset form after closing
+      setTimeout(() => {
+        resetForm();
+      }, 100);
 
       // Show success alert after modal closes
       setTimeout(() => {
@@ -255,34 +251,48 @@ export default function AddJournalModal({ visible, onClose, onSuccess }: AddJour
       Alert.alert("Recording in Progress", "Please stop recording before closing.");
       return;
     }
-    resetForm();
     onClose();
+    setTimeout(() => {
+      resetForm();
+    }, 300);
+  };
+
+  const handleMethodSelect = (method: "text" | "voice") => {
+    setInputMode(method);
+    setStep("input");
   };
 
   return (
     <Modal
       visible={visible}
-      animationType="slide"
+      animationType="fade"
       transparent={true}
       onRequestClose={handleClose}
     >
       <View
         style={{
           flex: 1,
-          backgroundColor: "rgba(0, 0, 0, 0.8)",
+          backgroundColor: "rgba(0, 0, 0, 0.85)",
           justifyContent: "center",
           alignItems: "center",
+          padding: 20,
         }}
       >
         <View
           style={{
-            width: "90%",
-            maxHeight: "85%",
-            backgroundColor: "#0A0A0F",
-            borderRadius: 20,
-            borderWidth: 1,
-            borderColor: "rgba(126, 63, 228, 0.3)",
+            width: "100%",
+            maxWidth: 400,
+            maxHeight: "90%",
+            backgroundColor: "#1A1A24",
+            borderRadius: 24,
+            borderWidth: 2,
+            borderColor: "rgba(126, 63, 228, 0.4)",
             overflow: "hidden",
+            shadowColor: "#7E3FE4",
+            shadowOffset: { width: 0, height: 8 },
+            shadowOpacity: 0.3,
+            shadowRadius: 16,
+            elevation: 10,
           }}
         >
           {/* Header */}
@@ -291,412 +301,366 @@ export default function AddJournalModal({ visible, onClose, onSuccess }: AddJour
               flexDirection: "row",
               justifyContent: "space-between",
               alignItems: "center",
-              padding: 16,
+              padding: 20,
               borderBottomWidth: 1,
               borderBottomColor: "rgba(126, 63, 228, 0.2)",
             }}
           >
-            <Text className="text-xl font-bold text-white">Add Journal Entry</Text>
+            <Text className="text-2xl font-bold text-white">Journal Entry</Text>
             <TouchableOpacity onPress={handleClose}>
-              <X size={24} color="white" />
+              <X size={28} color="white" />
             </TouchableOpacity>
           </View>
 
           <ScrollView
-            className="flex-1"
-            contentContainerStyle={{ padding: 16 }}
+            style={{ flex: 1 }}
+            contentContainerStyle={{ padding: 20 }}
             showsVerticalScrollIndicator={false}
           >
-            {/* Debug Info - Always visible */}
-            {__DEV__ && (
-              <View style={{
-                padding: 12,
-                backgroundColor: "rgba(255, 0, 0, 0.2)",
-                marginBottom: 12,
-                borderRadius: 8,
-                borderWidth: 2,
-                borderColor: "red"
-              }}>
-                <Text className="text-white text-xs font-bold">
-                  🔍 DEBUG INFO:
-                </Text>
-                <Text className="text-white text-xs">
-                  summary: &quot;{summary}&quot; (length: {summary.length})
-                </Text>
-                <Text className="text-white text-xs">
-                  !summary: {(!summary).toString()}
-                </Text>
-                <Text className="text-white text-xs">
-                  inputMode: {inputMode}
-                </Text>
-                <Text className="text-white text-xs">
-                  selectedOutcome: {selectedOutcome || "null"}
-                </Text>
-              </View>
-            )}
-
-            {/* Input Mode Selector */}
-            {!summary && (
-              <View style={{ marginBottom: 16 }}>
-                <Text className="text-sm font-semibold text-white/80 mb-3">
+            {/* STEP 1: Method Selection */}
+            {step === "method" && (
+              <View>
+                <Text className="text-lg font-semibold text-white mb-4 text-center">
                   How would you like to log your experience?
                 </Text>
-                <View style={{ flexDirection: "row", gap: 8 }}>
-                  <TouchableOpacity
-                    onPress={() => setInputMode("text")}
-                    style={{
-                      flex: 1,
-                      backgroundColor: inputMode === "text"
-                        ? "rgba(126, 63, 228, 0.3)"
-                        : "rgba(255, 255, 255, 0.05)",
-                      borderWidth: 2,
-                      borderColor: inputMode === "text"
-                        ? "#7E3FE4"
-                        : "rgba(126, 63, 228, 0.3)",
-                      borderRadius: 12,
-                      padding: 12,
-                      flexDirection: "row",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: 8,
-                    }}
-                  >
-                    <Type size={20} color={inputMode === "text" ? "#7E3FE4" : "white"} />
-                    <Text className={`font-semibold ${inputMode === "text" ? "text-[#7E3FE4]" : "text-white"}`}>
-                      Type
-                    </Text>
-                  </TouchableOpacity>
 
-                  <TouchableOpacity
-                    onPress={() => setInputMode("voice")}
-                    style={{
-                      flex: 1,
-                      backgroundColor: inputMode === "voice"
-                        ? "rgba(255, 107, 53, 0.3)"
-                        : "rgba(255, 255, 255, 0.05)",
-                      borderWidth: 2,
-                      borderColor: inputMode === "voice"
-                        ? "#FF6B35"
-                        : "rgba(126, 63, 228, 0.3)",
-                      borderRadius: 12,
-                      padding: 12,
-                      flexDirection: "row",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: 8,
-                    }}
-                  >
-                    <Mic size={20} color={inputMode === "voice" ? "#FF6B35" : "white"} />
-                    <Text className={`font-semibold ${inputMode === "voice" ? "text-[#FF6B35]" : "text-white"}`}>
-                      Voice
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            )}
-
-            {/* Text Input Section */}
-            {inputMode === "text" && !summary && (
-              <View
-                style={{
-                  backgroundColor: "rgba(255, 255, 255, 0.05)",
-                  borderWidth: 1,
-                  borderColor: "rgba(126, 63, 228, 0.3)",
-                  borderRadius: 16,
-                  padding: 16,
-                  marginBottom: 16,
-                }}
-              >
-                <Text className="text-base font-semibold text-white mb-3">
-                  Write Your Experience
-                </Text>
-                <TextInput
-                  value={textEntry}
-                  onChangeText={setTextEntry}
-                  placeholder="Describe what happened, how you felt, what you learned..."
-                  placeholderTextColor="rgba(255, 255, 255, 0.3)"
-                  multiline
-                  numberOfLines={6}
-                  style={{
-                    backgroundColor: "rgba(255, 255, 255, 0.03)",
-                    borderWidth: 1,
-                    borderColor: "rgba(126, 63, 228, 0.2)",
-                    borderRadius: 12,
-                    padding: 12,
-                    color: "white",
-                    fontSize: 14,
-                    minHeight: 120,
-                    textAlignVertical: "top",
-                    marginBottom: 12,
-                  }}
-                />
+                {/* Type Button */}
                 <TouchableOpacity
-                  onPress={handleProcessText}
-                  disabled={!textEntry.trim() || transcribing}
+                  onPress={() => handleMethodSelect("text")}
                   style={{
-                    backgroundColor: textEntry.trim() ? "#7E3FE4" : "rgba(126, 63, 228, 0.3)",
-                    borderRadius: 12,
-                    padding: 14,
+                    backgroundColor: "rgba(126, 63, 228, 0.2)",
+                    borderWidth: 2,
+                    borderColor: "#7E3FE4",
+                    borderRadius: 16,
+                    padding: 24,
+                    marginBottom: 16,
                     alignItems: "center",
                   }}
                 >
-                  {transcribing ? (
-                    <ActivityIndicator color="white" size="small" />
-                  ) : (
-                    <Text className="text-white font-semibold">Process Entry</Text>
-                  )}
+                  <View
+                    style={{
+                      width: 64,
+                      height: 64,
+                      borderRadius: 32,
+                      backgroundColor: "rgba(126, 63, 228, 0.3)",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      marginBottom: 12,
+                    }}
+                  >
+                    <Type size={32} color="#7E3FE4" />
+                  </View>
+                  <Text className="text-xl font-bold text-white mb-2">Type Your Entry</Text>
+                  <Text className="text-sm text-white/60 text-center">
+                    Write down your thoughts and experiences
+                  </Text>
+                </TouchableOpacity>
+
+                {/* Voice Button */}
+                <TouchableOpacity
+                  onPress={() => handleMethodSelect("voice")}
+                  style={{
+                    backgroundColor: "rgba(255, 107, 53, 0.2)",
+                    borderWidth: 2,
+                    borderColor: "#FF6B35",
+                    borderRadius: 16,
+                    padding: 24,
+                    alignItems: "center",
+                  }}
+                >
+                  <View
+                    style={{
+                      width: 64,
+                      height: 64,
+                      borderRadius: 32,
+                      backgroundColor: "rgba(255, 107, 53, 0.3)",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      marginBottom: 12,
+                    }}
+                  >
+                    <Mic size={32} color="#FF6B35" />
+                  </View>
+                  <Text className="text-xl font-bold text-white mb-2">Voice Recording</Text>
+                  <Text className="text-sm text-white/60 text-center">
+                    Speak your thoughts and we&apos;ll transcribe them
+                  </Text>
                 </TouchableOpacity>
               </View>
             )}
 
-            {/* Voice Recording Section */}
-            {inputMode === "voice" && !summary && (
-              <View
-                style={{
-                  backgroundColor: "rgba(255, 255, 255, 0.05)",
-                  borderWidth: 1,
-                  borderColor: "rgba(126, 63, 228, 0.3)",
-                  borderRadius: 16,
-                  padding: 16,
-                  marginBottom: 16,
-                }}
-              >
-                <Text className="text-base font-semibold text-white mb-3">
-                  Voice Recording
-                </Text>
+            {/* STEP 2: Input (Text or Voice) */}
+            {step === "input" && (
+              <View>
+                {/* Back Button */}
+                <TouchableOpacity
+                  onPress={() => setStep("method")}
+                  style={{ marginBottom: 16 }}
+                >
+                  <Text className="text-[#7E3FE4] font-semibold">← Back</Text>
+                </TouchableOpacity>
 
-                <View className="items-center py-4">
-                  {isRecording ? (
-                    <TouchableOpacity
-                      onPress={stopRecording}
-                      style={{
-                        width: 60,
-                        height: 60,
-                        borderRadius: 30,
-                        backgroundColor: "#FF3B30",
-                        justifyContent: "center",
-                        alignItems: "center",
-                      }}
-                    >
-                      <Square size={24} color="white" fill="white" />
-                    </TouchableOpacity>
-                  ) : (
-                    <TouchableOpacity
-                      onPress={startRecording}
-                      disabled={transcribing || createEntryMutation.isPending}
-                      style={{
-                        width: 60,
-                        height: 60,
-                        borderRadius: 30,
-                        backgroundColor: "#FF6B35",
-                        justifyContent: "center",
-                        alignItems: "center",
-                      }}
-                    >
-                      <Mic size={24} color="white" />
-                    </TouchableOpacity>
-                  )}
-
-                  <Text className="text-white/60 text-xs mt-2">
-                    {isRecording ? "Tap to stop" : "Tap to record"}
-                  </Text>
-                </View>
-
-                {transcribing && (
-                  <View className="items-center py-3">
-                    <ActivityIndicator size="small" color="#7E3FE4" />
-                    <Text className="text-white/60 text-xs mt-2">
-                      Transcribing...
+                {inputMode === "text" ? (
+                  <View>
+                    <Text className="text-lg font-semibold text-white mb-4">
+                      Write Your Experience
                     </Text>
+                    <TextInput
+                      value={textEntry}
+                      onChangeText={setTextEntry}
+                      placeholder="Describe what happened, how you felt, what you learned..."
+                      placeholderTextColor="rgba(255, 255, 255, 0.3)"
+                      multiline
+                      numberOfLines={8}
+                      style={{
+                        backgroundColor: "rgba(255, 255, 255, 0.05)",
+                        borderWidth: 1,
+                        borderColor: "rgba(126, 63, 228, 0.3)",
+                        borderRadius: 16,
+                        padding: 16,
+                        color: "white",
+                        fontSize: 15,
+                        minHeight: 180,
+                        textAlignVertical: "top",
+                        marginBottom: 20,
+                      }}
+                    />
+                    <TouchableOpacity
+                      onPress={handleProcessText}
+                      disabled={!textEntry.trim() || transcribing}
+                      style={{
+                        backgroundColor: textEntry.trim() ? "#7E3FE4" : "rgba(126, 63, 228, 0.3)",
+                        borderRadius: 16,
+                        padding: 18,
+                        alignItems: "center",
+                      }}
+                    >
+                      {transcribing ? (
+                        <ActivityIndicator color="white" size="small" />
+                      ) : (
+                        <Text className="text-white font-bold text-lg">Continue</Text>
+                      )}
+                    </TouchableOpacity>
+                  </View>
+                ) : (
+                  <View>
+                    <Text className="text-lg font-semibold text-white mb-4 text-center">
+                      Voice Recording
+                    </Text>
+
+                    <View className="items-center py-8">
+                      {isRecording ? (
+                        <TouchableOpacity
+                          onPress={stopRecording}
+                          style={{
+                            width: 100,
+                            height: 100,
+                            borderRadius: 50,
+                            backgroundColor: "#FF3B30",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            shadowColor: "#FF3B30",
+                            shadowOffset: { width: 0, height: 4 },
+                            shadowOpacity: 0.5,
+                            shadowRadius: 12,
+                            elevation: 8,
+                          }}
+                        >
+                          <Square size={40} color="white" fill="white" />
+                        </TouchableOpacity>
+                      ) : (
+                        <TouchableOpacity
+                          onPress={startRecording}
+                          disabled={transcribing}
+                          style={{
+                            width: 100,
+                            height: 100,
+                            borderRadius: 50,
+                            backgroundColor: "#FF6B35",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            shadowColor: "#FF6B35",
+                            shadowOffset: { width: 0, height: 4 },
+                            shadowOpacity: 0.5,
+                            shadowRadius: 12,
+                            elevation: 8,
+                          }}
+                        >
+                          <Mic size={40} color="white" />
+                        </TouchableOpacity>
+                      )}
+
+                      <Text className="text-white text-base mt-6 font-semibold">
+                        {isRecording ? "Tap to stop recording" : "Tap to start recording"}
+                      </Text>
+                    </View>
+
+                    {transcribing && (
+                      <View className="items-center py-4">
+                        <ActivityIndicator size="large" color="#7E3FE4" />
+                        <Text className="text-white/60 text-base mt-4">
+                          Transcribing your audio...
+                        </Text>
+                      </View>
+                    )}
                   </View>
                 )}
               </View>
             )}
 
-            {/* AI Summary Section */}
-            {summary && (
-              <>
+            {/* STEP 3: Outcome Selection */}
+            {step === "outcome" && (
+              <View>
+                {/* AI Summary */}
                 <View
                   style={{
-                    backgroundColor: "rgba(255, 255, 255, 0.05)",
+                    backgroundColor: "rgba(126, 63, 228, 0.1)",
                     borderWidth: 1,
                     borderColor: "rgba(126, 63, 228, 0.3)",
                     borderRadius: 16,
                     padding: 16,
-                    marginBottom: 16,
+                    marginBottom: 20,
                   }}
                 >
-                  <Text className="text-base font-semibold text-white mb-2">
+                  <Text className="text-sm font-semibold text-white/80 mb-2">
                     AI Summary
                   </Text>
-                  <Text className="text-white/80 text-sm mb-3">{summary}</Text>
-
-                  <Text className="text-xs font-semibold text-white/60 mb-2">
-                    Edit Summary (Optional)
-                  </Text>
-                  <TextInput
-                    value={editedSummary}
-                    onChangeText={setEditedSummary}
-                    multiline
-                    numberOfLines={2}
-                    placeholder="Modify the summary if needed..."
-                    placeholderTextColor="rgba(255, 255, 255, 0.3)"
-                    style={{
-                      backgroundColor: "rgba(255, 255, 255, 0.03)",
-                      borderWidth: 1,
-                      borderColor: "rgba(126, 63, 228, 0.2)",
-                      borderRadius: 12,
-                      padding: 10,
-                      color: "white",
-                      fontSize: 13,
-                      minHeight: 60,
-                    }}
-                  />
+                  <Text className="text-white text-base">{summary}</Text>
                 </View>
 
                 {/* Outcome Selection */}
-                <View
+                <Text className="text-lg font-semibold text-white mb-4">
+                  What was the outcome?
+                </Text>
+
+                {/* YES */}
+                <TouchableOpacity
+                  onPress={() => setSelectedOutcome("YES")}
                   style={{
-                    backgroundColor: "rgba(255, 255, 255, 0.05)",
-                    borderWidth: 1,
-                    borderColor: "rgba(126, 63, 228, 0.3)",
+                    backgroundColor:
+                      selectedOutcome === "YES"
+                        ? "rgba(255, 59, 48, 0.3)"
+                        : "rgba(255, 255, 255, 0.05)",
+                    borderWidth: 2,
+                    borderColor:
+                      selectedOutcome === "YES"
+                        ? "#FF3B30"
+                        : "rgba(255, 255, 255, 0.1)",
                     borderRadius: 16,
                     padding: 16,
-                    marginBottom: 16,
+                    marginBottom: 12,
+                    flexDirection: "row",
+                    alignItems: "center",
                   }}
                 >
-                  <Text className="text-base font-semibold text-white mb-3">
-                    What was the outcome?
-                  </Text>
-
-                  <View className="gap-2">
-                    {/* YES */}
-                    <TouchableOpacity
-                      onPress={() => setSelectedOutcome("YES")}
-                      style={{
-                        backgroundColor:
-                          selectedOutcome === "YES"
-                            ? "rgba(255, 59, 48, 0.2)"
-                            : "rgba(255, 255, 255, 0.03)",
-                        borderWidth: 2,
-                        borderColor:
-                          selectedOutcome === "YES"
-                            ? "#FF3B30"
-                            : "rgba(126, 63, 228, 0.2)",
-                        borderRadius: 12,
-                        padding: 12,
-                        flexDirection: "row",
-                        alignItems: "center",
-                      }}
-                    >
-                      <View
-                        style={{
-                          width: 32,
-                          height: 32,
-                          borderRadius: 16,
-                          backgroundColor: "rgba(255, 59, 48, 0.2)",
-                          justifyContent: "center",
-                          alignItems: "center",
-                          marginRight: 10,
-                        }}
-                      >
-                        <CheckCircle size={18} color="#FF3B30" />
-                      </View>
-                      <View style={{ flex: 1 }}>
-                        <Text className="text-white font-semibold text-sm">
-                          Yes
-                        </Text>
-                        <Text className="text-white/60 text-xs">
-                          They said yes!
-                        </Text>
-                      </View>
-                    </TouchableOpacity>
-
-                    {/* NO */}
-                    <TouchableOpacity
-                      onPress={() => setSelectedOutcome("NO")}
-                      style={{
-                        backgroundColor:
-                          selectedOutcome === "NO"
-                            ? "rgba(76, 175, 80, 0.2)"
-                            : "rgba(255, 255, 255, 0.03)",
-                        borderWidth: 2,
-                        borderColor:
-                          selectedOutcome === "NO"
-                            ? "#4CAF50"
-                            : "rgba(126, 63, 228, 0.2)",
-                        borderRadius: 12,
-                        padding: 12,
-                        flexDirection: "row",
-                        alignItems: "center",
-                      }}
-                    >
-                      <View
-                        style={{
-                          width: 32,
-                          height: 32,
-                          borderRadius: 16,
-                          backgroundColor: "rgba(76, 175, 80, 0.2)",
-                          justifyContent: "center",
-                          alignItems: "center",
-                          marginRight: 10,
-                        }}
-                      >
-                        <XCircle size={18} color="#4CAF50" />
-                      </View>
-                      <View style={{ flex: 1 }}>
-                        <Text className="text-white font-semibold text-sm">
-                          No
-                        </Text>
-                        <Text className="text-white/60 text-xs">
-                          Faced rejection
-                        </Text>
-                      </View>
-                    </TouchableOpacity>
-
-                    {/* ACTIVITY */}
-                    <TouchableOpacity
-                      onPress={() => setSelectedOutcome("ACTIVITY")}
-                      style={{
-                        backgroundColor:
-                          selectedOutcome === "ACTIVITY"
-                            ? "rgba(0, 217, 255, 0.2)"
-                            : "rgba(255, 255, 255, 0.03)",
-                        borderWidth: 2,
-                        borderColor:
-                          selectedOutcome === "ACTIVITY"
-                            ? "#00D9FF"
-                            : "rgba(126, 63, 228, 0.2)",
-                        borderRadius: 12,
-                        padding: 12,
-                        flexDirection: "row",
-                        alignItems: "center",
-                      }}
-                    >
-                      <View
-                        style={{
-                          width: 32,
-                          height: 32,
-                          borderRadius: 16,
-                          backgroundColor: "rgba(0, 217, 255, 0.2)",
-                          justifyContent: "center",
-                          alignItems: "center",
-                          marginRight: 10,
-                        }}
-                      >
-                        <Activity size={18} color="#00D9FF" />
-                      </View>
-                      <View style={{ flex: 1 }}>
-                        <Text className="text-white font-semibold text-sm">
-                          Activity
-                        </Text>
-                        <Text className="text-white/60 text-xs">
-                          Completed an action
-                        </Text>
-                      </View>
-                    </TouchableOpacity>
+                  <View
+                    style={{
+                      width: 48,
+                      height: 48,
+                      borderRadius: 24,
+                      backgroundColor: "rgba(255, 59, 48, 0.2)",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      marginRight: 16,
+                    }}
+                  >
+                    <CheckCircle size={24} color="#FF3B30" />
                   </View>
-                </View>
+                  <View style={{ flex: 1 }}>
+                    <Text className="text-white font-bold text-lg mb-1">
+                      Yes
+                    </Text>
+                    <Text className="text-white/60 text-sm">
+                      They said yes!
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+
+                {/* NO */}
+                <TouchableOpacity
+                  onPress={() => setSelectedOutcome("NO")}
+                  style={{
+                    backgroundColor:
+                      selectedOutcome === "NO"
+                        ? "rgba(76, 175, 80, 0.3)"
+                        : "rgba(255, 255, 255, 0.05)",
+                    borderWidth: 2,
+                    borderColor:
+                      selectedOutcome === "NO"
+                        ? "#4CAF50"
+                        : "rgba(255, 255, 255, 0.1)",
+                    borderRadius: 16,
+                    padding: 16,
+                    marginBottom: 12,
+                    flexDirection: "row",
+                    alignItems: "center",
+                  }}
+                >
+                  <View
+                    style={{
+                      width: 48,
+                      height: 48,
+                      borderRadius: 24,
+                      backgroundColor: "rgba(76, 175, 80, 0.2)",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      marginRight: 16,
+                    }}
+                  >
+                    <XCircle size={24} color="#4CAF50" />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text className="text-white font-bold text-lg mb-1">
+                      No
+                    </Text>
+                    <Text className="text-white/60 text-sm">
+                      Faced rejection
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+
+                {/* ACTIVITY */}
+                <TouchableOpacity
+                  onPress={() => setSelectedOutcome("ACTIVITY")}
+                  style={{
+                    backgroundColor:
+                      selectedOutcome === "ACTIVITY"
+                        ? "rgba(0, 217, 255, 0.3)"
+                        : "rgba(255, 255, 255, 0.05)",
+                    borderWidth: 2,
+                    borderColor:
+                      selectedOutcome === "ACTIVITY"
+                        ? "#00D9FF"
+                        : "rgba(255, 255, 255, 0.1)",
+                    borderRadius: 16,
+                    padding: 16,
+                    marginBottom: 24,
+                    flexDirection: "row",
+                    alignItems: "center",
+                  }}
+                >
+                  <View
+                    style={{
+                      width: 48,
+                      height: 48,
+                      borderRadius: 24,
+                      backgroundColor: "rgba(0, 217, 255, 0.2)",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      marginRight: 16,
+                    }}
+                  >
+                    <Activity size={24} color="#00D9FF" />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text className="text-white font-bold text-lg mb-1">
+                      Activity
+                    </Text>
+                    <Text className="text-white/60 text-sm">
+                      Completed an action
+                    </Text>
+                  </View>
+                </TouchableOpacity>
 
                 {/* Save Button */}
                 <TouchableOpacity
@@ -704,20 +668,20 @@ export default function AddJournalModal({ visible, onClose, onSuccess }: AddJour
                   disabled={!selectedOutcome || createEntryMutation.isPending}
                   style={{
                     backgroundColor: selectedOutcome ? "#7E3FE4" : "rgba(126, 63, 228, 0.3)",
-                    borderRadius: 12,
-                    padding: 14,
+                    borderRadius: 16,
+                    padding: 18,
                     alignItems: "center",
                   }}
                 >
                   {createEntryMutation.isPending ? (
                     <ActivityIndicator color="white" />
                   ) : (
-                    <Text className="text-white font-semibold text-base">
+                    <Text className="text-white font-bold text-lg">
                       Save Entry
                     </Text>
                   )}
                 </TouchableOpacity>
-              </>
+              </View>
             )}
           </ScrollView>
         </View>

@@ -1523,6 +1523,32 @@ See `ENV_SETUP.md` for complete environment variable setup guide.
 
 ## Recent Updates
 
+### 2025-11-16: Complete Journal Modal Redesign ✨ FIXED!
+- **Issue Resolved**: Modal state was persisting between opens, showing wrong screens
+- **Complete Redesign**: Brand new step-by-step flow with proper state management
+- **New Features**:
+  - **Step-Based Navigation**: 3 clear steps (Method → Input → Outcome)
+  - **Step 1 - Method Selection**: Beautiful large cards for Type vs Voice selection
+  - **Step 2 - Input**:
+    - Text mode: Large text area with "Continue" button
+    - Voice mode: Large 100px record button with visual feedback
+    - Back button to return to method selection
+  - **Step 3 - Outcome**: AI summary display + outcome selection + save
+  - **Automatic Step Progression**: Flows naturally from input → outcome after processing
+  - **Proper State Management**: Uses `step` state variable instead of conditional rendering
+  - **Clean Reset Logic**: Form resets to "method" step when modal opens
+  - **Enhanced UI**:
+    - Larger, more prominent buttons and icons
+    - Better visual hierarchy
+    - Centered popup design with dark overlay
+    - Purple glow effects and shadows
+    - Smooth fade animation
+- **Bug Fixes**:
+  - Fixed modal showing wrong screen on reopen
+  - Fixed state persistence issues
+  - Fixed refetch to use `refetchQueries` instead of `invalidateQueries`
+  - Journal entries now appear immediately after creation
+
 ### 2025-11-16: Fixed Journal Entry Display Updates ✅
 - **Issue Fixed**: Journal entries now show immediately after creation
 - **Root Cause**: Query invalidation wasn't forcing a refetch of data
