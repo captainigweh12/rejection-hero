@@ -274,9 +274,86 @@ export default function CommunityScreen({ navigation }: Props) {
           <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
             <Text style={{ fontSize: 32, fontWeight: "bold", color: "white" }}>Community</Text>
             <View style={{ flexDirection: "row", gap: 12 }}>
+              {/* Friends Badge */}
+              <Pressable
+                onPress={() => setActiveTab("friends")}
+                style={{
+                  paddingHorizontal: 12,
+                  paddingVertical: 6,
+                  borderRadius: 20,
+                  backgroundColor: activeTab === "friends" ? "#7E3FE4" : "rgba(255, 255, 255, 0.05)",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 6,
+                  borderWidth: 1,
+                  borderColor: activeTab === "friends" ? "#7E3FE4" : "rgba(126, 63, 228, 0.2)",
+                }}
+              >
+                <Users size={16} color={activeTab === "friends" ? "white" : "#888"} strokeWidth={2.5} />
+                <Text style={{ color: activeTab === "friends" ? "white" : "#888", fontSize: 13, fontWeight: "600" }}>
+                  {friends.length}
+                </Text>
+              </Pressable>
+
+              {/* Messages Badge */}
+              <Pressable
+                onPress={() => setActiveTab("messages")}
+                style={{
+                  paddingHorizontal: 12,
+                  paddingVertical: 6,
+                  borderRadius: 20,
+                  backgroundColor: activeTab === "messages" ? "#00D9FF" : "rgba(255, 255, 255, 0.05)",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 6,
+                  borderWidth: 1,
+                  borderColor: activeTab === "messages" ? "#00D9FF" : "rgba(126, 63, 228, 0.2)",
+                  position: "relative",
+                }}
+              >
+                <MessageCircle size={16} color={activeTab === "messages" ? "white" : "#888"} strokeWidth={2.5} />
+                <Text style={{ color: activeTab === "messages" ? "white" : "#888", fontSize: 13, fontWeight: "600" }}>
+                  {conversations.length}
+                </Text>
+                {conversations.some(c => c.unreadCount > 0) && (
+                  <View
+                    style={{
+                      position: "absolute",
+                      top: -4,
+                      right: -4,
+                      width: 12,
+                      height: 12,
+                      borderRadius: 6,
+                      backgroundColor: "#FF3B30",
+                    }}
+                  />
+                )}
+              </Pressable>
+
+              {/* Groups Badge */}
+              <Pressable
+                onPress={() => setActiveTab("groups")}
+                style={{
+                  paddingHorizontal: 12,
+                  paddingVertical: 6,
+                  borderRadius: 20,
+                  backgroundColor: activeTab === "groups" ? "#4CAF50" : "rgba(255, 255, 255, 0.05)",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 6,
+                  borderWidth: 1,
+                  borderColor: activeTab === "groups" ? "#4CAF50" : "rgba(126, 63, 228, 0.2)",
+                }}
+              >
+                <UsersRound size={16} color={activeTab === "groups" ? "white" : "#888"} strokeWidth={2.5} />
+                <Text style={{ color: activeTab === "groups" ? "white" : "#888", fontSize: 13, fontWeight: "600" }}>
+                  {myGroups.length}
+                </Text>
+              </Pressable>
+
+              {/* Notifications Bell */}
               <Pressable
                 onPress={() => {
-                  // Navigate to notifications screen
                   navigation.navigate("Notifications" as any);
                 }}
                 style={{
@@ -308,6 +385,8 @@ export default function CommunityScreen({ navigation }: Props) {
                   </View>
                 )}
               </Pressable>
+
+              {/* Search Button */}
               <Pressable
                 onPress={() => {
                   navigation.navigate("SearchUsers");
@@ -326,143 +405,97 @@ export default function CommunityScreen({ navigation }: Props) {
             </View>
           </View>
 
-          {/* Stats Cards */}
-          <View style={{ flexDirection: "row", gap: 12, marginBottom: 16 }}>
-            <View
-              style={{
-                flex: 1,
-                backgroundColor: "rgba(255, 255, 255, 0.05)",
-                borderRadius: 16,
-                padding: 16,
-                borderWidth: 1,
-                borderColor: "rgba(126, 63, 228, 0.3)",
-              }}
-            >
+          {/* Stats Cards - Only show when not on feed */}
+          {activeTab !== "feed" && (
+            <View style={{ flexDirection: "row", gap: 12, marginBottom: 16 }}>
               <View
-                style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 20,
-                  backgroundColor: "#7E3FE4" + "20",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  marginBottom: 8,
-                }}
-              >
-                <Users size={20} color="#7E3FE4" />
-              </View>
-              <Text style={{ fontSize: 24, fontWeight: "bold", color: "white", marginBottom: 4 }}>
-                {friends.length}
-              </Text>
-              <Text style={{ fontSize: 12, color: "rgba(255, 255, 255, 0.6)" }}>Friends</Text>
-            </View>
-
-            <View
-              style={{
-                flex: 1,
-                backgroundColor: "rgba(255, 255, 255, 0.05)",
-                borderRadius: 16,
-                padding: 16,
-                borderWidth: 1,
-                borderColor: "rgba(126, 63, 228, 0.3)",
-              }}
-            >
-              <View
-                style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 20,
-                  backgroundColor: "#00D9FF" + "20",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  marginBottom: 8,
-                }}
-              >
-                <MessageCircle size={20} color="#00D9FF" />
-              </View>
-              <Text style={{ fontSize: 24, fontWeight: "bold", color: "white", marginBottom: 4 }}>
-                {conversations.length}
-              </Text>
-              <Text style={{ fontSize: 12, color: "rgba(255, 255, 255, 0.6)" }}>Chats</Text>
-            </View>
-
-            <View
-              style={{
-                flex: 1,
-                backgroundColor: "rgba(255, 255, 255, 0.05)",
-                borderRadius: 16,
-                padding: 16,
-                borderWidth: 1,
-                borderColor: "rgba(126, 63, 228, 0.3)",
-              }}
-            >
-              <View
-                style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 20,
-                  backgroundColor: "#4CAF50" + "20",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  marginBottom: 8,
-                }}
-              >
-                <UsersRound size={20} color="#4CAF50" />
-              </View>
-              <Text style={{ fontSize: 24, fontWeight: "bold", color: "white", marginBottom: 4 }}>
-                {myGroups.length}
-              </Text>
-              <Text style={{ fontSize: 12, color: "rgba(255, 255, 255, 0.6)" }}>Groups</Text>
-            </View>
-          </View>
-
-          {/* Tab Switcher */}
-          <View
-            style={{
-              flexDirection: "row",
-              backgroundColor: "rgba(255, 255, 255, 0.03)",
-              borderRadius: 12,
-              padding: 4,
-            }}
-          >
-            {[
-              { key: "feed" as const, label: "Feed", icon: Home },
-              { key: "friends" as const, label: "Friends", icon: Users },
-              { key: "messages" as const, label: "Messages", icon: MessageCircle },
-              { key: "groups" as const, label: "Groups", icon: Group },
-            ].map((tab) => (
-              <Pressable
-                key={tab.key}
-                onPress={() => setActiveTab(tab.key)}
                 style={{
                   flex: 1,
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: 4,
-                  paddingVertical: 8,
-                  paddingHorizontal: 8,
-                  borderRadius: 8,
-                  backgroundColor: activeTab === tab.key ? "#7E3FE4" : "transparent",
+                  backgroundColor: "rgba(255, 255, 255, 0.05)",
+                  borderRadius: 16,
+                  padding: 16,
+                  borderWidth: 1,
+                  borderColor: "rgba(126, 63, 228, 0.3)",
                 }}
               >
-                <tab.icon
-                  size={16}
-                  color={activeTab === tab.key ? "white" : colors.textSecondary}
-                  strokeWidth={2.5}
-                />
-                <Text
+                <View
                   style={{
-                    fontSize: 13,
-                    fontWeight: activeTab === tab.key ? "700" : "600",
-                    color: activeTab === tab.key ? "white" : colors.textSecondary,
+                    width: 40,
+                    height: 40,
+                    borderRadius: 20,
+                    backgroundColor: "#7E3FE4" + "20",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginBottom: 8,
                   }}
                 >
-                  {tab.label}
+                  <Users size={20} color="#7E3FE4" />
+                </View>
+                <Text style={{ fontSize: 24, fontWeight: "bold", color: "white", marginBottom: 4 }}>
+                  {friends.length}
                 </Text>
-              </Pressable>
-            ))}
-          </View>
+                <Text style={{ fontSize: 12, color: "rgba(255, 255, 255, 0.6)" }}>Friends</Text>
+              </View>
+
+              <View
+                style={{
+                  flex: 1,
+                  backgroundColor: "rgba(255, 255, 255, 0.05)",
+                  borderRadius: 16,
+                  padding: 16,
+                  borderWidth: 1,
+                  borderColor: "rgba(126, 63, 228, 0.3)",
+                }}
+              >
+                <View
+                  style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: 20,
+                    backgroundColor: "#00D9FF" + "20",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginBottom: 8,
+                  }}
+                >
+                  <MessageCircle size={20} color="#00D9FF" />
+                </View>
+                <Text style={{ fontSize: 24, fontWeight: "bold", color: "white", marginBottom: 4 }}>
+                  {conversations.length}
+                </Text>
+                <Text style={{ fontSize: 12, color: "rgba(255, 255, 255, 0.6)" }}>Chats</Text>
+              </View>
+
+              <View
+                style={{
+                  flex: 1,
+                  backgroundColor: "rgba(255, 255, 255, 0.05)",
+                  borderRadius: 16,
+                  padding: 16,
+                  borderWidth: 1,
+                  borderColor: "rgba(126, 63, 228, 0.3)",
+                }}
+              >
+                <View
+                  style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: 20,
+                    backgroundColor: "#4CAF50" + "20",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginBottom: 8,
+                  }}
+                >
+                  <UsersRound size={20} color="#4CAF50" />
+                </View>
+                <Text style={{ fontSize: 24, fontWeight: "bold", color: "white", marginBottom: 4 }}>
+                  {myGroups.length}
+                </Text>
+                <Text style={{ fontSize: 12, color: "rgba(255, 255, 255, 0.6)" }}>Groups</Text>
+              </View>
+            </View>
+          )}
         </View>
 
         {/* Content */}
