@@ -10,6 +10,8 @@ import {
   type GetQuestRadarResponse,
   type GetWarmupActionResponse,
   type GetSmartQuestSuggestionsResponse,
+  generateMapQuestsRequestSchema,
+  type GenerateMapQuestsResponse,
 } from "@/shared/contracts";
 import { type AppType } from "../types";
 import { db } from "../db";
@@ -1191,6 +1193,121 @@ questsRouter.get("/smart-suggestions", async (c) => {
     suggestions,
     message,
   } satisfies GetSmartQuestSuggestionsResponse);
+});
+
+// ============================================
+// POST /api/quests/generate-map-quests - Generate quests for map within 5 miles
+// ============================================
+questsRouter.post("/generate-map-quests", zValidator("json", generateMapQuestsRequestSchema), async (c) => {
+  const user = c.get("user");
+
+  if (!user) {
+    return c.json({ message: "Unauthorized" }, 401);
+  }
+
+  const { latitude, longitude, count = 5 } = c.req.valid("json");
+
+  console.log(`🗺️ [Map Quests] Generating ${count} quests near (${latitude}, ${longitude}) for user ${user.id}`);
+
+  try {
+    // Fetch nearby places within 5 miles (8 km)
+    const nearbyPlaces = await fetchNearbyPlaces(latitude, longitude, 8000);
+
+    if (nearbyPlaces.length === 0) {
+      return c.json({
+        success: false,
+        quests: [],
+      }, 400);
+    }
+
+    console.log(`🗺️ [Map Quests] Found ${nearbyPlaces.length} nearby places`);
+
+    // Categories and difficulties for variety
+    const categories = ["SALES", "SOCIAL", "ENTREPRENEURSHIP", "DATING", "CONFIDENCE", "CAREER"];
+    const difficulties = ["EASY", "MEDIUM", "HARD"];
+    const questTypes = ["REJECTION", "ACTION"];
+
+    // Generate multiple quests
+    const generatedQuests: any[] = [];
+
+    for (let i = 0; i < count; i++) {
+      // Select random category, difficulty, and quest type for variety
+      const randomCategory = categories[Math.floor(Math.random() * categories.length)];
+      const randomDifficulty = difficulties[Math.floor(Math.random() * difficulties.length)];
+      const randomQuestType = questTypes[Math.floor(Math.random() * questTypes.length)];
+
+      // Select a random nearby place for this quest
+      const randomPlace = nearbyPlaces[Math.floor(Math.random() * nearbyPlaces.length)];
+
+      try {
+        // Generate quest using existing AI function
+        const questData = await generateQuestWithAI(
+          randomCategory,
+          randomDifficulty,
+          undefined, // no custom prompt
+          user.id,
+          randomPlace.name,
+          randomPlace.latitude,
+          randomPlace.longitude,
+          randomQuestType as "REJECTION" | "ACTION"
+        );
+
+        // Create the quest in the database (but don't assign to user yet)
+        const quest = await db.quest.create({
+          data: {
+            title: questData.title,
+            description: questData.description,
+            category: questData.category,
+            difficulty: questData.difficulty,
+            goalType: questData.goalType,
+            goalCount: questData.goalCount,
+            xpReward: questData.xpReward,
+            pointReward: questData.pointReward,
+            location: questData.location || randomPlace.name,
+            latitude: questData.latitude || randomPlace.latitude,
+            longitude: questData.longitude || randomPlace.longitude,
+            timeContext: questData.timeContext,
+            dateContext: questData.dateContext,
+          },
+        });
+
+        generatedQuests.push({
+          id: quest.id,
+          title: quest.title,
+          description: quest.description,
+          category: quest.category,
+          difficulty: quest.difficulty,
+          goalType: quest.goalType,
+          goalCount: quest.goalCount,
+          xpReward: quest.xpReward,
+          pointReward: quest.pointReward,
+          location: quest.location || "",
+          latitude: quest.latitude || randomPlace.latitude,
+          longitude: quest.longitude || randomPlace.longitude,
+          timeContext: quest.timeContext,
+          dateContext: quest.dateContext,
+        });
+
+        console.log(`✅ [Map Quests] Generated quest ${i + 1}/${count}: ${quest.title}`);
+      } catch (error) {
+        console.error(`❌ [Map Quests] Failed to generate quest ${i + 1}:`, error);
+        // Continue with next quest
+      }
+    }
+
+    console.log(`🗺️ [Map Quests] Successfully generated ${generatedQuests.length}/${count} quests`);
+
+    return c.json({
+      success: true,
+      quests: generatedQuests,
+    } satisfies GenerateMapQuestsResponse);
+  } catch (error) {
+    console.error("❌ [Map Quests] Error generating map quests:", error);
+    return c.json({
+      success: false,
+      quests: [],
+    }, 500);
+  }
 });
 
 export { questsRouter };

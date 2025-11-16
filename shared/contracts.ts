@@ -268,6 +268,36 @@ export const recordQuestActionResponseSchema = z.object({
 });
 export type RecordQuestActionResponse = z.infer<typeof recordQuestActionResponseSchema>;
 
+// POST /api/quests/generate-map-quests - Generate quests for map within 5 miles
+export const generateMapQuestsRequestSchema = z.object({
+  latitude: z.number(),
+  longitude: z.number(),
+  count: z.number().min(1).max(10).optional().default(5), // Generate 5 quests by default
+});
+export type GenerateMapQuestsRequest = z.infer<typeof generateMapQuestsRequestSchema>;
+export const generateMapQuestsResponseSchema = z.object({
+  success: z.boolean(),
+  quests: z.array(
+    z.object({
+      id: z.string(),
+      title: z.string(),
+      description: z.string(),
+      category: z.string(),
+      difficulty: z.string(),
+      goalType: z.string(),
+      goalCount: z.number(),
+      xpReward: z.number(),
+      pointReward: z.number(),
+      location: z.string(),
+      latitude: z.number(),
+      longitude: z.number(),
+      timeContext: z.string().nullable(),
+      dateContext: z.string().nullable(),
+    })
+  ),
+});
+export type GenerateMapQuestsResponse = z.infer<typeof generateMapQuestsResponseSchema>;
+
 // GET /api/stats - Get user stats
 export const getUserStatsResponseSchema = z.object({
   currentStreak: z.number(),

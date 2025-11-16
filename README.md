@@ -650,15 +650,32 @@ To enable Google sign-in, you need to configure authorized redirect URIs in your
   - Answers stored for AI quest generation
   - Can update username and answers in Profile → About tab
 
-**Map & Location Features**
-- Google Maps integration with real-time location tracking
+**Map & Location Features** ✨ FULLY ENHANCED!
+- **Google Maps integration** with real-time location tracking
+- **AI Quest Generation on Map** 🗺️ NEW!:
+  - **Generate Quests Button** (purple sparkles icon): Generate 5 AI-powered quests within 5 miles
+  - AI creates diverse quests at real nearby locations using Google Maps Places API
+  - Quests appear as colored markers on the map (color-coded by category)
+  - Tap any quest marker to view full details in a beautiful modal
+  - **Quest Details Modal**:
+    - Quest title, description, and location
+    - Category and difficulty badges
+    - XP and Points rewards display
+    - "Accept Quest" button to add quest to your list
+  - **Random Variety**: Each generation creates different categories, difficulties, and quest types
+  - **Real Locations**: Uses actual businesses and places within 5-mile radius
+  - Confirmation dialog before generating to avoid accidental API calls
 - **iOS & Android location permissions properly configured**:
   - iOS: NSLocationWhenInUseUsageDescription and NSLocationAlwaysAndWhenInUseUsageDescription set
   - Android: ACCESS_FINE_LOCATION and ACCESS_COARSE_LOCATION permissions added
+- **Three Action Buttons**:
+  - 🌟 **Generate Quests** (purple): Create 5 AI quests on map within 5 miles
+  - 🎯 **Recenter Map** (dark): Re-center map to your current location
+  - ➕ **Create Quest** (orange): Navigate to quest creation screen
 - Location permission handling with user-friendly error messages
-- Recenter map to current location
+- Recenter map to current location with smooth animation
 - Create location-based quests
-- Discover nearby quest opportunities (coming soon)
+- **Smart Header**: Shows quest count when quests are generated
 
 **Navigation & Menu**
 - Redesigned hamburger menu with organized sections
@@ -1217,11 +1234,19 @@ The app features a cohesive dark theme with modern 3D-style UI elements througho
 ### Quests (Enhanced)
 - `GET /api/quests` - Get user's active and queued quests
 - `POST /api/quests/generate` - Generate AI-powered quest
+- `POST /api/quests/generate-map-quests` 🗺️ NEW! - Generate quests for map display within 5 miles
 - `POST /api/quests/:id/start` - Start a quest (max 2 active)
 - `POST /api/quests/:id/record` - Record NO or YES attempt
 - `GET /api/quests/warmup` ✨ NEW! - Get a 5-second warm-up action
 - `GET /api/quests/radar` ✨ NEW! - Get location-based quest opportunities (NO Radar)
 - `GET /api/quests/smart-suggestions` ✨ NEW! - Get AI-adapted quest suggestions based on behavior
+
+**Map Quest Generation:**
+- Generates 5 AI-powered quests within 5-mile (8km) radius
+- Uses Google Maps Places API to find real nearby locations
+- Creates variety with random categories, difficulties, and quest types
+- Returns quest data for map markers (not assigned to user automatically)
+- Each quest includes: title, description, category, difficulty, location, GPS coordinates, rewards
 
 ### Live Streaming ✨ NEW!
 - `POST /api/live/start` - Start a live stream
@@ -1431,6 +1456,17 @@ See `ENV_SETUP.md` for complete environment variable setup guide.
 - **Database**: Prisma migrations required for schema changes
 
 ## Recent Updates
+
+### 2025-11-16: AI Quest Generation on Map
+- **New Feature**: Generate AI-powered quests directly on the map within 5-mile radius
+- **Backend**: Added POST /api/quests/generate-map-quests endpoint
+- **Frontend**: Updated MapScreen with:
+  - Purple sparkles button to trigger quest generation
+  - Clickable colored quest markers on map
+  - Beautiful quest detail modal with category, difficulty, rewards
+  - "Accept Quest" button to add quests to your list
+- **AI Integration**: Uses existing AI quest generation with random variety
+- **Real Locations**: Leverages Google Maps Places API for authentic nearby places
 
 ### 2025-11-16: Fixed 502 Bad Gateway Error on Profile Endpoint
 - **Issue**: GET /api/profile was returning 502 bad gateway errors
