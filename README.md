@@ -1523,31 +1523,38 @@ See `ENV_SETUP.md` for complete environment variable setup guide.
 
 ## Recent Updates
 
-### 2025-11-16: Complete Journal Modal Redesign ✨ FIXED!
-- **Issue Resolved**: Modal state was persisting between opens, showing wrong screens
-- **Complete Redesign**: Brand new step-by-step flow with proper state management
-- **New Features**:
-  - **Step-Based Navigation**: 3 clear steps (Method → Input → Outcome)
-  - **Step 1 - Method Selection**: Beautiful large cards for Type vs Voice selection
-  - **Step 2 - Input**:
-    - Text mode: Large text area with "Continue" button
-    - Voice mode: Large 100px record button with visual feedback
-    - Back button to return to method selection
-  - **Step 3 - Outcome**: AI summary display + outcome selection + save
-  - **Automatic Step Progression**: Flows naturally from input → outcome after processing
-  - **Proper State Management**: Uses `step` state variable instead of conditional rendering
-  - **Clean Reset Logic**: Form resets to "method" step when modal opens
-  - **Enhanced UI**:
-    - Larger, more prominent buttons and icons
-    - Better visual hierarchy
-    - Centered popup design with dark overlay
-    - Purple glow effects and shadows
-    - Smooth fade animation
-- **Bug Fixes**:
-  - Fixed modal showing wrong screen on reopen
-  - Fixed state persistence issues
-  - Fixed refetch to use `refetchQueries` instead of `invalidateQueries`
-  - Journal entries now appear immediately after creation
+### 2025-11-16: Brand New Journal Modal - Built From Scratch ✨
+- **Complete Rebuild**: Deleted old modal and created entirely new component
+- **Clean State Management**: Uses `currentStep` (1, 2, 3) instead of string-based steps
+- **Simplified Logic**: No complex conditional rendering or state persistence issues
+- **Step 1 - Method Selection**:
+  - Two large, beautiful cards (Type Your Entry / Voice Recording)
+  - 80px circular icons with colored backgrounds
+  - Purple card for text, orange card for voice
+  - Clear descriptions under each option
+  - Centered layout with generous spacing
+- **Step 2 - Input**:
+  - **Text Mode**: Large 200px text area + Continue button
+  - **Voice Mode**: 120px circular record button with shadow effects
+  - Back button to return to method selection
+  - Real-time processing feedback
+- **Step 3 - Outcome Selection**:
+  - AI-generated summary display in purple card
+  - Three large outcome cards (Yes/No/Activity)
+  - 48px circular icons with colored backgrounds
+  - Save button at bottom
+- **Features**:
+  - Automatic reset when modal opens (useEffect on `visible`)
+  - Smooth fade animation
+  - Dark overlay background (90% opacity)
+  - Purple border around entire modal
+  - Clean, modern UI matching app theme
+  - Journal entries appear immediately after saving
+- **Technical Improvements**:
+  - Uses `currentStep` numeric state (1, 2, 3)
+  - Simple if conditions instead of ternary chains
+  - Proper useEffect cleanup
+  - refetchQueries for instant UI updates
 
 ### 2025-11-16: Fixed Journal Entry Display Updates ✅
 - **Issue Fixed**: Journal entries now show immediately after creation

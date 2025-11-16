@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -15,21 +15,6 @@ import * as FileSystem from "expo-file-system";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 
-interface TranscribeAudioResponse {
-  transcript: string;
-  summary: string;
-}
-
-interface CreateJournalEntryResponse {
-  id: string;
-  achievement: {
-    id: string;
-    type: string;
-    description: string;
-    earnedAt: string;
-  };
-}
-
 interface AddJournalModalProps {
   visible: boolean;
   onClose: () => void;
@@ -39,50 +24,58 @@ interface AddJournalModalProps {
 export default function AddJournalModal({ visible, onClose, onSuccess }: AddJournalModalProps) {
   const queryClient = useQueryClient();
 
-  // State management
-  const [step, setStep] = useState<"method" | "input" | "outcome">("method");
-  const [inputMode, setInputMode] = useState<"text" | "voice">("text");
-  const [recording, setRecording] = useState<Audio.Recording | null>(null);
+  // Step control
+  const [currentStep, setCurrentStep] = useState(1);
+
+  // Method selection
+  const [selectedMethod, setSelectedMethod] = useState<"text" | "voice" | null>(null);
+
+  // Text input
+  const [textContent, setTextContent] = useState("");
+
+  // Voice recording
+  const [audioRecording, setAudioRecording] = useState<Audio.Recording | null>(null);
   const [isRecording, setIsRecording] = useState(false);
-  const [transcribing, setTranscribing] = useState(false);
-  const [textEntry, setTextEntry] = useState("");
-  const [transcript, setTranscript] = useState("");
-  const [summary, setSummary] = useState("");
-  const [editedSummary, setEditedSummary] = useState("");
-  const [selectedOutcome, setSelectedOutcome] = useState<"YES" | "NO" | "ACTIVITY" | null>(null);
   const [recordingUri, setRecordingUri] = useState<string | null>(null);
 
-  // Reset form when modal opens
-  React.useEffect(() => {
+  // Processing
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [aiSummary, setAiSummary] = useState("");
+  const [transcript, setTranscript] = useState("");
+
+  // Outcome
+  const [selectedOutcome, setSelectedOutcome] = useState<"YES" | "NO" | "ACTIVITY" | null>(null);
+
+  // Reset everything when modal opens
+  useEffect(() => {
     if (visible) {
-      console.log("[AddJournalModal] Modal opened - resetting to method step");
-      resetForm();
+      console.log("[Journal] Modal opened - resetting all state");
+      setCurrentStep(1);
+      setSelectedMethod(null);
+      setTextContent("");
+      setAudioRecording(null);
+      setIsRecording(false);
+      setRecordingUri(null);
+      setIsProcessing(false);
+      setAiSummary("");
+      setTranscript("");
+      setSelectedOutcome(null);
     }
   }, [visible]);
 
-  const resetForm = () => {
-    setStep("method");
-    setInputMode("text");
-    setRecording(null);
-    setIsRecording(false);
-    setTranscribing(false);
-    setRecordingUri(null);
-    setTextEntry("");
-    setTranscript("");
-    setSummary("");
-    setEditedSummary("");
-    setSelectedOutcome(null);
-    console.log("[AddJournalModal] Form reset complete");
+  // Step 1: Select method (Type or Voice)
+  const handleSelectMethod = (method: "text" | "voice") => {
+    console.log("[Journal] Method selected:", method);
+    setSelectedMethod(method);
+    setCurrentStep(2);
   };
 
-  // Start recording
-  const startRecording = async () => {
+  // Step 2: Voice recording functions
+  const startVoiceRecording = async () => {
     try {
-      console.log("Requesting permissions...");
       const permission = await Audio.requestPermissionsAsync();
-
       if (permission.status !== "granted") {
-        Alert.alert("Permission required", "Please enable microphone access to record audio.");
+        Alert.alert("Permission Required", "Please enable microphone access.");
         return;
       }
 
@@ -91,175 +84,152 @@ export default function AddJournalModal({ visible, onClose, onSuccess }: AddJour
         playsInSilentModeIOS: true,
       });
 
-      console.log("Starting recording...");
       const { recording } = await Audio.Recording.createAsync(
         Audio.RecordingOptionsPresets.HIGH_QUALITY
       );
 
-      setRecording(recording);
+      setAudioRecording(recording);
       setIsRecording(true);
-      console.log("Recording started");
     } catch (err) {
-      console.error("Failed to start recording", err);
-      Alert.alert("Error", "Failed to start recording. Please try again.");
+      console.error("Recording error:", err);
+      Alert.alert("Error", "Failed to start recording");
     }
   };
 
-  // Stop recording and transcribe
-  const stopRecording = async () => {
-    if (!recording) return;
+  const stopVoiceRecording = async () => {
+    if (!audioRecording) return;
 
     try {
-      console.log("Stopping recording...");
       setIsRecording(false);
-      await recording.stopAndUnloadAsync();
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: false,
-      });
+      await audioRecording.stopAndUnloadAsync();
+      await Audio.setAudioModeAsync({ allowsRecordingIOS: false });
 
-      const uri = recording.getURI();
-      console.log("Recording stopped, URI:", uri);
-
+      const uri = audioRecording.getURI();
       if (!uri) {
         Alert.alert("Error", "Failed to save recording");
         return;
       }
 
       setRecordingUri(uri);
-      setRecording(null);
+      setAudioRecording(null);
 
-      // Transcribe audio
-      setTranscribing(true);
-      try {
-        const audioBase64 = await FileSystem.readAsStringAsync(uri, {
-          encoding: FileSystem.EncodingType.Base64,
-        });
-
-        const data = await api.post<TranscribeAudioResponse>("/api/journal/transcribe", {
-          audioBase64,
-        });
-
-        setTranscript(data.transcript);
-        setSummary(data.summary);
-        setEditedSummary(data.summary);
-        setStep("outcome");
-        console.log("Transcription complete, moving to outcome step");
-      } catch (err) {
-        console.error("Transcription error:", err);
-        Alert.alert("Error", "Failed to transcribe audio. Please try again.");
-      } finally {
-        setTranscribing(false);
-      }
+      // Process the audio
+      await processAudio(uri);
     } catch (err) {
-      console.error("Failed to stop recording", err);
+      console.error("Stop recording error:", err);
       Alert.alert("Error", "Failed to stop recording");
     }
   };
 
-  // Process text entry
-  const handleProcessText = async () => {
-    if (!textEntry.trim()) {
-      Alert.alert("Error", "Please write your experience first");
-      return;
-    }
-
-    setTranscribing(true);
+  const processAudio = async (uri: string) => {
+    setIsProcessing(true);
     try {
-      const data = await api.post<TranscribeAudioResponse>("/api/journal/transcribe", {
-        text: textEntry.trim(),
+      const audioBase64 = await FileSystem.readAsStringAsync(uri, {
+        encoding: FileSystem.EncodingType.Base64,
       });
 
-      setSummary(data.summary);
-      setEditedSummary(data.summary);
-      setStep("outcome");
-      console.log("Text processing complete, moving to outcome step");
+      const response = await api.post<{ transcript: string; summary: string }>(
+        "/api/journal/transcribe",
+        { audioBase64 }
+      );
+
+      setTranscript(response.transcript);
+      setAiSummary(response.summary);
+      setCurrentStep(3);
     } catch (err) {
-      console.error("Text processing error:", err);
-      Alert.alert("Error", "Failed to process text. Please try again.");
+      console.error("Transcription error:", err);
+      Alert.alert("Error", "Failed to transcribe audio");
     } finally {
-      setTranscribing(false);
+      setIsProcessing(false);
     }
   };
 
-  // Create journal entry mutation
-  const createEntryMutation = useMutation({
+  // Step 2: Process text
+  const processText = async () => {
+    if (!textContent.trim()) {
+      Alert.alert("Empty Entry", "Please write something first");
+      return;
+    }
+
+    setIsProcessing(true);
+    try {
+      const response = await api.post<{ summary: string }>(
+        "/api/journal/transcribe",
+        { text: textContent.trim() }
+      );
+
+      setAiSummary(response.summary);
+      setCurrentStep(3);
+    } catch (err) {
+      console.error("Text processing error:", err);
+      Alert.alert("Error", "Failed to process text");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  // Step 3: Save entry
+  const saveEntryMutation = useMutation({
     mutationFn: async () => {
       if (!selectedOutcome) {
         throw new Error("Please select an outcome");
       }
 
-      console.log("Creating journal entry with data:", {
-        audioUrl: recordingUri,
-        audioTranscript: inputMode === "voice" ? transcript : textEntry,
-        aiSummary: summary,
-        userEditedSummary: editedSummary,
-        outcome: selectedOutcome,
-      });
-
-      return api.post<CreateJournalEntryResponse>("/api/journal", {
-        audioUrl: recordingUri,
-        audioTranscript: inputMode === "voice" ? transcript : textEntry,
-        aiSummary: summary,
-        userEditedSummary: editedSummary !== summary ? editedSummary : null,
-        outcome: selectedOutcome,
-      });
+      return api.post<{
+        id: string;
+        achievement: {
+          id: string;
+          type: string;
+          description: string;
+          earnedAt: string;
+        };
+      }>(
+        "/api/journal",
+        {
+          audioUrl: recordingUri,
+          audioTranscript: selectedMethod === "voice" ? transcript : textContent,
+          aiSummary,
+          userEditedSummary: null,
+          outcome: selectedOutcome,
+        }
+      );
     },
     onSuccess: async (data) => {
-      console.log("Journal entry created successfully:", data);
+      console.log("[Journal] Entry saved successfully");
 
-      // Refetch journal entries to ensure UI updates
+      // Refetch journal entries
       await queryClient.refetchQueries({ queryKey: ["journal-entries"] });
-
-      console.log("Journal entries refetched");
 
       // Close modal
       onClose();
 
-      // Reset form after closing
+      // Show achievement
       setTimeout(() => {
-        resetForm();
-      }, 100);
-
-      // Show success alert after modal closes
-      setTimeout(() => {
-        Alert.alert(
-          "Achievement Earned!",
-          data.achievement.description,
-          [{ text: "OK" }]
-        );
+        Alert.alert("Achievement Earned!", data.achievement.description);
       }, 300);
 
-      // Call success callback
       onSuccess?.();
     },
     onError: (error) => {
-      console.error("Create entry error:", error);
-      Alert.alert("Error", "Failed to save journal entry. Please try again.");
+      console.error("Save error:", error);
+      Alert.alert("Error", "Failed to save journal entry");
     },
   });
 
   const handleSave = () => {
     if (!selectedOutcome) {
-      Alert.alert("Missing Information", "Please select an outcome (Yes/No/Activity)");
+      Alert.alert("Missing Information", "Please select an outcome");
       return;
     }
-    createEntryMutation.mutate();
+    saveEntryMutation.mutate();
   };
 
   const handleClose = () => {
     if (isRecording) {
-      Alert.alert("Recording in Progress", "Please stop recording before closing.");
+      Alert.alert("Recording in Progress", "Please stop recording first");
       return;
     }
     onClose();
-    setTimeout(() => {
-      resetForm();
-    }, 300);
-  };
-
-  const handleMethodSelect = (method: "text" | "voice") => {
-    setInputMode(method);
-    setStep("input");
   };
 
   return (
@@ -270,10 +240,9 @@ export default function AddJournalModal({ visible, onClose, onSuccess }: AddJour
       onRequestClose={handleClose}
     >
       <View
-        key={`journal-modal-${step}`}
         style={{
           flex: 1,
-          backgroundColor: "rgba(0, 0, 0, 0.85)",
+          backgroundColor: "rgba(0, 0, 0, 0.9)",
           justifyContent: "center",
           alignItems: "center",
           padding: 20,
@@ -282,18 +251,13 @@ export default function AddJournalModal({ visible, onClose, onSuccess }: AddJour
         <View
           style={{
             width: "100%",
-            maxWidth: 400,
-            maxHeight: "90%",
+            maxWidth: 420,
+            maxHeight: "85%",
             backgroundColor: "#1A1A24",
             borderRadius: 24,
             borderWidth: 2,
-            borderColor: "rgba(126, 63, 228, 0.4)",
+            borderColor: "#7E3FE4",
             overflow: "hidden",
-            shadowColor: "#7E3FE4",
-            shadowOffset: { width: 0, height: 8 },
-            shadowOpacity: 0.3,
-            shadowRadius: 16,
-            elevation: 10,
           }}
         >
           {/* Header */}
@@ -304,10 +268,12 @@ export default function AddJournalModal({ visible, onClose, onSuccess }: AddJour
               alignItems: "center",
               padding: 20,
               borderBottomWidth: 1,
-              borderBottomColor: "rgba(126, 63, 228, 0.2)",
+              borderBottomColor: "rgba(126, 63, 228, 0.3)",
             }}
           >
-            <Text className="text-2xl font-bold text-white">Journal Entry</Text>
+            <Text style={{ fontSize: 24, fontWeight: "bold", color: "white" }}>
+              Journal Entry
+            </Text>
             <TouchableOpacity onPress={handleClose}>
               <X size={28} color="white" />
             </TouchableOpacity>
@@ -318,114 +284,114 @@ export default function AddJournalModal({ visible, onClose, onSuccess }: AddJour
             contentContainerStyle={{ padding: 20 }}
             showsVerticalScrollIndicator={false}
           >
-            {/* Debug Step Indicator */}
-            {__DEV__ && (
-              <View style={{
-                padding: 8,
-                backgroundColor: "rgba(255, 0, 0, 0.3)",
-                marginBottom: 12,
-                borderRadius: 8,
-                borderWidth: 2,
-                borderColor: "red",
-              }}>
-                <Text className="text-white text-xs font-bold">
-                  🔍 DEBUG: Current Step = &quot;{step}&quot;
-                </Text>
-              </View>
-            )}
-
-            {/* Render ONLY the current step */}
-            {step === "method" ? (
+            {/* STEP 1: METHOD SELECTION */}
+            {currentStep === 1 && (
               <View>
-                <Text className="text-lg font-semibold text-white mb-4 text-center">
+                <Text
+                  style={{
+                    fontSize: 18,
+                    fontWeight: "600",
+                    color: "white",
+                    textAlign: "center",
+                    marginBottom: 24,
+                  }}
+                >
                   How would you like to log your experience?
                 </Text>
 
                 {/* Type Button */}
                 <TouchableOpacity
-                  onPress={() => handleMethodSelect("text")}
+                  onPress={() => handleSelectMethod("text")}
                   style={{
                     backgroundColor: "rgba(126, 63, 228, 0.2)",
                     borderWidth: 2,
                     borderColor: "#7E3FE4",
-                    borderRadius: 16,
-                    padding: 24,
-                    marginBottom: 16,
+                    borderRadius: 20,
+                    padding: 28,
+                    marginBottom: 20,
                     alignItems: "center",
                   }}
                 >
                   <View
                     style={{
-                      width: 64,
-                      height: 64,
-                      borderRadius: 32,
-                      backgroundColor: "rgba(126, 63, 228, 0.3)",
+                      width: 80,
+                      height: 80,
+                      borderRadius: 40,
+                      backgroundColor: "#7E3FE4",
                       justifyContent: "center",
                       alignItems: "center",
-                      marginBottom: 12,
+                      marginBottom: 16,
                     }}
                   >
-                    <Type size={32} color="#7E3FE4" />
+                    <Type size={40} color="white" />
                   </View>
-                  <Text className="text-xl font-bold text-white mb-2">Type Your Entry</Text>
-                  <Text className="text-sm text-white/60 text-center">
+                  <Text style={{ fontSize: 22, fontWeight: "bold", color: "white", marginBottom: 8 }}>
+                    Type Your Entry
+                  </Text>
+                  <Text style={{ fontSize: 14, color: "rgba(255, 255, 255, 0.6)", textAlign: "center" }}>
                     Write down your thoughts and experiences
                   </Text>
                 </TouchableOpacity>
 
                 {/* Voice Button */}
                 <TouchableOpacity
-                  onPress={() => handleMethodSelect("voice")}
+                  onPress={() => handleSelectMethod("voice")}
                   style={{
                     backgroundColor: "rgba(255, 107, 53, 0.2)",
                     borderWidth: 2,
                     borderColor: "#FF6B35",
-                    borderRadius: 16,
-                    padding: 24,
+                    borderRadius: 20,
+                    padding: 28,
                     alignItems: "center",
                   }}
                 >
                   <View
                     style={{
-                      width: 64,
-                      height: 64,
-                      borderRadius: 32,
-                      backgroundColor: "rgba(255, 107, 53, 0.3)",
+                      width: 80,
+                      height: 80,
+                      borderRadius: 40,
+                      backgroundColor: "#FF6B35",
                       justifyContent: "center",
                       alignItems: "center",
-                      marginBottom: 12,
+                      marginBottom: 16,
                     }}
                   >
-                    <Mic size={32} color="#FF6B35" />
+                    <Mic size={40} color="white" />
                   </View>
-                  <Text className="text-xl font-bold text-white mb-2">Voice Recording</Text>
-                  <Text className="text-sm text-white/60 text-center">
+                  <Text style={{ fontSize: 22, fontWeight: "bold", color: "white", marginBottom: 8 }}>
+                    Voice Recording
+                  </Text>
+                  <Text style={{ fontSize: 14, color: "rgba(255, 255, 255, 0.6)", textAlign: "center" }}>
                     Speak your thoughts and we&apos;ll transcribe them
                   </Text>
                 </TouchableOpacity>
               </View>
-            ) : step === "input" ? (
+            )}
+
+            {/* STEP 2: INPUT */}
+            {currentStep === 2 && (
               <View>
                 {/* Back Button */}
                 <TouchableOpacity
-                  onPress={() => setStep("method")}
-                  style={{ marginBottom: 16 }}
+                  onPress={() => setCurrentStep(1)}
+                  style={{ marginBottom: 20 }}
                 >
-                  <Text className="text-[#7E3FE4] font-semibold">← Back</Text>
+                  <Text style={{ color: "#7E3FE4", fontSize: 16, fontWeight: "600" }}>
+                    ← Back
+                  </Text>
                 </TouchableOpacity>
 
-                {inputMode === "text" ? (
+                {selectedMethod === "text" ? (
                   <View>
-                    <Text className="text-lg font-semibold text-white mb-4">
+                    <Text style={{ fontSize: 18, fontWeight: "600", color: "white", marginBottom: 16 }}>
                       Write Your Experience
                     </Text>
                     <TextInput
-                      value={textEntry}
-                      onChangeText={setTextEntry}
+                      value={textContent}
+                      onChangeText={setTextContent}
                       placeholder="Describe what happened, how you felt, what you learned..."
                       placeholderTextColor="rgba(255, 255, 255, 0.3)"
                       multiline
-                      numberOfLines={8}
                       style={{
                         backgroundColor: "rgba(255, 255, 255, 0.05)",
                         borderWidth: 1,
@@ -434,85 +400,84 @@ export default function AddJournalModal({ visible, onClose, onSuccess }: AddJour
                         padding: 16,
                         color: "white",
                         fontSize: 15,
-                        minHeight: 180,
+                        minHeight: 200,
                         textAlignVertical: "top",
-                        marginBottom: 20,
+                        marginBottom: 24,
                       }}
                     />
                     <TouchableOpacity
-                      onPress={handleProcessText}
-                      disabled={!textEntry.trim() || transcribing}
+                      onPress={processText}
+                      disabled={!textContent.trim() || isProcessing}
                       style={{
-                        backgroundColor: textEntry.trim() ? "#7E3FE4" : "rgba(126, 63, 228, 0.3)",
+                        backgroundColor: textContent.trim() ? "#7E3FE4" : "rgba(126, 63, 228, 0.3)",
                         borderRadius: 16,
                         padding: 18,
                         alignItems: "center",
                       }}
                     >
-                      {transcribing ? (
-                        <ActivityIndicator color="white" size="small" />
+                      {isProcessing ? (
+                        <ActivityIndicator color="white" />
                       ) : (
-                        <Text className="text-white font-bold text-lg">Continue</Text>
+                        <Text style={{ color: "white", fontSize: 18, fontWeight: "bold" }}>
+                          Continue
+                        </Text>
                       )}
                     </TouchableOpacity>
                   </View>
                 ) : (
                   <View>
-                    <Text className="text-lg font-semibold text-white mb-4 text-center">
+                    <Text
+                      style={{
+                        fontSize: 18,
+                        fontWeight: "600",
+                        color: "white",
+                        textAlign: "center",
+                        marginBottom: 32,
+                      }}
+                    >
                       Voice Recording
                     </Text>
 
-                    <View className="items-center py-8">
-                      {isRecording ? (
-                        <TouchableOpacity
-                          onPress={stopRecording}
-                          style={{
-                            width: 100,
-                            height: 100,
-                            borderRadius: 50,
-                            backgroundColor: "#FF3B30",
-                            justifyContent: "center",
-                            alignItems: "center",
-                            shadowColor: "#FF3B30",
-                            shadowOffset: { width: 0, height: 4 },
-                            shadowOpacity: 0.5,
-                            shadowRadius: 12,
-                            elevation: 8,
-                          }}
-                        >
-                          <Square size={40} color="white" fill="white" />
-                        </TouchableOpacity>
-                      ) : (
-                        <TouchableOpacity
-                          onPress={startRecording}
-                          disabled={transcribing}
-                          style={{
-                            width: 100,
-                            height: 100,
-                            borderRadius: 50,
-                            backgroundColor: "#FF6B35",
-                            justifyContent: "center",
-                            alignItems: "center",
-                            shadowColor: "#FF6B35",
-                            shadowOffset: { width: 0, height: 4 },
-                            shadowOpacity: 0.5,
-                            shadowRadius: 12,
-                            elevation: 8,
-                          }}
-                        >
-                          <Mic size={40} color="white" />
-                        </TouchableOpacity>
-                      )}
+                    <View style={{ alignItems: "center", paddingVertical: 40 }}>
+                      <TouchableOpacity
+                        onPress={isRecording ? stopVoiceRecording : startVoiceRecording}
+                        disabled={isProcessing}
+                        style={{
+                          width: 120,
+                          height: 120,
+                          borderRadius: 60,
+                          backgroundColor: isRecording ? "#FF3B30" : "#FF6B35",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          shadowColor: isRecording ? "#FF3B30" : "#FF6B35",
+                          shadowOffset: { width: 0, height: 8 },
+                          shadowOpacity: 0.6,
+                          shadowRadius: 16,
+                        }}
+                      >
+                        {isRecording ? (
+                          <Square size={48} color="white" fill="white" />
+                        ) : (
+                          <Mic size={48} color="white" />
+                        )}
+                      </TouchableOpacity>
 
-                      <Text className="text-white text-base mt-6 font-semibold">
+                      <Text
+                        style={{
+                          color: "white",
+                          fontSize: 16,
+                          fontWeight: "600",
+                          marginTop: 24,
+                        }}
+                      >
                         {isRecording ? "Tap to stop recording" : "Tap to start recording"}
                       </Text>
                     </View>
 
-                    {transcribing && (
-                      <View className="items-center py-4">
+                    {isProcessing && (
+                      <View style={{ alignItems: "center", marginTop: 20 }}>
                         <ActivityIndicator size="large" color="#7E3FE4" />
-                        <Text className="text-white/60 text-base mt-4">
+                        <Text style={{ color: "rgba(255, 255, 255, 0.6)", marginTop: 12 }}>
                           Transcribing your audio...
                         </Text>
                       </View>
@@ -520,7 +485,10 @@ export default function AddJournalModal({ visible, onClose, onSuccess }: AddJour
                   </View>
                 )}
               </View>
-            ) : step === "outcome" ? (
+            )}
+
+            {/* STEP 3: OUTCOME SELECTION */}
+            {currentStep === 3 && (
               <View>
                 {/* AI Summary */}
                 <View
@@ -530,17 +498,16 @@ export default function AddJournalModal({ visible, onClose, onSuccess }: AddJour
                     borderColor: "rgba(126, 63, 228, 0.3)",
                     borderRadius: 16,
                     padding: 16,
-                    marginBottom: 20,
+                    marginBottom: 24,
                   }}
                 >
-                  <Text className="text-sm font-semibold text-white/80 mb-2">
+                  <Text style={{ fontSize: 14, fontWeight: "600", color: "rgba(255, 255, 255, 0.7)", marginBottom: 8 }}>
                     AI Summary
                   </Text>
-                  <Text className="text-white text-base">{summary}</Text>
+                  <Text style={{ fontSize: 15, color: "white" }}>{aiSummary}</Text>
                 </View>
 
-                {/* Outcome Selection */}
-                <Text className="text-lg font-semibold text-white mb-4">
+                <Text style={{ fontSize: 18, fontWeight: "600", color: "white", marginBottom: 16 }}>
                   What was the outcome?
                 </Text>
 
@@ -549,14 +516,9 @@ export default function AddJournalModal({ visible, onClose, onSuccess }: AddJour
                   onPress={() => setSelectedOutcome("YES")}
                   style={{
                     backgroundColor:
-                      selectedOutcome === "YES"
-                        ? "rgba(255, 59, 48, 0.3)"
-                        : "rgba(255, 255, 255, 0.05)",
+                      selectedOutcome === "YES" ? "rgba(255, 59, 48, 0.3)" : "rgba(255, 255, 255, 0.05)",
                     borderWidth: 2,
-                    borderColor:
-                      selectedOutcome === "YES"
-                        ? "#FF3B30"
-                        : "rgba(255, 255, 255, 0.1)",
+                    borderColor: selectedOutcome === "YES" ? "#FF3B30" : "rgba(255, 255, 255, 0.1)",
                     borderRadius: 16,
                     padding: 16,
                     marginBottom: 12,
@@ -577,11 +539,11 @@ export default function AddJournalModal({ visible, onClose, onSuccess }: AddJour
                   >
                     <CheckCircle size={24} color="#FF3B30" />
                   </View>
-                  <View style={{ flex: 1 }}>
-                    <Text className="text-white font-bold text-lg mb-1">
+                  <View>
+                    <Text style={{ fontSize: 18, fontWeight: "bold", color: "white", marginBottom: 4 }}>
                       Yes
                     </Text>
-                    <Text className="text-white/60 text-sm">
+                    <Text style={{ fontSize: 13, color: "rgba(255, 255, 255, 0.6)" }}>
                       They said yes!
                     </Text>
                   </View>
@@ -592,14 +554,9 @@ export default function AddJournalModal({ visible, onClose, onSuccess }: AddJour
                   onPress={() => setSelectedOutcome("NO")}
                   style={{
                     backgroundColor:
-                      selectedOutcome === "NO"
-                        ? "rgba(76, 175, 80, 0.3)"
-                        : "rgba(255, 255, 255, 0.05)",
+                      selectedOutcome === "NO" ? "rgba(76, 175, 80, 0.3)" : "rgba(255, 255, 255, 0.05)",
                     borderWidth: 2,
-                    borderColor:
-                      selectedOutcome === "NO"
-                        ? "#4CAF50"
-                        : "rgba(255, 255, 255, 0.1)",
+                    borderColor: selectedOutcome === "NO" ? "#4CAF50" : "rgba(255, 255, 255, 0.1)",
                     borderRadius: 16,
                     padding: 16,
                     marginBottom: 12,
@@ -620,11 +577,11 @@ export default function AddJournalModal({ visible, onClose, onSuccess }: AddJour
                   >
                     <XCircle size={24} color="#4CAF50" />
                   </View>
-                  <View style={{ flex: 1 }}>
-                    <Text className="text-white font-bold text-lg mb-1">
+                  <View>
+                    <Text style={{ fontSize: 18, fontWeight: "bold", color: "white", marginBottom: 4 }}>
                       No
                     </Text>
-                    <Text className="text-white/60 text-sm">
+                    <Text style={{ fontSize: 13, color: "rgba(255, 255, 255, 0.6)" }}>
                       Faced rejection
                     </Text>
                   </View>
@@ -635,14 +592,9 @@ export default function AddJournalModal({ visible, onClose, onSuccess }: AddJour
                   onPress={() => setSelectedOutcome("ACTIVITY")}
                   style={{
                     backgroundColor:
-                      selectedOutcome === "ACTIVITY"
-                        ? "rgba(0, 217, 255, 0.3)"
-                        : "rgba(255, 255, 255, 0.05)",
+                      selectedOutcome === "ACTIVITY" ? "rgba(0, 217, 255, 0.3)" : "rgba(255, 255, 255, 0.05)",
                     borderWidth: 2,
-                    borderColor:
-                      selectedOutcome === "ACTIVITY"
-                        ? "#00D9FF"
-                        : "rgba(255, 255, 255, 0.1)",
+                    borderColor: selectedOutcome === "ACTIVITY" ? "#00D9FF" : "rgba(255, 255, 255, 0.1)",
                     borderRadius: 16,
                     padding: 16,
                     marginBottom: 24,
@@ -663,11 +615,11 @@ export default function AddJournalModal({ visible, onClose, onSuccess }: AddJour
                   >
                     <Activity size={24} color="#00D9FF" />
                   </View>
-                  <View style={{ flex: 1 }}>
-                    <Text className="text-white font-bold text-lg mb-1">
+                  <View>
+                    <Text style={{ fontSize: 18, fontWeight: "bold", color: "white", marginBottom: 4 }}>
                       Activity
                     </Text>
-                    <Text className="text-white/60 text-sm">
+                    <Text style={{ fontSize: 13, color: "rgba(255, 255, 255, 0.6)" }}>
                       Completed an action
                     </Text>
                   </View>
@@ -676,7 +628,7 @@ export default function AddJournalModal({ visible, onClose, onSuccess }: AddJour
                 {/* Save Button */}
                 <TouchableOpacity
                   onPress={handleSave}
-                  disabled={!selectedOutcome || createEntryMutation.isPending}
+                  disabled={!selectedOutcome || saveEntryMutation.isPending}
                   style={{
                     backgroundColor: selectedOutcome ? "#7E3FE4" : "rgba(126, 63, 228, 0.3)",
                     borderRadius: 16,
@@ -684,16 +636,16 @@ export default function AddJournalModal({ visible, onClose, onSuccess }: AddJour
                     alignItems: "center",
                   }}
                 >
-                  {createEntryMutation.isPending ? (
+                  {saveEntryMutation.isPending ? (
                     <ActivityIndicator color="white" />
                   ) : (
-                    <Text className="text-white font-bold text-lg">
+                    <Text style={{ color: "white", fontSize: 18, fontWeight: "bold" }}>
                       Save Entry
                     </Text>
                   )}
                 </TouchableOpacity>
               </View>
-            ) : null}
+            )}
           </ScrollView>
         </View>
       </View>
