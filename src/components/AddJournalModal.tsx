@@ -317,6 +317,22 @@ export default function AddJournalModal({ visible, onClose, onSuccess }: AddJour
             contentContainerStyle={{ padding: 20 }}
             showsVerticalScrollIndicator={false}
           >
+            {/* Debug Step Indicator */}
+            {__DEV__ && (
+              <View style={{
+                padding: 8,
+                backgroundColor: "rgba(255, 0, 0, 0.3)",
+                marginBottom: 12,
+                borderRadius: 8,
+                borderWidth: 2,
+                borderColor: "red",
+              }}>
+                <Text className="text-white text-xs font-bold">
+                  🔍 DEBUG: Current Step = &quot;{step}&quot;
+                </Text>
+              </View>
+            )}
+
             {/* STEP 1: Method Selection */}
             {step === "method" && (
               <View>
