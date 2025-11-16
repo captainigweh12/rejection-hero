@@ -174,3 +174,121 @@ Failed to find Response internal state key
 --> POST /api/profile [32m200[0m 34ms
 <-- GET /api/profile
 --> GET /api/profile [32m200[0m 4ms
+<-- GET /api/posts/feed
+--> GET /api/posts/feed [32m200[0m 5ms
+<-- GET /api/friends
+--> GET /api/friends [32m200[0m 2ms
+<-- GET /api/moments
+<-- GET /api/groups
+<-- GET /api/messages/conversations
+<-- GET /api/notifications/unread-count
+<-- GET /api/friends/requests
+--> GET /api/moments [32m200[0m 4ms
+--> GET /api/friends/requests [32m200[0m 6ms
+--> GET /api/groups [32m200[0m 8ms
+--> GET /api/notifications/unread-count [32m200[0m 6ms
+--> GET /api/messages/conversations [32m200[0m 8ms
+<-- GET /api/journal
+--> GET /api/journal [32m200[0m 2ms
+<-- GET /api/quests
+--> GET /api/quests [32m200[0m 6ms
+<-- GET /api/stats
+--> GET /api/stats [32m200[0m 2ms
+<-- GET /api/live/active
+--> GET /api/live/active [32m200[0m 3ms
+<-- POST /api/live/start
+[Live] Created Daily.co room: https://rejectionhero.daily.co/quest-live-kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp-1763286716046
+--> POST /api/live/start [32m200[0m 341ms
+<-- GET /api/live/active
+--> GET /api/live/active [32m200[0m 3ms
+<-- GET /api/live/cmi1jdtvz0003m2ud9ki460bk/comments
+--> GET /api/live/cmi1jdtvz0003m2ud9ki460bk/comments [32m200[0m 2ms
+<-- GET /api/live/cmi1jdtvz0003m2ud9ki460bk/quest-suggestions
+--> GET /api/live/cmi1jdtvz0003m2ud9ki460bk/quest-suggestions [32m200[0m 5ms
+<-- GET /api/live/cmi1jdtvz0003m2ud9ki460bk/comments
+--> GET /api/live/cmi1jdtvz0003m2ud9ki460bk/comments [32m200[0m 2ms
+<-- GET /api/live/active
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/live/cmi1jdtvz0003m2ud9ki460bk/quest-suggestions
+--> GET /api/live/cmi1jdtvz0003m2ud9ki460bk/quest-suggestions [32m200[0m 3ms
+<-- GET /api/live/cmi1jdtvz0003m2ud9ki460bk/comments
+--> GET /api/live/cmi1jdtvz0003m2ud9ki460bk/comments [32m200[0m 3ms
+<-- POST /api/live/cmi1jdtvz0003m2ud9ki460bk/end
+[Live] Deleted Daily.co room: quest-live-kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp-1763286716046
+--> POST /api/live/cmi1jdtvz0003m2ud9ki460bk/end [32m200[0m 60ms
+<-- GET /api/live/active
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/groups/cmi0wj2dx0001m208yf893ghm
+--> GET /api/groups/cmi0wj2dx0001m208yf893ghm [32m200[0m 3ms
+<-- GET /api/live/active
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/group-quests/cmi0wj2dx0001m208yf893ghm
+--> GET /api/group-quests/cmi0wj2dx0001m208yf893ghm [32m200[0m 3ms
+<-- GET /api/quests
+--> GET /api/quests [32m200[0m 4ms
+<-- GET /api/live/active
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/group-quests/cmi0wj2dx0001m208yf893ghm
+--> GET /api/group-quests/cmi0wj2dx0001m208yf893ghm [32m200[0m 3ms
+<-- GET /api/groups/cmi0wj2dx0001m208yf893ghm
+--> GET /api/groups/cmi0wj2dx0001m208yf893ghm [32m200[0m 3ms
+<-- GET /api/live/active
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/group-quests/cmi0wj2dx0001m208yf893ghm
+--> GET /api/group-quests/cmi0wj2dx0001m208yf893ghm [32m200[0m 2ms
+<-- GET /api/notifications/unread-count
+--> GET /api/notifications/unread-count [32m200[0m 2ms
+<-- GET /api/live/active
+--> GET /api/live/active [32m200[0m 8ms
+<-- GET /api/group-quests/cmi0wj2dx0001m208yf893ghm
+--> GET /api/group-quests/cmi0wj2dx0001m208yf893ghm [32m200[0m 3ms
+<-- GET /api/live/active
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/group-quests/cmi0wj2dx0001m208yf893ghm
+--> GET /api/group-quests/cmi0wj2dx0001m208yf893ghm [32m200[0m 3ms
+<-- GET /api/live/active
+--> GET /api/live/active [32m200[0m 5ms
+<-- GET /api/group-quests/cmi0wj2dx0001m208yf893ghm
+--> GET /api/group-quests/cmi0wj2dx0001m208yf893ghm [32m200[0m 2ms
+<-- GET /api/live/active
+--> GET /api/live/active [32m200[0m 9ms
+<-- GET /api/group-quests/cmi0wj2dx0001m208yf893ghm
+--> GET /api/group-quests/cmi0wj2dx0001m208yf893ghm [32m200[0m 7ms
+<-- GET /api/live/active
+--> GET /api/live/active [32m200[0m 6ms
+<-- GET /api/group-quests/cmi0wj2dx0001m208yf893ghm
+--> GET /api/group-quests/cmi0wj2dx0001m208yf893ghm [32m200[0m 4ms
+<-- GET /api/live/active
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/notifications/unread-count
+--> GET /api/notifications/unread-count [32m200[0m 2ms
+<-- GET /api/group-quests/cmi0wj2dx0001m208yf893ghm
+--> GET /api/group-quests/cmi0wj2dx0001m208yf893ghm [32m200[0m 3ms
+<-- GET /api/live/active
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/group-quests/cmi0wj2dx0001m208yf893ghm
+--> GET /api/group-quests/cmi0wj2dx0001m208yf893ghm [32m200[0m 3ms
+<-- GET /api/live/active
+--> GET /api/live/active [32m200[0m 3ms
+<-- GET /api/group-quests/cmi0wj2dx0001m208yf893ghm
+--> GET /api/group-quests/cmi0wj2dx0001m208yf893ghm [32m200[0m 2ms
+<-- GET /api/live/active
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/group-quests/cmi0wj2dx0001m208yf893ghm
+--> GET /api/group-quests/cmi0wj2dx0001m208yf893ghm [32m200[0m 2ms
+<-- GET /api/live/active
+--> GET /api/live/active [32m200[0m 5ms
+<-- GET /api/group-quests/cmi0wj2dx0001m208yf893ghm
+--> GET /api/group-quests/cmi0wj2dx0001m208yf893ghm [32m200[0m 5ms
+<-- GET /api/live/active
+--> GET /api/live/active [32m200[0m 4ms
+<-- GET /api/group-quests/cmi0wj2dx0001m208yf893ghm
+--> GET /api/group-quests/cmi0wj2dx0001m208yf893ghm [32m200[0m 6ms
+<-- GET /api/notifications/unread-count
+--> GET /api/notifications/unread-count [32m200[0m 2ms
+<-- GET /api/live/active
+--> GET /api/live/active [32m200[0m 3ms
+<-- GET /api/group-quests/cmi0wj2dx0001m208yf893ghm
+--> GET /api/group-quests/cmi0wj2dx0001m208yf893ghm [32m200[0m 3ms
+<-- GET /api/live/active
+--> GET /api/live/active [32m200[0m 3ms

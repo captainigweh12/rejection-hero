@@ -564,37 +564,40 @@ export default function FeedScreen() {
         visible={showCreateMoment}
         animationType="slide"
         onRequestClose={() => setShowCreateMoment(false)}
+        presentationStyle="fullScreen"
       >
-        <SafeAreaView style={{ flex: 1, backgroundColor: "#0A0A0F" }} edges={["top", "bottom"]}>
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
-              padding: 16,
-              borderBottomWidth: 1,
-              borderBottomColor: "rgba(126, 63, 228, 0.2)",
-            }}
-          >
-            <TouchableOpacity onPress={() => setShowCreateMoment(false)}>
-              <X size={24} color="white" />
-            </TouchableOpacity>
-            <Text style={{ fontSize: 18, fontWeight: "bold", color: "white" }}>
-              Create Moment
-            </Text>
-            <TouchableOpacity
-              onPress={handleCreateMoment}
-              disabled={createMomentMutation.isPending}
+        <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
+          <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+                paddingHorizontal: 16,
+                paddingVertical: 16,
+                borderBottomWidth: 1,
+                borderBottomColor: "rgba(126, 63, 228, 0.2)",
+              }}
             >
-              {createMomentMutation.isPending ? (
-                <ActivityIndicator size="small" color="#7E3FE4" />
-              ) : (
-                <Text style={{ color: "#7E3FE4", fontWeight: "600" }}>Share</Text>
-              )}
-            </TouchableOpacity>
-          </View>
+              <TouchableOpacity onPress={() => setShowCreateMoment(false)}>
+                <X size={24} color="white" />
+              </TouchableOpacity>
+              <Text style={{ fontSize: 18, fontWeight: "bold", color: "white" }}>
+                Create Moment
+              </Text>
+              <TouchableOpacity
+                onPress={handleCreateMoment}
+                disabled={createMomentMutation.isPending}
+              >
+                {createMomentMutation.isPending ? (
+                  <ActivityIndicator size="small" color="#7E3FE4" />
+                ) : (
+                  <Text style={{ color: "#7E3FE4", fontWeight: "600" }}>Share</Text>
+                )}
+              </TouchableOpacity>
+            </View>
 
-          <View style={{ flex: 1, alignItems: "center", justifyContent: "center", padding: 16 }}>
+            <View style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 16, paddingBottom: 40 }}>
             {momentImage ? (
               <>
                 <Image
@@ -693,7 +696,8 @@ export default function FeedScreen() {
               </>
             )}
           </View>
-        </SafeAreaView>
+          </SafeAreaView>
+        </View>
       </Modal>
 
       {/* Moment Viewer Modal */}

@@ -701,13 +701,14 @@ To enable Google sign-in, you need to configure authorized redirect URIs in your
   - Remove individual images before posting
   - No overflow issues on any device
 - **Create Moment Modal** ✨ FULLY OPTIMIZED!:
-  - **Perfect SafeArea**: Proper top and bottom safe area handling with optimized padding
-  - Full-screen moment creation interface
+  - **Perfect SafeArea**: Proper safe area handling with fullScreen presentation style
+  - **Fixed Overflow**: Content properly padded to prevent edge cutoff
+  - Full-screen moment creation interface with proper margins
   - **Gallery Button**: Select photos from device
   - **Camera Button**: Take photos with camera
   - Photo preview before sharing
   - Change or remove photo before posting
-  - No overflow issues on any device
+  - No overflow or clipping issues on any device or screen size
 - **Feed Header** ✨ FIXED!:
   - **Safe Area Padding**: Header positioned with paddingTop: 60 to prevent overlap with status bar
   - Buttons properly sized and positioned
