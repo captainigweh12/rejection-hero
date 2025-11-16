@@ -1429,3 +1429,15 @@ See `ENV_SETUP.md` for complete environment variable setup guide.
 - **Styling**: Nativewind (TailwindCSS)
 - **Type Safety**: Shared contracts via `/shared/contracts.ts`
 - **Database**: Prisma migrations required for schema changes
+
+## Recent Updates
+
+### 2025-11-16: Fixed 502 Bad Gateway Error on Profile Endpoint
+- **Issue**: GET /api/profile was returning 502 bad gateway errors
+- **Fix**: Added comprehensive error handling and logging to profile route
+- **Changes**:
+  - Wrapped profile GET handler in try-catch block
+  - Added detailed console logging for debugging
+  - Added error logging to auth middleware
+  - Returns 500 status with error message instead of crashing
+- **Testing**: Monitor backend logs when calling profile endpoint to see detailed error information

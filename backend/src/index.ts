@@ -42,10 +42,23 @@ app.use("/*", cors());
  * All routes can access c.get("user") and c.get("session")
  */
 app.use("*", async (c, next) => {
-  const session = await auth.api.getSession({ headers: c.req.raw.headers });
-  c.set("user", session?.user ?? null); // type: typeof auth.$Infer.Session.user | null
-  c.set("session", session?.session ?? null); // type: typeof auth.$Infer.Session.session | null
-  return next();
+  try {
+    const session = await auth.api.getSession({ headers: c.req.raw.headers });
+    c.set("user", session?.user ?? null); // type: typeof auth.$Infer.Session.user | null
+    c.set("session", session?.session ?? null); // type: typeof auth.$Infer.Session.session | null
+
+    // Log auth status for API requests
+    if (c.req.path.startsWith("/api/") && !c.req.path.startsWith("/api/auth/")) {
+      console.log(`🔐 [Auth Middleware] ${c.req.method} ${c.req.path} - User: ${session?.user?.id || "null"}`);
+    }
+
+    return next();
+  } catch (error) {
+    console.error("❌ [Auth Middleware] Error:", error);
+    c.set("user", null);
+    c.set("session", null);
+    return next();
+  }
 });
 
 // Better Auth handler

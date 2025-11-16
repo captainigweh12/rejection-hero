@@ -18,74 +18,83 @@ const profileRouter = new Hono<AppType>();
 // GET /api/profile - Get current user's profile
 // ============================================
 profileRouter.get("/", async (c) => {
-  const user = c.get("user");
+  try {
+    const user = c.get("user");
+    console.log("👤 [Profile] GET request - User:", user ? user.id : "null");
 
-  if (!user) {
-    return c.json({ message: "Unauthorized" }, 401);
-  }
+    if (!user) {
+      console.log("❌ [Profile] Unauthorized - no user in context");
+      return c.json({ message: "Unauthorized" }, 401);
+    }
 
-  let profile = await db.profile.findUnique({
-    where: { userId: user.id },
-  });
-
-  // Auto-create profile if it doesn't exist (for OAuth users)
-  if (!profile) {
-    console.log(`📝 Creating default profile for user ${user.id} (${user.email})`);
-    const displayName = user.name || user.email?.split("@")[0] || "User";
-
-    profile = await db.profile.create({
-      data: {
-        userId: user.id,
-        displayName: displayName,
-        bio: null,
-        age: null,
-        photos: null,
-        avatar: null,
-        interests: null,
-        location: null,
-        latitude: null,
-        longitude: null,
-        isLive: false,
-        liveViewers: 0,
-        userContext: null,
-        userGoals: null,
-        onboardingCompleted: false,
-      },
+    console.log(`🔍 [Profile] Fetching profile for user ${user.id}`);
+    let profile = await db.profile.findUnique({
+      where: { userId: user.id },
     });
 
-    // Sync new user to GoHighLevel and send welcome email
-    syncNewUserToGoHighLevel(
-      user.email,
-      displayName,
-      user.id,
-      profile.username || undefined
-    ).catch(err => {
-      console.error("⚠️ Failed to sync user to GoHighLevel (non-blocking):", err);
-    });
+    // Auto-create profile if it doesn't exist (for OAuth users)
+    if (!profile) {
+      console.log(`📝 Creating default profile for user ${user.id} (${user.email})`);
+      const displayName = user.name || user.email?.split("@")[0] || "User";
+
+      profile = await db.profile.create({
+        data: {
+          userId: user.id,
+          displayName: displayName,
+          bio: null,
+          age: null,
+          photos: null,
+          avatar: null,
+          interests: null,
+          location: null,
+          latitude: null,
+          longitude: null,
+          isLive: false,
+          liveViewers: 0,
+          userContext: null,
+          userGoals: null,
+          onboardingCompleted: false,
+        },
+      });
+
+      // Sync new user to GoHighLevel and send welcome email
+      syncNewUserToGoHighLevel(
+        user.email,
+        displayName,
+        user.id,
+        profile.username || undefined
+      ).catch(err => {
+        console.error("⚠️ Failed to sync user to GoHighLevel (non-blocking):", err);
+      });
+    }
+
+    const photos = profile.photos ? JSON.parse(profile.photos) : [];
+    const interests = profile.interests ? JSON.parse(profile.interests) : [];
+
+    console.log(`✅ [Profile] Successfully fetched profile for user ${user.id}`);
+    return c.json({
+      id: profile.id,
+      userId: profile.userId,
+      username: profile.username,
+      displayName: profile.displayName,
+      bio: profile.bio,
+      age: profile.age,
+      photos,
+      avatar: profile.avatar,
+      interests,
+      location: profile.location,
+      latitude: profile.latitude,
+      longitude: profile.longitude,
+      isLive: profile.isLive,
+      liveViewers: profile.liveViewers,
+      userContext: profile.userContext,
+      userGoals: profile.userGoals,
+      onboardingCompleted: profile.onboardingCompleted,
+    } satisfies GetProfileResponse);
+  } catch (error) {
+    console.error("❌ [Profile] Error in GET /api/profile:", error);
+    return c.json({ message: "Internal server error" }, 500);
   }
-
-  const photos = profile.photos ? JSON.parse(profile.photos) : [];
-  const interests = profile.interests ? JSON.parse(profile.interests) : [];
-
-  return c.json({
-    id: profile.id,
-    userId: profile.userId,
-    username: profile.username,
-    displayName: profile.displayName,
-    bio: profile.bio,
-    age: profile.age,
-    photos,
-    avatar: profile.avatar,
-    interests,
-    location: profile.location,
-    latitude: profile.latitude,
-    longitude: profile.longitude,
-    isLive: profile.isLive,
-    liveViewers: profile.liveViewers,
-    userContext: profile.userContext,
-    userGoals: profile.userGoals,
-    onboardingCompleted: profile.onboardingCompleted,
-  } satisfies GetProfileResponse);
 });
 
 // ============================================
