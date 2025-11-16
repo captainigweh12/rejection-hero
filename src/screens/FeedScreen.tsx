@@ -591,209 +591,522 @@ export default function FeedScreen() {
         </View>
       </Modal>
 
-      {/* Create Moment Modal */}
+      {/* Create Moment Modal - Instagram/Snapchat Style */}
       <Modal
         visible={showCreateMoment}
         animationType="slide"
         onRequestClose={() => setShowCreateMoment(false)}
         presentationStyle="fullScreen"
       >
-        <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
+        <View style={{ flex: 1, backgroundColor: "#000000" }}>
           <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
+            {/* Header */}
             <View
               style={{
                 flexDirection: "row",
                 alignItems: "center",
                 justifyContent: "space-between",
-                paddingHorizontal: 16,
+                paddingHorizontal: 20,
                 paddingVertical: 16,
-                borderBottomWidth: 1,
-                borderBottomColor: "rgba(126, 63, 228, 0.2)",
               }}
             >
               <TouchableOpacity onPress={() => setShowCreateMoment(false)}>
-                <X size={24} color="white" />
+                <X size={28} color="white" strokeWidth={2.5} />
               </TouchableOpacity>
-              <Text style={{ fontSize: 18, fontWeight: "bold", color: "white" }}>
-                Create Moment
+              <Text style={{ fontSize: 20, fontWeight: "700", color: "white" }}>
+                Add to story
               </Text>
-              <TouchableOpacity
-                onPress={handleCreateMoment}
-                disabled={createMomentMutation.isPending}
-              >
-                {createMomentMutation.isPending ? (
-                  <ActivityIndicator size="small" color="#7E3FE4" />
-                ) : (
-                  <Text style={{ color: "#7E3FE4", fontWeight: "600" }}>Share</Text>
-                )}
+              <TouchableOpacity>
+                <View
+                  style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: 16,
+                    borderWidth: 2,
+                    borderColor: "white",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <View
+                    style={{
+                      width: 8,
+                      height: 8,
+                      borderRadius: 4,
+                      backgroundColor: "white",
+                    }}
+                  />
+                </View>
               </TouchableOpacity>
             </View>
 
-            <View style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 16, paddingBottom: 40 }}>
-            {momentImage ? (
-              <>
-                <Image
-                  source={{ uri: momentImage }}
-                  style={{ width: "100%", height: "70%", borderRadius: 12 }}
-                  resizeMode="contain"
-                />
-                <View style={{ flexDirection: "row", gap: 12, marginTop: 20 }}>
-                  <TouchableOpacity
-                    onPress={handlePickMomentImage}
-                    style={{
-                      paddingHorizontal: 24,
-                      paddingVertical: 12,
-                      borderRadius: 8,
-                      backgroundColor: "rgba(126, 63, 228, 0.2)",
-                      borderWidth: 1,
-                      borderColor: "#7E3FE4",
-                    }}
-                  >
-                    <Text style={{ color: "#7E3FE4", fontWeight: "600" }}>Change Photo</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => setMomentImage(null)}
-                    style={{
-                      paddingHorizontal: 24,
-                      paddingVertical: 12,
-                      borderRadius: 8,
-                      backgroundColor: "rgba(255, 59, 48, 0.2)",
-                      borderWidth: 1,
-                      borderColor: "#FF3B30",
-                    }}
-                  >
-                    <Text style={{ color: "#FF3B30", fontWeight: "600" }}>Remove</Text>
-                  </TouchableOpacity>
-                </View>
-              </>
-            ) : (
-              <>
+            <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
+              {/* Creation Options */}
+              <View style={{ paddingHorizontal: 20, marginTop: 20 }}>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  <View style={{ flexDirection: "row", gap: 16 }}>
+                    {/* Add Yours Option */}
+                    <TouchableOpacity
+                      onPress={handlePickMomentImage}
+                      style={{
+                        width: 140,
+                        height: 180,
+                        borderRadius: 16,
+                        backgroundColor: "rgba(255, 255, 255, 0.1)",
+                        overflow: "hidden",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <View
+                        style={{
+                          width: 60,
+                          height: 60,
+                          borderRadius: 30,
+                          backgroundColor: "rgba(255, 255, 255, 0.2)",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          marginBottom: 12,
+                        }}
+                      >
+                        <Plus size={32} color="white" strokeWidth={3} />
+                      </View>
+                      <Text style={{ color: "white", fontSize: 16, fontWeight: "700" }}>
+                        Add Yours
+                      </Text>
+                    </TouchableOpacity>
+
+                    {/* Music Option */}
+                    <TouchableOpacity
+                      style={{
+                        width: 140,
+                        height: 180,
+                        borderRadius: 16,
+                        backgroundColor: "rgba(255, 255, 255, 0.1)",
+                        overflow: "hidden",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <View
+                        style={{
+                          width: 60,
+                          height: 60,
+                          borderRadius: 30,
+                          backgroundColor: "rgba(255, 100, 100, 0.3)",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          marginBottom: 12,
+                        }}
+                      >
+                        <Text style={{ fontSize: 32 }}>🎵</Text>
+                      </View>
+                      <Text style={{ color: "white", fontSize: 16, fontWeight: "700" }}>
+                        Music
+                      </Text>
+                    </TouchableOpacity>
+
+                    {/* Collage Option */}
+                    <TouchableOpacity
+                      style={{
+                        width: 140,
+                        height: 180,
+                        borderRadius: 16,
+                        backgroundColor: "rgba(255, 255, 255, 0.1)",
+                        overflow: "hidden",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <View
+                        style={{
+                          width: 60,
+                          height: 60,
+                          borderRadius: 30,
+                          backgroundColor: "rgba(255, 150, 100, 0.3)",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          marginBottom: 12,
+                        }}
+                      >
+                        <ImageIcon size={32} color="white" />
+                      </View>
+                      <Text style={{ color: "white", fontSize: 16, fontWeight: "700" }}>
+                        Collage
+                      </Text>
+                    </TouchableOpacity>
+
+                    {/* AI Images Option */}
+                    <TouchableOpacity
+                      style={{
+                        width: 140,
+                        height: 180,
+                        borderRadius: 16,
+                        backgroundColor: "rgba(255, 255, 255, 0.1)",
+                        overflow: "hidden",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <View
+                        style={{
+                          width: 60,
+                          height: 60,
+                          borderRadius: 30,
+                          backgroundColor: "rgba(150, 100, 255, 0.3)",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          marginBottom: 12,
+                        }}
+                      >
+                        <Text style={{ fontSize: 32 }}>✨</Text>
+                      </View>
+                      <Text style={{ color: "white", fontSize: 16, fontWeight: "700" }}>
+                        AI Images
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </ScrollView>
+              </View>
+
+              {/* Recents Section */}
+              <View style={{ marginTop: 32, paddingHorizontal: 20 }}>
                 <View
                   style={{
-                    width: 200,
-                    height: 200,
-                    borderRadius: 100,
-                    backgroundColor: "rgba(126, 63, 228, 0.2)",
-                    borderWidth: 2,
-                    borderColor: "#7E3FE4",
-                    borderStyle: "dashed",
+                    flexDirection: "row",
                     alignItems: "center",
-                    justifyContent: "center",
-                    marginBottom: 24,
+                    justifyContent: "space-between",
+                    marginBottom: 16,
                   }}
                 >
-                  <ImageIcon size={48} color="#7E3FE4" />
-                  <Text style={{ color: "white", marginTop: 12, fontSize: 16 }}>
-                    Add Photo
+                  <Text style={{ color: "white", fontSize: 18, fontWeight: "700" }}>
+                    Recents
                   </Text>
-                </View>
-                <View style={{ flexDirection: "row", gap: 12 }}>
-                  <TouchableOpacity
-                    onPress={handlePickMomentImage}
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      paddingHorizontal: 24,
-                      paddingVertical: 12,
-                      borderRadius: 8,
-                      backgroundColor: "rgba(126, 63, 228, 0.2)",
-                      borderWidth: 1,
-                      borderColor: "#7E3FE4",
-                    }}
-                  >
-                    <ImageIcon size={20} color="#7E3FE4" />
-                    <Text style={{ color: "white", marginLeft: 8, fontWeight: "600" }}>
-                      Gallery
-                    </Text>
+                  <TouchableOpacity>
+                    <View
+                      style={{
+                        width: 32,
+                        height: 32,
+                        borderRadius: 8,
+                        backgroundColor: "rgba(255, 255, 255, 0.1)",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <ImageIcon size={18} color="white" />
+                    </View>
                   </TouchableOpacity>
+                </View>
+
+                {/* Recent Posts Grid */}
+                <View style={{ gap: 12 }}>
+                  {feedData?.posts.slice(0, 4).map((post) => (
+                    <TouchableOpacity
+                      key={post.id}
+                      onPress={() => {
+                        // Could implement selecting a post to share as story
+                        Alert.alert("Coming Soon", "Share post as story feature coming soon!");
+                      }}
+                      style={{
+                        backgroundColor: "rgba(255, 255, 255, 0.08)",
+                        borderRadius: 16,
+                        padding: 16,
+                        flexDirection: "row",
+                        alignItems: "center",
+                        gap: 12,
+                      }}
+                    >
+                      {post.images && post.images[0] ? (
+                        <Image
+                          source={{ uri: post.images[0].imageUrl }}
+                          style={{
+                            width: 80,
+                            height: 80,
+                            borderRadius: 12,
+                            backgroundColor: "rgba(255, 255, 255, 0.1)",
+                          }}
+                        />
+                      ) : (
+                        <View
+                          style={{
+                            width: 80,
+                            height: 80,
+                            borderRadius: 12,
+                            backgroundColor: "rgba(126, 63, 228, 0.3)",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <Camera size={32} color="#7E3FE4" />
+                        </View>
+                      )}
+                      <View style={{ flex: 1 }}>
+                        <Text
+                          style={{ color: "white", fontSize: 15, fontWeight: "600" }}
+                          numberOfLines={2}
+                        >
+                          {post.content}
+                        </Text>
+                        <Text
+                          style={{
+                            color: "rgba(255, 255, 255, 0.5)",
+                            fontSize: 13,
+                            marginTop: 4,
+                          }}
+                        >
+                          {new Date(post.createdAt).toLocaleDateString()}
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
+                  ))}
+
+                  {/* Camera Button at Bottom */}
                   <TouchableOpacity
                     onPress={handleTakeMomentPhoto}
                     style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      paddingHorizontal: 24,
-                      paddingVertical: 12,
-                      borderRadius: 8,
                       backgroundColor: "rgba(126, 63, 228, 0.2)",
-                      borderWidth: 1,
+                      borderRadius: 16,
+                      padding: 20,
+                      alignItems: "center",
+                      justifyContent: "center",
+                      borderWidth: 2,
                       borderColor: "#7E3FE4",
+                      marginTop: 8,
                     }}
                   >
-                    <Camera size={20} color="#7E3FE4" />
-                    <Text style={{ color: "white", marginLeft: 8, fontWeight: "600" }}>
-                      Camera
+                    <Camera size={40} color="#7E3FE4" strokeWidth={2} />
+                    <Text
+                      style={{
+                        color: "#7E3FE4",
+                        fontSize: 16,
+                        fontWeight: "700",
+                        marginTop: 8,
+                      }}
+                    >
+                      Take Photo
                     </Text>
                   </TouchableOpacity>
                 </View>
-              </>
+              </View>
+            </ScrollView>
+
+            {/* Share Selected Image */}
+            {momentImage && (
+              <View
+                style={{
+                  position: "absolute",
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  backgroundColor: "rgba(0, 0, 0, 0.95)",
+                  paddingVertical: 20,
+                  paddingHorizontal: 20,
+                  borderTopWidth: 1,
+                  borderTopColor: "rgba(255, 255, 255, 0.1)",
+                }}
+              >
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+                  <Image
+                    source={{ uri: momentImage }}
+                    style={{
+                      width: 60,
+                      height: 60,
+                      borderRadius: 12,
+                    }}
+                  />
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ color: "white", fontSize: 16, fontWeight: "600" }}>
+                      Ready to share
+                    </Text>
+                    <Text style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: 14 }}>
+                      Expires in 24 hours
+                    </Text>
+                  </View>
+                  <TouchableOpacity
+                    onPress={() => setMomentImage(null)}
+                    style={{ padding: 8 }}
+                  >
+                    <X size={24} color="white" />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={handleCreateMoment}
+                    disabled={createMomentMutation.isPending}
+                    style={{
+                      backgroundColor: "#7E3FE4",
+                      paddingHorizontal: 24,
+                      paddingVertical: 12,
+                      borderRadius: 24,
+                    }}
+                  >
+                    {createMomentMutation.isPending ? (
+                      <ActivityIndicator size="small" color="white" />
+                    ) : (
+                      <Text style={{ color: "white", fontWeight: "700", fontSize: 16 }}>
+                        Share
+                      </Text>
+                    )}
+                  </TouchableOpacity>
+                </View>
+              </View>
             )}
-          </View>
           </SafeAreaView>
         </View>
       </Modal>
 
-      {/* Moment Viewer Modal */}
+      {/* Moment Viewer Modal - Instagram Style */}
       {selectedMoment && (
         <Modal
           visible={!!selectedMoment}
           animationType="fade"
           onRequestClose={() => setSelectedMoment(null)}
         >
-          <SafeAreaView style={{ flex: 1, backgroundColor: "black" }} edges={["top", "bottom"]}>
-            <TouchableOpacity
-              onPress={() => setSelectedMoment(null)}
-              style={{ position: "absolute", top: 50, right: 20, zIndex: 10 }}
-            >
-              <X size={32} color="white" />
-            </TouchableOpacity>
+          <View style={{ flex: 1, backgroundColor: "black" }}>
+            <SafeAreaView style={{ flex: 1 }} edges={["top", "bottom"]}>
+              {/* Progress Bars */}
+              <View
+                style={{
+                  flexDirection: "row",
+                  gap: 4,
+                  paddingHorizontal: 12,
+                  paddingTop: 12,
+                }}
+              >
+                {selectedMoment.moments.map((_, index) => (
+                  <View
+                    key={index}
+                    style={{
+                      flex: 1,
+                      height: 3,
+                      backgroundColor: "rgba(255, 255, 255, 0.3)",
+                      borderRadius: 2,
+                      overflow: "hidden",
+                    }}
+                  >
+                    <View
+                      style={{
+                        height: "100%",
+                        backgroundColor: index <= momentIndex ? "white" : "transparent",
+                        borderRadius: 2,
+                      }}
+                    />
+                  </View>
+                ))}
+              </View>
 
-            {selectedMoment.moments[momentIndex]?.imageUrl && (
-              <Image
-                source={{ uri: selectedMoment.moments[momentIndex].imageUrl }}
-                style={{ width: "100%", height: "100%" }}
-                resizeMode="contain"
-              />
-            )}
-
-            <View
-              style={{
-                position: "absolute",
-                bottom: 40,
-                left: 20,
-                right: 20,
-                flexDirection: "row",
-                justifyContent: "space-between",
-              }}
-            >
-              {momentIndex > 0 && (
+              {/* Header */}
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  paddingHorizontal: 16,
+                  paddingVertical: 12,
+                }}
+              >
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+                  <View
+                    style={{
+                      width: 36,
+                      height: 36,
+                      borderRadius: 18,
+                      borderWidth: 2,
+                      borderColor: "#7E3FE4",
+                      overflow: "hidden",
+                    }}
+                  >
+                    {selectedMoment.userAvatar ? (
+                      <Image
+                        source={{ uri: selectedMoment.userAvatar }}
+                        style={{ width: "100%", height: "100%" }}
+                      />
+                    ) : (
+                      <View
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          backgroundColor: "#7E3FE4",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <Text style={{ color: "white", fontSize: 16, fontWeight: "700" }}>
+                          {selectedMoment.userName?.charAt(0).toUpperCase() || "?"}
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+                  <View>
+                    <Text style={{ color: "white", fontSize: 16, fontWeight: "700" }}>
+                      {selectedMoment.userName || "Anonymous"}
+                    </Text>
+                    <Text style={{ color: "rgba(255, 255, 255, 0.7)", fontSize: 13 }}>
+                      {new Date(selectedMoment.moments[momentIndex].createdAt).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </Text>
+                  </View>
+                </View>
                 <TouchableOpacity
-                  onPress={() => setMomentIndex(momentIndex - 1)}
+                  onPress={() => setSelectedMoment(null)}
+                  style={{ padding: 8 }}
+                >
+                  <X size={28} color="white" strokeWidth={2.5} />
+                </TouchableOpacity>
+              </View>
+
+              {/* Story Content */}
+              <TouchableOpacity
+                activeOpacity={1}
+                onPress={(e) => {
+                  const { locationX } = e.nativeEvent;
+                  const screenWidth = 400; // approximate
+                  if (locationX < screenWidth / 2) {
+                    // Tap left side - previous
+                    if (momentIndex > 0) {
+                      setMomentIndex(momentIndex - 1);
+                    }
+                  } else {
+                    // Tap right side - next
+                    if (momentIndex < selectedMoment.moments.length - 1) {
+                      setMomentIndex(momentIndex + 1);
+                    } else {
+                      setSelectedMoment(null);
+                    }
+                  }
+                }}
+                style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+              >
+                {selectedMoment.moments[momentIndex]?.imageUrl && (
+                  <Image
+                    source={{ uri: selectedMoment.moments[momentIndex].imageUrl }}
+                    style={{ width: "100%", height: "100%" }}
+                    resizeMode="contain"
+                  />
+                )}
+              </TouchableOpacity>
+
+              {/* Bottom Info */}
+              {selectedMoment.moments[momentIndex]?.content && (
+                <View
                   style={{
+                    position: "absolute",
+                    bottom: 40,
+                    left: 20,
+                    right: 20,
                     backgroundColor: "rgba(0, 0, 0, 0.6)",
-                    paddingHorizontal: 20,
-                    paddingVertical: 10,
-                    borderRadius: 20,
+                    paddingHorizontal: 16,
+                    paddingVertical: 12,
+                    borderRadius: 12,
                   }}
                 >
-                  <Text style={{ color: "white", fontWeight: "600" }}>Previous</Text>
-                </TouchableOpacity>
+                  <Text style={{ color: "white", fontSize: 15 }}>
+                    {selectedMoment.moments[momentIndex].content}
+                  </Text>
+                </View>
               )}
-
-              {momentIndex < selectedMoment.moments.length - 1 && (
-                <TouchableOpacity
-                  onPress={() => setMomentIndex(momentIndex + 1)}
-                  style={{
-                    backgroundColor: "rgba(0, 0, 0, 0.6)",
-                    paddingHorizontal: 20,
-                    paddingVertical: 10,
-                    borderRadius: 20,
-                  }}
-                >
-                  <Text style={{ color: "white", fontWeight: "600" }}>Next</Text>
-                </TouchableOpacity>
-              )}
-            </View>
-          </SafeAreaView>
+            </SafeAreaView>
+          </View>
         </Modal>
       )}
     </View>

@@ -688,14 +688,31 @@ To enable Google sign-in, you need to configure authorized redirect URIs in your
   - User avatars and display names
   - Timestamp with "time ago" display
   - Group post indicators
-- **Moments (Stories)** 📸 ENHANCED!:
-  - Instagram-style 24-hour stories
-  - **"Your Story" Button** ✨ NEW!: Always-visible button at the start of moments bar to create new moments
+- **Moments (Stories)** 📸 FULLY REDESIGNED!:
+  - Instagram/Snapchat-style 24-hour stories with modern black UI
+  - **"Your Story" Button** ✨: Always-visible button at the start of moments bar to create new moments
   - Dashed purple circle with plus icon for easy access
   - **Camera Support**: Take photos directly or select from gallery
   - Horizontal scrollable moments bar at top of feed
-  - View friends' moments in fullscreen viewer
-  - Navigate between multiple moments
+  - **Modern Story Creation Screen** 🎨 NEW!:
+    - Full-screen black background with Instagram-style header
+    - "Add to story" title with settings icon
+    - **Multiple Creation Options**:
+      - 🆕 **Add Yours**: Quick photo/gallery selection (primary option)
+      - 🎵 **Music**: Add music to your story (coming soon)
+      - 🖼️ **Collage**: Create photo collages (coming soon)
+      - ✨ **AI Images**: Generate AI images for stories (coming soon)
+    - **Recents Section**: Shows your recent posts that can be shared as stories
+    - **Camera Button**: Large prominent button to take photos
+    - **Selected Image Preview**: Bottom bar shows selected image with "Ready to share" text
+  - **Instagram-Style Story Viewer** 📱 NEW!:
+    - Full-screen immersive story viewing experience
+    - Progress bars at top showing story position
+    - User avatar and name with timestamp in header
+    - Tap left/right to navigate between stories
+    - Tap anywhere on right to advance or close
+    - Clean X button to exit
+    - Content text overlay at bottom with semi-transparent background
   - Automatic expiration after 24 hours
   - Purple ring indicator for new moments
   - Moments bar always visible with "Add Your Story" button
