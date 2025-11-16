@@ -321,7 +321,7 @@ questsRouter.post("/:id/record", zValidator("json", recordQuestActionRequestSche
 
   // If completed, update user stats
   if (isCompleted) {
-    await updateUserStats(user.id, userQuest.quest.xpReward, userQuest.quest.pointReward);
+    await updateUserStats(user.id, userQuest.quest.xpReward, userQuest.quest.pointReward, userQuest.quest.difficulty);
   }
 
   return c.json({
@@ -827,7 +827,65 @@ function getPredefinedQuest(category?: string, difficulty?: string) {
   return quests[Math.floor(Math.random() * quests.length)];
 }
 
-async function updateUserStats(userId: string, xpReward: number, pointReward: number) {
+async function updateUserStats(userId: string, xpReward: number, pointReward: number, difficulty?: string) {
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  // Get current stats
+  const currentStats = await db.userStats.findUnique({
+    where: { userId },
+  });
+
+  // Calculate streak
+  let newCurrentStreak = 1;
+  let newLongestStreak = 1;
+
+  if (currentStats) {
+    const lastActiveDate = currentStats.lastActiveAt
+      ? new Date(currentStats.lastActiveAt.getFullYear(), currentStats.lastActiveAt.getMonth(), currentStats.lastActiveAt.getDate())
+      : null;
+
+    if (lastActiveDate) {
+      const daysDiff = Math.floor((today.getTime() - lastActiveDate.getTime()) / (1000 * 60 * 60 * 24));
+
+      if (daysDiff === 0) {
+        // Same day, keep current streak
+        newCurrentStreak = currentStats.currentStreak;
+      } else if (daysDiff === 1) {
+        // Consecutive day, increment streak
+        newCurrentStreak = currentStats.currentStreak + 1;
+      } else {
+        // Streak broken, reset to 1
+        newCurrentStreak = 1;
+      }
+    }
+
+    // Update longest streak if current streak is higher
+    newLongestStreak = Math.max(newCurrentStreak, currentStats.longestStreak);
+  }
+
+  // Determine which difficulty zone to increment
+  const updateData: any = {
+    totalXP: { increment: xpReward },
+    totalPoints: { increment: pointReward },
+    currentStreak: newCurrentStreak,
+    longestStreak: newLongestStreak,
+    lastActiveAt: now,
+    lastQuestCompletedAt: now,
+  };
+
+  // Track difficulty zones
+  if (difficulty) {
+    const difficultyLower = difficulty.toLowerCase();
+    if (difficultyLower === "easy") {
+      updateData.easyZoneCount = { increment: 1 };
+    } else if (difficultyLower === "medium") {
+      updateData.growthZoneCount = { increment: 1 };
+    } else if (difficultyLower === "hard" || difficultyLower === "expert") {
+      updateData.fearZoneCount = { increment: 1 };
+    }
+  }
+
   await db.userStats.upsert({
     where: { userId },
     create: {
@@ -838,12 +896,13 @@ async function updateUserStats(userId: string, xpReward: number, pointReward: nu
       longestStreak: 1,
       trophies: 0,
       diamonds: 0,
+      lastActiveAt: now,
+      lastQuestCompletedAt: now,
+      easyZoneCount: difficulty?.toLowerCase() === "easy" ? 1 : 0,
+      growthZoneCount: difficulty?.toLowerCase() === "medium" ? 1 : 0,
+      fearZoneCount: (difficulty?.toLowerCase() === "hard" || difficulty?.toLowerCase() === "expert") ? 1 : 0,
     },
-    update: {
-      totalXP: { increment: xpReward },
-      totalPoints: { increment: pointReward },
-      lastActiveAt: new Date(),
-    },
+    update: updateData,
   });
 }
 
