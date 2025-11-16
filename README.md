@@ -203,6 +203,13 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 - **Single Accomplishments Page**:
   - Shows XP and Points earned with bright white text and colored shadows
   - Displays Total XP and Total Points with enhanced contrast
+  - **Share to Community Button** 🎯 NEW!:
+    - Purple gradient button with Share icon
+    - Automatically creates a formatted post with quest details
+    - Shows quest title, category, difficulty, and rewards
+    - Includes NO/YES/action counts
+    - Posts publicly to community feed
+    - Success confirmation after sharing
   - "Tap to continue" button returns you to home screen
   - Clean, simple completion flow - no more multi-page confusion
 

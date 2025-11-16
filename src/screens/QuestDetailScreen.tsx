@@ -3,7 +3,7 @@ import { View, Text, Pressable, ActivityIndicator, ScrollView, Modal, Animated, 
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Bell, Menu as MenuIcon, Flame, Trophy, Diamond, Clock, Sparkles, Star, X, Video } from "lucide-react-native";
+import { ArrowLeft, Bell, Menu as MenuIcon, Flame, Trophy, Diamond, Clock, Sparkles, Star, X, Video, Share2 } from "lucide-react-native";
 import * as Location from "expo-location";
 import * as Haptics from "expo-haptics";
 import type { RootStackScreenProps } from "@/navigation/types";
@@ -270,6 +270,57 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
       userLatitude: userLocation?.latitude,
       userLongitude: userLocation?.longitude,
     });
+  };
+
+  // Share quest completion to community
+  const shareToCommunityMutation = useMutation({
+    mutationFn: async () => {
+      if (!savedQuestData || !completionData) {
+        throw new Error("No quest data available");
+      }
+
+      const questTitle = savedQuestData.quest.title;
+      const category = savedQuestData.quest.category;
+      const difficulty = savedQuestData.quest.difficulty;
+      const xpReward = savedQuestData.quest.xpReward;
+      const pointsReward = savedQuestData.quest.pointsReward;
+      const noCount = completionData.noCount || 0;
+      const yesCount = completionData.yesCount || 0;
+      const actionsCompleted = completionData.actionsCompleted || 0;
+
+      let postContent = `🎯 Quest Complete!\n\n"${questTitle}"\n\n`;
+
+      if (noCount > 0) {
+        postContent += `✅ Collected ${noCount} NO${noCount > 1 ? 's' : ''}\n`;
+      }
+      if (yesCount > 0) {
+        postContent += `✅ Collected ${yesCount} YES${yesCount > 1 ? 'es' : ''}\n`;
+      }
+      if (actionsCompleted > 0) {
+        postContent += `✅ Completed ${actionsCompleted} action${actionsCompleted > 1 ? 's' : ''}\n`;
+      }
+
+      postContent += `\n📊 Category: ${category}\n`;
+      postContent += `⚡ Difficulty: ${difficulty}\n`;
+      postContent += `🏆 Earned: ${xpReward} XP + ${pointsReward} Points\n\n`;
+      postContent += `#QuestComplete #${category}`;
+
+      return api.post("/api/posts", {
+        content: postContent,
+        privacy: "PUBLIC",
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["posts-feed"] });
+      Alert.alert("Success", "Your quest achievement has been shared to the community!");
+    },
+    onError: () => {
+      Alert.alert("Error", "Failed to share to community. Please try again.");
+    },
+  });
+
+  const handleShareToCommunity = () => {
+    shareToCommunityMutation.mutate();
   };
 
   // Regenerate quest with new category/difficulty
@@ -1532,10 +1583,57 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                   </View>
                 </Animated.View>
 
+                {/* Share to Community Button */}
+                <Animated.View
+                  style={{
+                    marginTop: 32,
+                    width: "100%",
+                    opacity: celebrationAnim,
+                  }}
+                >
+                  <Pressable
+                    onPress={handleShareToCommunity}
+                    disabled={shareToCommunityMutation.isPending}
+                    style={{
+                      backgroundColor: "#7E3FE4",
+                      paddingVertical: 16,
+                      paddingHorizontal: 32,
+                      borderRadius: 24,
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 12,
+                      shadowColor: "#7E3FE4",
+                      shadowOffset: { width: 0, height: 4 },
+                      shadowOpacity: 0.4,
+                      shadowRadius: 12,
+                      elevation: 8,
+                      opacity: shareToCommunityMutation.isPending ? 0.6 : 1,
+                    }}
+                  >
+                    {shareToCommunityMutation.isPending ? (
+                      <ActivityIndicator size="small" color="white" />
+                    ) : (
+                      <>
+                        <Share2 size={22} color="white" />
+                        <Text
+                          style={{
+                            color: "white",
+                            fontSize: 18,
+                            fontWeight: "700",
+                          }}
+                        >
+                          Share to Community
+                        </Text>
+                      </>
+                    )}
+                  </Pressable>
+                </Animated.View>
+
                 {/* Tap to continue */}
                 <Animated.Text
                   style={{
-                    marginTop: 32,
+                    marginTop: 24,
                     fontSize: 18,
                     color: "#FFFFFF",
                     fontWeight: "600",
