@@ -440,8 +440,31 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
       - Email includes group features (quests, live, community)
       - Join link for easy signup and group joining
     - Non-users receive signup link that auto-joins group after registration
-  - **Group Quests** 🎯 NEW & ACTIVE!:
-    - **Create Group Quests**: Members can create quests for the group
+  - **Group Quests** 🎯 FULLY ACTIVE!:
+    - **Create Group Quests** ✅ ENABLED!:
+      - **3-Step Creation Flow**:
+        - Step 1: Select from your existing active or queued quests
+        - Step 2: Choose assignment type (Open to All or Assigned Only)
+        - Step 3: Select specific members (if Assigned Only)
+      - **Quest Selection Screen**:
+        - Browse all your active and queued quests
+        - Beautiful card-based UI with quest details
+        - Shows difficulty, category, XP rewards
+        - Visual selection with checkmarks
+      - **Assignment Types**:
+        - **Open to All**: Any group member can join the quest
+        - **Assigned Only**: Only selected members can participate
+      - **Member Selection** (for Assigned quests):
+        - Browse group members with avatars
+        - Multi-select members to assign quest
+        - Shows member roles (Admin/Moderator/Member)
+        - Visual selection indicators
+      - **Step Progress Indicators**: Visual progress bar showing current step
+    - **Join Group Quests** ✅ ACTIVE!:
+      - Members can join open quests with one tap
+      - "Join Quest" button on quest cards
+      - Automatic status updates after joining
+      - Success notifications on join
     - **Assignment Options**:
       - "All" mode: Anyone in the group can join the quest
       - "Assigned" mode: Only select members can participate
@@ -451,7 +474,7 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
       - Status indicators: Joined, In Progress, Completed, Failed
     - **Group Quest List Screen**:
       - Beautiful card-based UI showing all group quests
-      - **WhatsApp-Style Participant Display** 🆕:
+      - **WhatsApp-Style Participant Display**:
         - Overlapping circular avatars in horizontal row
         - First 5 participants shown with overflow counter (+N)
         - Color-coded status badges on each avatar (green=completed, blue=in progress, red=failed)
@@ -463,6 +486,12 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
       - Live refresh every 5 seconds for real-time updates
       - Quest details with rewards, difficulty, and location
       - Assignment type badges (Open to All vs Assigned Only)
+    - **Participant Action Buttons**:
+      - **Join Quest**: Purple button for non-participants
+      - **Start Quest**: Green button for joined members
+      - **Continue Quest**: Cyan button for in-progress quests
+      - **Completed Badge**: Green checkmark for completed quests
+      - **Failed Badge**: Red X for failed quests
     - **Participant Features**:
       - Join any open quest or assigned quests
       - Track individual progress within group quests
