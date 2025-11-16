@@ -320,7 +320,7 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
           onPress={() => setShowCreateMoment(true)}
           style={{
             width: 110,
-            height: 180,
+            height: 200,
             borderRadius: 12,
             overflow: "hidden",
             backgroundColor: "rgba(255, 255, 255, 0.05)",
@@ -400,7 +400,7 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
             }}
             style={{
               width: 110,
-              height: 180,
+              height: 200,
               borderRadius: 12,
               overflow: "hidden",
               position: "relative",
