@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, Text, Pressable, ScrollView, TextInput, Image, ActivityIndicator, RefreshControl, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
-import { Users, Search, UserPlus, Check, X, Send, ChevronLeft } from "lucide-react-native";
+import { Users, Search, UserPlus, Check, X, Send, ChevronLeft, Sparkles } from "lucide-react-native";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "@/navigation/types";
@@ -203,21 +203,38 @@ export default function FriendsScreen({ navigation }: Props) {
             </Text>
           )}
         </View>
-        <Pressable
-          onPress={() => {
-            // Navigate to send quest screen with friend pre-selected
-            navigation.navigate("SendQuestToFriend", { friendId: friend.id, friendName: friend.displayName });
-          }}
-          style={{
-            backgroundColor: "rgba(0, 217, 255, 0.2)",
-            borderRadius: 12,
-            padding: 10,
-            borderWidth: 1,
-            borderColor: "rgba(0, 217, 255, 0.3)",
-          }}
-        >
-          <Send size={20} color="#00D9FF" />
-        </Pressable>
+        <View style={{ flexDirection: "row", gap: 8 }}>
+          <Pressable
+            onPress={() => {
+              // Navigate to send quest screen with friend pre-selected
+              navigation.navigate("SendQuestToFriend", { friendId: friend.id, friendName: friend.displayName });
+            }}
+            style={{
+              backgroundColor: "rgba(0, 217, 255, 0.2)",
+              borderRadius: 12,
+              padding: 10,
+              borderWidth: 1,
+              borderColor: "rgba(0, 217, 255, 0.3)",
+            }}
+          >
+            <Send size={20} color="#00D9FF" />
+          </Pressable>
+          <Pressable
+            onPress={() => {
+              // Navigate to create custom quest screen
+              navigation.navigate("CreateCustomQuest", { friendId: friend.id, friendName: friend.displayName });
+            }}
+            style={{
+              backgroundColor: "rgba(126, 63, 228, 0.2)",
+              borderRadius: 12,
+              padding: 10,
+              borderWidth: 1,
+              borderColor: "rgba(126, 63, 228, 0.3)",
+            }}
+          >
+            <Sparkles size={20} color="#7E3FE4" />
+          </Pressable>
+        </View>
       </View>
     </View>
   );

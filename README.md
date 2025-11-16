@@ -537,21 +537,28 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
     - Shows XP and point rewards
     - Optional personal message when sharing
   - **Create Custom Quests** ✨ NEW!:
-    - **Voice Input** 🎤: Record your quest idea and AI transcribes it
+    - **Voice Input** 🎤: Record your quest idea and AI transcribes it (using expo-av)
     - **Text Input** ⌨️: Type your custom quest description
     - **AI Safety Filtering** 🛡️: All quests reviewed by GPT-4o-mini for safety
       - Rejects illegal, harmful, or inappropriate content
       - Allows personal growth, networking, and rejection challenges
       - Provides safety warnings if quest is flagged
+      - Auto-refunds XP/Points if quest rejected
     - **XP & Points Gifting** 💎:
       - Gift your own XP and Points to make quests more rewarding
       - Must have sufficient balance to gift (complete quests to earn!)
       - Points automatically deducted from sender and added to quest reward
       - Refunded if quest fails safety check
+      - Slider controls for easy gifting (0-10,000 XP/Points)
     - **Customizable Parameters**:
-      - Choose category, difficulty, goal type, and goal count
+      - Choose category (Social, Sales, Dating, Career, etc.)
+      - Set difficulty (Easy, Medium, Hard, Expert)
+      - Define goal type (Collect NOs, Collect YESes, Take Action)
+      - Adjust goal count (1-20)
       - AI suggests smart defaults if not specified
     - **Balance Validation**: Can't gift more than you have - complete quests first!
+    - **Beautiful UI**: Purple Sparkles (✨) button on each friend card
+    - **Real-time Balance Display**: See your current XP and Points while creating
   - **Friend Acceptance**: Friends receive shared quest in their inbox
   - **Auto-Queue**: Accepted quests automatically added to friend's queue
   - **Purple Share Icon** for easy identification

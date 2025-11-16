@@ -36,6 +36,7 @@ import GroupDetailScreen from "@/screens/GroupDetailScreen";
 import GroupQuestsScreen from "@/screens/GroupQuestsScreen";
 import GroupLiveScreen from "@/screens/GroupLiveScreen";
 import ChatScreen from "@/screens/ChatScreen";
+import CreateCustomQuestScreen from "@/screens/CreateCustomQuestScreen";
 import { useSession } from "@/lib/useSession";
 import { api } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
@@ -103,6 +104,11 @@ const RootNavigator = () => {
         <RootStack.Screen
           name="SendQuestToFriend"
           component={SendQuestToFriendScreen}
+          options={{ headerShown: false }}
+        />
+        <RootStack.Screen
+          name="CreateCustomQuest"
+          component={CreateCustomQuestScreen}
           options={{ headerShown: false }}
         />
         <RootStack.Screen

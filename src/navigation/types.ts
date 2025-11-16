@@ -23,6 +23,7 @@ export type RootStackParamList = {
   GrowthAchievements: undefined;
   Friends: undefined;
   SendQuestToFriend: { friendId: string; friendName: string };
+  CreateCustomQuest: { friendId: string; friendName: string };
   Notifications: undefined;
   QuestCalendar: undefined;
   InviteWarriors: undefined;
