@@ -395,6 +395,72 @@ postsRouter.post("/:id/comment", zValidator("json", addCommentRequestSchema), as
 });
 
 // ============================================
+// PUT /api/posts/:id - Update a post
+// ============================================
+postsRouter.put("/:id", async (c) => {
+  const user = c.get("user");
+
+  if (!user) {
+    return c.json({ message: "Unauthorized" }, 401);
+  }
+
+  const postId = c.req.param("id");
+  const body = await c.req.json();
+  const { content } = body;
+
+  if (!content || !content.trim()) {
+    return c.json({ message: "Content is required" }, 400);
+  }
+
+  try {
+    // Verify post exists and belongs to user
+    const post = await db.post.findUnique({
+      where: { id: postId },
+    });
+
+    if (!post) {
+      return c.json({ message: "Post not found" }, 404);
+    }
+
+    if (post.userId !== user.id) {
+      return c.json({ message: "You can only edit your own posts" }, 403);
+    }
+
+    // Update post
+    const updatedPost = await db.post.update({
+      where: { id: postId },
+      data: {
+        content: content.trim(),
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            image: true,
+          },
+        },
+      },
+    });
+
+    return c.json({
+      id: updatedPost.id,
+      content: updatedPost.content,
+      privacy: updatedPost.privacy,
+      updatedAt: updatedPost.updatedAt.toISOString(),
+      user: {
+        id: updatedPost.user.id,
+        name: updatedPost.user.name,
+        avatar: updatedPost.user.image,
+      },
+    });
+  } catch (error) {
+    console.error("Update post error:", error);
+    return c.json({ message: "Failed to update post" }, 500);
+  }
+});
+
+// ============================================
 // DELETE /api/posts/:id - Delete a post
 // ============================================
 postsRouter.delete("/:id", async (c) => {

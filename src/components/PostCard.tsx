@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, Image, TextInput, Alert, Modal } from "react-native";
-import { Heart, MessageCircle, Send, MoreVertical, Edit2, Trash2, Globe, Users, Lock } from "lucide-react-native";
+import { View, Text, TouchableOpacity, Image, TextInput, Alert, Modal, ActivityIndicator } from "react-native";
+import { Heart, MessageCircle, Send, MoreVertical, Edit2, Trash2, Globe, Users, Lock, X } from "lucide-react-native";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 
@@ -46,6 +46,8 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
   const [showComments, setShowComments] = useState(false);
   const [commentText, setCommentText] = useState("");
   const [showMenu, setShowMenu] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editContent, setEditContent] = useState(post.content);
 
   // Like mutation
   const likeMutation = useMutation({
@@ -81,6 +83,19 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
     },
   });
 
+  // Edit mutation
+  const editMutation = useMutation({
+    mutationFn: (content: string) => api.put(`/api/posts/${post.id}`, { content }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["posts-feed"] });
+      setShowEditModal(false);
+      Alert.alert("Success", "Post updated successfully!");
+    },
+    onError: () => {
+      Alert.alert("Error", "Failed to update post. Please try again.");
+    },
+  });
+
   const handleLike = () => {
     if (post.isLikedByCurrentUser) {
       unlikeMutation.mutate();
@@ -92,6 +107,14 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
   const handleComment = () => {
     if (!commentText.trim()) return;
     commentMutation.mutate(commentText);
+  };
+
+  const handleEdit = () => {
+    if (!editContent.trim()) {
+      Alert.alert("Error", "Post content cannot be empty");
+      return;
+    }
+    editMutation.mutate(editContent);
   };
 
   const handleDelete = () => {
@@ -246,7 +269,7 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
                 <TouchableOpacity
                   onPress={() => {
                     setShowMenu(false);
-                    Alert.alert("Edit Post", "Edit functionality coming soon!");
+                    setShowEditModal(true);
                   }}
                   style={{
                     flexDirection: "row",
@@ -555,6 +578,111 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
           </View>
         </View>
       )}
+
+      {/* Edit Post Modal */}
+      <Modal
+        visible={showEditModal}
+        animationType="fade"
+        onRequestClose={() => setShowEditModal(false)}
+        transparent={true}
+      >
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: "rgba(0, 0, 0, 0.85)",
+            justifyContent: "center",
+            alignItems: "center",
+            paddingHorizontal: 20,
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: "#1A1A24",
+              borderRadius: 20,
+              borderWidth: 1,
+              borderColor: "rgba(126, 63, 228, 0.3)",
+              width: "100%",
+              maxWidth: 500,
+              maxHeight: "80%",
+            }}
+          >
+            {/* Header */}
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+                paddingHorizontal: 20,
+                paddingVertical: 16,
+                borderBottomWidth: 1,
+                borderBottomColor: "rgba(255, 255, 255, 0.1)",
+              }}
+            >
+              <Text style={{ fontSize: 20, fontWeight: "700", color: "white" }}>
+                Edit post
+              </Text>
+              <TouchableOpacity
+                onPress={() => setShowEditModal(false)}
+                style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: 16,
+                  backgroundColor: "rgba(255, 255, 255, 0.1)",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <X size={20} color="white" />
+              </TouchableOpacity>
+            </View>
+
+            {/* Content */}
+            <View style={{ padding: 20 }}>
+              <TextInput
+                value={editContent}
+                onChangeText={setEditContent}
+                placeholder="What's on your mind?"
+                placeholderTextColor="#666"
+                multiline
+                style={{
+                  backgroundColor: "rgba(255, 255, 255, 0.05)",
+                  borderRadius: 12,
+                  padding: 16,
+                  color: "white",
+                  fontSize: 16,
+                  minHeight: 150,
+                  textAlignVertical: "top",
+                  borderWidth: 1,
+                  borderColor: "rgba(126, 63, 228, 0.3)",
+                }}
+                maxLength={5000}
+              />
+
+              {/* Save Button */}
+              <TouchableOpacity
+                onPress={handleEdit}
+                disabled={!editContent.trim() || editMutation.isPending}
+                style={{
+                  backgroundColor: editContent.trim() ? "#7E3FE4" : "rgba(126, 63, 228, 0.3)",
+                  paddingVertical: 14,
+                  borderRadius: 12,
+                  alignItems: "center",
+                  marginTop: 16,
+                  opacity: editMutation.isPending ? 0.7 : 1,
+                }}
+              >
+                {editMutation.isPending ? (
+                  <ActivityIndicator size="small" color="white" />
+                ) : (
+                  <Text style={{ color: "white", fontSize: 16, fontWeight: "700" }}>
+                    Save changes
+                  </Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }

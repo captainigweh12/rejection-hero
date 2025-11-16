@@ -275,32 +275,7 @@ export default function CommunityScreen({ navigation }: Props) {
         {/* Header */}
         <View style={{ paddingHorizontal: 20, paddingTop: 16, paddingBottom: 12 }}>
           <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-            <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
-              <Text style={{ fontSize: 32, fontWeight: "bold", color: "white" }}>Community</Text>
-
-              {/* Create Post Button - moved next to Community title */}
-              {activeTab === "feed" && (
-                <TouchableOpacity
-                  onPress={() => {
-                    if (feedCreatePostHandler) {
-                      feedCreatePostHandler();
-                    }
-                  }}
-                  style={{
-                    backgroundColor: "rgba(126, 63, 228, 0.2)",
-                    width: 40,
-                    height: 40,
-                    borderRadius: 20,
-                    alignItems: "center",
-                    justifyContent: "center",
-                    borderWidth: 1,
-                    borderColor: "#7E3FE4",
-                  }}
-                >
-                  <Plus size={24} color="#7E3FE4" strokeWidth={2.5} />
-                </TouchableOpacity>
-              )}
-            </View>
+            <Text style={{ fontSize: 32, fontWeight: "bold", color: "white" }}>Community</Text>
 
             <View style={{ flexDirection: "row", gap: 12 }}>
               {/* Notifications Bell */}

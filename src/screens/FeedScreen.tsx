@@ -545,7 +545,7 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
           renderItem={({ item }) => (
             <PostCard post={item} currentUserId={sessionData?.user?.id || ""} />
           )}
-          contentContainerStyle={{ padding: 12, paddingBottom: 100 }}
+          contentContainerStyle={{ paddingHorizontal: 12, paddingTop: 20, paddingBottom: 100 }}
           refreshControl={
             <RefreshControl
               refreshing={false}

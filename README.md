@@ -1496,6 +1496,27 @@ See `ENV_SETUP.md` for complete environment variable setup guide.
 
 ## Recent Updates
 
+### 2025-11-16: Feed UI Improvements & Edit Post Functionality
+- **Removed + Button**: Removed redundant create post button from Community header
+  - Button was duplicate of "What's on your mind?" input box
+  - Cleaner, simpler header design
+- **Increased Spacing**: Fixed overlapping between stories and posts
+  - Added 20px top padding to posts feed (previously 12px)
+  - Stories bar has 16px bottom margin
+  - Clear visual separation between sections
+- **Edit Post Feature** ✨ NEW & FULLY FUNCTIONAL!:
+  - Click three-dot menu on your own posts
+  - Select "Edit post" from dropdown menu
+  - Beautiful modal with text editor (5000 char limit)
+  - Save changes with validation
+  - Success confirmation after edit
+  - Backend PUT endpoint `/api/posts/:id`
+  - Real-time feed updates after editing
+- **Menu Improvements**:
+  - Edit and Delete options in dropdown
+  - Edit opens modal, Delete shows confirmation
+  - Auto-closes after selection
+
 ### 2025-11-16: Enhanced Feed Post Cards - Facebook-Style Improvements
 - **Privacy Display**: Privacy icon and label now shown next to timestamp on every post
   - Globe icon for Public posts
