@@ -690,35 +690,41 @@ To enable Google sign-in, you need to configure authorized redirect URIs in your
   - Group post indicators
 - **Moments (Stories)** 📸 ENHANCED!:
   - Instagram-style 24-hour stories
+  - **"Your Story" Button** ✨ NEW!: Always-visible button at the start of moments bar to create new moments
+  - Dashed purple circle with plus icon for easy access
   - **Camera Support**: Take photos directly or select from gallery
   - Horizontal scrollable moments bar at top of feed
   - View friends' moments in fullscreen viewer
   - Navigate between multiple moments
   - Automatic expiration after 24 hours
   - Purple ring indicator for new moments
+  - Moments bar always visible with "Add Your Story" button
 - **Community Tab Integration**:
   - Four tabs: Feed, Friends, Messages, Groups (optimized button padding)
   - Feed tab shows social posts and moments
   - Seamless integration with existing community features
   - **Fixed Tab Buttons**: Reduced padding (8px vertical, 8px horizontal) and font size (13px) for better fit
-- **Create Post Modal** ✨ FULLY OPTIMIZED!:
-  - **Perfect SafeArea**: Proper top and bottom safe area handling with optimized padding
+- **Create Post Modal** ✨ FULLY FIXED!:
+  - **Fixed SafeArea**: No more status bar overlap on all devices
+  - **Proper Modal Structure**: fullScreen presentation with outer View wrapper
   - Full-screen modal for creating posts
   - Text input with character counter
   - **Gallery Button**: Pick multiple photos from device
   - **Camera Button**: Take photos directly in the app
-  - Privacy selector with icons
+  - Privacy selector with icons (PUBLIC, FRIENDS, GROUPS)
   - Preview selected images before posting
   - Remove individual images before posting
-  - No overflow issues on any device
-- **Create Moment Modal** ✨ FULLY OPTIMIZED!:
-  - **Perfect SafeArea**: Proper safe area handling with fullScreen presentation style
-  - **Fixed Overflow**: Content properly padded to prevent edge cutoff
+  - **Bottom Padding**: Extra padding (40px) prevents content cutoff
+  - No overflow or clipping issues on any device
+- **Create Moment Modal** ✨ FULLY FIXED!:
+  - **Fixed SafeArea**: No more status bar overlap on all devices
+  - **Proper Modal Structure**: fullScreen presentation with outer View wrapper
   - Full-screen moment creation interface with proper margins
   - **Gallery Button**: Select photos from device
   - **Camera Button**: Take photos with camera
   - Photo preview before sharing
   - Change or remove photo before posting
+  - **Bottom Padding**: Extra padding (40px) prevents content cutoff
   - No overflow or clipping issues on any device or screen size
 - **Feed Header** ✨ FIXED!:
   - **Safe Area Padding**: Header positioned with paddingTop: 60 to prevent overlap with status bar

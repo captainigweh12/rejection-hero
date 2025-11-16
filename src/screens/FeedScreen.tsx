@@ -295,7 +295,7 @@ export default function FeedScreen() {
       </View>
 
       {/* Moments Bar */}
-      {momentsData && momentsData.moments.length > 0 && (
+      {(momentsData && momentsData.moments.length > 0) || true && (
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -305,7 +305,35 @@ export default function FeedScreen() {
           }}
           contentContainerStyle={{ padding: 12, gap: 12 }}
         >
-          {momentsData.moments.map((momentUser) => (
+          {/* Add Your Moment Button */}
+          <TouchableOpacity
+            onPress={() => setShowCreateMoment(true)}
+            style={{ alignItems: "center" }}
+          >
+            <View
+              style={{
+                width: 70,
+                height: 70,
+                borderRadius: 35,
+                borderWidth: 3,
+                borderColor: "#7E3FE4",
+                borderStyle: "dashed",
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: "rgba(126, 63, 228, 0.1)",
+              }}
+            >
+              <Plus size={32} color="#7E3FE4" />
+            </View>
+            <Text
+              style={{ color: "#7E3FE4", fontSize: 12, marginTop: 4, fontWeight: "600" }}
+              numberOfLines={1}
+            >
+              Your Story
+            </Text>
+          </TouchableOpacity>
+
+          {momentsData?.moments.map((momentUser) => (
             <TouchableOpacity
               key={momentUser.userId}
               onPress={() => {
@@ -396,19 +424,22 @@ export default function FeedScreen() {
         visible={showCreatePost}
         animationType="slide"
         onRequestClose={() => setShowCreatePost(false)}
+        presentationStyle="fullScreen"
       >
-        <SafeAreaView style={{ flex: 1, backgroundColor: "#0A0A0F" }} edges={["top", "bottom"]}>
-          {/* Header */}
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
-              padding: 16,
-              borderBottomWidth: 1,
-              borderBottomColor: "rgba(126, 63, 228, 0.2)",
-            }}
-          >
+        <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
+          <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
+            {/* Header */}
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+                paddingHorizontal: 16,
+                paddingVertical: 16,
+                borderBottomWidth: 1,
+                borderBottomColor: "rgba(126, 63, 228, 0.2)",
+              }}
+            >
             <TouchableOpacity onPress={() => setShowCreatePost(false)}>
               <X size={24} color="white" />
             </TouchableOpacity>
@@ -427,7 +458,7 @@ export default function FeedScreen() {
             </TouchableOpacity>
           </View>
 
-          <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 16 }}>
+          <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 16, paddingBottom: 40 }}>
             {/* Privacy Selector */}
             <View style={{ marginBottom: 20 }}>
               <Text style={{ color: "white", fontSize: 14, marginBottom: 8 }}>
@@ -556,7 +587,8 @@ export default function FeedScreen() {
               </TouchableOpacity>
             </View>
           </ScrollView>
-        </SafeAreaView>
+          </SafeAreaView>
+        </View>
       </Modal>
 
       {/* Create Moment Modal */}
