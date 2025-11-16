@@ -405,8 +405,8 @@ function CreateGroupQuestModal({ visible, onClose, groupId, onSuccess }: CreateG
                   ) : (
                     <View style={{ gap: 12 }}>
                       {groupData?.group.members
-                        .filter((m) => m.userId !== sessionData?.user?.id)
-                        .map((member) => (
+                        ?.filter((m) => m.userId !== sessionData?.user?.id)
+                        ?.map((member) => (
                           <Pressable
                             key={member.userId}
                             onPress={() => toggleMember(member.userId)}

@@ -7,14 +7,14 @@ $ prisma generate
 Environment variables loaded from .env
 Prisma schema loaded from prisma/schema.prisma
 
-✔ Generated Prisma Client (v6.17.1) to ./generated/prisma in 312ms
+✔ Generated Prisma Client (v6.17.1) to ./generated/prisma in 293ms
 
 Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
 
-Tip: Need your database queries to be 1000x faster? Accelerate offers you that and more: https://pris.ly/tip-2-accelerate
+Tip: Want to turn off tips and other hints? https://pris.ly/tip-4-nohints
 
 
-Checked 760 installs across 702 packages (no changes) [1.84s]
+Checked 760 installs across 702 packages (no changes) [1.79s]
 Starting server in dev mode with hot reload...
 $ NODE_ENV=development bun run --hot src/index.ts
 Failed to find Response internal state key
@@ -79,6 +79,8 @@ Failed to find Response internal state key
   💚 Health:       GET /health
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+<-- GET /api/group-quests/cmi0wj2dx0001m208yf893ghm
+--> GET /api/group-quests/cmi0wj2dx0001m208yf893ghm [32m200[0m 38ms
 Failed to find Response internal state key
 ✅ Environment variables validated successfully
 🔍 OPENAI_API_KEY from process.env: EXISTS
@@ -115,6 +117,7 @@ Failed to find Response internal state key
 🎫 Mounting support routes at /api/support
 📁 Mounting categories routes at /api/categories
 ⚙️  Starting server...
+<-- GET /api/live/active
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📍 Environment: development
 🚀 Server is running on port 3000
@@ -141,154 +144,32 @@ Failed to find Response internal state key
   💚 Health:       GET /health
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-<-- GET /api/auth/get-session
---> GET /api/auth/get-session [32m200[0m 10ms
-<-- GET /api/quests
---> GET /api/quests [32m200[0m 7ms
-<-- GET /api/profile
-<-- GET /api/stats/reflection-prompt
---> GET /api/profile [32m200[0m 3ms
-<-- GET /api/stats/weekly-forecast
---> GET /api/stats/reflection-prompt [32m200[0m 9ms
-<-- GET /api/stats
---> GET /api/stats/weekly-forecast [32m200[0m 15ms
---> GET /api/stats [32m200[0m 8ms
-<-- GET /api/profile
-<-- GET /api/stats
---> GET /api/stats [32m200[0m 3ms
---> GET /api/profile [32m200[0m 4ms
-<-- POST /api/profile/generate-avatar
-🔑 Checking OpenAI API key...
-  env.OPENAI_API_KEY exists: true
-  env.OPENAI_API_KEY length: 164
-  process.env.OPENAI_API_KEY exists: true
-  All env keys: [
-  "PORT", "NODE_ENV", "DATABASE_URL", "DATABASE_PROVIDER", "BETTER_AUTH_SECRET", "BACKEND_URL",
-  "GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET", "GOOGLE_ANDROID_CLIENT_ID", "GOOGLE_IOS_CLIENT_ID",
-  "OPENAI_API_KEY", "RESEND_API_KEY", "GOOGLE_MAPS_API_KEY", "PERPLEXITY_API_KEY"
-]
-🎨 Generating AI avatar with prompt: Stealth ninja character, mysterious, dark background, action pose, professional game art. Square composition, centered, suitable for profile picture. No text or watermarks.
-✅ Avatar generated successfully: https://oaidalleapiprodscus.blob.core.windows.net/private/org-jdr5vFDku87EJnQDwH0mvzHA/user-11t2zrBKGXhVgELCbCQNjquS/img-H9zo3MyzeK8eZ4thwQwo5Agl.png?st=2025-11-16T08%3A49%3A55Z&se=2025-11-16T10%3A49%3A55Z&sp=r&sv=2024-08-04&sr=b&rscd=inline&rsct=image/png&skoid=77e5a8ec-6bd1-4477-8afc-16703a64f029&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-11-16T09%3A35%3A04Z&ske=2025-11-17T09%3A35%3A04Z&sks=b&skv=2024-08-04&sig=rVD5tfTiv1gL9kDO3qbPgnwsyo%2BrAcLMo53g6hm13bQ%3D
---> POST /api/profile/generate-avatar [32m200[0m 12s
-<-- POST /api/profile
---> POST /api/profile [32m200[0m 34ms
-<-- GET /api/profile
---> GET /api/profile [32m200[0m 4ms
-<-- GET /api/posts/feed
---> GET /api/posts/feed [32m200[0m 5ms
-<-- GET /api/friends
---> GET /api/friends [32m200[0m 2ms
-<-- GET /api/moments
-<-- GET /api/groups
-<-- GET /api/messages/conversations
-<-- GET /api/notifications/unread-count
-<-- GET /api/friends/requests
---> GET /api/moments [32m200[0m 4ms
---> GET /api/friends/requests [32m200[0m 6ms
---> GET /api/groups [32m200[0m 8ms
---> GET /api/notifications/unread-count [32m200[0m 6ms
---> GET /api/messages/conversations [32m200[0m 8ms
-<-- GET /api/journal
---> GET /api/journal [32m200[0m 2ms
-<-- GET /api/quests
---> GET /api/quests [32m200[0m 6ms
-<-- GET /api/stats
---> GET /api/stats [32m200[0m 2ms
-<-- GET /api/live/active
---> GET /api/live/active [32m200[0m 3ms
-<-- POST /api/live/start
-[Live] Created Daily.co room: https://rejectionhero.daily.co/quest-live-kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp-1763286716046
---> POST /api/live/start [32m200[0m 341ms
-<-- GET /api/live/active
---> GET /api/live/active [32m200[0m 3ms
-<-- GET /api/live/cmi1jdtvz0003m2ud9ki460bk/comments
---> GET /api/live/cmi1jdtvz0003m2ud9ki460bk/comments [32m200[0m 2ms
-<-- GET /api/live/cmi1jdtvz0003m2ud9ki460bk/quest-suggestions
---> GET /api/live/cmi1jdtvz0003m2ud9ki460bk/quest-suggestions [32m200[0m 5ms
-<-- GET /api/live/cmi1jdtvz0003m2ud9ki460bk/comments
---> GET /api/live/cmi1jdtvz0003m2ud9ki460bk/comments [32m200[0m 2ms
-<-- GET /api/live/active
---> GET /api/live/active [32m200[0m 2ms
-<-- GET /api/live/cmi1jdtvz0003m2ud9ki460bk/quest-suggestions
---> GET /api/live/cmi1jdtvz0003m2ud9ki460bk/quest-suggestions [32m200[0m 3ms
-<-- GET /api/live/cmi1jdtvz0003m2ud9ki460bk/comments
---> GET /api/live/cmi1jdtvz0003m2ud9ki460bk/comments [32m200[0m 3ms
-<-- POST /api/live/cmi1jdtvz0003m2ud9ki460bk/end
-[Live] Deleted Daily.co room: quest-live-kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp-1763286716046
---> POST /api/live/cmi1jdtvz0003m2ud9ki460bk/end [32m200[0m 60ms
-<-- GET /api/live/active
---> GET /api/live/active [32m200[0m 2ms
-<-- GET /api/groups/cmi0wj2dx0001m208yf893ghm
---> GET /api/groups/cmi0wj2dx0001m208yf893ghm [32m200[0m 3ms
-<-- GET /api/live/active
---> GET /api/live/active [32m200[0m 2ms
-<-- GET /api/group-quests/cmi0wj2dx0001m208yf893ghm
---> GET /api/group-quests/cmi0wj2dx0001m208yf893ghm [32m200[0m 3ms
-<-- GET /api/quests
---> GET /api/quests [32m200[0m 4ms
-<-- GET /api/live/active
---> GET /api/live/active [32m200[0m 2ms
-<-- GET /api/group-quests/cmi0wj2dx0001m208yf893ghm
---> GET /api/group-quests/cmi0wj2dx0001m208yf893ghm [32m200[0m 3ms
-<-- GET /api/groups/cmi0wj2dx0001m208yf893ghm
---> GET /api/groups/cmi0wj2dx0001m208yf893ghm [32m200[0m 3ms
-<-- GET /api/live/active
---> GET /api/live/active [32m200[0m 2ms
-<-- GET /api/group-quests/cmi0wj2dx0001m208yf893ghm
---> GET /api/group-quests/cmi0wj2dx0001m208yf893ghm [32m200[0m 2ms
-<-- GET /api/notifications/unread-count
---> GET /api/notifications/unread-count [32m200[0m 2ms
-<-- GET /api/live/active
---> GET /api/live/active [32m200[0m 8ms
-<-- GET /api/group-quests/cmi0wj2dx0001m208yf893ghm
---> GET /api/group-quests/cmi0wj2dx0001m208yf893ghm [32m200[0m 3ms
-<-- GET /api/live/active
---> GET /api/live/active [32m200[0m 2ms
-<-- GET /api/group-quests/cmi0wj2dx0001m208yf893ghm
---> GET /api/group-quests/cmi0wj2dx0001m208yf893ghm [32m200[0m 3ms
-<-- GET /api/live/active
---> GET /api/live/active [32m200[0m 5ms
-<-- GET /api/group-quests/cmi0wj2dx0001m208yf893ghm
---> GET /api/group-quests/cmi0wj2dx0001m208yf893ghm [32m200[0m 2ms
-<-- GET /api/live/active
---> GET /api/live/active [32m200[0m 9ms
+--> GET /api/live/active [32m200[0m 24ms
 <-- GET /api/group-quests/cmi0wj2dx0001m208yf893ghm
 --> GET /api/group-quests/cmi0wj2dx0001m208yf893ghm [32m200[0m 7ms
 <-- GET /api/live/active
---> GET /api/live/active [32m200[0m 6ms
-<-- GET /api/group-quests/cmi0wj2dx0001m208yf893ghm
---> GET /api/group-quests/cmi0wj2dx0001m208yf893ghm [32m200[0m 4ms
-<-- GET /api/live/active
---> GET /api/live/active [32m200[0m 2ms
-<-- GET /api/notifications/unread-count
---> GET /api/notifications/unread-count [32m200[0m 2ms
-<-- GET /api/group-quests/cmi0wj2dx0001m208yf893ghm
---> GET /api/group-quests/cmi0wj2dx0001m208yf893ghm [32m200[0m 3ms
-<-- GET /api/live/active
---> GET /api/live/active [32m200[0m 2ms
-<-- GET /api/group-quests/cmi0wj2dx0001m208yf893ghm
---> GET /api/group-quests/cmi0wj2dx0001m208yf893ghm [32m200[0m 3ms
-<-- GET /api/live/active
---> GET /api/live/active [32m200[0m 3ms
-<-- GET /api/group-quests/cmi0wj2dx0001m208yf893ghm
---> GET /api/group-quests/cmi0wj2dx0001m208yf893ghm [32m200[0m 2ms
-<-- GET /api/live/active
---> GET /api/live/active [32m200[0m 2ms
-<-- GET /api/group-quests/cmi0wj2dx0001m208yf893ghm
---> GET /api/group-quests/cmi0wj2dx0001m208yf893ghm [32m200[0m 2ms
-<-- GET /api/live/active
---> GET /api/live/active [32m200[0m 5ms
-<-- GET /api/group-quests/cmi0wj2dx0001m208yf893ghm
---> GET /api/group-quests/cmi0wj2dx0001m208yf893ghm [32m200[0m 5ms
-<-- GET /api/live/active
---> GET /api/live/active [32m200[0m 4ms
-<-- GET /api/group-quests/cmi0wj2dx0001m208yf893ghm
---> GET /api/group-quests/cmi0wj2dx0001m208yf893ghm [32m200[0m 6ms
-<-- GET /api/notifications/unread-count
---> GET /api/notifications/unread-count [32m200[0m 2ms
-<-- GET /api/live/active
---> GET /api/live/active [32m200[0m 3ms
-<-- GET /api/group-quests/cmi0wj2dx0001m208yf893ghm
---> GET /api/group-quests/cmi0wj2dx0001m208yf893ghm [32m200[0m 3ms
-<-- GET /api/live/active
---> GET /api/live/active [32m200[0m 3ms
+--> GET /api/live/active [32m200[0m 8ms
+<-- GET /api/auth/get-session
+--> GET /api/auth/get-session [32m200[0m 6ms
+<-- GET /api/stats/reflection-prompt
+--> GET /api/stats/reflection-prompt [32m200[0m 5ms
+<-- GET /api/stats
+<-- GET /api/profile
+--> GET /api/stats [32m200[0m 3ms
+<-- GET /api/quests
+<-- GET /api/stats/weekly-forecast
+--> GET /api/profile [32m200[0m 4ms
+--> GET /api/stats/weekly-forecast [32m200[0m 7ms
+--> GET /api/quests [32m200[0m 9ms
+<-- GET /api/auth/get-session
+--> GET /api/auth/get-session [32m200[0m 8ms
+<-- GET /api/profile
+--> GET /api/profile [32m200[0m 2ms
+<-- GET /api/stats/reflection-prompt
+<-- GET /api/stats
+<-- GET /api/stats/weekly-forecast
+<-- GET /api/quests
+--> GET /api/stats/reflection-prompt [32m200[0m 11ms
+--> GET /api/quests [32m200[0m 10ms
+--> GET /api/stats [32m200[0m 18ms
+--> GET /api/stats/weekly-forecast [32m200[0m 18ms
