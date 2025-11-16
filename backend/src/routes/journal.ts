@@ -20,7 +20,7 @@ journalRouter.post("/transcribe", zValidator("json", transcribeAudioRequestSchem
     return c.json({ message: "Unauthorized" }, 401);
   }
 
-  const { audioBase64 } = c.req.valid("json");
+  const { audioBase64, text } = c.req.valid("json");
 
   // Check if OpenAI API key is available
   const openaiKey = process.env.OPENAI_API_KEY;
@@ -29,31 +29,40 @@ journalRouter.post("/transcribe", zValidator("json", transcribeAudioRequestSchem
   }
 
   try {
-    // Convert base64 to buffer
-    const audioBuffer = Buffer.from(audioBase64, "base64");
+    let transcript = "";
 
-    // Step 1: Transcribe audio using Whisper API
-    const formData = new FormData();
-    const audioBlob = new Blob([audioBuffer], { type: "audio/m4a" });
-    formData.append("file", audioBlob, "audio.m4a");
-    formData.append("model", "whisper-1");
+    // If text is provided directly, use it; otherwise transcribe audio
+    if (text) {
+      transcript = text;
+    } else if (audioBase64) {
+      // Convert base64 to buffer
+      const audioBuffer = Buffer.from(audioBase64, "base64");
 
-    const transcriptionResponse = await fetch("https://api.openai.com/v1/audio/transcriptions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${openaiKey}`,
-      },
-      body: formData,
-    });
+      // Step 1: Transcribe audio using Whisper API
+      const formData = new FormData();
+      const audioBlob = new Blob([audioBuffer], { type: "audio/m4a" });
+      formData.append("file", audioBlob, "audio.m4a");
+      formData.append("model", "whisper-1");
 
-    if (!transcriptionResponse.ok) {
-      const error = await transcriptionResponse.text();
-      console.error("Whisper API error:", error);
-      return c.json({ message: "Failed to transcribe audio" }, 500);
+      const transcriptionResponse = await fetch("https://api.openai.com/v1/audio/transcriptions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${openaiKey}`,
+        },
+        body: formData,
+      });
+
+      if (!transcriptionResponse.ok) {
+        const error = await transcriptionResponse.text();
+        console.error("Whisper API error:", error);
+        return c.json({ message: "Failed to transcribe audio" }, 500);
+      }
+
+      const transcriptionData = await transcriptionResponse.json();
+      transcript = transcriptionData.text;
+    } else {
+      return c.json({ message: "Either audioBase64 or text must be provided" }, 400);
     }
-
-    const transcriptionData = await transcriptionResponse.json();
-    const transcript = transcriptionData.text;
 
     // Step 2: Generate summary using GPT-4
     const summaryResponse = await fetch("https://api.openai.com/v1/chat/completions", {

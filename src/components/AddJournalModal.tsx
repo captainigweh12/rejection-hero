@@ -9,7 +9,7 @@ import {
   Alert,
   Modal,
 } from "react-native";
-import { Mic, Square, CheckCircle, XCircle, Activity, X } from "lucide-react-native";
+import { Mic, Square, CheckCircle, XCircle, Activity, X, Type } from "lucide-react-native";
 import { Audio } from "expo-av";
 import * as FileSystem from "expo-file-system";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -38,9 +38,11 @@ interface AddJournalModalProps {
 
 export default function AddJournalModal({ visible, onClose, onSuccess }: AddJournalModalProps) {
   const queryClient = useQueryClient();
+  const [inputMode, setInputMode] = useState<"text" | "voice">("text");
   const [recording, setRecording] = useState<Audio.Recording | null>(null);
   const [isRecording, setIsRecording] = useState(false);
   const [transcribing, setTranscribing] = useState(false);
+  const [textEntry, setTextEntry] = useState("");
   const [transcript, setTranscript] = useState("");
   const [summary, setSummary] = useState("");
   const [editedSummary, setEditedSummary] = useState("");
@@ -129,6 +131,31 @@ export default function AddJournalModal({ visible, onClose, onSuccess }: AddJour
     }
   };
 
+  // Process text entry
+  const handleProcessText = async () => {
+    if (!textEntry.trim()) {
+      Alert.alert("Error", "Please write your experience first");
+      return;
+    }
+
+    setTranscribing(true);
+    try {
+      // Use the same transcribe endpoint but with text instead of audio
+      const data = await api.post<TranscribeAudioResponse>("/api/journal/transcribe", {
+        text: textEntry.trim(),
+      });
+
+      setSummary(data.summary);
+      setEditedSummary(data.summary);
+      console.log("Text processing complete");
+    } catch (err) {
+      console.error("Text processing error:", err);
+      Alert.alert("Error", "Failed to process text. Please try again.");
+    } finally {
+      setTranscribing(false);
+    }
+  };
+
   // Create journal entry mutation
   const createEntryMutation = useMutation({
     mutationFn: async () => {
@@ -138,7 +165,7 @@ export default function AddJournalModal({ visible, onClose, onSuccess }: AddJour
 
       return api.post<CreateJournalEntryResponse>("/api/journal", {
         audioUrl: recordingUri,
-        audioTranscript: transcript,
+        audioTranscript: inputMode === "voice" ? transcript : textEntry,
         aiSummary: summary,
         userEditedSummary: editedSummary,
         outcome: selectedOutcome,
@@ -163,7 +190,9 @@ export default function AddJournalModal({ visible, onClose, onSuccess }: AddJour
   });
 
   const resetForm = () => {
+    setInputMode("text");
     setRecordingUri(null);
+    setTextEntry("");
     setTranscript("");
     setSummary("");
     setEditedSummary("");
@@ -235,67 +264,183 @@ export default function AddJournalModal({ visible, onClose, onSuccess }: AddJour
             contentContainerStyle={{ padding: 16 }}
             showsVerticalScrollIndicator={false}
           >
-            {/* Recording Section */}
-            <View
-              style={{
-                backgroundColor: "rgba(255, 255, 255, 0.05)",
-                borderWidth: 1,
-                borderColor: "rgba(126, 63, 228, 0.3)",
-                borderRadius: 16,
-                padding: 16,
-                marginBottom: 16,
-              }}
-            >
-              <Text className="text-base font-semibold text-white mb-3">
-                Voice Recording
-              </Text>
-
-              <View className="items-center py-4">
-                {isRecording ? (
-                  <TouchableOpacity
-                    onPress={stopRecording}
-                    style={{
-                      width: 60,
-                      height: 60,
-                      borderRadius: 30,
-                      backgroundColor: "#FF3B30",
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Square size={24} color="white" fill="white" />
-                  </TouchableOpacity>
-                ) : (
-                  <TouchableOpacity
-                    onPress={startRecording}
-                    disabled={transcribing || createEntryMutation.isPending}
-                    style={{
-                      width: 60,
-                      height: 60,
-                      borderRadius: 30,
-                      backgroundColor: "#7E3FE4",
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Mic size={24} color="white" />
-                  </TouchableOpacity>
-                )}
-
-                <Text className="text-white/60 text-xs mt-2">
-                  {isRecording ? "Tap to stop" : "Tap to record"}
+            {/* Input Mode Selector */}
+            {!summary && (
+              <View style={{ marginBottom: 16 }}>
+                <Text className="text-sm font-semibold text-white/80 mb-3">
+                  How would you like to log your experience?
                 </Text>
-              </View>
+                <View style={{ flexDirection: "row", gap: 8 }}>
+                  <TouchableOpacity
+                    onPress={() => setInputMode("text")}
+                    style={{
+                      flex: 1,
+                      backgroundColor: inputMode === "text"
+                        ? "rgba(126, 63, 228, 0.3)"
+                        : "rgba(255, 255, 255, 0.05)",
+                      borderWidth: 2,
+                      borderColor: inputMode === "text"
+                        ? "#7E3FE4"
+                        : "rgba(126, 63, 228, 0.3)",
+                      borderRadius: 12,
+                      padding: 12,
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 8,
+                    }}
+                  >
+                    <Type size={20} color={inputMode === "text" ? "#7E3FE4" : "white"} />
+                    <Text className={`font-semibold ${inputMode === "text" ? "text-[#7E3FE4]" : "text-white"}`}>
+                      Type
+                    </Text>
+                  </TouchableOpacity>
 
-              {transcribing && (
-                <View className="items-center py-3">
-                  <ActivityIndicator size="small" color="#7E3FE4" />
+                  <TouchableOpacity
+                    onPress={() => setInputMode("voice")}
+                    style={{
+                      flex: 1,
+                      backgroundColor: inputMode === "voice"
+                        ? "rgba(255, 107, 53, 0.3)"
+                        : "rgba(255, 255, 255, 0.05)",
+                      borderWidth: 2,
+                      borderColor: inputMode === "voice"
+                        ? "#FF6B35"
+                        : "rgba(126, 63, 228, 0.3)",
+                      borderRadius: 12,
+                      padding: 12,
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 8,
+                    }}
+                  >
+                    <Mic size={20} color={inputMode === "voice" ? "#FF6B35" : "white"} />
+                    <Text className={`font-semibold ${inputMode === "voice" ? "text-[#FF6B35]" : "text-white"}`}>
+                      Voice
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )}
+
+            {/* Text Input Section */}
+            {inputMode === "text" && !summary && (
+              <View
+                style={{
+                  backgroundColor: "rgba(255, 255, 255, 0.05)",
+                  borderWidth: 1,
+                  borderColor: "rgba(126, 63, 228, 0.3)",
+                  borderRadius: 16,
+                  padding: 16,
+                  marginBottom: 16,
+                }}
+              >
+                <Text className="text-base font-semibold text-white mb-3">
+                  Write Your Experience
+                </Text>
+                <TextInput
+                  value={textEntry}
+                  onChangeText={setTextEntry}
+                  placeholder="Describe what happened, how you felt, what you learned..."
+                  placeholderTextColor="rgba(255, 255, 255, 0.3)"
+                  multiline
+                  numberOfLines={6}
+                  style={{
+                    backgroundColor: "rgba(255, 255, 255, 0.03)",
+                    borderWidth: 1,
+                    borderColor: "rgba(126, 63, 228, 0.2)",
+                    borderRadius: 12,
+                    padding: 12,
+                    color: "white",
+                    fontSize: 14,
+                    minHeight: 120,
+                    textAlignVertical: "top",
+                    marginBottom: 12,
+                  }}
+                />
+                <TouchableOpacity
+                  onPress={handleProcessText}
+                  disabled={!textEntry.trim() || transcribing}
+                  style={{
+                    backgroundColor: textEntry.trim() ? "#7E3FE4" : "rgba(126, 63, 228, 0.3)",
+                    borderRadius: 12,
+                    padding: 14,
+                    alignItems: "center",
+                  }}
+                >
+                  {transcribing ? (
+                    <ActivityIndicator color="white" size="small" />
+                  ) : (
+                    <Text className="text-white font-semibold">Process Entry</Text>
+                  )}
+                </TouchableOpacity>
+              </View>
+            )}
+
+            {/* Voice Recording Section */}
+            {inputMode === "voice" && !summary && (
+              <View
+                style={{
+                  backgroundColor: "rgba(255, 255, 255, 0.05)",
+                  borderWidth: 1,
+                  borderColor: "rgba(126, 63, 228, 0.3)",
+                  borderRadius: 16,
+                  padding: 16,
+                  marginBottom: 16,
+                }}
+              >
+                <Text className="text-base font-semibold text-white mb-3">
+                  Voice Recording
+                </Text>
+
+                <View className="items-center py-4">
+                  {isRecording ? (
+                    <TouchableOpacity
+                      onPress={stopRecording}
+                      style={{
+                        width: 60,
+                        height: 60,
+                        borderRadius: 30,
+                        backgroundColor: "#FF3B30",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Square size={24} color="white" fill="white" />
+                    </TouchableOpacity>
+                  ) : (
+                    <TouchableOpacity
+                      onPress={startRecording}
+                      disabled={transcribing || createEntryMutation.isPending}
+                      style={{
+                        width: 60,
+                        height: 60,
+                        borderRadius: 30,
+                        backgroundColor: "#FF6B35",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Mic size={24} color="white" />
+                    </TouchableOpacity>
+                  )}
+
                   <Text className="text-white/60 text-xs mt-2">
-                    Transcribing...
+                    {isRecording ? "Tap to stop" : "Tap to record"}
                   </Text>
                 </View>
-              )}
-            </View>
+
+                {transcribing && (
+                  <View className="items-center py-3">
+                    <ActivityIndicator size="small" color="#7E3FE4" />
+                    <Text className="text-white/60 text-xs mt-2">
+                      Transcribing...
+                    </Text>
+                  </View>
+                )}
+              </View>
+            )}
 
             {/* AI Summary Section */}
             {summary && (

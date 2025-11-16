@@ -816,13 +816,28 @@ To enable Google sign-in, you need to configure authorized redirect URIs in your
   - Easy to access with + button in header
   - Quick journal entry creation without leaving your current screen
   - Smooth slide animation on open/close
+- **Dual Input Methods** ⌨️🎤 NEW!:
+  - **Type Mode**: Write your experience directly with text input
+    - Large multiline text area (120px min height)
+    - "Process Entry" button to generate AI summary
+    - Perfect for detailed reflections
+  - **Voice Mode**: Record audio for AI transcription
+    - Tap-to-record interface with microphone button (60px compact size)
+    - AI-powered transcription using OpenAI Whisper
+    - Automatic conversion to text for summary
+  - Toggle between modes with visual selector buttons
+  - Purple highlight for Type mode, Orange for Voice mode
 - **Voice Recording Journal**:
   - Record audio reflections about rejection experiences
-  - Tap-to-record interface with microphone button (60px compact size)
   - AI-powered transcription using OpenAI Whisper
   - Automatic AI summarization of journal entries
   - Edit AI summaries before saving
   - Recent entries displayed with outcome badges
+- **Text Input Journal** ✨ NEW!:
+  - Type your experiences directly
+  - AI generates summaries from your written text
+  - Same AI processing as voice entries
+  - Great for quiet environments or detailed writing
 - **Outcome Tracking**:
   - **Yes**: Track when people say yes to your requests (Red color)
   - **No**: Track rejection experiences - the core of growth! (Green color)
@@ -1507,6 +1522,37 @@ See `ENV_SETUP.md` for complete environment variable setup guide.
 - **Database**: Prisma migrations required for schema changes
 
 ## Recent Updates
+
+### 2025-11-16: Journal Dual Input Methods - Type or Voice 📝🎤
+- **New Input Mode Selector**:
+  - Choose between Type mode (purple) and Voice mode (orange)
+  - Visual toggle buttons with icons at top of modal
+  - Clear indication of selected mode
+- **Type Mode** ✨ NEW!:
+  - Large multiline text input area (120px minimum height)
+  - Placeholder text with helpful prompts
+  - "Process Entry" button to generate AI summary
+  - Perfect for detailed written reflections
+  - Great for quiet environments
+- **Voice Mode** (Enhanced):
+  - Existing voice recording functionality preserved
+  - 60px compact microphone button
+  - AI transcription with OpenAI Whisper
+  - Automatic summary generation
+- **Unified AI Processing**:
+  - Backend updated to handle both text and audio input
+  - Same AI summarization for both input types
+  - Text entries go directly to GPT-4o-mini for summaries
+  - Voice entries transcribed first, then summarized
+- **Backend Updates**:
+  - `/api/journal/transcribe` endpoint now accepts `text` or `audioBase64`
+  - Shared contracts updated with optional parameters
+  - Flexible input handling for all journal entry types
+- **User Experience**:
+  - Seamless switching between input modes
+  - Consistent flow regardless of input method
+  - All entries get AI summaries and outcome tracking
+  - Same achievement system for both types
 
 ### 2025-11-16: Compact Story Creation Modal & Improved Spacing 🎨
 - **Create Story Modal Redesigned** ✨:

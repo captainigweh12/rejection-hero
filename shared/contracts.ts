@@ -497,9 +497,10 @@ export type RespondToSuggestionResponse = z.infer<typeof respondToSuggestionResp
 // Journal Routes
 // ==========================================
 
-// POST /api/journal/transcribe - Transcribe audio to text
+// POST /api/journal/transcribe - Transcribe audio to text or process text
 export const transcribeAudioRequestSchema = z.object({
-  audioBase64: z.string(), // Base64 encoded audio
+  audioBase64: z.string().optional(), // Base64 encoded audio (optional if text is provided)
+  text: z.string().optional(), // Direct text input (optional if audio is provided)
 });
 export type TranscribeAudioRequest = z.infer<typeof transcribeAudioRequestSchema>;
 export const transcribeAudioResponseSchema = z.object({
