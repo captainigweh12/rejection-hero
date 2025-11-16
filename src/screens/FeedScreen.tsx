@@ -566,293 +566,269 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
         />
       )}
 
-      {/* Create Post Modal - Facebook Style */}
+      {/* Create Post Modal - Modern Popup Style */}
       <Modal
         visible={showCreatePost}
-        animationType="slide"
+        animationType="fade"
         onRequestClose={() => setShowCreatePost(false)}
-        presentationStyle="fullScreen"
+        transparent={true}
       >
-        <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
-          <SafeAreaView style={{ flex: 1 }} edges={["top", "bottom"]}>
-          {/* Header */}
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
-              paddingHorizontal: 16,
-              paddingTop: 16,
-              paddingBottom: 16,
-              borderBottomWidth: 1,
-              borderBottomColor: "rgba(126, 63, 228, 0.2)",
-            }}
-          >
-              <TouchableOpacity onPress={() => setShowCreatePost(false)}>
-                <X size={28} color="white" />
-              </TouchableOpacity>
-              <Text style={{ fontSize: 20, fontWeight: "bold", color: "white" }}>
-                Create post
-              </Text>
-              <TouchableOpacity
-                onPress={handleCreatePost}
-                disabled={createPostMutation.isPending || !postContent.trim()}
+        <View style={{
+          flex: 1,
+          backgroundColor: "rgba(0, 0, 0, 0.85)",
+          justifyContent: "center",
+          alignItems: "center",
+          paddingHorizontal: 20,
+        }}>
+          <SafeAreaView style={{ width: "100%", maxWidth: 500 }}>
+            <View style={{
+              backgroundColor: "#1A1A24",
+              borderRadius: 20,
+              borderWidth: 1,
+              borderColor: "rgba(126, 63, 228, 0.3)",
+              maxHeight: "85%",
+              width: "100%",
+            }}>
+              {/* Header */}
+              <View
                 style={{
-                  backgroundColor: !postContent.trim() ? "rgba(126, 63, 228, 0.3)" : "#7E3FE4",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
                   paddingHorizontal: 20,
-                  paddingVertical: 8,
-                  borderRadius: 6,
+                  paddingTop: 20,
+                  paddingBottom: 16,
+                  borderBottomWidth: 1,
+                  borderBottomColor: "rgba(126, 63, 228, 0.2)",
                 }}
               >
-                {createPostMutation.isPending ? (
-                  <ActivityIndicator size="small" color="white" />
-                ) : (
-                  <Text style={{
-                    color: "white",
-                    fontWeight: "600",
-                    opacity: !postContent.trim() ? 0.5 : 1
-                  }}>
-                    Post
-                  </Text>
-                )}
-              </TouchableOpacity>
-            </View>
-
-            <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 40 }}>
-              {/* User Info - Facebook Style */}
-              <View style={{ paddingHorizontal: 16, paddingTop: 16, paddingBottom: 12 }}>
-                <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
-                  {/* Avatar */}
-                  {sessionData?.user?.image ? (
-                    <Image
-                      source={{ uri: sessionData.user.image }}
-                      style={{ width: 48, height: 48, borderRadius: 24 }}
-                    />
+                <TouchableOpacity onPress={() => setShowCreatePost(false)}>
+                  <X size={24} color="white" />
+                </TouchableOpacity>
+                <Text style={{ fontSize: 18, fontWeight: "700", color: "white" }}>
+                  Create post
+                </Text>
+                <TouchableOpacity
+                  onPress={handleCreatePost}
+                  disabled={createPostMutation.isPending || !postContent.trim()}
+                  style={{
+                    backgroundColor: !postContent.trim() ? "rgba(126, 63, 228, 0.3)" : "#7E3FE4",
+                    paddingHorizontal: 16,
+                    paddingVertical: 6,
+                    borderRadius: 8,
+                  }}
+                >
+                  {createPostMutation.isPending ? (
+                    <ActivityIndicator size="small" color="white" />
                   ) : (
-                    <View
-                      style={{
-                        width: 48,
-                        height: 48,
-                        borderRadius: 24,
-                        backgroundColor: "#7E3FE4",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <Text style={{ color: "white", fontSize: 20, fontWeight: "bold" }}>
-                        {sessionData?.user?.name?.charAt(0).toUpperCase() || "?"}
-                      </Text>
-                    </View>
-                  )}
-                  <View style={{ flex: 1 }}>
-                    <Text style={{ color: "white", fontSize: 16, fontWeight: "600", marginBottom: 4 }}>
-                      {sessionData?.user?.name || "Anonymous"}
+                    <Text style={{
+                      color: "white",
+                      fontWeight: "600",
+                      fontSize: 14,
+                      opacity: !postContent.trim() ? 0.5 : 1
+                    }}>
+                      Post
                     </Text>
-                    {/* Privacy Selector - Compact */}
-                    <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
-                      {(["PUBLIC", "FRIENDS", "GROUPS"] as const).map((privacy) => (
-                        <TouchableOpacity
-                          key={privacy}
-                          onPress={() => setPostPrivacy(privacy)}
-                          style={{
-                            flexDirection: "row",
-                            alignItems: "center",
-                            paddingHorizontal: 10,
-                            paddingVertical: 5,
-                            borderRadius: 6,
-                            backgroundColor:
-                              postPrivacy === privacy
-                                ? "rgba(126, 63, 228, 0.3)"
-                                : "rgba(255, 255, 255, 0.05)",
-                            borderWidth: 1,
-                            borderColor:
-                              postPrivacy === privacy
-                                ? "#7E3FE4"
-                                : "rgba(126, 63, 228, 0.2)",
-                          }}
-                        >
-                          {privacyIcon(privacy)}
-                          <Text
+                  )}
+                </TouchableOpacity>
+              </View>
+
+              <ScrollView
+                style={{ maxHeight: 450 }}
+                showsVerticalScrollIndicator={false}
+              >
+                {/* User Info */}
+                <View style={{ paddingHorizontal: 20, paddingTop: 16, paddingBottom: 12 }}>
+                  <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+                    {/* Avatar */}
+                    {sessionData?.user?.image ? (
+                      <Image
+                        source={{ uri: sessionData.user.image }}
+                        style={{ width: 44, height: 44, borderRadius: 22 }}
+                      />
+                    ) : (
+                      <View
+                        style={{
+                          width: 44,
+                          height: 44,
+                          borderRadius: 22,
+                          backgroundColor: "#7E3FE4",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <Text style={{ color: "white", fontSize: 18, fontWeight: "bold" }}>
+                          {sessionData?.user?.name?.charAt(0).toUpperCase() || "?"}
+                        </Text>
+                      </View>
+                    )}
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ color: "white", fontSize: 15, fontWeight: "600", marginBottom: 6 }}>
+                        {sessionData?.user?.name || "Anonymous"}
+                      </Text>
+                      {/* Privacy Selector - Compact */}
+                      <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
+                        {(["PUBLIC", "FRIENDS", "GROUPS"] as const).map((privacy) => (
+                          <TouchableOpacity
+                            key={privacy}
+                            onPress={() => setPostPrivacy(privacy)}
                             style={{
-                              color: postPrivacy === privacy ? "#7E3FE4" : "#888",
-                              marginLeft: 4,
-                              fontSize: 12,
-                              fontWeight: postPrivacy === privacy ? "600" : "400",
+                              flexDirection: "row",
+                              alignItems: "center",
+                              paddingHorizontal: 8,
+                              paddingVertical: 4,
+                              borderRadius: 6,
+                              backgroundColor:
+                                postPrivacy === privacy
+                                  ? "rgba(126, 63, 228, 0.3)"
+                                  : "rgba(255, 255, 255, 0.05)",
+                              borderWidth: 1,
+                              borderColor:
+                                postPrivacy === privacy
+                                  ? "#7E3FE4"
+                                  : "rgba(126, 63, 228, 0.2)",
                             }}
                           >
-                            {privacy}
-                          </Text>
-                        </TouchableOpacity>
-                      ))}
+                            {privacyIcon(privacy)}
+                            <Text
+                              style={{
+                                color: postPrivacy === privacy ? "#7E3FE4" : "#888",
+                                marginLeft: 4,
+                                fontSize: 11,
+                                fontWeight: postPrivacy === privacy ? "600" : "400",
+                              }}
+                            >
+                              {privacy}
+                            </Text>
+                          </TouchableOpacity>
+                        ))}
+                      </View>
                     </View>
                   </View>
                 </View>
-              </View>
 
-              {/* Content Input */}
-              <View style={{ paddingHorizontal: 16 }}>
-                <TextInput
-                  value={postContent}
-                  onChangeText={setPostContent}
-                  placeholder="What's on your mind?"
-                  placeholderTextColor="#666"
-                  multiline
-                  autoFocus
-                  style={{
-                    color: "white",
-                    fontSize: 18,
-                    minHeight: 150,
-                    textAlignVertical: "top",
-                    marginBottom: 16,
-                  }}
-                />
+                {/* Content Input */}
+                <View style={{ paddingHorizontal: 20 }}>
+                  <TextInput
+                    value={postContent}
+                    onChangeText={setPostContent}
+                    placeholder="What's on your mind?"
+                    placeholderTextColor="#666"
+                    multiline
+                    autoFocus
+                    style={{
+                      color: "white",
+                      fontSize: 16,
+                      minHeight: 120,
+                      maxHeight: 200,
+                      textAlignVertical: "top",
+                      marginBottom: 12,
+                    }}
+                  />
 
-                {/* Selected Images */}
-                {selectedImages.length > 0 && (
-                  <View style={{
-                    backgroundColor: "rgba(255, 255, 255, 0.05)",
-                    borderRadius: 12,
-                    padding: 8,
-                    marginBottom: 16,
-                    borderWidth: 1,
-                    borderColor: "rgba(126, 63, 228, 0.2)",
-                  }}>
-                    <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
-                      {selectedImages.map((uri, index) => (
-                        <View key={index} style={{ position: "relative" }}>
-                          <Image
-                            source={{ uri }}
-                            style={{ width: 100, height: 100, borderRadius: 8 }}
-                          />
-                          <TouchableOpacity
-                            onPress={() =>
-                              setSelectedImages(selectedImages.filter((_, i) => i !== index))
-                            }
-                            style={{
-                              position: "absolute",
-                              top: 4,
-                              right: 4,
-                              backgroundColor: "rgba(0, 0, 0, 0.7)",
-                              borderRadius: 12,
-                              width: 24,
-                              height: 24,
-                              alignItems: "center",
-                              justifyContent: "center",
-                            }}
-                          >
-                            <X size={16} color="white" />
-                          </TouchableOpacity>
-                        </View>
-                      ))}
+                  {/* Selected Images */}
+                  {selectedImages.length > 0 && (
+                    <View style={{
+                      backgroundColor: "rgba(255, 255, 255, 0.05)",
+                      borderRadius: 12,
+                      padding: 8,
+                      marginBottom: 12,
+                      borderWidth: 1,
+                      borderColor: "rgba(126, 63, 228, 0.2)",
+                    }}>
+                      <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
+                        {selectedImages.map((uri, index) => (
+                          <View key={index} style={{ position: "relative" }}>
+                            <Image
+                              source={{ uri }}
+                              style={{ width: 90, height: 90, borderRadius: 8 }}
+                            />
+                            <TouchableOpacity
+                              onPress={() =>
+                                setSelectedImages(selectedImages.filter((_, i) => i !== index))
+                              }
+                              style={{
+                                position: "absolute",
+                                top: 4,
+                                right: 4,
+                                backgroundColor: "rgba(0, 0, 0, 0.7)",
+                                borderRadius: 12,
+                                width: 24,
+                                height: 24,
+                                alignItems: "center",
+                                justifyContent: "center",
+                              }}
+                            >
+                              <X size={16} color="white" />
+                            </TouchableOpacity>
+                          </View>
+                        ))}
+                      </View>
                     </View>
+                  )}
+                </View>
+
+                {/* Action Buttons */}
+                <View style={{
+                  paddingHorizontal: 20,
+                  paddingBottom: 20,
+                }}>
+                  <Text style={{
+                    color: "#888",
+                    fontSize: 13,
+                    fontWeight: "600",
+                    marginBottom: 10,
+                  }}>
+                    Add to your post
+                  </Text>
+                  <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
+                    {/* Photo/video */}
+                    <TouchableOpacity
+                      onPress={handlePickImage}
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        paddingHorizontal: 12,
+                        paddingVertical: 8,
+                        borderRadius: 8,
+                        backgroundColor: "rgba(76, 175, 80, 0.2)",
+                        borderWidth: 1,
+                        borderColor: "rgba(76, 175, 80, 0.3)",
+                        flex: 1,
+                        minWidth: 100,
+                      }}
+                    >
+                      <ImageIcon size={18} color="#4CAF50" />
+                      <Text style={{ color: "#4CAF50", marginLeft: 6, fontWeight: "600", fontSize: 13 }}>
+                        Photo
+                      </Text>
+                    </TouchableOpacity>
+
+                    {/* Camera */}
+                    <TouchableOpacity
+                      onPress={handleTakePhoto}
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        paddingHorizontal: 12,
+                        paddingVertical: 8,
+                        borderRadius: 8,
+                        backgroundColor: "rgba(255, 107, 53, 0.2)",
+                        borderWidth: 1,
+                        borderColor: "rgba(255, 107, 53, 0.3)",
+                        flex: 1,
+                        minWidth: 100,
+                      }}
+                    >
+                      <Camera size={18} color="#FF6B35" />
+                      <Text style={{ color: "#FF6B35", marginLeft: 6, fontWeight: "600", fontSize: 13 }}>
+                        Camera
+                      </Text>
+                    </TouchableOpacity>
                   </View>
-                )}
-              </View>
-            </ScrollView>
-
-            {/* Bottom Action Bar - Facebook Style */}
-            <View
-              style={{
-                borderTopWidth: 1,
-                borderTopColor: "rgba(126, 63, 228, 0.2)",
-                backgroundColor: "#0A0A0F",
-                paddingBottom: 20,
-              }}
-            >
-              <Text style={{
-                color: "white",
-                fontSize: 14,
-                fontWeight: "600",
-                paddingHorizontal: 16,
-                paddingTop: 12,
-                paddingBottom: 8,
-              }}>
-                Add to your post
-              </Text>
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={{ paddingHorizontal: 12, gap: 8 }}
-              >
-                {/* Photo/video */}
-                <TouchableOpacity
-                  onPress={handlePickImage}
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    paddingHorizontal: 16,
-                    paddingVertical: 10,
-                    borderRadius: 8,
-                    backgroundColor: "rgba(76, 175, 80, 0.2)",
-                    borderWidth: 1,
-                    borderColor: "rgba(76, 175, 80, 0.3)",
-                  }}
-                >
-                  <ImageIcon size={20} color="#4CAF50" />
-                  <Text style={{ color: "#4CAF50", marginLeft: 8, fontWeight: "600" }}>
-                    Photo/video
-                  </Text>
-                </TouchableOpacity>
-
-                {/* Camera */}
-                <TouchableOpacity
-                  onPress={handleTakePhoto}
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    paddingHorizontal: 16,
-                    paddingVertical: 10,
-                    borderRadius: 8,
-                    backgroundColor: "rgba(255, 107, 53, 0.2)",
-                    borderWidth: 1,
-                    borderColor: "rgba(255, 107, 53, 0.3)",
-                  }}
-                >
-                  <Camera size={20} color="#FF6B35" />
-                  <Text style={{ color: "#FF6B35", marginLeft: 8, fontWeight: "600" }}>
-                    Camera
-                  </Text>
-                </TouchableOpacity>
-
-                {/* Tag people */}
-                <TouchableOpacity
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    paddingHorizontal: 16,
-                    paddingVertical: 10,
-                    borderRadius: 8,
-                    backgroundColor: "rgba(0, 153, 255, 0.2)",
-                    borderWidth: 1,
-                    borderColor: "rgba(0, 153, 255, 0.3)",
-                  }}
-                >
-                  <Users size={20} color="#0099FF" />
-                  <Text style={{ color: "#0099FF", marginLeft: 8, fontWeight: "600" }}>
-                    Tag people
-                  </Text>
-                </TouchableOpacity>
-
-                {/* Feeling/activity */}
-                <TouchableOpacity
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    paddingHorizontal: 16,
-                    paddingVertical: 10,
-                    borderRadius: 8,
-                    backgroundColor: "rgba(255, 215, 0, 0.2)",
-                    borderWidth: 1,
-                    borderColor: "rgba(255, 215, 0, 0.3)",
-                  }}
-                >
-                  <Text style={{ fontSize: 20 }}>😊</Text>
-                  <Text style={{ color: "#FFD700", marginLeft: 8, fontWeight: "600" }}>
-                    Feeling/activity
-                  </Text>
-                </TouchableOpacity>
-            </ScrollView>
-          </View>
+                </View>
+              </ScrollView>
+            </View>
           </SafeAreaView>
         </View>
       </Modal>
