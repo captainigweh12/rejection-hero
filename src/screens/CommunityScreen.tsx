@@ -358,7 +358,11 @@ export default function CommunityScreen({ navigation }: Props) {
           </View>
 
           {/* Tab Switcher Buttons */}
-          <View style={{ flexDirection: "row", gap: 8 }}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ gap: 8 }}
+          >
             {/* Feed Tab */}
             <Pressable
               onPress={() => setActiveTab("feed")}
@@ -434,7 +438,7 @@ export default function CommunityScreen({ navigation }: Props) {
                 Groups
               </Text>
             </Pressable>
-          </View>
+          </ScrollView>
         </View>
 
         {/* Content */}

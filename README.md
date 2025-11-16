@@ -1496,6 +1496,15 @@ See `ENV_SETUP.md` for complete environment variable setup guide.
 
 ## Recent Updates
 
+### 2025-11-16: Fixed Groups Tab Overflow in Community Screen
+- **Issue**: Tab switcher buttons were cutting off when too many tabs were displayed
+- **Fix**: Wrapped tab buttons in horizontal ScrollView
+- **Changes**:
+  - Added horizontal scrolling to tab switcher
+  - Disabled horizontal scroll indicator for cleaner look
+  - Maintains gap spacing between tab buttons
+- **Result**: All tab buttons now accessible via horizontal scroll, no cutoff
+
 ### 2025-11-16: Redesigned Create Post Modal - Modern Popup Style 🎨
 - **Complete Redesign**: Changed from fullscreen to centered popup modal
 - **New Features**:
