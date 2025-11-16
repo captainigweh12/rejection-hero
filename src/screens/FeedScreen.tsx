@@ -84,7 +84,11 @@ interface GetMomentsResponse {
   moments: MomentsUser[];
 }
 
-export default function FeedScreen() {
+interface FeedScreenProps {
+  onCreatePostPress?: () => void;
+}
+
+export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) {
   const queryClient = useQueryClient();
   const { data: sessionData } = useSession();
   const [showCreatePost, setShowCreatePost] = useState(false);
@@ -285,42 +289,18 @@ export default function FeedScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
-      <SafeAreaView edges={["top"]} style={{ backgroundColor: "#0A0A0F" }}>
-        {/* Header with + icon only */}
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "flex-end",
-            paddingHorizontal: 20,
-            paddingVertical: 12,
-          }}
-        >
-          <TouchableOpacity
-            onPress={() => setShowCreatePost(true)}
-            style={{
-              backgroundColor: "rgba(126, 63, 228, 0.2)",
-              width: 40,
-              height: 40,
-              borderRadius: 20,
-              alignItems: "center",
-              justifyContent: "center",
-              borderWidth: 1,
-              borderColor: "#7E3FE4",
-            }}
-          >
-            <Plus size={24} color="#7E3FE4" strokeWidth={2.5} />
-          </TouchableOpacity>
-        </View>
-
-        {/* What's on your mind - Facebook Style */}
+      {/* What's on your mind - Facebook Style */}
+      <View style={{ paddingHorizontal: 16, paddingTop: 8 }}>
         <TouchableOpacity
-          onPress={() => setShowCreatePost(true)}
+          onPress={() => {
+            if (onCreatePostPress) {
+              onCreatePostPress();
+            }
+            setShowCreatePost(true);
+          }}
           activeOpacity={0.7}
           style={{
             backgroundColor: "rgba(255, 255, 255, 0.05)",
-            marginHorizontal: 16,
-            marginVertical: 8,
             borderRadius: 16,
             padding: 12,
             borderWidth: 1,
@@ -358,7 +338,7 @@ export default function FeedScreen() {
             <ImageIcon size={24} color="#4CAF50" />
           </View>
         </TouchableOpacity>
-      </SafeAreaView>
+      </View>
 
       {/* Stories/Moments Bar - Facebook Style */}
       <ScrollView

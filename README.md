@@ -1527,10 +1527,11 @@ See `ENV_SETUP.md` for complete environment variable setup guide.
       - Messages tab (message icon) - Access conversations
       - Groups tab (users-round icon) - Browse and manage groups
     - Active tab highlighted in purple (#7E3FE4)
+    - **Create Post Button**: Purple + button positioned next to "Community" title (only visible on Feed tab)
     - Bell icon with notification count in header
     - Search icon for user search in header
-    - **Clean Layout**: No stat cards, just navigation tabs and content
-    - **Feed Tab**: Shows only "What's on your mind?", stories, and posts
+    - **Clean Layout**: Removed stat cards, compact spacing between header and content
+    - **Feed Tab**: Shows only "What's on your mind?", stories, and posts directly below navigation
 - **Better UX**: More spacious layout, clearer hierarchy, modern glassmorphism effects
 - **Maintained App Theme**: All Facebook-inspired elements use Vibecode's purple color scheme
 

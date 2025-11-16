@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, ScrollView, Pressable, TextInput, ActivityIndicator, Image, Alert, Modal, KeyboardAvoidingView, Platform } from "react-native";
+import { View, Text, ScrollView, Pressable, TextInput, ActivityIndicator, Image, Alert, Modal, KeyboardAvoidingView, Platform, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -69,6 +69,9 @@ export default function CommunityScreen({ navigation }: Props) {
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState<"feed" | "friends" | "messages" | "groups">("feed");
+
+  // Ref to store FeedScreen's setShowCreatePost function
+  const [feedCreatePostHandler, setFeedCreatePostHandler] = useState<(() => void) | null>(null);
 
   // Create Group modal state
   const [showCreateGroupModal, setShowCreateGroupModal] = useState(false);
@@ -271,8 +274,34 @@ export default function CommunityScreen({ navigation }: Props) {
       <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
         {/* Header */}
         <View style={{ paddingHorizontal: 20, paddingTop: 16, paddingBottom: 12 }}>
-          <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-            <Text style={{ fontSize: 32, fontWeight: "bold", color: "white" }}>Community</Text>
+          <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+              <Text style={{ fontSize: 32, fontWeight: "bold", color: "white" }}>Community</Text>
+
+              {/* Create Post Button - moved next to Community title */}
+              {activeTab === "feed" && (
+                <TouchableOpacity
+                  onPress={() => {
+                    if (feedCreatePostHandler) {
+                      feedCreatePostHandler();
+                    }
+                  }}
+                  style={{
+                    backgroundColor: "rgba(126, 63, 228, 0.2)",
+                    width: 40,
+                    height: 40,
+                    borderRadius: 20,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    borderWidth: 1,
+                    borderColor: "#7E3FE4",
+                  }}
+                >
+                  <Plus size={24} color="#7E3FE4" strokeWidth={2.5} />
+                </TouchableOpacity>
+              )}
+            </View>
+
             <View style={{ flexDirection: "row", gap: 12 }}>
               {/* Notifications Bell */}
               <Pressable
@@ -329,7 +358,7 @@ export default function CommunityScreen({ navigation }: Props) {
           </View>
 
           {/* Tab Switcher Buttons */}
-          <View style={{ flexDirection: "row", gap: 8, marginBottom: 16 }}>
+          <View style={{ flexDirection: "row", gap: 8 }}>
             {/* Feed Tab */}
             <Pressable
               onPress={() => setActiveTab("feed")}
@@ -410,7 +439,14 @@ export default function CommunityScreen({ navigation }: Props) {
 
         {/* Content */}
         {activeTab === "feed" ? (
-          <FeedScreen />
+          <FeedScreen
+            onCreatePostPress={() => {
+              // Store the handler for the + button to use
+              setFeedCreatePostHandler(() => () => {
+                // This function will be called by FeedScreen's internal handler
+              });
+            }}
+          />
         ) : (
           <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 100 }}>
             {/* Friends Tab */}
