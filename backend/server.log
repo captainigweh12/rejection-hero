@@ -214,3 +214,12 @@ Failed to find Response internal state key
 <-- GET /api/notifications/unread-count
 🔐 [Auth Middleware] GET /api/notifications/unread-count - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
 --> GET /api/notifications/unread-count [32m200[0m 2ms
+<-- GET /api/notifications/unread-count
+🔐 [Auth Middleware] GET /api/notifications/unread-count - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+--> GET /api/notifications/unread-count [32m200[0m 2ms
+<-- GET /api/notifications/unread-count
+🔐 [Auth Middleware] GET /api/notifications/unread-count - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+--> GET /api/notifications/unread-count [32m200[0m 4ms
+<-- GET /api/notifications/unread-count
+🔐 [Auth Middleware] GET /api/notifications/unread-count - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+--> GET /api/notifications/unread-count [32m200[0m 14ms
