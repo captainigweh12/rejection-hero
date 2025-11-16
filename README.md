@@ -1496,6 +1496,12 @@ See `ENV_SETUP.md` for complete environment variable setup guide.
 
 ## Recent Updates
 
+### 2025-11-16: Fixed Create Post Modal SafeArea Overlap 🔧
+- **Issue**: Create post modal header was overlapping with the status bar
+- **Root Cause**: SafeAreaView was only configured with bottom edge protection, not top
+- **Fix**: Changed SafeAreaView edges from `["bottom"]` to `["top", "bottom"]`
+- **Result**: Header now properly respects status bar height and displays correctly
+
 ### 2025-11-16: Facebook-Style Feed Redesign 🎨
 - **Complete Feed UI Overhaul** inspired by Facebook's design:
   - **Minimalist Header**: Clean header with only + icon button (removed vibecode logo for cleaner look)

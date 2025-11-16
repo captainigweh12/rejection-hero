@@ -574,7 +574,7 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
         presentationStyle="fullScreen"
       >
         <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
-          <SafeAreaView style={{ flex: 1 }} edges={["bottom"]}>
+          <SafeAreaView style={{ flex: 1 }} edges={["top", "bottom"]}>
           {/* Header */}
           <View
             style={{
