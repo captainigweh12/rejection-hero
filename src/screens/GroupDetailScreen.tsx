@@ -327,8 +327,10 @@ export default function GroupDetailScreen({ navigation, route }: Props) {
               {/* Group Live Button */}
               <Pressable
                 onPress={() => {
-                  // TODO: Navigate to group live screen
-                  Alert.alert("Coming Soon", "Group live streaming is being developed!");
+                  navigation.navigate("GroupLive", {
+                    groupId: group.id,
+                    groupName: group.name
+                  });
                 }}
                 style={{
                   backgroundColor: "rgba(255, 107, 53, 0.2)",

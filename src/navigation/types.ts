@@ -30,6 +30,7 @@ export type RootStackParamList = {
   Support: undefined;
   GroupDetail: { groupId: string };
   GroupQuests: { groupId: string; groupName: string };
+  GroupLive: { groupId: string; groupName: string };
 };
 
 export type BottomTabParamList = {

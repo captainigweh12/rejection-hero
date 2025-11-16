@@ -444,10 +444,30 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
       - See who completed, who's in progress, and who failed
       - Compare progress with other group members
     - **Small Invite Icon**: Quick access to invite members (top-right corner)
+  - **Group Live** 📹 NEW & ACTIVE!:
+    - **Live Streaming to Groups**: Members can stream to their group
+    - **Group Live Screen**:
+      - View all active live streams in the group
+      - Real-time viewer counts
+      - Live refresh every 5 seconds
+      - Beautiful card-based UI with stream thumbnails
+    - **Stream Features**:
+      - Start live stream with "Go Live" button
+      - Stream with or without a linked quest
+      - Show quest details during stream (title, description, category)
+      - Live badge and viewer count display
+      - Time since stream started
+    - **Viewer Experience**:
+      - Tap any stream to join and watch
+      - See who's streaming (name and avatar)
+      - View linked quest information
+      - Join/leave streams with automatic viewer count updates
+    - **Privacy**: Only group members can view and join group streams
+    - **Integration**: Supports Daily.co for WebRTC streaming
   - **Group Actions**:
     - Leave group (for members)
     - Delete group (admin only, with confirmation)
-    - Navigate to Group Live (coming soon)
+    - Navigate to Group Live ✅ ACTIVE!
     - Navigate to Group Quests ✅ ACTIVE!
   - Public/private group options
   - Member count and role management
@@ -1144,6 +1164,23 @@ The app features a cohesive dark theme with modern 3D-style UI elements througho
 - See who completed, who's in progress, and who failed
 - Quest rewards, difficulty, and location displayed
 - Participant list with avatars and progress bars
+
+### Group Live ✨ NEW!
+- `GET /api/group-live/:groupId` - Get active live streams in a group
+- `POST /api/group-live/start` - Start a group live stream
+- `POST /api/group-live/:streamId/end` - End a group live stream
+- `POST /api/group-live/:streamId/join` - Join a stream (increment viewer count)
+- `POST /api/group-live/:streamId/leave` - Leave a stream (decrement viewer count)
+
+**Group Live Features:**
+- Live streaming within groups (members only)
+- Real-time viewer count tracking
+- Stream with or without linked quests
+- View all active streams in group with thumbnails
+- Live badge and time tracking
+- Daily.co integration for WebRTC streaming
+- Automatic profile status updates (isLive, liveViewers)
+- Privacy: Only group members can view group streams
 
 ### Shared Quests ✨ NEW!
 - `GET /api/shared-quests` - Get received quest shares

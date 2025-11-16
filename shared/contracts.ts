@@ -934,3 +934,71 @@ export const recordGroupQuestProgressResponseSchema = z.object({
   status: z.string(),
 });
 export type RecordGroupQuestProgressResponse = z.infer<typeof recordGroupQuestProgressResponseSchema>;
+
+// ==========================================
+// Group Live Routes
+// ==========================================
+
+// GET /api/group-live/:groupId - Get active live streams in a group
+export const getGroupLiveStreamsResponseSchema = z.object({
+  liveStreams: z.array(
+    z.object({
+      id: z.string(),
+      roomUrl: z.string(),
+      roomName: z.string(),
+      viewerCount: z.number(),
+      startedAt: z.string(),
+      streamer: z.object({
+        id: z.string(),
+        displayName: z.string(),
+        avatar: z.string().nullable(),
+      }),
+      quest: z
+        .object({
+          id: z.string(),
+          title: z.string(),
+          description: z.string(),
+          category: z.string(),
+          difficulty: z.string(),
+        })
+        .nullable(),
+    })
+  ),
+});
+export type GetGroupLiveStreamsResponse = z.infer<typeof getGroupLiveStreamsResponseSchema>;
+
+// POST /api/group-live/start - Start a group live stream
+export const startGroupLiveRequestSchema = z.object({
+  groupId: z.string(),
+  userQuestId: z.string().optional(),
+});
+export type StartGroupLiveRequest = z.infer<typeof startGroupLiveRequestSchema>;
+
+export const startGroupLiveResponseSchema = z.object({
+  success: z.boolean(),
+  liveStreamId: z.string(),
+  roomUrl: z.string(),
+  roomName: z.string(),
+});
+export type StartGroupLiveResponse = z.infer<typeof startGroupLiveResponseSchema>;
+
+// POST /api/group-live/:streamId/end - End a group live stream
+export const endGroupLiveResponseSchema = z.object({
+  success: z.boolean(),
+  message: z.string(),
+});
+export type EndGroupLiveResponse = z.infer<typeof endGroupLiveResponseSchema>;
+
+// POST /api/group-live/:streamId/join - Join a group live stream
+export const joinGroupLiveResponseSchema = z.object({
+  success: z.boolean(),
+  message: z.string(),
+});
+export type JoinGroupLiveResponse = z.infer<typeof joinGroupLiveResponseSchema>;
+
+// POST /api/group-live/:streamId/leave - Leave a group live stream
+export const leaveGroupLiveResponseSchema = z.object({
+  success: z.boolean(),
+  message: z.string(),
+});
+export type LeaveGroupLiveResponse = z.infer<typeof leaveGroupLiveResponseSchema>;

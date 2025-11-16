@@ -19,6 +19,7 @@ import { friendsRouter } from "./routes/friends";
 import { messagesRouter } from "./routes/messages";
 import { groupsRouter } from "./routes/groups";
 import { groupQuestsRouter } from "./routes/groupQuests";
+import { groupLiveRouter } from "./routes/groupLive";
 import { sharedQuestsRouter } from "./routes/sharedQuests";
 import journalRouter from "./routes/journal";
 import postsRouter from "./routes/posts";
@@ -96,6 +97,9 @@ app.route("/api/groups", groupsRouter);
 
 console.log("🎯 Mounting group quests routes at /api/group-quests");
 app.route("/api/group-quests", groupQuestsRouter);
+
+console.log("📹 Mounting group live routes at /api/group-live");
+app.route("/api/group-live", groupLiveRouter);
 
 console.log("🎁 Mounting shared quests routes at /api/shared-quests");
 app.route("/api/shared-quests", sharedQuestsRouter);

@@ -34,6 +34,7 @@ import ManageCategoriesScreen from "@/screens/ManageCategoriesScreen";
 import SupportScreen from "@/screens/SupportScreen";
 import GroupDetailScreen from "@/screens/GroupDetailScreen";
 import GroupQuestsScreen from "@/screens/GroupQuestsScreen";
+import GroupLiveScreen from "@/screens/GroupLiveScreen";
 import { useSession } from "@/lib/useSession";
 import { api } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
@@ -141,6 +142,11 @@ const RootNavigator = () => {
         <RootStack.Screen
           name="GroupQuests"
           component={GroupQuestsScreen}
+          options={{ headerShown: false }}
+        />
+        <RootStack.Screen
+          name="GroupLive"
+          component={GroupLiveScreen}
           options={{ headerShown: false }}
         />
       </RootStack.Navigator>

@@ -236,6 +236,7 @@ model LiveStream {
   roomUrl     String              @unique
   roomName    String              @unique
   userQuestId String?
+  groupId     String?             // For group live streams
   isActive    Boolean             @default(true)
   viewerCount Int                 @default(0)
   startedAt   DateTime            @default(now())
@@ -244,6 +245,7 @@ model LiveStream {
   updatedAt   DateTime            @updatedAt
   userQuest   UserQuest?          @relation(fields: [userQuestId], references: [id])
   user        User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group       Group?              @relation(fields: [groupId], references: [id], onDelete: Cascade)
   comments    LiveStreamComment[]
   questSuggestions QuestSuggestion[]
 
@@ -319,6 +321,7 @@ model Group {
   members     GroupMember[]
   posts       Post[]
   groupQuests GroupQuest[]
+  liveStreams LiveStream[]
 
   @@map("group")
 }
