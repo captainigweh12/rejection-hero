@@ -311,7 +311,7 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
         style={{
           borderBottomWidth: 1,
           borderBottomColor: "rgba(126, 63, 228, 0.2)",
-          marginBottom: 8,
+          marginBottom: 20,
         }}
         contentContainerStyle={{ paddingHorizontal: 12, paddingVertical: 12, gap: 10, paddingBottom: 16 }}
       >
