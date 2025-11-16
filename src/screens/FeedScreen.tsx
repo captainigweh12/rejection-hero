@@ -311,9 +311,8 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
         style={{
           borderBottomWidth: 1,
           borderBottomColor: "rgba(126, 63, 228, 0.2)",
-          marginBottom: 32,
         }}
-        contentContainerStyle={{ paddingHorizontal: 12, paddingVertical: 12, gap: 10, paddingBottom: 16 }}
+        contentContainerStyle={{ paddingHorizontal: 12, paddingVertical: 12, gap: 10, paddingBottom: 16, marginBottom: 16 }}
       >
         {/* Create Story Card - Facebook Style */}
         <TouchableOpacity
@@ -509,7 +508,7 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
           renderItem={({ item }) => (
             <PostCard post={item} currentUserId={sessionData?.user?.id || ""} />
           )}
-          contentContainerStyle={{ paddingHorizontal: 12, paddingTop: 12, paddingBottom: 100 }}
+          contentContainerStyle={{ paddingHorizontal: 12, paddingTop: 24, paddingBottom: 100 }}
           refreshControl={
             <RefreshControl
               refreshing={false}
