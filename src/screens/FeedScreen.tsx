@@ -19,6 +19,7 @@ import * as ImagePicker from "expo-image-picker";
 import { api } from "@/lib/api";
 import PostCard from "@/components/PostCard";
 import { useSession } from "@/lib/useSession";
+import CreateStoryModal from "@/components/CreateStoryModal";
 
 interface Post {
   id: string;
@@ -101,9 +102,6 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
   const [postPrivacy, setPostPrivacy] = useState<"PUBLIC" | "FRIENDS" | "GROUPS">("PUBLIC");
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
 
-  // Create moment state
-  const [momentImage, setMomentImage] = useState<string | null>(null);
-
   // Fetch posts feed
   const {
     data: feedData,
@@ -147,7 +145,6 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["moments"] });
       setShowCreateMoment(false);
-      setMomentImage(null);
       Alert.alert("Success", "Moment created! It will expire in 24 hours.");
     },
     onError: () => {
@@ -187,36 +184,6 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
     }
   };
 
-  const handlePickMomentImage = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 0.8,
-    });
-
-    if (!result.canceled && result.assets[0]) {
-      setMomentImage(result.assets[0].uri);
-    }
-  };
-
-  const handleTakeMomentPhoto = async () => {
-    // Request camera permissions
-    const { status } = await ImagePicker.requestCameraPermissionsAsync();
-    if (status !== "granted") {
-      Alert.alert("Permission Required", "Camera permission is required to take photos.");
-      return;
-    }
-
-    const result = await ImagePicker.launchCameraAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 0.8,
-      allowsEditing: true,
-    });
-
-    if (!result.canceled && result.assets[0]) {
-      setMomentImage(result.assets[0].uri);
-    }
-  };
-
   const handleCreatePost = () => {
     if (!postContent.trim()) {
       Alert.alert("Error", "Please write something");
@@ -230,21 +197,16 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
     });
   };
 
-  const handleCreateMoment = async () => {
-    if (!momentImage) {
-      Alert.alert("Error", "Please select an image");
-      return;
-    }
-
+  const handleCreateMoment = async (imageUrl: string, text?: string) => {
     try {
       // Upload image to server first
       const formData = new FormData();
-      const filename = momentImage.split("/").pop() || "moment.jpg";
+      const filename = imageUrl.split("/").pop() || "moment.jpg";
       const match = /\.(\w+)$/.exec(filename);
       const type = match ? `image/${match[1]}` : "image/jpeg";
 
       formData.append("image", {
-        uri: momentImage,
+        uri: imageUrl,
         name: filename,
         type,
       } as any);
@@ -267,10 +229,12 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
       // Now create moment with server URL
       createMomentMutation.mutate({
         imageUrl: serverImageUrl,
+        content: text,
       });
     } catch (error) {
       console.error("Upload error:", error);
       Alert.alert("Error", "Failed to upload image. Please try again.");
+      throw error; // Re-throw so modal can handle it
     }
   };
 
@@ -347,7 +311,7 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
         style={{
           borderBottomWidth: 1,
           borderBottomColor: "rgba(126, 63, 228, 0.2)",
-          marginBottom: 20,
+          marginBottom: 32,
         }}
         contentContainerStyle={{ paddingHorizontal: 12, paddingVertical: 12, gap: 10, paddingBottom: 16 }}
       >
@@ -545,7 +509,7 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
           renderItem={({ item }) => (
             <PostCard post={item} currentUserId={sessionData?.user?.id || ""} />
           )}
-          contentContainerStyle={{ paddingHorizontal: 12, paddingTop: 48, paddingBottom: 100 }}
+          contentContainerStyle={{ paddingHorizontal: 12, paddingTop: 12, paddingBottom: 100 }}
           refreshControl={
             <RefreshControl
               refreshing={false}
@@ -834,367 +798,13 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
         </View>
       </Modal>
 
-      {/* Create Moment Modal - Instagram/Snapchat Style */}
-      <Modal
+      {/* Create Story Modal - Compact Popup */}
+      <CreateStoryModal
         visible={showCreateMoment}
-        animationType="slide"
-        onRequestClose={() => setShowCreateMoment(false)}
-        presentationStyle="fullScreen"
-      >
-        <View style={{ flex: 1, backgroundColor: "#000000" }}>
-          <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
-            {/* Header */}
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-                paddingHorizontal: 20,
-                paddingVertical: 16,
-              }}
-            >
-              <TouchableOpacity onPress={() => setShowCreateMoment(false)}>
-                <X size={28} color="white" strokeWidth={2.5} />
-              </TouchableOpacity>
-              <Text style={{ fontSize: 20, fontWeight: "700", color: "white" }}>
-                Add to story
-              </Text>
-              <TouchableOpacity>
-                <View
-                  style={{
-                    width: 32,
-                    height: 32,
-                    borderRadius: 16,
-                    borderWidth: 2,
-                    borderColor: "white",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <View
-                    style={{
-                      width: 8,
-                      height: 8,
-                      borderRadius: 4,
-                      backgroundColor: "white",
-                    }}
-                  />
-                </View>
-              </TouchableOpacity>
-            </View>
-
-            <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
-              {/* Creation Options */}
-              <View style={{ paddingHorizontal: 20, marginTop: 20 }}>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                  <View style={{ flexDirection: "row", gap: 16 }}>
-                    {/* Add Yours Option */}
-                    <TouchableOpacity
-                      onPress={handlePickMomentImage}
-                      style={{
-                        width: 140,
-                        height: 180,
-                        borderRadius: 16,
-                        backgroundColor: "rgba(255, 255, 255, 0.1)",
-                        overflow: "hidden",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <View
-                        style={{
-                          width: 60,
-                          height: 60,
-                          borderRadius: 30,
-                          backgroundColor: "rgba(255, 255, 255, 0.2)",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          marginBottom: 12,
-                        }}
-                      >
-                        <Plus size={32} color="white" strokeWidth={3} />
-                      </View>
-                      <Text style={{ color: "white", fontSize: 16, fontWeight: "700" }}>
-                        Add Yours
-                      </Text>
-                    </TouchableOpacity>
-
-                    {/* Music Option */}
-                    <TouchableOpacity
-                      style={{
-                        width: 140,
-                        height: 180,
-                        borderRadius: 16,
-                        backgroundColor: "rgba(255, 255, 255, 0.1)",
-                        overflow: "hidden",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <View
-                        style={{
-                          width: 60,
-                          height: 60,
-                          borderRadius: 30,
-                          backgroundColor: "rgba(255, 100, 100, 0.3)",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          marginBottom: 12,
-                        }}
-                      >
-                        <Text style={{ fontSize: 32 }}>🎵</Text>
-                      </View>
-                      <Text style={{ color: "white", fontSize: 16, fontWeight: "700" }}>
-                        Music
-                      </Text>
-                    </TouchableOpacity>
-
-                    {/* Collage Option */}
-                    <TouchableOpacity
-                      style={{
-                        width: 140,
-                        height: 180,
-                        borderRadius: 16,
-                        backgroundColor: "rgba(255, 255, 255, 0.1)",
-                        overflow: "hidden",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <View
-                        style={{
-                          width: 60,
-                          height: 60,
-                          borderRadius: 30,
-                          backgroundColor: "rgba(255, 150, 100, 0.3)",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          marginBottom: 12,
-                        }}
-                      >
-                        <ImageIcon size={32} color="white" />
-                      </View>
-                      <Text style={{ color: "white", fontSize: 16, fontWeight: "700" }}>
-                        Collage
-                      </Text>
-                    </TouchableOpacity>
-
-                    {/* AI Images Option */}
-                    <TouchableOpacity
-                      style={{
-                        width: 140,
-                        height: 180,
-                        borderRadius: 16,
-                        backgroundColor: "rgba(255, 255, 255, 0.1)",
-                        overflow: "hidden",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <View
-                        style={{
-                          width: 60,
-                          height: 60,
-                          borderRadius: 30,
-                          backgroundColor: "rgba(150, 100, 255, 0.3)",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          marginBottom: 12,
-                        }}
-                      >
-                        <Text style={{ fontSize: 32 }}>✨</Text>
-                      </View>
-                      <Text style={{ color: "white", fontSize: 16, fontWeight: "700" }}>
-                        AI Images
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                </ScrollView>
-              </View>
-
-              {/* Recents Section */}
-              <View style={{ marginTop: 32, paddingHorizontal: 20 }}>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    marginBottom: 16,
-                  }}
-                >
-                  <Text style={{ color: "white", fontSize: 18, fontWeight: "700" }}>
-                    Recents
-                  </Text>
-                  <TouchableOpacity>
-                    <View
-                      style={{
-                        width: 32,
-                        height: 32,
-                        borderRadius: 8,
-                        backgroundColor: "rgba(255, 255, 255, 0.1)",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <ImageIcon size={18} color="white" />
-                    </View>
-                  </TouchableOpacity>
-                </View>
-
-                {/* Recent Posts Grid */}
-                <View style={{ gap: 12 }}>
-                  {feedData?.posts.slice(0, 4).map((post) => (
-                    <TouchableOpacity
-                      key={post.id}
-                      onPress={() => {
-                        // Could implement selecting a post to share as story
-                        Alert.alert("Coming Soon", "Share post as story feature coming soon!");
-                      }}
-                      style={{
-                        backgroundColor: "rgba(255, 255, 255, 0.08)",
-                        borderRadius: 16,
-                        padding: 16,
-                        flexDirection: "row",
-                        alignItems: "center",
-                        gap: 12,
-                      }}
-                    >
-                      {post.images && post.images[0] ? (
-                        <Image
-                          source={{ uri: post.images[0].imageUrl }}
-                          style={{
-                            width: 80,
-                            height: 80,
-                            borderRadius: 12,
-                            backgroundColor: "rgba(255, 255, 255, 0.1)",
-                          }}
-                        />
-                      ) : (
-                        <View
-                          style={{
-                            width: 80,
-                            height: 80,
-                            borderRadius: 12,
-                            backgroundColor: "rgba(126, 63, 228, 0.3)",
-                            alignItems: "center",
-                            justifyContent: "center",
-                          }}
-                        >
-                          <Camera size={32} color="#7E3FE4" />
-                        </View>
-                      )}
-                      <View style={{ flex: 1 }}>
-                        <Text
-                          style={{ color: "white", fontSize: 15, fontWeight: "600" }}
-                          numberOfLines={2}
-                        >
-                          {post.content}
-                        </Text>
-                        <Text
-                          style={{
-                            color: "rgba(255, 255, 255, 0.5)",
-                            fontSize: 13,
-                            marginTop: 4,
-                          }}
-                        >
-                          {new Date(post.createdAt).toLocaleDateString()}
-                        </Text>
-                      </View>
-                    </TouchableOpacity>
-                  ))}
-
-                  {/* Camera Button at Bottom */}
-                  <TouchableOpacity
-                    onPress={handleTakeMomentPhoto}
-                    style={{
-                      backgroundColor: "rgba(126, 63, 228, 0.2)",
-                      borderRadius: 16,
-                      padding: 20,
-                      alignItems: "center",
-                      justifyContent: "center",
-                      borderWidth: 2,
-                      borderColor: "#7E3FE4",
-                      marginTop: 8,
-                    }}
-                  >
-                    <Camera size={40} color="#7E3FE4" strokeWidth={2} />
-                    <Text
-                      style={{
-                        color: "#7E3FE4",
-                        fontSize: 16,
-                        fontWeight: "700",
-                        marginTop: 8,
-                      }}
-                    >
-                      Take Photo
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </ScrollView>
-
-            {/* Share Selected Image */}
-            {momentImage && (
-              <View
-                style={{
-                  position: "absolute",
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  backgroundColor: "rgba(0, 0, 0, 0.95)",
-                  paddingVertical: 20,
-                  paddingHorizontal: 20,
-                  borderTopWidth: 1,
-                  borderTopColor: "rgba(255, 255, 255, 0.1)",
-                }}
-              >
-                <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
-                  <Image
-                    source={{ uri: momentImage }}
-                    style={{
-                      width: 60,
-                      height: 60,
-                      borderRadius: 12,
-                    }}
-                  />
-                  <View style={{ flex: 1 }}>
-                    <Text style={{ color: "white", fontSize: 16, fontWeight: "600" }}>
-                      Ready to share
-                    </Text>
-                    <Text style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: 14 }}>
-                      Expires in 24 hours
-                    </Text>
-                  </View>
-                  <TouchableOpacity
-                    onPress={() => setMomentImage(null)}
-                    style={{ padding: 8 }}
-                  >
-                    <X size={24} color="white" />
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={handleCreateMoment}
-                    disabled={createMomentMutation.isPending}
-                    style={{
-                      backgroundColor: "#7E3FE4",
-                      paddingHorizontal: 24,
-                      paddingVertical: 12,
-                      borderRadius: 24,
-                    }}
-                  >
-                    {createMomentMutation.isPending ? (
-                      <ActivityIndicator size="small" color="white" />
-                    ) : (
-                      <Text style={{ color: "white", fontWeight: "700", fontSize: 16 }}>
-                        Share
-                      </Text>
-                    )}
-                  </TouchableOpacity>
-                </View>
-              </View>
-            )}
-          </SafeAreaView>
-        </View>
-      </Modal>
+        onClose={() => setShowCreateMoment(false)}
+        onCreateStory={handleCreateMoment}
+        isLoading={createMomentMutation.isPending}
+      />
 
       {/* Moment Viewer Modal - Instagram Style */}
       {selectedMoment && (

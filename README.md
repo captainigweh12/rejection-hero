@@ -1508,6 +1508,42 @@ See `ENV_SETUP.md` for complete environment variable setup guide.
 
 ## Recent Updates
 
+### 2025-11-16: Compact Story Creation Modal & Improved Spacing 🎨
+- **Create Story Modal Redesigned** ✨:
+  - Changed from full-screen to compact popup modal (90% width, 80% max height)
+  - Centered card with dark overlay for better focus
+  - Simple two-step flow: Upload image → Add text (optional)
+  - Two main actions: Choose from Gallery or Take Photo
+  - Text input overlay on photo preview (200 char limit)
+  - Character counter for text input
+  - Change Photo and Share Story buttons
+  - Smooth fade animation
+  - Keyboard-aware design for text editing
+- **Better Separation Between Stories and Posts**:
+  - Increased stories bar bottom margin from 20px to 32px
+  - Reduced posts feed top padding from 48px to 12px
+  - Clearer visual hierarchy and breathing room
+  - No more cramped feeling between sections
+- **Simplified Story Creation**:
+  - Removed complex full-screen interface with multiple options
+  - Focused on core functionality: photo + text
+  - Faster workflow for creating stories
+  - Matches journal modal design pattern
+
+### 2025-11-16: Compact Journal Entry Modal 📝
+- **Journal Entry Modal Redesigned**:
+  - Changed from full-screen to compact popup modal (90% width, 85% max height)
+  - Centered card with dark overlay
+  - Compact recording interface with 60px microphone button
+  - Smaller outcome selection cards
+  - All functionality preserved in smaller format
+  - Quick access with + button in header
+- **Journal Screen Updated**:
+  - Clean list view showing entry history
+  - Floating purple + button to add entries
+  - Empty state with helpful prompt
+  - Recent entries with outcome badges
+
 ### 2025-11-16: Feed UI Improvements & Edit Post Functionality
 - **Removed + Button**: Removed redundant create post button from Community header
   - Button was duplicate of "What's on your mind?" input box
