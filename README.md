@@ -528,15 +528,30 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
   - Public/private group options
   - Member count and role management
   - Beautiful 3D glassmorphism design matching app theme
-- **Quest Sharing** 🎁 FULLY ENABLED!:
-  - **Share Button** on every friend card in Community and Friends screens
-  - **Quest Selection Screen**:
+- **Quest Sharing** 🎁 FULLY ENHANCED!:
+  - **Share Existing Quests**:
+    - Share button on every friend card in Community and Friends screens
     - Browse all active, queued, and recently completed quests
     - Beautiful card-based UI with category colors
     - Difficulty badges (Easy, Medium, Hard, Expert)
     - Shows XP and point rewards
-    - Select any quest to share
-  - **Optional Message**: Add a personal note when sharing
+    - Optional personal message when sharing
+  - **Create Custom Quests** ✨ NEW!:
+    - **Voice Input** 🎤: Record your quest idea and AI transcribes it
+    - **Text Input** ⌨️: Type your custom quest description
+    - **AI Safety Filtering** 🛡️: All quests reviewed by GPT-4o-mini for safety
+      - Rejects illegal, harmful, or inappropriate content
+      - Allows personal growth, networking, and rejection challenges
+      - Provides safety warnings if quest is flagged
+    - **XP & Points Gifting** 💎:
+      - Gift your own XP and Points to make quests more rewarding
+      - Must have sufficient balance to gift (complete quests to earn!)
+      - Points automatically deducted from sender and added to quest reward
+      - Refunded if quest fails safety check
+    - **Customizable Parameters**:
+      - Choose category, difficulty, goal type, and goal count
+      - AI suggests smart defaults if not specified
+    - **Balance Validation**: Can't gift more than you have - complete quests first!
   - **Friend Acceptance**: Friends receive shared quest in their inbox
   - **Auto-Queue**: Accepted quests automatically added to friend's queue
   - **Purple Share Icon** for easy identification

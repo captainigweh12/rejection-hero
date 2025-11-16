@@ -347,6 +347,21 @@ model SharedQuest {
   message    String?
   status     String   @default("pending") // pending, accepted, declined
   createdAt  DateTime @default(now())
+
+  // Custom quest fields
+  isCustomQuest    Boolean @default(false) // True if this is a custom-created quest
+  customTitle      String? // Custom quest title
+  customDescription String? // Custom quest description
+  customCategory   String? // Custom category
+  customDifficulty String? // Custom difficulty
+  customGoalType   String? // COLLECT_NOS, COLLECT_YES, or TAKE_ACTION
+  customGoalCount  Int?    // Custom goal count
+  audioTranscript  String? // Voice-to-text transcript if created by voice
+
+  // Gifting fields
+  giftedXP         Int     @default(0) // XP gifted from sender's balance
+  giftedPoints     Int     @default(0) // Points gifted from sender's balance
+
   sender     User     @relation(fields: [senderId], references: [id], onDelete: Cascade)
   quest      Quest    @relation(fields: [questId], references: [id], onDelete: Cascade)
 

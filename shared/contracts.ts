@@ -1055,3 +1055,55 @@ export const getConversationsResponseSchema = z.object({
   ),
 });
 export type GetConversationsResponse = z.infer<typeof getConversationsResponseSchema>;
+
+// ==========================================
+// Custom Quest Creation for Friends
+// ==========================================
+
+// POST /api/shared-quests/create-custom - Create and share custom quest with AI safety filtering
+export const createCustomQuestRequestSchema = z.object({
+  friendId: z.string(),
+
+  // Quest creation method
+  audioTranscript: z.string().optional(), // Voice-to-text transcript
+  textDescription: z.string().optional(), // OR text description
+
+  // Optional customization
+  category: z.string().optional(),
+  difficulty: z.enum(["EASY", "MEDIUM", "HARD", "EXPERT"]).optional(),
+  goalType: z.enum(["COLLECT_NOS", "COLLECT_YES", "TAKE_ACTION"]).optional(),
+  goalCount: z.number().min(1).max(50).optional(),
+
+  // Gifting (from sender's balance)
+  giftXP: z.number().min(0).max(10000).default(0),
+  giftPoints: z.number().min(0).max(10000).default(0),
+
+  // Optional message
+  message: z.string().max(500).optional(),
+});
+export type CreateCustomQuestRequest = z.infer<typeof createCustomQuestRequestSchema>;
+
+export const createCustomQuestResponseSchema = z.object({
+  success: z.boolean(),
+  sharedQuestId: z.string().optional(),
+  message: z.string(),
+
+  // Quest details (after AI safety filtering)
+  quest: z
+    .object({
+      title: z.string(),
+      description: z.string(),
+      category: z.string(),
+      difficulty: z.string(),
+      goalType: z.string(),
+      goalCount: z.number(),
+      xpReward: z.number(),
+      pointReward: z.number(),
+    })
+    .optional(),
+
+  // Safety check result
+  isSafe: z.boolean(),
+  safetyWarning: z.string().optional(),
+});
+export type CreateCustomQuestResponse = z.infer<typeof createCustomQuestResponseSchema>;

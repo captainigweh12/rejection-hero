@@ -3,8 +3,102 @@ import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
 import { type AppType } from "../types";
 import { db } from "../db";
+import { env } from "../env";
 
 const sharedQuestsRouter = new Hono<AppType>();
+
+// ============================================
+// AI Safety Filtering Function
+// ============================================
+async function checkQuestSafety(description: string): Promise<{ isSafe: boolean; warning?: string; cleanDescription?: string }> {
+  const OPENAI_API_KEY = env.OPENAI_API_KEY || env.EXPO_PUBLIC_VIBECODE_OPENAI_API_KEY;
+
+  if (!OPENAI_API_KEY) {
+    console.warn("⚠️ No OpenAI API key - skipping AI safety check");
+    return { isSafe: true, cleanDescription: description };
+  }
+
+  try {
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${OPENAI_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: "gpt-4o-mini",
+        messages: [
+          {
+            role: "system",
+            content: `You are a content safety moderator for a personal growth app called "Go for No".
+The app helps users overcome fear of rejection through challenges.
+
+Your job is to review quest descriptions and determine if they are safe and appropriate.
+
+REJECT quests that involve:
+- Illegal activities (theft, harassment, violence, fraud, trespassing)
+- Harmful behavior (stalking, bullying, deception for malicious purposes)
+- Inappropriate sexual content or advances
+- Dangerous physical activities that could cause injury
+- Privacy violations or unauthorized recording
+- Manipulative or exploitative behavior
+- Discrimination or hate speech
+
+ALLOW quests that involve:
+- Politely asking for things (discounts, favors, recommendations)
+- Networking and professional outreach
+- Social confidence building (compliments, small talk, public speaking)
+- Sales and entrepreneurship practice
+- Career advancement (job applications, pitching ideas)
+- Dating (respectful approaches, asking for numbers/dates)
+- Personal growth challenges (stepping outside comfort zone)
+
+If the quest is SAFE, respond with JSON: {"safe": true, "description": "cleaned up description"}
+If the quest is UNSAFE, respond with JSON: {"safe": false, "reason": "brief explanation"}
+
+Important: Be permissive with rejection challenges - the app is about overcoming fear, not breaking rules.`,
+          },
+          {
+            role: "user",
+            content: `Review this quest description: "${description}"`,
+          },
+        ],
+        temperature: 0.3,
+        max_tokens: 200,
+        response_format: { type: "json_object" },
+      }),
+    });
+
+    if (!response.ok) {
+      console.error("OpenAI API error:", response.statusText);
+      return { isSafe: true, cleanDescription: description }; // Fail open
+    }
+
+    const result = await response.json();
+    const content = result.choices[0]?.message?.content;
+
+    if (!content) {
+      return { isSafe: true, cleanDescription: description };
+    }
+
+    const safetyResult = JSON.parse(content);
+
+    if (safetyResult.safe === false) {
+      return {
+        isSafe: false,
+        warning: safetyResult.reason || "This quest was flagged as potentially unsafe or inappropriate.",
+      };
+    }
+
+    return {
+      isSafe: true,
+      cleanDescription: safetyResult.description || description,
+    };
+  } catch (error) {
+    console.error("Error in AI safety check:", error);
+    return { isSafe: true, cleanDescription: description }; // Fail open on error
+  }
+}
 
 // ============================================
 // GET /api/shared-quests - Get received quest shares
@@ -220,3 +314,203 @@ sharedQuestsRouter.post("/:id/decline", async (c) => {
 });
 
 export { sharedQuestsRouter };
+
+// ============================================
+// POST /api/shared-quests/create-custom - Create custom quest and share with friend
+// ============================================
+const createCustomQuestSchema = z.object({
+  friendId: z.string(),
+  audioTranscript: z.string().optional(),
+  textDescription: z.string().optional(),
+  category: z.string().optional(),
+  difficulty: z.enum(["EASY", "MEDIUM", "HARD", "EXPERT"]).optional(),
+  goalType: z.enum(["COLLECT_NOS", "COLLECT_YES", "TAKE_ACTION"]).optional(),
+  goalCount: z.number().min(1).max(50).optional(),
+  giftXP: z.number().min(0).max(10000).default(0),
+  giftPoints: z.number().min(0).max(10000).default(0),
+  message: z.string().max(500).optional(),
+});
+
+sharedQuestsRouter.post("/create-custom", zValidator("json", createCustomQuestSchema), async (c) => {
+  const user = c.get("user");
+
+  if (!user) {
+    return c.json({ success: false, message: "Unauthorized", isSafe: false }, 401);
+  }
+
+  const data = c.req.valid("json");
+  const { friendId, audioTranscript, textDescription, category, difficulty, goalType, goalCount, giftXP, giftPoints, message } = data;
+
+  // Check if they are friends
+  const friendship = await db.friendship.findFirst({
+    where: {
+      OR: [
+        { initiatorId: user.id, receiverId: friendId, status: "ACCEPTED" },
+        { initiatorId: friendId, receiverId: user.id, status: "ACCEPTED" },
+      ],
+    },
+  });
+
+  if (!friendship) {
+    return c.json({ success: false, message: "You can only share quests with friends", isSafe: false }, 403);
+  }
+
+  // Check user's balance if gifting points/XP
+  if (giftXP > 0 || giftPoints > 0) {
+    const userStats = await db.userStats.findUnique({
+      where: { userId: user.id },
+    });
+
+    if (!userStats) {
+      return c.json({
+        success: false,
+        message: "You need to complete a quest first to earn XP and Points before gifting!",
+        isSafe: false,
+      }, 400);
+    }
+
+    if (giftXP > userStats.totalXP) {
+      return c.json({
+        success: false,
+        message: `You only have ${userStats.totalXP} XP. You can't gift ${giftXP} XP. Complete more quests to earn XP!`,
+        isSafe: false,
+      }, 400);
+    }
+
+    if (giftPoints > userStats.totalPoints) {
+      return c.json({
+        success: false,
+        message: `You only have ${userStats.totalPoints} Points. You can't gift ${giftPoints} Points. Complete more quests to earn Points!`,
+        isSafe: false,
+      }, 400);
+    }
+
+    // Deduct from sender's balance
+    await db.userStats.update({
+      where: { userId: user.id },
+      data: {
+        totalXP: { decrement: giftXP },
+        totalPoints: { decrement: giftPoints },
+      },
+    });
+  }
+
+  // Get description from voice or text
+  const description = audioTranscript || textDescription;
+
+  if (!description) {
+    return c.json({
+      success: false,
+      message: "Please provide a quest description via voice or text",
+      isSafe: false,
+    }, 400);
+  }
+
+  // AI Safety Check
+  console.log("🛡️ Running AI safety check on quest description...");
+  const safetyCheck = await checkQuestSafety(description);
+
+  if (!safetyCheck.isSafe) {
+    // Refund XP/Points if quest was unsafe
+    if (giftXP > 0 || giftPoints > 0) {
+      await db.userStats.update({
+        where: { userId: user.id },
+        data: {
+          totalXP: { increment: giftXP },
+          totalPoints: { increment: giftPoints },
+        },
+      });
+    }
+
+    return c.json({
+      success: false,
+      message: "Quest cannot be created",
+      isSafe: false,
+      safetyWarning: safetyCheck.warning,
+    }, 400);
+  }
+
+  console.log("✅ Quest passed safety check");
+
+  // Determine quest parameters
+  const finalCategory = category || "SOCIAL";
+  const finalDifficulty = difficulty || "MEDIUM";
+  const finalGoalType = goalType || "COLLECT_NOS";
+  const finalGoalCount = goalCount || (finalDifficulty === "EASY" ? 3 : finalDifficulty === "MEDIUM" ? 5 : 8);
+
+  // Calculate rewards
+  const difficultyMultiplier = { EASY: 1, MEDIUM: 1.5, HARD: 2, EXPERT: 3 }[finalDifficulty] || 1;
+  const baseXP = Math.floor(finalGoalCount * 10 * difficultyMultiplier) + 50;
+  const basePoints = Math.floor(finalGoalCount * 20 * difficultyMultiplier) + 100;
+
+  // Create the quest in the database
+  const quest = await db.quest.create({
+    data: {
+      title: safetyCheck.cleanDescription?.substring(0, 50) || description.substring(0, 50),
+      description: safetyCheck.cleanDescription || description,
+      category: finalCategory,
+      difficulty: finalDifficulty,
+      goalType: finalGoalType,
+      goalCount: finalGoalCount,
+      xpReward: baseXP + giftXP,
+      pointReward: basePoints + giftPoints,
+      isAIGenerated: false,
+    },
+  });
+
+  // Create shared quest with custom fields
+  const sharedQuest = await db.sharedQuest.create({
+    data: {
+      senderId: user.id,
+      receiverId: friendId,
+      questId: quest.id,
+      message,
+      status: "pending",
+      isCustomQuest: true,
+      customTitle: quest.title,
+      customDescription: quest.description,
+      customCategory: finalCategory,
+      customDifficulty: finalDifficulty,
+      customGoalType: finalGoalType,
+      customGoalCount: finalGoalCount,
+      audioTranscript: audioTranscript || null,
+      giftedXP: giftXP,
+      giftedPoints: giftPoints,
+    },
+  });
+
+  const userName = user.name || user.email || "A friend";
+  const giftMessage = giftXP > 0 || giftPoints > 0 ? ` with ${giftXP} XP and ${giftPoints} Points!` : "!";
+
+  // Create notification for friend
+  await db.notification.create({
+    data: {
+      userId: friendId,
+      senderId: user.id,
+      type: "QUEST_SHARED",
+      title: "Custom Quest Received!",
+      message: `${userName} created a custom quest for you${giftMessage}`,
+      read: false,
+    },
+  });
+
+  console.log(`✅ Custom quest created and shared with friend ${friendId}`);
+  console.log(`💎 Gifted: ${giftXP} XP, ${giftPoints} Points`);
+
+  return c.json({
+    success: true,
+    sharedQuestId: sharedQuest.id,
+    message: "Custom quest created and shared successfully!",
+    quest: {
+      title: quest.title,
+      description: quest.description,
+      category: quest.category,
+      difficulty: quest.difficulty,
+      goalType: quest.goalType,
+      goalCount: quest.goalCount,
+      xpReward: quest.xpReward,
+      pointReward: quest.pointReward,
+    },
+    isSafe: true,
+  });
+});
