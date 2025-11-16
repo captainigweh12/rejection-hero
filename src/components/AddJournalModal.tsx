@@ -270,6 +270,7 @@ export default function AddJournalModal({ visible, onClose, onSuccess }: AddJour
       onRequestClose={handleClose}
     >
       <View
+        key={`journal-modal-${step}`}
         style={{
           flex: 1,
           backgroundColor: "rgba(0, 0, 0, 0.85)",
@@ -333,8 +334,8 @@ export default function AddJournalModal({ visible, onClose, onSuccess }: AddJour
               </View>
             )}
 
-            {/* STEP 1: Method Selection */}
-            {step === "method" && (
+            {/* Render ONLY the current step */}
+            {step === "method" ? (
               <View>
                 <Text className="text-lg font-semibold text-white mb-4 text-center">
                   How would you like to log your experience?
@@ -403,10 +404,7 @@ export default function AddJournalModal({ visible, onClose, onSuccess }: AddJour
                   </Text>
                 </TouchableOpacity>
               </View>
-            )}
-
-            {/* STEP 2: Input (Text or Voice) */}
-            {step === "input" && (
+            ) : step === "input" ? (
               <View>
                 {/* Back Button */}
                 <TouchableOpacity
@@ -522,10 +520,7 @@ export default function AddJournalModal({ visible, onClose, onSuccess }: AddJour
                   </View>
                 )}
               </View>
-            )}
-
-            {/* STEP 3: Outcome Selection */}
-            {step === "outcome" && (
+            ) : step === "outcome" ? (
               <View>
                 {/* AI Summary */}
                 <View
@@ -698,7 +693,7 @@ export default function AddJournalModal({ visible, onClose, onSuccess }: AddJour
                   )}
                 </TouchableOpacity>
               </View>
-            )}
+            ) : null}
           </ScrollView>
         </View>
       </View>
