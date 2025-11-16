@@ -49,13 +49,25 @@ export default function AddJournalModal({ visible, onClose, onSuccess }: AddJour
   const [selectedOutcome, setSelectedOutcome] = useState<"YES" | "NO" | "ACTIVITY" | null>(null);
   const [recordingUri, setRecordingUri] = useState<string | null>(null);
 
+  // Define resetForm function
+  const resetForm = React.useCallback(() => {
+    console.log("[AddJournalModal] Resetting form...");
+    setInputMode("text");
+    setRecordingUri(null);
+    setTextEntry("");
+    setTranscript("");
+    setSummary("");
+    setEditedSummary("");
+    setSelectedOutcome(null);
+  }, []);
+
   // Reset form when modal opens
   React.useEffect(() => {
     if (visible) {
       console.log("[AddJournalModal] Modal opened - resetting form");
       resetForm();
     }
-  }, [visible]);
+  }, [visible, resetForm]);
 
   // Debug: Log state changes
   React.useEffect(() => {
@@ -229,16 +241,6 @@ export default function AddJournalModal({ visible, onClose, onSuccess }: AddJour
       Alert.alert("Error", "Failed to save journal entry. Please try again.");
     },
   });
-
-  const resetForm = () => {
-    setInputMode("text");
-    setRecordingUri(null);
-    setTextEntry("");
-    setTranscript("");
-    setSummary("");
-    setEditedSummary("");
-    setSelectedOutcome(null);
-  };
 
   const handleSave = () => {
     if (!selectedOutcome) {
