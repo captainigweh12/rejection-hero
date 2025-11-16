@@ -1467,6 +1467,7 @@ See `ENV_SETUP.md` for complete environment variable setup guide.
   - "Accept Quest" button to add quests to your list
 - **AI Integration**: Uses existing AI quest generation with random variety
 - **Real Locations**: Leverages Google Maps Places API for authentic nearby places
+- **Bug Fix**: Fixed undefined function error - uses `getNearbyPlaces` and correct property names (`lat`/`lng`)
 
 ### 2025-11-16: Fixed 502 Bad Gateway Error on Profile Endpoint
 - **Issue**: GET /api/profile was returning 502 bad gateway errors

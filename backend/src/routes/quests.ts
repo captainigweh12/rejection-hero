@@ -1211,7 +1211,7 @@ questsRouter.post("/generate-map-quests", zValidator("json", generateMapQuestsRe
 
   try {
     // Fetch nearby places within 5 miles (8 km)
-    const nearbyPlaces = await fetchNearbyPlaces(latitude, longitude, 8000);
+    const nearbyPlaces = await getNearbyPlaces(latitude, longitude, 8000);
 
     if (nearbyPlaces.length === 0) {
       return c.json({
@@ -1247,8 +1247,8 @@ questsRouter.post("/generate-map-quests", zValidator("json", generateMapQuestsRe
           undefined, // no custom prompt
           user.id,
           randomPlace.name,
-          randomPlace.latitude,
-          randomPlace.longitude,
+          randomPlace.lat,
+          randomPlace.lng,
           randomQuestType as "REJECTION" | "ACTION"
         );
 
@@ -1264,8 +1264,8 @@ questsRouter.post("/generate-map-quests", zValidator("json", generateMapQuestsRe
             xpReward: questData.xpReward,
             pointReward: questData.pointReward,
             location: questData.location || randomPlace.name,
-            latitude: questData.latitude || randomPlace.latitude,
-            longitude: questData.longitude || randomPlace.longitude,
+            latitude: questData.latitude || randomPlace.lat,
+            longitude: questData.longitude || randomPlace.lng,
             timeContext: questData.timeContext,
             dateContext: questData.dateContext,
           },
@@ -1282,8 +1282,8 @@ questsRouter.post("/generate-map-quests", zValidator("json", generateMapQuestsRe
           xpReward: quest.xpReward,
           pointReward: quest.pointReward,
           location: quest.location || "",
-          latitude: quest.latitude || randomPlace.latitude,
-          longitude: quest.longitude || randomPlace.longitude,
+          latitude: quest.latitude || randomPlace.lat,
+          longitude: quest.longitude || randomPlace.lng,
           timeContext: quest.timeContext,
           dateContext: quest.dateContext,
         });
