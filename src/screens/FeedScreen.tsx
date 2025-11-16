@@ -573,7 +573,8 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
         onRequestClose={() => setShowCreatePost(false)}
         presentationStyle="fullScreen"
       >
-        <SafeAreaView style={{ flex: 1, backgroundColor: "#0A0A0F" }} edges={["top", "bottom"]}>
+        <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
+          <SafeAreaView style={{ flex: 1 }} edges={["bottom"]}>
           {/* Header */}
           <View
             style={{
@@ -581,7 +582,8 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
               alignItems: "center",
               justifyContent: "space-between",
               paddingHorizontal: 16,
-              paddingVertical: 16,
+              paddingTop: 16,
+              paddingBottom: 16,
               borderBottomWidth: 1,
               borderBottomColor: "rgba(126, 63, 228, 0.2)",
             }}
@@ -851,7 +853,8 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
                 </TouchableOpacity>
             </ScrollView>
           </View>
-        </SafeAreaView>
+          </SafeAreaView>
+        </View>
       </Modal>
 
       {/* Create Moment Modal - Instagram/Snapchat Style */}
