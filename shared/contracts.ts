@@ -893,7 +893,8 @@ export type GetGroupQuestsResponse = z.infer<typeof getGroupQuestsResponseSchema
 // POST /api/group-quests/create - Create a group quest
 export const createGroupQuestRequestSchema = z.object({
   groupId: z.string(),
-  questId: z.string(),
+  questId: z.string().optional(), // Optional for custom quests
+  customQuestDescription: z.string().optional(), // For custom quests
   assignmentType: z.enum(["all", "assigned"]).default("all"),
   assignedMemberIds: z.array(z.string()).optional(),
 });

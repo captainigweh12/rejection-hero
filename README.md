@@ -443,12 +443,23 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
       - Join link for easy signup and group joining
     - Non-users receive signup link that auto-joins group after registration
   - **Group Quests** 🎯 FULLY ACTIVE!:
-    - **Create Group Quests** ✅ ENABLED!:
+    - **Create Group Quests** ✅ ENHANCED!:
+      - **Fixed SafeArea**: Modal now displays correctly without status bar overlap on all devices
+      - **Two Creation Options**:
+        - **From My Quests**: Select from your existing active or queued quests
+        - **Create Custom** ✨ NEW!: Write a custom quest description for the group
       - **3-Step Creation Flow**:
-        - Step 1: Select from your existing active or queued quests
+        - Step 1: Choose quest type (Existing or Custom) and select/create quest
         - Step 2: Choose assignment type (Open to All or Assigned Only)
         - Step 3: Select specific members (if Assigned Only)
-      - **Quest Selection Screen**:
+      - **Custom Quest Creation** ✨ NEW!:
+        - Text input for custom quest description
+        - Multiline editor with placeholder example
+        - **AI Safety Filter** 🛡️: All custom quests checked for harmful content
+        - Visual feedback showing safety check status
+        - Automatic quest generation with default rewards (50 XP, 10 points)
+        - Categories as "CUSTOM" with medium difficulty
+      - **Quest Selection Screen** (From My Quests):
         - Browse all your active and queued quests
         - Beautiful card-based UI with quest details
         - Shows difficulty, category, XP rewards
@@ -461,7 +472,7 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
         - Multi-select members to assign quest
         - Shows member roles (Admin/Moderator/Member)
         - Visual selection indicators
-      - **Step Progress Indicators**: Visual progress bar showing current step
+      - **Step Progress Indicators**: Visual progress bar showing current step (1/2/3)
     - **Join Group Quests** ✅ ACTIVE!:
       - Members can join open quests with one tap
       - "Join Quest" button on quest cards

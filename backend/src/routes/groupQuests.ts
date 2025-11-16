@@ -3,6 +3,7 @@ import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
 import { type AppType } from "../types";
 import { db } from "../db";
+import { checkFullQuestSafety } from "../utils/safetyFilter";
 
 const groupQuestsRouter = new Hono<AppType>();
 
@@ -113,7 +114,8 @@ groupQuestsRouter.get("/:groupId", async (c) => {
 // ============================================
 const createGroupQuestSchema = z.object({
   groupId: z.string(),
-  questId: z.string(),
+  questId: z.string().optional(), // Optional for custom quests
+  customQuestDescription: z.string().optional(), // For custom quests
   assignmentType: z.enum(["all", "assigned"]).default("all"),
   assignedMemberIds: z.array(z.string()).optional(), // Only used if assignmentType is "assigned"
 });
@@ -125,7 +127,12 @@ groupQuestsRouter.post("/create", zValidator("json", createGroupQuestSchema), as
     return c.json({ message: "Unauthorized" }, 401);
   }
 
-  const { groupId, questId, assignmentType, assignedMemberIds } = c.req.valid("json");
+  const { groupId, questId, customQuestDescription, assignmentType, assignedMemberIds } = c.req.valid("json");
+
+  // Validate that either questId or customQuestDescription is provided
+  if (!questId && !customQuestDescription) {
+    return c.json({ message: "Either questId or customQuestDescription must be provided" }, 400);
+  }
 
   // Check if user is a member of the group
   const membership = await db.groupMember.findUnique({
@@ -141,20 +148,60 @@ groupQuestsRouter.post("/create", zValidator("json", createGroupQuestSchema), as
     return c.json({ message: "You are not a member of this group" }, 403);
   }
 
-  // Check if quest exists
-  const quest = await db.quest.findUnique({
-    where: { id: questId },
-  });
+  let finalQuestId = questId;
 
-  if (!quest) {
-    return c.json({ message: "Quest not found" }, 404);
+  // If custom quest, create a new quest first
+  if (customQuestDescription && !questId) {
+    console.log("🔍 Creating custom group quest:", customQuestDescription);
+
+    // Safety filter check
+    const safetyCheck = checkFullQuestSafety(customQuestDescription, "Custom Group Quest");
+    if (!safetyCheck.isSafe) {
+      console.log("⚠️ Quest blocked by safety filter:", safetyCheck.reason);
+      return c.json({
+        message: `Quest blocked for safety: ${safetyCheck.reason}`,
+        isSafe: false
+      }, 400);
+    }
+
+    console.log("✅ Quest passed safety filter");
+
+    // Create the custom quest
+    const customQuest = await db.quest.create({
+      data: {
+        title: customQuestDescription.slice(0, 100), // Use first 100 chars as title
+        description: customQuestDescription,
+        category: "CUSTOM",
+        difficulty: "MEDIUM",
+        goalType: "COLLECT_NOS",
+        goalCount: 1,
+        xpReward: 50,
+        pointReward: 10,
+      },
+    });
+
+    finalQuestId = customQuest.id;
+    console.log("✅ Custom quest created:", finalQuestId);
+  }
+
+  // Verify quest exists
+  if (finalQuestId) {
+    const quest = await db.quest.findUnique({
+      where: { id: finalQuestId },
+    });
+
+    if (!quest) {
+      return c.json({ message: "Quest not found" }, 404);
+    }
+  } else {
+    return c.json({ message: "Failed to create or find quest" }, 500);
   }
 
   // Create the group quest
   const groupQuest = await db.groupQuest.create({
     data: {
       groupId,
-      questId,
+      questId: finalQuestId,
       createdBy: user.id,
       assignmentType,
     },

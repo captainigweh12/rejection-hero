@@ -50,10 +50,12 @@ function CreateGroupQuestModal({ visible, onClose, groupId, onSuccess }: CreateG
   const { data: sessionData } = useSession();
   const queryClient = useQueryClient();
 
+  const [creationType, setCreationType] = useState<"existing" | "custom">("existing");
+  const [customQuestText, setCustomQuestText] = useState("");
   const [selectedQuestId, setSelectedQuestId] = useState<string | null>(null);
   const [assignmentType, setAssignmentType] = useState<"all" | "assigned">("all");
   const [selectedMemberIds, setSelectedMemberIds] = useState<string[]>([]);
-  const [step, setStep] = useState<1 | 2 | 3>(1); // 1: Select Quest, 2: Assignment Type, 3: Select Members (if assigned)
+  const [step, setStep] = useState<1 | 2 | 3>(1); // 1: Select Quest Type, 2: Assignment Type, 3: Select Members (if assigned)
 
   // Fetch user's quests
   const { data: questsData, isLoading: questsLoading } = useQuery({
@@ -90,6 +92,8 @@ function CreateGroupQuestModal({ visible, onClose, groupId, onSuccess }: CreateG
   });
 
   const resetAndClose = () => {
+    setCreationType("existing");
+    setCustomQuestText("");
     setSelectedQuestId(null);
     setAssignmentType("all");
     setSelectedMemberIds([]);
@@ -98,11 +102,18 @@ function CreateGroupQuestModal({ visible, onClose, groupId, onSuccess }: CreateG
   };
 
   const handleNext = () => {
-    if (step === 1 && !selectedQuestId) {
-      Alert.alert("Error", "Please select a quest");
-      return;
-    }
-    if (step === 2) {
+    if (step === 1) {
+      // Validate based on creation type
+      if (creationType === "existing" && !selectedQuestId) {
+        Alert.alert("Error", "Please select a quest");
+        return;
+      }
+      if (creationType === "custom" && !customQuestText.trim()) {
+        Alert.alert("Error", "Please enter a quest description");
+        return;
+      }
+      setStep(2);
+    } else if (step === 2) {
       if (assignmentType === "all") {
         handleCreate();
       } else {
@@ -114,20 +125,25 @@ function CreateGroupQuestModal({ visible, onClose, groupId, onSuccess }: CreateG
         return;
       }
       handleCreate();
-    } else {
-      setStep((step + 1) as 2 | 3);
     }
   };
 
   const handleCreate = () => {
-    if (!selectedQuestId) return;
-
-    createMutation.mutate({
+    const requestData: CreateGroupQuestRequest = {
       groupId,
-      questId: selectedQuestId,
       assignmentType,
       assignedMemberIds: assignmentType === "assigned" ? selectedMemberIds : undefined,
-    });
+    };
+
+    if (creationType === "existing") {
+      if (!selectedQuestId) return;
+      requestData.questId = selectedQuestId;
+    } else {
+      if (!customQuestText.trim()) return;
+      requestData.customQuestDescription = customQuestText.trim();
+    }
+
+    createMutation.mutate(requestData);
   };
 
   const toggleMember = (userId: string) => {
@@ -156,10 +172,10 @@ function CreateGroupQuestModal({ visible, onClose, groupId, onSuccess }: CreateG
   };
 
   return (
-    <Modal visible={visible} animationType="slide" transparent={true} onRequestClose={resetAndClose}>
-      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
-        <View style={{ flex: 1, backgroundColor: "rgba(0, 0, 0, 0.9)" }}>
-          <SafeAreaView edges={["top"]} style={{ flex: 1 }}>
+    <Modal visible={visible} animationType="slide" transparent={false} onRequestClose={resetAndClose}>
+      <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
+        <SafeAreaView edges={["top"]} style={{ flex: 1 }}>
+          <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
             {/* Header */}
             <View
               style={{
@@ -204,86 +220,170 @@ function CreateGroupQuestModal({ visible, onClose, groupId, onSuccess }: CreateG
             </View>
 
             <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
-              {/* Step 1: Select Quest */}
+              {/* Step 1: Choose Quest Type and Select/Create Quest */}
               {step === 1 && (
                 <View style={{ padding: 20 }}>
-                  <Text style={{ color: "white", fontSize: 16, fontWeight: "600", marginBottom: 16 }}>
-                    Select a Quest
+                  {/* Quest Type Selector */}
+                  <Text style={{ color: "white", fontSize: 16, fontWeight: "600", marginBottom: 12 }}>
+                    Choose Quest Type
                   </Text>
-                  {questsLoading ? (
-                    <ActivityIndicator size="large" color="#7E3FE4" />
-                  ) : allQuests.length === 0 ? (
-                    <View style={{ padding: 40, alignItems: "center" }}>
-                      <Target size={48} color="rgba(255, 255, 255, 0.3)" />
-                      <Text style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: 15, marginTop: 16, textAlign: "center" }}>
-                        You don&apos;t have any quests yet. Create a quest first!
+                  <View style={{ flexDirection: "row", gap: 12, marginBottom: 24 }}>
+                    <Pressable
+                      onPress={() => setCreationType("existing")}
+                      style={{
+                        flex: 1,
+                        padding: 16,
+                        borderRadius: 12,
+                        backgroundColor: creationType === "existing" ? "rgba(126, 63, 228, 0.2)" : "rgba(255, 255, 255, 0.05)",
+                        borderWidth: 2,
+                        borderColor: creationType === "existing" ? "#7E3FE4" : "rgba(255, 255, 255, 0.1)",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Target size={24} color={creationType === "existing" ? "#7E3FE4" : "rgba(255, 255, 255, 0.5)"} />
+                      <Text style={{ color: creationType === "existing" ? "white" : "rgba(255, 255, 255, 0.6)", fontSize: 13, fontWeight: "600", marginTop: 8, textAlign: "center" }}>
+                        From My Quests
                       </Text>
-                    </View>
-                  ) : (
-                    <View style={{ gap: 12 }}>
-                      {allQuests.map((q) => (
-                        <Pressable
-                          key={q.quest.id}
-                          onPress={() => setSelectedQuestId(q.quest.id)}
-                          style={{
-                            backgroundColor: selectedQuestId === q.quest.id ? "rgba(126, 63, 228, 0.2)" : "rgba(255, 255, 255, 0.05)",
-                            borderRadius: 16,
-                            padding: 16,
-                            borderWidth: 2,
-                            borderColor: selectedQuestId === q.quest.id ? "#7E3FE4" : "rgba(255, 255, 255, 0.1)",
-                          }}
-                        >
-                          <View style={{ flexDirection: "row", alignItems: "flex-start", gap: 12 }}>
-                            <View
+                    </Pressable>
+                    <Pressable
+                      onPress={() => setCreationType("custom")}
+                      style={{
+                        flex: 1,
+                        padding: 16,
+                        borderRadius: 12,
+                        backgroundColor: creationType === "custom" ? "rgba(126, 63, 228, 0.2)" : "rgba(255, 255, 255, 0.05)",
+                        borderWidth: 2,
+                        borderColor: creationType === "custom" ? "#7E3FE4" : "rgba(255, 255, 255, 0.1)",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Plus size={24} color={creationType === "custom" ? "#7E3FE4" : "rgba(255, 255, 255, 0.5)"} />
+                      <Text style={{ color: creationType === "custom" ? "white" : "rgba(255, 255, 255, 0.6)", fontSize: 13, fontWeight: "600", marginTop: 8, textAlign: "center" }}>
+                        Create Custom
+                      </Text>
+                    </Pressable>
+                  </View>
+
+                  {/* Existing Quest Selection */}
+                  {creationType === "existing" && (
+                    <>
+                      <Text style={{ color: "white", fontSize: 16, fontWeight: "600", marginBottom: 16 }}>
+                        Select a Quest
+                      </Text>
+                      {questsLoading ? (
+                        <ActivityIndicator size="large" color="#7E3FE4" />
+                      ) : allQuests.length === 0 ? (
+                        <View style={{ padding: 40, alignItems: "center" }}>
+                          <Target size={48} color="rgba(255, 255, 255, 0.3)" />
+                          <Text style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: 15, marginTop: 16, textAlign: "center" }}>
+                            You don&apos;t have any quests yet. Try creating a custom quest instead!
+                          </Text>
+                        </View>
+                      ) : (
+                        <View style={{ gap: 12 }}>
+                          {allQuests.map((q) => (
+                            <Pressable
+                              key={q.quest.id}
+                              onPress={() => setSelectedQuestId(q.quest.id)}
                               style={{
-                                width: 24,
-                                height: 24,
-                                borderRadius: 12,
-                                backgroundColor: selectedQuestId === q.quest.id ? "#7E3FE4" : "rgba(255, 255, 255, 0.1)",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                marginTop: 2,
+                                backgroundColor: selectedQuestId === q.quest.id ? "rgba(126, 63, 228, 0.2)" : "rgba(255, 255, 255, 0.05)",
+                                borderRadius: 16,
+                                padding: 16,
+                                borderWidth: 2,
+                                borderColor: selectedQuestId === q.quest.id ? "#7E3FE4" : "rgba(255, 255, 255, 0.1)",
                               }}
                             >
-                              {selectedQuestId === q.quest.id && <Check size={16} color="white" />}
-                            </View>
-                            <View style={{ flex: 1 }}>
-                              <Text style={{ color: "white", fontSize: 16, fontWeight: "700", marginBottom: 4 }}>
-                                {q.quest.title}
-                              </Text>
-                              <Text style={{ color: "rgba(255, 255, 255, 0.7)", fontSize: 14, marginBottom: 8 }}>
-                                {q.quest.description}
-                              </Text>
-                              <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
+                              <View style={{ flexDirection: "row", alignItems: "flex-start", gap: 12 }}>
                                 <View
                                   style={{
-                                    backgroundColor: getDifficultyColor(q.quest.difficulty) + "30",
-                                    paddingHorizontal: 10,
-                                    paddingVertical: 4,
-                                    borderRadius: 8,
+                                    width: 24,
+                                    height: 24,
+                                    borderRadius: 12,
+                                    backgroundColor: selectedQuestId === q.quest.id ? "#7E3FE4" : "rgba(255, 255, 255, 0.1)",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    marginTop: 2,
                                   }}
                                 >
-                                  <Text style={{ color: getDifficultyColor(q.quest.difficulty), fontSize: 12, fontWeight: "600" }}>
-                                    {q.quest.difficulty}
-                                  </Text>
+                                  {selectedQuestId === q.quest.id && <Check size={16} color="white" />}
                                 </View>
-                                <View style={{ backgroundColor: "rgba(0, 217, 255, 0.2)", paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 }}>
-                                  <Text style={{ color: "#00D9FF", fontSize: 12, fontWeight: "600" }}>
-                                    {q.quest.category}
+                                <View style={{ flex: 1 }}>
+                                  <Text style={{ color: "white", fontSize: 16, fontWeight: "700", marginBottom: 4 }}>
+                                    {q.quest.title}
                                   </Text>
-                                </View>
-                                <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-                                  <Star size={14} color="#FFD700" />
-                                  <Text style={{ color: "rgba(255, 255, 255, 0.8)", fontSize: 12 }}>
-                                    {q.quest.xpReward} XP
+                                  <Text style={{ color: "rgba(255, 255, 255, 0.7)", fontSize: 14, marginBottom: 8 }}>
+                                    {q.quest.description}
                                   </Text>
+                                  <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
+                                    <View
+                                      style={{
+                                        backgroundColor: getDifficultyColor(q.quest.difficulty) + "30",
+                                        paddingHorizontal: 10,
+                                        paddingVertical: 4,
+                                        borderRadius: 8,
+                                      }}
+                                    >
+                                      <Text style={{ color: getDifficultyColor(q.quest.difficulty), fontSize: 12, fontWeight: "600" }}>
+                                        {q.quest.difficulty}
+                                      </Text>
+                                    </View>
+                                    <View style={{ backgroundColor: "rgba(0, 217, 255, 0.2)", paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 }}>
+                                      <Text style={{ color: "#00D9FF", fontSize: 12, fontWeight: "600" }}>
+                                        {q.quest.category}
+                                      </Text>
+                                    </View>
+                                    <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+                                      <Star size={14} color="#FFD700" />
+                                      <Text style={{ color: "rgba(255, 255, 255, 0.8)", fontSize: 12 }}>
+                                        {q.quest.xpReward} XP
+                                      </Text>
+                                    </View>
+                                  </View>
                                 </View>
                               </View>
-                            </View>
-                          </View>
-                        </Pressable>
-                      ))}
-                    </View>
+                            </Pressable>
+                          ))}
+                        </View>
+                      )}
+                    </>
+                  )}
+
+                  {/* Custom Quest Creation */}
+                  {creationType === "custom" && (
+                    <>
+                      <Text style={{ color: "white", fontSize: 16, fontWeight: "600", marginBottom: 12 }}>
+                        Describe Your Quest
+                      </Text>
+                      <Text style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: 14, marginBottom: 16 }}>
+                        Enter a description for the custom group quest. AI safety filters will ensure it&apos;s appropriate.
+                      </Text>
+                      <TextInput
+                        value={customQuestText}
+                        onChangeText={setCustomQuestText}
+                        placeholder="e.g., Ask 3 strangers for directions to a nearby coffee shop"
+                        placeholderTextColor="rgba(255, 255, 255, 0.3)"
+                        multiline
+                        numberOfLines={4}
+                        style={{
+                          backgroundColor: "rgba(255, 255, 255, 0.05)",
+                          borderRadius: 12,
+                          borderWidth: 2,
+                          borderColor: customQuestText.trim() ? "#7E3FE4" : "rgba(255, 255, 255, 0.1)",
+                          padding: 16,
+                          color: "white",
+                          fontSize: 15,
+                          minHeight: 120,
+                          textAlignVertical: "top",
+                        }}
+                      />
+                      {customQuestText.trim() && (
+                        <View style={{ marginTop: 12, padding: 12, backgroundColor: "rgba(126, 63, 228, 0.1)", borderRadius: 8, borderLeftWidth: 3, borderLeftColor: "#7E3FE4" }}>
+                          <Text style={{ color: "rgba(255, 255, 255, 0.8)", fontSize: 13 }}>
+                            ✓ Quest will be checked by AI safety filters before creation
+                          </Text>
+                        </View>
+                      )}
+                    </>
                   )}
                 </View>
               )}
@@ -513,9 +613,9 @@ function CreateGroupQuestModal({ visible, onClose, groupId, onSuccess }: CreateG
                 )}
               </Pressable>
             </View>
-          </SafeAreaView>
-        </View>
-      </KeyboardAvoidingView>
+          </KeyboardAvoidingView>
+        </SafeAreaView>
+      </View>
     </Modal>
   );
 }
