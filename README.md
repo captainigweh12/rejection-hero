@@ -1521,19 +1521,14 @@ See `ENV_SETUP.md` for complete environment variable setup guide.
     - Rounded comment bubbles with timestamps
     - Circular send button for comments
   - **Community Tab Redesign** 🎯 UPDATED!:
-    - **Badge-Based Navigation**: Replaced tab switcher with header badges
-    - Compact badges showing counts (Friends, Messages, Groups)
-    - Color-coded badges (Purple for Friends, Cyan for Messages, Green for Groups)
-    - Unread indicator dot on Messages badge
-    - Bell and Search icons in header
-    - **iPhone-Style Stats Cards** ✨ NEW!:
-      - Three stats cards always visible below Community header
-      - Red notification badges (iPhone-style) indicating activity:
-        - **Friends Card**: Shows count of pending friend requests
-        - **Messages Card**: Shows total unread message count
-        - **Groups Card**: No badge currently (ready for future group activity)
-      - Badges positioned in top-right corner with white border
-      - Clean iOS-inspired notification design (#FF3B30)
+    - **Badge-Based Navigation**: Compact header badges replace tab switcher
+    - Color-coded badges showing counts:
+      - Purple badge for Friends with count
+      - Cyan badge for Messages with count and unread indicator dot
+      - Green badge for Groups with count
+    - Bell icon with notification count
+    - Search icon for user search
+    - **Clean Header Design**: Minimalist layout with just Community title and action badges
     - **Feed Tab**: Shows only "What's on your mind?", stories, and posts
 - **Better UX**: More spacious layout, clearer hierarchy, modern glassmorphism effects
 - **Maintained App Theme**: All Facebook-inspired elements use Vibecode's purple color scheme
