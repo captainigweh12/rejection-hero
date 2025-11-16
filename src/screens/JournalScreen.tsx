@@ -39,10 +39,28 @@ export default function JournalScreen({ navigation }: Props) {
   const [modalVisible, setModalVisible] = useState(false);
 
   // Fetch journal entries
-  const { data: entriesData } = useQuery({
+  const { data: entriesData, isLoading, error, refetch } = useQuery({
     queryKey: ["journal-entries"],
-    queryFn: () => api.get<GetJournalEntriesResponse>("/api/journal"),
+    queryFn: async () => {
+      console.log("[JournalScreen] Fetching journal entries...");
+      const result = await api.get<GetJournalEntriesResponse>("/api/journal");
+      console.log("[JournalScreen] Fetched entries:", result?.entries?.length || 0);
+      return result;
+    },
   });
+
+  // Log when data changes
+  React.useEffect(() => {
+    console.log("[JournalScreen] entriesData updated:", {
+      hasData: !!entriesData,
+      entryCount: entriesData?.entries?.length || 0,
+      entries: entriesData?.entries?.map(e => ({
+        id: e.id,
+        summary: e.userEditedSummary || e.aiSummary,
+        outcome: e.outcome,
+      })),
+    });
+  }, [entriesData]);
 
   return (
     <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
@@ -81,6 +99,16 @@ export default function JournalScreen({ navigation }: Props) {
               <Plus size={28} color="white" />
             </TouchableOpacity>
           </View>
+
+          {/* Debug Info */}
+          {__DEV__ && (
+            <View style={{ padding: 12, backgroundColor: "rgba(255, 255, 255, 0.05)", marginBottom: 12, borderRadius: 8 }}>
+              <Text className="text-white/60 text-xs">
+                Debug: {isLoading ? "Loading..." : `${entriesData?.entries?.length || 0} entries`}
+                {error ? ` | Error: ${error}` : ""}
+              </Text>
+            </View>
+          )}
 
           {/* Recent Entries */}
           {entriesData && entriesData.entries.length > 0 ? (
