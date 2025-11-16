@@ -1496,6 +1496,22 @@ See `ENV_SETUP.md` for complete environment variable setup guide.
 
 ## Recent Updates
 
+### 2025-11-16: Enhanced Feed Post Cards - Facebook-Style Improvements
+- **Privacy Display**: Privacy icon and label now shown next to timestamp on every post
+  - Globe icon for Public posts
+  - Users icon for Friends-only posts
+  - Lock icon for Groups-only posts
+- **Edit/Delete Menu**: Three-dot menu now shows dropdown with options
+  - Edit post option (coming soon)
+  - Delete post option with confirmation
+  - Beautiful dropdown with purple borders and shadows
+- **Profile Photos**: User avatars now display actual profile photos instead of just initials
+- **Better Spacing**: Added 16px margin between stories bar and posts feed
+- **Menu Improvements**:
+  - Menu closes automatically after selecting an option
+  - Positioned correctly with proper z-index
+  - Clean separator between menu items
+
 ### 2025-11-16: Fixed Groups Tab Overflow in Community Screen
 - **Issue**: Tab switcher buttons were cutting off when too many tabs were displayed
 - **Fix**: Wrapped tab buttons in horizontal ScrollView

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, Image, TextInput, Alert } from "react-native";
-import { Heart, MessageCircle, Send, MoreVertical } from "lucide-react-native";
+import { View, Text, TouchableOpacity, Image, TextInput, Alert, Modal } from "react-native";
+import { Heart, MessageCircle, Send, MoreVertical, Edit2, Trash2, Globe, Users, Lock } from "lucide-react-native";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 
@@ -45,6 +45,7 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
   const queryClient = useQueryClient();
   const [showComments, setShowComments] = useState(false);
   const [commentText, setCommentText] = useState("");
+  const [showMenu, setShowMenu] = useState(false);
 
   // Like mutation
   const likeMutation = useMutation({
@@ -115,6 +116,32 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
     return `${Math.floor(seconds / 86400)}d ago`;
   };
 
+  const privacyIcon = () => {
+    switch (post.privacy) {
+      case "PUBLIC":
+        return <Globe size={13} color="#888" />;
+      case "FRIENDS":
+        return <Users size={13} color="#888" />;
+      case "GROUPS":
+        return <Lock size={13} color="#888" />;
+      default:
+        return <Globe size={13} color="#888" />;
+    }
+  };
+
+  const privacyLabel = () => {
+    switch (post.privacy) {
+      case "PUBLIC":
+        return "Public";
+      case "FRIENDS":
+        return "Friends";
+      case "GROUPS":
+        return "Groups";
+      default:
+        return "Public";
+    }
+  };
+
   return (
     <View
       style={{
@@ -167,15 +194,18 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
             <Text style={{ color: "white", fontSize: 17, fontWeight: "700", marginBottom: 2 }}>
               {post.user.name || "Anonymous"}
             </Text>
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
               <Text style={{ color: "#888", fontSize: 13 }}>
                 {timeAgo(post.createdAt)}
               </Text>
+              <Text style={{ color: "#888", fontSize: 13 }}>•</Text>
+              {privacyIcon()}
+              <Text style={{ color: "#888", fontSize: 13 }}>
+                {privacyLabel()}
+              </Text>
               {post.group && (
                 <>
-                  <Text style={{ color: "#888", fontSize: 13, marginHorizontal: 4 }}>
-                    •
-                  </Text>
+                  <Text style={{ color: "#888", fontSize: 13 }}>•</Text>
                   <Text style={{ color: "#7E3FE4", fontSize: 13, fontWeight: "600" }}>
                     {post.group.name}
                   </Text>
@@ -187,9 +217,74 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
 
         {/* More options */}
         {post.user.id === currentUserId && (
-          <TouchableOpacity onPress={handleDelete} style={{ padding: 4 }}>
-            <MoreVertical size={22} color="#888" />
-          </TouchableOpacity>
+          <View>
+            <TouchableOpacity onPress={() => setShowMenu(!showMenu)} style={{ padding: 4 }}>
+              <MoreVertical size={22} color="#888" />
+            </TouchableOpacity>
+
+            {/* Dropdown Menu */}
+            {showMenu && (
+              <View
+                style={{
+                  position: "absolute",
+                  right: 0,
+                  top: 35,
+                  backgroundColor: "#1A1A24",
+                  borderRadius: 12,
+                  borderWidth: 1,
+                  borderColor: "rgba(126, 63, 228, 0.3)",
+                  paddingVertical: 8,
+                  minWidth: 150,
+                  shadowColor: "#000",
+                  shadowOffset: { width: 0, height: 4 },
+                  shadowOpacity: 0.3,
+                  shadowRadius: 8,
+                  elevation: 5,
+                  zIndex: 1000,
+                }}
+              >
+                <TouchableOpacity
+                  onPress={() => {
+                    setShowMenu(false);
+                    Alert.alert("Edit Post", "Edit functionality coming soon!");
+                  }}
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    paddingHorizontal: 16,
+                    paddingVertical: 12,
+                    gap: 12,
+                  }}
+                >
+                  <Edit2 size={18} color="#888" />
+                  <Text style={{ color: "white", fontSize: 15, fontWeight: "600" }}>
+                    Edit post
+                  </Text>
+                </TouchableOpacity>
+
+                <View style={{ height: 1, backgroundColor: "rgba(255, 255, 255, 0.1)", marginHorizontal: 12 }} />
+
+                <TouchableOpacity
+                  onPress={() => {
+                    setShowMenu(false);
+                    handleDelete();
+                  }}
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    paddingHorizontal: 16,
+                    paddingVertical: 12,
+                    gap: 12,
+                  }}
+                >
+                  <Trash2 size={18} color="#FF3B30" />
+                  <Text style={{ color: "#FF3B30", fontSize: 15, fontWeight: "600" }}>
+                    Delete post
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
         )}
       </View>
 
