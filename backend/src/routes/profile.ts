@@ -177,6 +177,12 @@ profileRouter.post("/generate-avatar", zValidator("json", generateAvatarRequestS
   const data = c.req.valid("json");
 
   // Check if OpenAI API key is configured
+  console.log("🔑 Checking OpenAI API key...");
+  console.log("  env.OPENAI_API_KEY exists:", !!env.OPENAI_API_KEY);
+  console.log("  env.OPENAI_API_KEY length:", env.OPENAI_API_KEY?.length);
+  console.log("  process.env.OPENAI_API_KEY exists:", !!process.env.OPENAI_API_KEY);
+  console.log("  All env keys:", Object.keys(env));
+
   if (!env.OPENAI_API_KEY) {
     return c.json({
       success: false,

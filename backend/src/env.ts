@@ -45,6 +45,8 @@ function validateEnv() {
   try {
     const parsed = envSchema.parse(process.env);
     console.log("✅ Environment variables validated successfully");
+    console.log("🔍 OPENAI_API_KEY from process.env:", process.env.OPENAI_API_KEY ? "EXISTS" : "MISSING");
+    console.log("🔍 OPENAI_API_KEY in parsed:", parsed.OPENAI_API_KEY ? "EXISTS" : "MISSING");
     return parsed;
   } catch (error) {
     if (error instanceof z.ZodError) {
