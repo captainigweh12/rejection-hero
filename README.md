@@ -1523,6 +1523,17 @@ See `ENV_SETUP.md` for complete environment variable setup guide.
 
 ## Recent Updates
 
+### 2025-11-16: Fixed Journal Entry Display Updates ✅
+- **Issue Fixed**: Journal entries now show immediately after creation
+- **Root Cause**: Query invalidation wasn't forcing a refetch of data
+- **Solution**: Changed from `invalidateQueries` to `refetchQueries` for immediate updates
+- **Improvements**:
+  - Added console logging for debugging
+  - Proper async/await for refetch completion
+  - Alert now shows after modal closes for better UX
+  - Only saves `userEditedSummary` if it differs from AI summary
+  - Form resets before modal closes to prevent state issues
+
 ### 2025-11-16: Journal Dual Input Methods - Type or Voice 📝🎤
 - **New Input Mode Selector**:
   - Choose between Type mode (purple) and Voice mode (orange)

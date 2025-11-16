@@ -163,24 +163,46 @@ export default function AddJournalModal({ visible, onClose, onSuccess }: AddJour
         throw new Error("Please select an outcome");
       }
 
-      return api.post<CreateJournalEntryResponse>("/api/journal", {
+      console.log("Creating journal entry with data:", {
         audioUrl: recordingUri,
         audioTranscript: inputMode === "voice" ? transcript : textEntry,
         aiSummary: summary,
         userEditedSummary: editedSummary,
         outcome: selectedOutcome,
       });
+
+      return api.post<CreateJournalEntryResponse>("/api/journal", {
+        audioUrl: recordingUri,
+        audioTranscript: inputMode === "voice" ? transcript : textEntry,
+        aiSummary: summary,
+        userEditedSummary: editedSummary !== summary ? editedSummary : null,
+        outcome: selectedOutcome,
+      });
     },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["journal-entries"] });
-      Alert.alert(
-        "Achievement Earned!",
-        data.achievement.description,
-        [{ text: "OK" }]
-      );
-      // Reset form
+    onSuccess: async (data) => {
+      console.log("Journal entry created successfully:", data);
+
+      // Refetch journal entries to ensure UI updates
+      await queryClient.refetchQueries({ queryKey: ["journal-entries"] });
+
+      console.log("Journal entries refetched");
+
+      // Reset form first
       resetForm();
+
+      // Close modal
       onClose();
+
+      // Show success alert after modal closes
+      setTimeout(() => {
+        Alert.alert(
+          "Achievement Earned!",
+          data.achievement.description,
+          [{ text: "OK" }]
+        );
+      }, 300);
+
+      // Call success callback
       onSuccess?.();
     },
     onError: (error) => {
