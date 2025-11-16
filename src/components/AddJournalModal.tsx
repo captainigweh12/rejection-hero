@@ -307,6 +307,34 @@ export default function AddJournalModal({ visible, onClose, onSuccess }: AddJour
             contentContainerStyle={{ padding: 16 }}
             showsVerticalScrollIndicator={false}
           >
+            {/* Debug Info - Always visible */}
+            {__DEV__ && (
+              <View style={{
+                padding: 12,
+                backgroundColor: "rgba(255, 0, 0, 0.2)",
+                marginBottom: 12,
+                borderRadius: 8,
+                borderWidth: 2,
+                borderColor: "red"
+              }}>
+                <Text className="text-white text-xs font-bold">
+                  🔍 DEBUG INFO:
+                </Text>
+                <Text className="text-white text-xs">
+                  summary: &quot;{summary}&quot; (length: {summary.length})
+                </Text>
+                <Text className="text-white text-xs">
+                  !summary: {(!summary).toString()}
+                </Text>
+                <Text className="text-white text-xs">
+                  inputMode: {inputMode}
+                </Text>
+                <Text className="text-white text-xs">
+                  selectedOutcome: {selectedOutcome || "null"}
+                </Text>
+              </View>
+            )}
+
             {/* Input Mode Selector */}
             {!summary && (
               <View style={{ marginBottom: 16 }}>
