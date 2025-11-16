@@ -49,6 +49,25 @@ export default function AddJournalModal({ visible, onClose, onSuccess }: AddJour
   const [selectedOutcome, setSelectedOutcome] = useState<"YES" | "NO" | "ACTIVITY" | null>(null);
   const [recordingUri, setRecordingUri] = useState<string | null>(null);
 
+  // Reset form when modal opens
+  React.useEffect(() => {
+    if (visible) {
+      console.log("[AddJournalModal] Modal opened - resetting form");
+      resetForm();
+    }
+  }, [visible]);
+
+  // Debug: Log state changes
+  React.useEffect(() => {
+    console.log("[AddJournalModal] State:", {
+      inputMode,
+      hasSummary: !!summary,
+      hasTextEntry: !!textEntry,
+      hasTranscript: !!transcript,
+      selectedOutcome,
+    });
+  }, [inputMode, summary, textEntry, transcript, selectedOutcome]);
+
   // Start recording
   const startRecording = async () => {
     try {
