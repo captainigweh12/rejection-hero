@@ -405,97 +405,149 @@ export default function CommunityScreen({ navigation }: Props) {
             </View>
           </View>
 
-          {/* Stats Cards - Only show when not on feed */}
-          {activeTab !== "feed" && (
-            <View style={{ flexDirection: "row", gap: 12, marginBottom: 16 }}>
+          {/* Stats Cards - Always visible with notification badges */}
+          <View style={{ flexDirection: "row", gap: 12, marginBottom: 16 }}>
+            {/* Friends Card */}
+            <View
+              style={{
+                flex: 1,
+                backgroundColor: "rgba(255, 255, 255, 0.05)",
+                borderRadius: 16,
+                padding: 16,
+                borderWidth: 1,
+                borderColor: "rgba(126, 63, 228, 0.3)",
+                position: "relative",
+              }}
+            >
               <View
                 style={{
-                  flex: 1,
-                  backgroundColor: "rgba(255, 255, 255, 0.05)",
-                  borderRadius: 16,
-                  padding: 16,
-                  borderWidth: 1,
-                  borderColor: "rgba(126, 63, 228, 0.3)",
+                  width: 40,
+                  height: 40,
+                  borderRadius: 20,
+                  backgroundColor: "#7E3FE4" + "20",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginBottom: 8,
                 }}
               >
-                <View
-                  style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: 20,
-                    backgroundColor: "#7E3FE4" + "20",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    marginBottom: 8,
-                  }}
-                >
-                  <Users size={20} color="#7E3FE4" />
-                </View>
-                <Text style={{ fontSize: 24, fontWeight: "bold", color: "white", marginBottom: 4 }}>
-                  {friends.length}
-                </Text>
-                <Text style={{ fontSize: 12, color: "rgba(255, 255, 255, 0.6)" }}>Friends</Text>
+                <Users size={20} color="#7E3FE4" />
               </View>
+              <Text style={{ fontSize: 24, fontWeight: "bold", color: "white", marginBottom: 4 }}>
+                {friends.length}
+              </Text>
+              <Text style={{ fontSize: 12, color: "rgba(255, 255, 255, 0.6)" }}>Friends</Text>
 
-              <View
-                style={{
-                  flex: 1,
-                  backgroundColor: "rgba(255, 255, 255, 0.05)",
-                  borderRadius: 16,
-                  padding: 16,
-                  borderWidth: 1,
-                  borderColor: "rgba(126, 63, 228, 0.3)",
-                }}
-              >
+              {/* Red notification badge for friend requests */}
+              {requests.length > 0 && (
                 <View
                   style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: 20,
-                    backgroundColor: "#00D9FF" + "20",
+                    position: "absolute",
+                    top: -6,
+                    right: -6,
+                    minWidth: 20,
+                    height: 20,
+                    borderRadius: 10,
+                    backgroundColor: "#FF3B30",
                     alignItems: "center",
                     justifyContent: "center",
-                    marginBottom: 8,
+                    paddingHorizontal: 6,
+                    borderWidth: 2,
+                    borderColor: "#0A0A0F",
                   }}
                 >
-                  <MessageCircle size={20} color="#00D9FF" />
+                  <Text style={{ color: "white", fontSize: 11, fontWeight: "bold" }}>
+                    {requests.length}
+                  </Text>
                 </View>
-                <Text style={{ fontSize: 24, fontWeight: "bold", color: "white", marginBottom: 4 }}>
-                  {conversations.length}
-                </Text>
-                <Text style={{ fontSize: 12, color: "rgba(255, 255, 255, 0.6)" }}>Chats</Text>
-              </View>
-
-              <View
-                style={{
-                  flex: 1,
-                  backgroundColor: "rgba(255, 255, 255, 0.05)",
-                  borderRadius: 16,
-                  padding: 16,
-                  borderWidth: 1,
-                  borderColor: "rgba(126, 63, 228, 0.3)",
-                }}
-              >
-                <View
-                  style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: 20,
-                    backgroundColor: "#4CAF50" + "20",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    marginBottom: 8,
-                  }}
-                >
-                  <UsersRound size={20} color="#4CAF50" />
-                </View>
-                <Text style={{ fontSize: 24, fontWeight: "bold", color: "white", marginBottom: 4 }}>
-                  {myGroups.length}
-                </Text>
-                <Text style={{ fontSize: 12, color: "rgba(255, 255, 255, 0.6)" }}>Groups</Text>
-              </View>
+              )}
             </View>
-          )}
+
+            {/* Messages Card */}
+            <View
+              style={{
+                flex: 1,
+                backgroundColor: "rgba(255, 255, 255, 0.05)",
+                borderRadius: 16,
+                padding: 16,
+                borderWidth: 1,
+                borderColor: "rgba(126, 63, 228, 0.3)",
+                position: "relative",
+              }}
+            >
+              <View
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 20,
+                  backgroundColor: "#00D9FF" + "20",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginBottom: 8,
+                }}
+              >
+                <MessageCircle size={20} color="#00D9FF" />
+              </View>
+              <Text style={{ fontSize: 24, fontWeight: "bold", color: "white", marginBottom: 4 }}>
+                {conversations.length}
+              </Text>
+              <Text style={{ fontSize: 12, color: "rgba(255, 255, 255, 0.6)" }}>Chats</Text>
+
+              {/* Red notification badge for unread messages */}
+              {conversations.filter(c => c.unreadCount > 0).length > 0 && (
+                <View
+                  style={{
+                    position: "absolute",
+                    top: -6,
+                    right: -6,
+                    minWidth: 20,
+                    height: 20,
+                    borderRadius: 10,
+                    backgroundColor: "#FF3B30",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    paddingHorizontal: 6,
+                    borderWidth: 2,
+                    borderColor: "#0A0A0F",
+                  }}
+                >
+                  <Text style={{ color: "white", fontSize: 11, fontWeight: "bold" }}>
+                    {conversations.reduce((sum, c) => sum + c.unreadCount, 0)}
+                  </Text>
+                </View>
+              )}
+            </View>
+
+            {/* Groups Card */}
+            <View
+              style={{
+                flex: 1,
+                backgroundColor: "rgba(255, 255, 255, 0.05)",
+                borderRadius: 16,
+                padding: 16,
+                borderWidth: 1,
+                borderColor: "rgba(126, 63, 228, 0.3)",
+                position: "relative",
+              }}
+            >
+              <View
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 20,
+                  backgroundColor: "#4CAF50" + "20",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginBottom: 8,
+                }}
+              >
+                <UsersRound size={20} color="#4CAF50" />
+              </View>
+              <Text style={{ fontSize: 24, fontWeight: "bold", color: "white", marginBottom: 4 }}>
+                {myGroups.length}
+              </Text>
+              <Text style={{ fontSize: 12, color: "rgba(255, 255, 255, 0.6)" }}>Groups</Text>
+            </View>
+          </View>
         </View>
 
         {/* Content */}
