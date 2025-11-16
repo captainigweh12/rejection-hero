@@ -31,6 +31,7 @@ export type RootStackParamList = {
   GroupDetail: { groupId: string };
   GroupQuests: { groupId: string; groupName: string };
   GroupLive: { groupId: string; groupName: string };
+  Chat: { userId: string; userName: string; userAvatar?: string | null };
 };
 
 export type BottomTabParamList = {

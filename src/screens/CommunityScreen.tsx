@@ -193,9 +193,12 @@ export default function CommunityScreen({ navigation }: Props) {
     joinGroupMutation.mutate(groupId);
   };
 
-  const handleMessageFriend = (friendId: string) => {
-    // TODO: Navigate to chat screen when created
-    Alert.alert("Coming Soon", "Chat screen is being developed!");
+  const handleMessageFriend = (friendId: string, friendName: string, friendAvatar: string | null) => {
+    navigation.navigate("Chat", {
+      userId: friendId,
+      userName: friendName,
+      userAvatar: friendAvatar
+    });
   };
 
   const handleShareQuest = (friendId: string, friendName: string) => {
@@ -619,7 +622,7 @@ export default function CommunityScreen({ navigation }: Props) {
                       </View>
                       <View style={{ flexDirection: "row", gap: 8 }}>
                         <Pressable
-                          onPress={() => handleMessageFriend(friend.id)}
+                          onPress={() => handleMessageFriend(friend.id, friend.displayName, friend.avatar)}
                           style={{
                             width: 40,
                             height: 40,

@@ -1002,3 +1002,56 @@ export const leaveGroupLiveResponseSchema = z.object({
   message: z.string(),
 });
 export type LeaveGroupLiveResponse = z.infer<typeof leaveGroupLiveResponseSchema>;
+
+// ==========================================
+// Messages Routes
+// ==========================================
+
+// GET /api/messages/:userId - Get messages with specific user
+export const getMessagesResponseSchema = z.object({
+  messages: z.array(
+    z.object({
+      id: z.string(),
+      senderId: z.string(),
+      receiverId: z.string(),
+      content: z.string(),
+      read: z.boolean(),
+      createdAt: z.string(),
+      sender: z.object({
+        id: z.string(),
+        displayName: z.string(),
+        avatar: z.string().nullable(),
+      }),
+    })
+  ),
+});
+export type GetMessagesResponse = z.infer<typeof getMessagesResponseSchema>;
+
+// POST /api/messages/send - Send a message
+export const sendMessageRequestSchema = z.object({
+  receiverId: z.string(),
+  content: z.string().min(1).max(500),
+});
+export type SendMessageRequest = z.infer<typeof sendMessageRequestSchema>;
+
+export const sendMessageResponseSchema = z.object({
+  success: z.boolean(),
+  messageId: z.string(),
+});
+export type SendMessageResponse = z.infer<typeof sendMessageResponseSchema>;
+
+// GET /api/messages/conversations - Get all conversations
+export const getConversationsResponseSchema = z.object({
+  conversations: z.array(
+    z.object({
+      userId: z.string(),
+      email: z.string(),
+      displayName: z.string(),
+      avatar: z.string().nullable(),
+      lastMessage: z.string(),
+      lastMessageAt: z.string(),
+      unreadCount: z.number(),
+    })
+  ),
+});
+export type GetConversationsResponse = z.infer<typeof getConversationsResponseSchema>;
