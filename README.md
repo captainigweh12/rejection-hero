@@ -809,10 +809,16 @@ To enable Google sign-in, you need to configure authorized redirect URIs in your
   - Real-time like/comment updates
   - Optimistic UI updates
 
-**Journal & Growth Tracking** ✨ NEW!
+**Journal & Growth Tracking** ✨ ENHANCED!
+- **Compact Modal Interface** 🎨 NEW!:
+  - Beautiful popup modal instead of full screen
+  - Centered card with dark overlay (90% screen width)
+  - Easy to access with + button in header
+  - Quick journal entry creation without leaving your current screen
+  - Smooth slide animation on open/close
 - **Voice Recording Journal**:
   - Record audio reflections about rejection experiences
-  - Tap-to-record interface with microphone button
+  - Tap-to-record interface with microphone button (60px compact size)
   - AI-powered transcription using OpenAI Whisper
   - Automatic AI summarization of journal entries
   - Edit AI summaries before saving
@@ -821,7 +827,7 @@ To enable Google sign-in, you need to configure authorized redirect URIs in your
   - **Yes**: Track when people say yes to your requests (Red color)
   - **No**: Track rejection experiences - the core of growth! (Green color)
   - **Activity**: Track completed actions and milestones (Blue color)
-  - Visual cards with color-coded icons for each outcome
+  - Compact visual cards with color-coded icons for each outcome
 - **Growth Achievements System** 🌟:
   - Earn gold stars for every journal entry
   - Automatic achievement generation on save
@@ -835,6 +841,12 @@ To enable Google sign-in, you need to configure authorized redirect URIs in your
   - Filter by outcome type (Yes/No/Activity)
   - View journal entry summaries with each achievement
   - Track growth over time
+- **Journal Screen** 📝:
+  - Clean main screen showing your entry history
+  - Floating purple + button to add new entries
+  - Empty state with helpful prompt
+  - Recent entries with outcome badges and dates
+  - Quick link to Growth & Achievements
 - **Bottom Tab Navigation**: Dedicated Journal tab for quick access
 - **AI Integration**: Requires OPENAI_API_KEY for transcription and summarization
 
