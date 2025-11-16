@@ -1498,10 +1498,19 @@ See `ENV_SETUP.md` for complete environment variable setup guide.
 
 ### 2025-11-16: Facebook-Style Feed Redesign 🎨
 - **Complete Feed UI Overhaul** inspired by Facebook's design:
-  - **New Header**: "vibecode" branding with circular action buttons
-  - **"What's on your mind?" Input**: Prominent entry point with user avatar
+  - **Minimalist Header**: Clean header with only + icon button (removed vibecode logo for cleaner look)
+  - **"What's on your mind?" First**: Input box moved to top of screen for easy access
+  - **Facebook-Style Stories** 🎬 NEW!:
+    - Rectangular story cards (110x180px) matching Facebook's design
+    - "Create story" card with user's image background and + button
+    - Story preview shows first image with gradient overlay
+    - User avatar ring in top-left corner of each story
+    - Username at bottom with text shadow for readability
+    - Horizontal scrollable stories bar
+    - Removed separate moments button - users create stories by clicking the card
   - **Enhanced Post Cards**: Larger avatars (48px), better typography, glassmorphism design
   - **Redesigned Create Post Modal**:
+    - **SafeArea Protection**: Proper SafeAreaView implementation prevents overflow on all devices
     - User profile section at top
     - Inline privacy selector pills
     - Bottom action bar with colorful buttons (Photo/video, Camera, Tag people, Feeling/activity)

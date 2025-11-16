@@ -285,24 +285,17 @@ export default function FeedScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
-      {/* Header - Facebook Style */}
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-          paddingHorizontal: 20,
-          paddingVertical: 12,
-          paddingTop: 60,
-          borderBottomWidth: 1,
-          borderBottomColor: "rgba(126, 63, 228, 0.2)",
-          backgroundColor: "#0A0A0F",
-        }}
-      >
-        <Text style={{ fontSize: 28, fontWeight: "bold", color: "#7E3FE4", letterSpacing: -0.5 }}>
-          vibecode
-        </Text>
-        <View style={{ flexDirection: "row", gap: 16 }}>
+      <SafeAreaView edges={["top"]} style={{ backgroundColor: "#0A0A0F" }}>
+        {/* Header with + icon only */}
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "flex-end",
+            paddingHorizontal: 20,
+            paddingVertical: 12,
+          }}
+        >
           <TouchableOpacity
             onPress={() => setShowCreatePost(true)}
             style={{
@@ -316,162 +309,248 @@ export default function FeedScreen() {
               borderColor: "#7E3FE4",
             }}
           >
-            <Plus size={22} color="#7E3FE4" strokeWidth={2.5} />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {/* Search functionality */}}
-            style={{
-              backgroundColor: "rgba(126, 63, 228, 0.2)",
-              width: 40,
-              height: 40,
-              borderRadius: 20,
-              alignItems: "center",
-              justifyContent: "center",
-              borderWidth: 1,
-              borderColor: "#7E3FE4",
-            }}
-          >
-            <Users size={22} color="#7E3FE4" strokeWidth={2.5} />
+            <Plus size={24} color="#7E3FE4" strokeWidth={2.5} />
           </TouchableOpacity>
         </View>
-      </View>
 
-      {/* What's on your mind - Facebook Style */}
-      <TouchableOpacity
-        onPress={() => setShowCreatePost(true)}
-        activeOpacity={0.7}
-        style={{
-          backgroundColor: "rgba(255, 255, 255, 0.05)",
-          marginHorizontal: 16,
-          marginVertical: 12,
-          borderRadius: 16,
-          padding: 12,
-          borderWidth: 1,
-          borderColor: "rgba(126, 63, 228, 0.2)",
-        }}
-      >
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
-          {/* User Avatar */}
-          {sessionData?.user?.image ? (
-            <Image
-              source={{ uri: sessionData.user.image }}
-              style={{ width: 44, height: 44, borderRadius: 22 }}
-            />
-          ) : (
-            <View
-              style={{
-                width: 44,
-                height: 44,
-                borderRadius: 22,
-                backgroundColor: "#7E3FE4",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <Text style={{ color: "white", fontSize: 18, fontWeight: "bold" }}>
-                {sessionData?.user?.name?.charAt(0).toUpperCase() || "?"}
-              </Text>
-            </View>
-          )}
-          {/* Input Placeholder */}
-          <Text style={{ flex: 1, color: "#888", fontSize: 16 }}>
-            What&apos;s on your mind?
-          </Text>
-          {/* Photo Icon */}
-          <ImageIcon size={24} color="#4CAF50" />
-        </View>
-      </TouchableOpacity>
-
-      {/* Moments Bar */}
-      {(momentsData && momentsData.moments.length > 0) || true && (
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
+        {/* What's on your mind - Facebook Style */}
+        <TouchableOpacity
+          onPress={() => setShowCreatePost(true)}
+          activeOpacity={0.7}
           style={{
-            borderBottomWidth: 1,
-            borderBottomColor: "rgba(126, 63, 228, 0.2)",
+            backgroundColor: "rgba(255, 255, 255, 0.05)",
+            marginHorizontal: 16,
+            marginVertical: 8,
+            borderRadius: 16,
+            padding: 12,
+            borderWidth: 1,
+            borderColor: "rgba(126, 63, 228, 0.2)",
           }}
-          contentContainerStyle={{ padding: 12, gap: 12 }}
         >
-          {/* Add Your Moment Button */}
-          <TouchableOpacity
-            onPress={() => setShowCreateMoment(true)}
-            style={{ alignItems: "center" }}
-          >
-            <View
-              style={{
-                width: 70,
-                height: 70,
-                borderRadius: 35,
-                borderWidth: 3,
-                borderColor: "#7E3FE4",
-                borderStyle: "dashed",
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: "rgba(126, 63, 228, 0.1)",
-              }}
-            >
-              <Plus size={32} color="#7E3FE4" />
-            </View>
-            <Text
-              style={{ color: "#7E3FE4", fontSize: 12, marginTop: 4, fontWeight: "600" }}
-              numberOfLines={1}
-            >
-              Your Story
-            </Text>
-          </TouchableOpacity>
-
-          {momentsData?.moments.map((momentUser) => (
-            <TouchableOpacity
-              key={momentUser.userId}
-              onPress={() => {
-                setSelectedMoment(momentUser);
-                setMomentIndex(0);
-              }}
-              style={{ alignItems: "center" }}
-            >
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+            {/* User Avatar */}
+            {sessionData?.user?.image ? (
+              <Image
+                source={{ uri: sessionData.user.image }}
+                style={{ width: 44, height: 44, borderRadius: 22 }}
+              />
+            ) : (
               <View
                 style={{
-                  width: 70,
-                  height: 70,
-                  borderRadius: 35,
-                  borderWidth: 3,
-                  borderColor: "#7E3FE4",
-                  padding: 3,
+                  width: 44,
+                  height: 44,
+                  borderRadius: 22,
+                  backgroundColor: "#7E3FE4",
+                  alignItems: "center",
+                  justifyContent: "center",
                 }}
               >
-                {momentUser.userAvatar ? (
-                  <Image
-                    source={{ uri: momentUser.userAvatar }}
-                    style={{ width: "100%", height: "100%", borderRadius: 32 }}
-                  />
-                ) : (
-                  <View
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      borderRadius: 32,
-                      backgroundColor: "#7E3FE4",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <Text style={{ color: "white", fontSize: 24, fontWeight: "bold" }}>
-                      {momentUser.userName?.charAt(0).toUpperCase() || "?"}
-                    </Text>
-                  </View>
-                )}
+                <Text style={{ color: "white", fontSize: 18, fontWeight: "bold" }}>
+                  {sessionData?.user?.name?.charAt(0).toUpperCase() || "?"}
+                </Text>
               </View>
+            )}
+            {/* Input Placeholder */}
+            <Text style={{ flex: 1, color: "#888", fontSize: 16 }}>
+              What&apos;s on your mind?
+            </Text>
+            {/* Photo Icon */}
+            <ImageIcon size={24} color="#4CAF50" />
+          </View>
+        </TouchableOpacity>
+      </SafeAreaView>
+
+      {/* Stories/Moments Bar - Facebook Style */}
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={{
+          borderBottomWidth: 1,
+          borderBottomColor: "rgba(126, 63, 228, 0.2)",
+        }}
+        contentContainerStyle={{ paddingHorizontal: 12, paddingVertical: 12, gap: 10 }}
+      >
+        {/* Create Story Card - Facebook Style */}
+        <TouchableOpacity
+          onPress={() => setShowCreateMoment(true)}
+          style={{
+            width: 110,
+            height: 180,
+            borderRadius: 12,
+            overflow: "hidden",
+            backgroundColor: "rgba(255, 255, 255, 0.05)",
+            borderWidth: 1,
+            borderColor: "rgba(126, 63, 228, 0.2)",
+          }}
+        >
+          {/* User Image Background */}
+          <View style={{ flex: 1, backgroundColor: "rgba(126, 63, 228, 0.2)" }}>
+            {sessionData?.user?.image ? (
+              <Image
+                source={{ uri: sessionData.user.image }}
+                style={{ width: "100%", height: "70%" }}
+                resizeMode="cover"
+              />
+            ) : (
+              <View
+                style={{
+                  width: "100%",
+                  height: "70%",
+                  backgroundColor: "#7E3FE4",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Text style={{ color: "white", fontSize: 32, fontWeight: "bold" }}>
+                  {sessionData?.user?.name?.charAt(0).toUpperCase() || "?"}
+                </Text>
+              </View>
+            )}
+          </View>
+
+          {/* Create Story Button */}
+          <View
+            style={{
+              position: "absolute",
+              bottom: 30,
+              left: "50%",
+              marginLeft: -18,
+              width: 36,
+              height: 36,
+              borderRadius: 18,
+              backgroundColor: "#7E3FE4",
+              alignItems: "center",
+              justifyContent: "center",
+              borderWidth: 3,
+              borderColor: "#0A0A0F",
+            }}
+          >
+            <Plus size={20} color="white" strokeWidth={3} />
+          </View>
+
+          {/* Text Label */}
+          <View
+            style={{
+              position: "absolute",
+              bottom: 0,
+              width: "100%",
+              paddingVertical: 8,
+              backgroundColor: "rgba(0, 0, 0, 0.6)",
+              alignItems: "center",
+            }}
+          >
+            <Text style={{ color: "white", fontSize: 12, fontWeight: "600" }}>
+              Create story
+            </Text>
+          </View>
+        </TouchableOpacity>
+
+        {/* User Stories */}
+        {momentsData?.moments.map((momentUser) => (
+          <TouchableOpacity
+            key={momentUser.userId}
+            onPress={() => {
+              setSelectedMoment(momentUser);
+              setMomentIndex(0);
+            }}
+            style={{
+              width: 110,
+              height: 180,
+              borderRadius: 12,
+              overflow: "hidden",
+              position: "relative",
+            }}
+          >
+            {/* Story Image */}
+            {momentUser.moments[0]?.imageUrl ? (
+              <Image
+                source={{ uri: momentUser.moments[0].imageUrl }}
+                style={{ width: "100%", height: "100%" }}
+                resizeMode="cover"
+              />
+            ) : (
+              <View
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  backgroundColor: "#7E3FE4",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Text style={{ color: "white", fontSize: 32, fontWeight: "bold" }}>
+                  {momentUser.userName?.charAt(0).toUpperCase() || "?"}
+                </Text>
+              </View>
+            )}
+
+            {/* Gradient Overlay */}
+            <View
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: "rgba(0, 0, 0, 0.3)",
+              }}
+            />
+
+            {/* User Avatar Ring */}
+            <View
+              style={{
+                position: "absolute",
+                top: 8,
+                left: 8,
+                width: 40,
+                height: 40,
+                borderRadius: 20,
+                borderWidth: 3,
+                borderColor: "#7E3FE4",
+                overflow: "hidden",
+              }}
+            >
+              {momentUser.userAvatar ? (
+                <Image
+                  source={{ uri: momentUser.userAvatar }}
+                  style={{ width: "100%", height: "100%" }}
+                />
+              ) : (
+                <View
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    backgroundColor: "#7E3FE4",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Text style={{ color: "white", fontSize: 16, fontWeight: "bold" }}>
+                    {momentUser.userName?.charAt(0).toUpperCase() || "?"}
+                  </Text>
+                </View>
+              )}
+            </View>
+
+            {/* User Name */}
+            <View
+              style={{
+                position: "absolute",
+                bottom: 8,
+                left: 8,
+                right: 8,
+              }}
+            >
               <Text
-                style={{ color: "white", fontSize: 12, marginTop: 4 }}
-                numberOfLines={1}
+                style={{ color: "white", fontSize: 13, fontWeight: "700", textShadowColor: "rgba(0, 0, 0, 0.8)", textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 3 }}
+                numberOfLines={2}
               >
                 {momentUser.userName || "Anonymous"}
               </Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      )}
+            </View>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
 
       {/* Posts Feed */}
       {feedLoading ? (
@@ -514,20 +593,19 @@ export default function FeedScreen() {
         onRequestClose={() => setShowCreatePost(false)}
         presentationStyle="fullScreen"
       >
-        <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
-          <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
-            {/* Header */}
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-                paddingHorizontal: 16,
-                paddingVertical: 16,
-                borderBottomWidth: 1,
-                borderBottomColor: "rgba(126, 63, 228, 0.2)",
-              }}
-            >
+        <SafeAreaView style={{ flex: 1, backgroundColor: "#0A0A0F" }} edges={["top", "bottom"]}>
+          {/* Header */}
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+              paddingHorizontal: 16,
+              paddingVertical: 16,
+              borderBottomWidth: 1,
+              borderBottomColor: "rgba(126, 63, 228, 0.2)",
+            }}
+          >
               <TouchableOpacity onPress={() => setShowCreatePost(false)}>
                 <X size={28} color="white" />
               </TouchableOpacity>
@@ -791,10 +869,9 @@ export default function FeedScreen() {
                     Feeling/activity
                   </Text>
                 </TouchableOpacity>
-              </ScrollView>
-            </View>
-          </SafeAreaView>
-        </View>
+            </ScrollView>
+          </View>
+        </SafeAreaView>
       </Modal>
 
       {/* Create Moment Modal - Instagram/Snapchat Style */}
