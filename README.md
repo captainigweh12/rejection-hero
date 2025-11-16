@@ -592,7 +592,17 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 **Profile Management**
 - Add profile photos, bio, age, location
 - **Set Interest Tags** to display on swipe cards
-- AI-generated gaming avatars
+- **AI-generated gaming avatars** with 8 style options:
+  - Gaming (futuristic warrior, neon colors)
+  - Anime (bold anime art style)
+  - Realistic (professional portrait)
+  - Fantasy (magical RPG character)
+  - Warrior (epic fantasy armor)
+  - Ninja (stealth action character)
+  - Mage (magical wizard with effects)
+  - Cyborg (futuristic tech character with cybernetic elements)
+  - Uses OpenAI DALL-E-3 for high-quality avatar generation
+  - Content-safe prompts that comply with OpenAI policies
 - View all your connections
 
 **Authentication**

@@ -210,7 +210,7 @@ profileRouter.post("/generate-avatar", zValidator("json", generateAvatarRequestS
         warrior: "Powerful warrior character, battle-ready, strong presence, epic fantasy style, glowing armor",
         ninja: "Stealth ninja character, mysterious, dark background, action pose, professional game art",
         mage: "Magical wizard character, casting spell, mystical energy, fantasy RPG style, glowing magic effects",
-        cyborg: "Futuristic cyborg character, half human half machine, neon lights, cyberpunk aesthetic",
+        cyborg: "Futuristic tech character with cybernetic elements, neon lights and digital effects, advanced technology aesthetic, sci-fi style",
       };
 
       prompt = stylePrompts[style] || stylePrompts.gaming;
