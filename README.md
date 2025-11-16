@@ -401,12 +401,16 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
     - Character limit (500 characters)
     - Send button with loading state
     - Keyboard-aware design
+  - **Access Points**:
+    - Tap chat icon on any friend card in Friends tab
+    - Tap any conversation in Messages tab to resume chat
+  - **Conversation List**:
+    - Shows all active conversations
+    - Unread message badges and counts
+    - Last message preview with timestamps
+    - Message read/unread tracking
   - **Empty State**: Encouraging prompt to start conversation
   - **User Header**: Shows friend's name and avatar
-  - **Tap chat icon** on any friend card to open chat
-  - Unread message badges and counts
-  - Last message preview with timestamps
-  - Message read/unread tracking
 - **Groups (Facebook-style)** ✨ FULLY ENHANCED!:
   - **My Groups**: Groups you've joined with role badges (admin/moderator/member)
   - **Discover Groups**: Browse and join public groups

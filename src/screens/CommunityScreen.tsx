@@ -205,9 +205,12 @@ export default function CommunityScreen({ navigation }: Props) {
     navigation.navigate("SendQuestToFriend", { friendId, friendName });
   };
 
-  const handleOpenConversation = (userId: string) => {
-    // TODO: Navigate to chat screen when created
-    Alert.alert("Coming Soon", "Chat screen is being developed!");
+  const handleOpenConversation = (userId: string, userName: string, userAvatar: string | null) => {
+    navigation.navigate("Chat", {
+      userId,
+      userName,
+      userAvatar,
+    });
   };
 
   const handleOpenGroup = (groupId: string) => {
@@ -674,7 +677,7 @@ export default function CommunityScreen({ navigation }: Props) {
                 conversations.map((conv) => (
                   <Pressable
                     key={conv.userId}
-                    onPress={() => handleOpenConversation(conv.userId)}
+                    onPress={() => handleOpenConversation(conv.userId, conv.displayName, conv.avatar)}
                     style={{
                       backgroundColor: "rgba(255, 255, 255, 0.05)",
                       borderRadius: 16,
