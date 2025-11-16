@@ -451,10 +451,18 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
       - Status indicators: Joined, In Progress, Completed, Failed
     - **Group Quest List Screen**:
       - Beautiful card-based UI showing all group quests
+      - **WhatsApp-Style Participant Display** 🆕:
+        - Overlapping circular avatars in horizontal row
+        - First 5 participants shown with overflow counter (+N)
+        - Color-coded status badges on each avatar (green=completed, blue=in progress, red=failed)
+        - Status-based avatar background colors
+      - **Progress Summary Card**:
+        - Quick stats showing completed/in-progress/failed counts
+        - Three-column layout with visual separators
+        - Large, colorful numbers for easy scanning
       - Live refresh every 5 seconds for real-time updates
-      - See all participants and their progress
-      - View completed vs active participants
       - Quest details with rewards, difficulty, and location
+      - Assignment type badges (Open to All vs Assigned Only)
     - **Participant Features**:
       - Join any open quest or assigned quests
       - Track individual progress within group quests

@@ -242,7 +242,7 @@ export default function GroupQuestsScreen({ navigation, route }: Props) {
                     )}
                   </View>
 
-                  {/* Participants */}
+                  {/* Participants - WhatsApp Style */}
                   <View
                     style={{
                       borderTopWidth: 1,
@@ -250,7 +250,8 @@ export default function GroupQuestsScreen({ navigation, route }: Props) {
                       paddingTop: 12,
                     }}
                   >
-                    <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+                    {/* Participant Count and Status */}
+                    <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
                       <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
                         <Users size={16} color="#7E3FE4" />
                         <Text style={{ color: "rgba(255, 255, 255, 0.8)", fontSize: 14, fontWeight: "600" }}>
@@ -262,63 +263,123 @@ export default function GroupQuestsScreen({ navigation, route }: Props) {
                       </Text>
                     </View>
 
-                    {/* Participant List */}
-                    <View style={{ gap: 8 }}>
-                      {gq.participants.slice(0, 3).map((participant) => (
+                    {/* WhatsApp-style Overlapping Avatars */}
+                    <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 12 }}>
+                      {gq.participants.slice(0, 5).map((participant, index) => (
                         <View
                           key={participant.id}
                           style={{
-                            flexDirection: "row",
+                            width: 44,
+                            height: 44,
+                            borderRadius: 22,
+                            backgroundColor: "#0A0A0F",
                             alignItems: "center",
-                            justifyContent: "space-between",
-                            backgroundColor: "rgba(255, 255, 255, 0.03)",
-                            padding: 10,
-                            borderRadius: 10,
+                            justifyContent: "center",
+                            marginLeft: index === 0 ? 0 : -12,
+                            borderWidth: 2,
+                            borderColor: "#0A0A0F",
+                            position: "relative",
+                            zIndex: 10 - index,
                           }}
                         >
-                          <View style={{ flexDirection: "row", alignItems: "center", gap: 10, flex: 1 }}>
-                            <View
-                              style={{
-                                width: 36,
-                                height: 36,
-                                borderRadius: 18,
-                                backgroundColor: "#7E3FE4" + "30",
-                                alignItems: "center",
-                                justifyContent: "center",
-                              }}
-                            >
-                              {participant.avatar ? (
-                                <Image
-                                  source={{ uri: participant.avatar }}
-                                  style={{ width: 36, height: 36, borderRadius: 18 }}
-                                />
-                              ) : (
-                                <Text style={{ color: "#7E3FE4", fontSize: 16, fontWeight: "700" }}>
-                                  {participant.displayName.charAt(0).toUpperCase()}
-                                </Text>
-                              )}
-                            </View>
-                            <View style={{ flex: 1 }}>
-                              <Text style={{ color: "white", fontSize: 14, fontWeight: "600" }}>
-                                {participant.displayName}
-                                {participant.userId === currentUserId && " (You)"}
+                          <View
+                            style={{
+                              width: 40,
+                              height: 40,
+                              borderRadius: 20,
+                              backgroundColor: getStatusColor(participant.status) + "30",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              overflow: "hidden",
+                            }}
+                          >
+                            {participant.avatar ? (
+                              <Image
+                                source={{ uri: participant.avatar }}
+                                style={{ width: 40, height: 40, borderRadius: 20 }}
+                              />
+                            ) : (
+                              <Text style={{ color: getStatusColor(participant.status), fontSize: 16, fontWeight: "700" }}>
+                                {participant.displayName.charAt(0).toUpperCase()}
                               </Text>
-                              <Text style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: 12 }}>
-                                {gq.quest.goalType === "COLLECT_NOS" && `${participant.noCount}/${gq.quest.goalCount} NOs`}
-                                {gq.quest.goalType === "COLLECT_YES" && `${participant.yesCount}/${gq.quest.goalCount} YESes`}
-                                {gq.quest.goalType === "TAKE_ACTION" && `${participant.actionCount}/${gq.quest.goalCount} actions`}
-                              </Text>
-                            </View>
-                            {getStatusIcon(participant.status)}
+                            )}
+                          </View>
+                          {/* Status Badge */}
+                          <View
+                            style={{
+                              position: "absolute",
+                              bottom: 0,
+                              right: 0,
+                              width: 16,
+                              height: 16,
+                              borderRadius: 8,
+                              backgroundColor: "#0A0A0F",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              borderWidth: 1.5,
+                              borderColor: getStatusColor(participant.status),
+                            }}
+                          >
+                            {participant.status === "completed" && (
+                              <CheckCircle size={10} color="#10B981" fill="#10B981" />
+                            )}
+                            {participant.status === "failed" && (
+                              <XCircle size={10} color="#FF3B30" fill="#FF3B30" />
+                            )}
+                            {participant.status === "in_progress" && (
+                              <Clock size={10} color="#00D9FF" fill="#00D9FF" />
+                            )}
                           </View>
                         </View>
                       ))}
-                      {gq.participants.length > 3 && (
-                        <Text style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: 12, textAlign: "center" }}>
-                          +{gq.participants.length - 3} more participants
-                        </Text>
+                      {gq.participants.length > 5 && (
+                        <View
+                          style={{
+                            width: 44,
+                            height: 44,
+                            borderRadius: 22,
+                            backgroundColor: "rgba(126, 63, 228, 0.2)",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            marginLeft: -12,
+                            borderWidth: 2,
+                            borderColor: "#0A0A0F",
+                          }}
+                        >
+                          <Text style={{ color: "#7E3FE4", fontSize: 13, fontWeight: "700" }}>
+                            +{gq.participants.length - 5}
+                          </Text>
+                        </View>
                       )}
                     </View>
+
+                    {/* Progress Summary */}
+                    {gq.participants.length > 0 && (
+                      <View style={{ backgroundColor: "rgba(255, 255, 255, 0.03)", padding: 10, borderRadius: 10, marginBottom: 12 }}>
+                        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-around" }}>
+                          <View style={{ alignItems: "center" }}>
+                            <Text style={{ color: "#10B981", fontSize: 18, fontWeight: "700" }}>
+                              {gq.participants.filter((p) => p.status === "completed").length}
+                            </Text>
+                            <Text style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: 11 }}>Completed</Text>
+                          </View>
+                          <View style={{ width: 1, height: 30, backgroundColor: "rgba(255, 255, 255, 0.1)" }} />
+                          <View style={{ alignItems: "center" }}>
+                            <Text style={{ color: "#00D9FF", fontSize: 18, fontWeight: "700" }}>
+                              {gq.participants.filter((p) => p.status === "in_progress").length}
+                            </Text>
+                            <Text style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: 11 }}>In Progress</Text>
+                          </View>
+                          <View style={{ width: 1, height: 30, backgroundColor: "rgba(255, 255, 255, 0.1)" }} />
+                          <View style={{ alignItems: "center" }}>
+                            <Text style={{ color: "#FF3B30", fontSize: 18, fontWeight: "700" }}>
+                              {gq.participants.filter((p) => p.status === "failed").length}
+                            </Text>
+                            <Text style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: 11 }}>Failed</Text>
+                          </View>
+                        </View>
+                      </View>
+                    )}
 
                     {/* User Actions */}
                     {!gq.userParticipation && (
@@ -331,7 +392,6 @@ export default function GroupQuestsScreen({ navigation, route }: Props) {
                           backgroundColor: "#7E3FE4",
                           paddingVertical: 12,
                           borderRadius: 12,
-                          marginTop: 12,
                           alignItems: "center",
                         }}
                       >
