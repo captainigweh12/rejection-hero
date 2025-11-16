@@ -275,7 +275,7 @@ export default function CommunityScreen({ navigation }: Props) {
         {/* Header */}
         <View style={{ paddingHorizontal: 20, paddingTop: 16, paddingBottom: 12 }}>
           <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-            <Text style={{ fontSize: 32, fontWeight: "bold", color: "white" }}>Community</Text>
+            <Text style={{ fontSize: 32, fontWeight: "bold", color: "white" }}>Community Feed 🔥</Text>
 
             <View style={{ flexDirection: "row", gap: 12 }}>
               {/* Notifications Bell */}

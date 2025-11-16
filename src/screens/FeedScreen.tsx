@@ -496,6 +496,9 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
         ))}
       </ScrollView>
 
+      {/* RED TEST BAR - TO CONFIRM FILE IS BEING USED */}
+      <View style={{ height: 40, backgroundColor: 'red' }} />
+
       {/* Posts Feed */}
       {feedLoading ? (
         <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
