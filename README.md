@@ -1449,11 +1449,36 @@ The app features a cohesive dark theme with modern 3D-style UI elements througho
 - `POST /api/shared-quests/:id/accept` - Accept shared quest
 - `POST /api/shared-quests/:id/decline` - Decline shared quest
 
-### Journal ✨ NEW!
+### Journal ✨ ENHANCED WITH MERGED DESIGN & IMAGES!
+
+**New Merged Journal Screen Design** 📖
+- **Integrated Insights Panel**: Shows current streak, total entries, YES outcomes, and NO outcomes
+- **Interactive Calendar**: Navigate months, click dates to view entries for that day
+- **Visual Calendar Indicators**: Orange dots show which dates have journal entries
+- **Entry Gallery**: Beautiful cards showing entry content with:
+  - Outcome badge (YES ✅ / NO ❌ / ACTIVITY 📊)
+  - Location display with map pin icon
+  - Summary text (user-edited or AI-generated)
+  - **Image Gallery**: Horizontal scroll of images attached to the entry
+  - Achievement unlock badges
+- **Same Great Functionalities**:
+  - Voice recording with AI transcription
+  - Text-based entries with AI summarization
+  - Editable summaries
+  - Achievement tracking
+  - Location tagging
+
+**Image Support** 🖼️
+- Upload and store multiple images with journal entries
+- Display images in beautiful gallery format within each entry
+- Images stored as JSON array of URLs in database
+- Easy to view all memories from a specific date
+
+**Backend Endpoints**
 - `POST /api/journal/transcribe` - Transcribe audio to text with AI summarization
-- `POST /api/journal` - Create journal entry with achievement
-- `GET /api/journal` - Get all journal entries with achievements
-- `PUT /api/journal/:id` - Update journal entry summary
+- `POST /api/journal` - Create journal entry with images and location
+- `GET /api/journal` - Get all journal entries with images and locations
+- `PUT /api/journal/:id` - Update journal entry (including images/location)
 - `GET /api/journal/achievements` - Get all growth achievements with stats
 
 ### Posts & Social Feed ✨ NEW!

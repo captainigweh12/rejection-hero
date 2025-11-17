@@ -1,17 +1,36 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
   ScrollView,
+  Pressable,
+  Modal,
+  ActivityIndicator,
+  Image,
+  FlatList,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Plus, Star, CheckCircle, XCircle, Activity } from "lucide-react-native";
+import {
+  Plus,
+  Star,
+  CheckCircle,
+  XCircle,
+  Activity,
+  ChevronLeft,
+  ChevronRight,
+  Flame,
+  Calendar as CalendarIcon,
+  MapPin,
+} from "lucide-react-native";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import type { BottomTabScreenProps } from "@/navigation/types";
 import AddJournalModal from "@/components/AddJournalModal";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useSession } from "@/lib/useSession";
+import { LinearGradient } from "expo-linear-gradient";
+import type { GetUserStatsResponse } from "@/shared/contracts";
 
 interface JournalEntry {
   id: string;
@@ -20,6 +39,8 @@ interface JournalEntry {
   aiSummary: string;
   userEditedSummary: string | null;
   outcome: string;
+  imageUrls?: string[];
+  location?: string | null;
   createdAt: string;
   updatedAt: string;
   achievements: Array<{
@@ -38,10 +59,23 @@ type Props = BottomTabScreenProps<"JournalTab">;
 
 export default function JournalScreen({ navigation }: Props) {
   const { colors } = useTheme();
+  const { data: sessionData } = useSession();
   const [modalVisible, setModalVisible] = useState(false);
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [showInsights, setShowInsights] = useState(true);
+
+  // Fetch user stats
+  const { data: statsData } = useQuery<GetUserStatsResponse>({
+    queryKey: ["stats"],
+    queryFn: async () => {
+      return api.get<GetUserStatsResponse>("/api/stats");
+    },
+    enabled: !!sessionData?.user,
+  });
 
   // Fetch journal entries
-  const { data: entriesData, isLoading, error, refetch } = useQuery({
+  const { data: entriesData, isLoading, refetch } = useQuery({
     queryKey: ["journal-entries"],
     queryFn: async () => {
       console.log("[JournalScreen] Fetching journal entries...");
@@ -51,147 +85,533 @@ export default function JournalScreen({ navigation }: Props) {
     },
   });
 
-  // Log when data changes
-  React.useEffect(() => {
-    console.log("[JournalScreen] entriesData updated:", {
-      hasData: !!entriesData,
-      entryCount: entriesData?.entries?.length || 0,
-      entries: entriesData?.entries?.map(e => ({
-        id: e.id,
-        summary: e.userEditedSummary || e.aiSummary,
-        outcome: e.outcome,
-      })),
+  const entries = entriesData?.entries || [];
+
+  // Get entries for selected date
+  const entriesForSelectedDate = useMemo(() => {
+    return entries.filter((entry) => {
+      const entryDate = new Date(entry.createdAt);
+      return (
+        entryDate.getDate() === selectedDate.getDate() &&
+        entryDate.getMonth() === selectedDate.getMonth() &&
+        entryDate.getFullYear() === selectedDate.getFullYear()
+      );
     });
-  }, [entriesData]);
+  }, [entries, selectedDate]);
+
+  // Get dates with entries for current month
+  const datesWithEntries = useMemo(() => {
+    return new Set(
+      entries
+        .filter((entry) => {
+          const entryDate = new Date(entry.createdAt);
+          return (
+            entryDate.getMonth() === currentMonth.getMonth() &&
+            entryDate.getFullYear() === currentMonth.getFullYear()
+          );
+        })
+        .map((entry) => new Date(entry.createdAt).getDate())
+    );
+  }, [entries, currentMonth]);
+
+  // Calculate stats
+  const journalStats = useMemo(() => {
+    const totalEntries = entries.length;
+    const noCount = entries.filter((e) => e.outcome === "NO").length;
+    const yesCount = entries.filter((e) => e.outcome === "YES").length;
+    const activityCount = entries.filter((e) => e.outcome === "ACTIVITY").length;
+    const totalAchievements = entries.reduce((sum, e) => sum + e.achievements.length, 0);
+
+    return {
+      totalEntries,
+      noCount,
+      yesCount,
+      activityCount,
+      totalAchievements,
+    };
+  }, [entries]);
+
+  // Calendar helpers
+  const getDaysInMonth = (date: Date) => {
+    return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+  };
+
+  const getFirstDayOfMonth = (date: Date) => {
+    return new Date(date.getFullYear(), date.getMonth(), 1).getDay();
+  };
+
+  const goToPreviousMonth = () => {
+    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1));
+  };
+
+  const goToNextMonth = () => {
+    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1));
+  };
+
+  // Render calendar
+  const renderCalendar = () => {
+    const daysInMonth = getDaysInMonth(currentMonth);
+    const firstDay = getFirstDayOfMonth(currentMonth);
+    const days = [];
+    const dayNames = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+
+    // Day names header
+    days.push(
+      <View key="header" style={{ flexDirection: "row", marginBottom: 8 }}>
+        {dayNames.map((name) => (
+          <View key={name} style={{ flex: 1, alignItems: "center" }}>
+            <Text style={{ color: colors.textSecondary, fontSize: 11, fontWeight: "600" }}>
+              {name}
+            </Text>
+          </View>
+        ))}
+      </View>
+    );
+
+    // Empty cells
+    let dayNumbers = [];
+    for (let i = 0; i < firstDay; i++) {
+      dayNumbers.push(<View key={`empty-${i}`} style={{ flex: 1 }} />);
+    }
+
+    // Day cells
+    for (let day = 1; day <= daysInMonth; day++) {
+      const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
+      const isSelected =
+        date.getDate() === selectedDate.getDate() &&
+        date.getMonth() === selectedDate.getMonth() &&
+        date.getFullYear() === selectedDate.getFullYear();
+      const hasEntry = datesWithEntries.has(day);
+      const isToday =
+        date.getDate() === new Date().getDate() &&
+        date.getMonth() === new Date().getMonth() &&
+        date.getFullYear() === new Date().getFullYear();
+
+      dayNumbers.push(
+        <Pressable
+          key={day}
+          onPress={() => setSelectedDate(date)}
+          style={{
+            flex: 1,
+            aspectRatio: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            borderRadius: 8,
+            backgroundColor: isSelected ? "rgba(0, 217, 255, 0.2)" : "transparent",
+            borderWidth: isSelected ? 1 : 0,
+            borderColor: isSelected ? "#00D9FF" : "transparent",
+          }}
+        >
+          <View style={{ position: "relative" }}>
+            <Text
+              style={{
+                color: isToday ? "#FFD700" : colors.text,
+                fontSize: 14,
+                fontWeight: isToday ? "bold" : "600",
+              }}
+            >
+              {day}
+            </Text>
+            {hasEntry && (
+              <View
+                style={{
+                  width: 4,
+                  height: 4,
+                  borderRadius: 2,
+                  backgroundColor: "#FF6B35",
+                  position: "absolute",
+                  bottom: -6,
+                  alignSelf: "center",
+                }}
+              />
+            )}
+          </View>
+        </Pressable>
+      );
+    }
+
+    const rows = [];
+    for (let i = 0; i < dayNumbers.length; i += 7) {
+      rows.push(
+        <View key={`row-${i}`} style={{ flexDirection: "row", marginBottom: 8 }}>
+          {dayNumbers.slice(i, i + 7)}
+        </View>
+      );
+    }
+
+    return [days[0], ...rows];
+  };
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.backgroundSolid }}>
       <SafeAreaView edges={["top"]} style={{ flex: 1 }}>
         <ScrollView
-          className="flex-1 px-4"
-          contentContainerStyle={{ paddingBottom: 100 }}
           showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 100 }}
         >
           {/* Header */}
-          <View className="py-6 flex-row justify-between items-center">
-            <View>
-              <Text className="text-3xl font-bold" style={{ color: colors.text }}>Journal</Text>
-              <Text className="text-base mt-1" style={{ color: colors.textSecondary }}>
-                Record your growth experiences
-              </Text>
+          <View style={{ paddingHorizontal: 24, paddingTop: 20, paddingBottom: 16 }}>
+            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+              <View>
+                <Text style={{ fontSize: 28, fontWeight: "bold", color: colors.text }}>
+                  Journal
+                </Text>
+                <Text style={{ fontSize: 14, marginTop: 4, color: colors.textSecondary }}>
+                  Track your growth journey
+                </Text>
+              </View>
+              <TouchableOpacity
+                onPress={() => setModalVisible(true)}
+                style={{
+                  width: 56,
+                  height: 56,
+                  borderRadius: 28,
+                  backgroundColor: colors.primary,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  shadowColor: colors.primary,
+                  shadowOffset: { width: 0, height: 4 },
+                  shadowOpacity: 0.3,
+                  shadowRadius: 8,
+                  elevation: 8,
+                }}
+              >
+                <Plus size={28} color={colors.text} />
+              </TouchableOpacity>
             </View>
-
-            {/* Add Entry Button */}
-            <TouchableOpacity
-              onPress={() => setModalVisible(true)}
-              style={{
-                width: 56,
-                height: 56,
-                borderRadius: 28,
-                backgroundColor: colors.primary,
-                justifyContent: "center",
-                alignItems: "center",
-                shadowColor: colors.primary,
-                shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: 0.3,
-                shadowRadius: 8,
-                elevation: 8,
-              }}
-            >
-              <Plus size={28} color={colors.text} />
-            </TouchableOpacity>
           </View>
 
-          {/* Debug Info */}
-          {__DEV__ && (
-            <View style={{ padding: 12, backgroundColor: colors.surface, marginBottom: 12, borderRadius: 8 }}>
-              <Text className="text-xs" style={{ color: colors.textSecondary }}>
-                Debug: {isLoading ? "Loading..." : `${entriesData?.entries?.length || 0} entries`}
-                {error ? ` | Error: ${error}` : ""}
-              </Text>
+          {/* Insights Panel */}
+          {showInsights && (
+            <View style={{ paddingHorizontal: 24, marginBottom: 20 }}>
+              <LinearGradient
+                colors={["rgba(126, 63, 228, 0.15)", "rgba(0, 217, 255, 0.1)"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={{
+                  borderRadius: 16,
+                  padding: 20,
+                  borderWidth: 1,
+                  borderColor: "rgba(0, 217, 255, 0.2)",
+                }}
+              >
+                <View style={{ marginBottom: 20 }}>
+                  <Text style={{ fontSize: 18, fontWeight: "bold", color: colors.text, marginBottom: 16 }}>
+                    Insights
+                  </Text>
+
+                  {/* Streak Card */}
+                  <View
+                    style={{
+                      backgroundColor: "rgba(67, 233, 123, 0.15)",
+                      borderRadius: 12,
+                      padding: 16,
+                      marginBottom: 12,
+                      borderWidth: 1,
+                      borderColor: "rgba(67, 233, 123, 0.3)",
+                    }}
+                  >
+                    <View style={{ flexDirection: "row", alignItems: "center" }}>
+                      <View
+                        style={{
+                          width: 48,
+                          height: 48,
+                          borderRadius: 24,
+                          backgroundColor: "rgba(67, 233, 123, 0.2)",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          marginRight: 12,
+                        }}
+                      >
+                        <Flame size={24} color="#43E97B" />
+                      </View>
+                      <View style={{ flex: 1 }}>
+                        <Text style={{ fontSize: 12, color: colors.textSecondary }}>Current Streak</Text>
+                        <Text style={{ fontSize: 20, fontWeight: "bold", color: "#43E97B" }}>
+                          {statsData?.currentStreak || 0} days
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+
+                  {/* Stats Grid */}
+                  <View style={{ flexDirection: "row", gap: 12 }}>
+                    {/* Entries Card */}
+                    <View
+                      style={{
+                        flex: 1,
+                        backgroundColor: "rgba(255, 107, 53, 0.15)",
+                        borderRadius: 12,
+                        padding: 12,
+                        borderWidth: 1,
+                        borderColor: "rgba(255, 107, 53, 0.3)",
+                      }}
+                    >
+                      <Text style={{ fontSize: 24, fontWeight: "bold", color: "#FF6B35" }}>
+                        {journalStats.totalEntries}
+                      </Text>
+                      <Text style={{ fontSize: 12, color: colors.textSecondary, marginTop: 4 }}>
+                        Entries
+                      </Text>
+                    </View>
+
+                    {/* YES Count */}
+                    <View
+                      style={{
+                        flex: 1,
+                        backgroundColor: "rgba(67, 233, 123, 0.15)",
+                        borderRadius: 12,
+                        padding: 12,
+                        borderWidth: 1,
+                        borderColor: "rgba(67, 233, 123, 0.3)",
+                      }}
+                    >
+                      <Text style={{ fontSize: 24, fontWeight: "bold", color: "#43E97B" }}>
+                        {journalStats.yesCount}
+                      </Text>
+                      <Text style={{ fontSize: 12, color: colors.textSecondary, marginTop: 4 }}>
+                        YES Outcomes
+                      </Text>
+                    </View>
+
+                    {/* NO Count */}
+                    <View
+                      style={{
+                        flex: 1,
+                        backgroundColor: "rgba(0, 217, 255, 0.15)",
+                        borderRadius: 12,
+                        padding: 12,
+                        borderWidth: 1,
+                        borderColor: "rgba(0, 217, 255, 0.3)",
+                      }}
+                    >
+                      <Text style={{ fontSize: 24, fontWeight: "bold", color: "#00D9FF" }}>
+                        {journalStats.noCount}
+                      </Text>
+                      <Text style={{ fontSize: 12, color: colors.textSecondary, marginTop: 4 }}>
+                        NO Outcomes
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+              </LinearGradient>
             </View>
           )}
 
-          {/* Recent Entries */}
-          {entriesData && entriesData.entries.length > 0 ? (
-            <View className="mb-8">
-              <View className="flex-row justify-between items-center mb-4">
-                <Text className="text-xl font-bold" style={{ color: colors.text }}>
-                  Your Entries
+          {/* Calendar Section */}
+          <View style={{ paddingHorizontal: 24, marginBottom: 24 }}>
+            <View
+              style={{
+                backgroundColor: colors.card,
+                borderWidth: 1,
+                borderColor: colors.cardBorder,
+                borderRadius: 16,
+                padding: 16,
+              }}
+            >
+              {/* Month Navigation */}
+              <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+                <Text style={{ fontSize: 16, fontWeight: "bold", color: colors.text }}>
+                  {currentMonth.toLocaleDateString("en-US", { month: "long", year: "numeric" })}
                 </Text>
-                <TouchableOpacity
-                  onPress={() => navigation.navigate("GrowthAchievements")}
-                >
-                  <Text className="font-semibold" style={{ color: colors.primary }}>
-                    View Achievements
-                  </Text>
-                </TouchableOpacity>
+                <View style={{ flexDirection: "row", gap: 8 }}>
+                  <Pressable
+                    onPress={goToPreviousMonth}
+                    style={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: 8,
+                      backgroundColor: colors.surface,
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <ChevronLeft size={20} color={colors.text} />
+                  </Pressable>
+                  <Pressable
+                    onPress={goToNextMonth}
+                    style={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: 8,
+                      backgroundColor: colors.surface,
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <ChevronRight size={20} color={colors.text} />
+                  </Pressable>
+                </View>
               </View>
 
-              {entriesData.entries.map((entry) => (
+              {/* Calendar Grid */}
+              {renderCalendar()}
+            </View>
+          </View>
+
+          {/* Date Header */}
+          <View style={{ paddingHorizontal: 24, marginBottom: 12 }}>
+            <Text style={{ fontSize: 16, fontWeight: "bold", color: colors.text }}>
+              {selectedDate.toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" })}
+            </Text>
+          </View>
+
+          {/* Entries for Selected Date */}
+          {isLoading ? (
+            <View style={{ justifyContent: "center", alignItems: "center", paddingVertical: 60 }}>
+              <ActivityIndicator size="large" color={colors.primary} />
+            </View>
+          ) : entriesForSelectedDate.length > 0 ? (
+            <View style={{ paddingHorizontal: 24, marginBottom: 24 }}>
+              {entriesForSelectedDate.map((entry) => (
                 <View
                   key={entry.id}
                   style={{
                     backgroundColor: colors.card,
                     borderWidth: 1,
                     borderColor: colors.cardBorder,
-                    borderRadius: 12,
+                    borderRadius: 16,
                     padding: 16,
-                    marginBottom: 12,
+                    marginBottom: 16,
+                    overflow: "hidden",
                   }}
                 >
-                  <View className="flex-row items-center justify-between mb-2">
-                    <View className="flex-row items-center">
+                  {/* Entry Header */}
+                  <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                    <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
                       {entry.outcome === "YES" && (
-                        <CheckCircle size={20} color={colors.error} />
+                        <View
+                          style={{
+                            width: 32,
+                            height: 32,
+                            borderRadius: 16,
+                            backgroundColor: "rgba(67, 233, 123, 0.2)",
+                            justifyContent: "center",
+                            alignItems: "center",
+                          }}
+                        >
+                          <CheckCircle size={18} color="#43E97B" />
+                        </View>
                       )}
                       {entry.outcome === "NO" && (
-                        <XCircle size={20} color={colors.success} />
+                        <View
+                          style={{
+                            width: 32,
+                            height: 32,
+                            borderRadius: 16,
+                            backgroundColor: "rgba(0, 217, 255, 0.2)",
+                            justifyContent: "center",
+                            alignItems: "center",
+                          }}
+                        >
+                          <XCircle size={18} color="#00D9FF" />
+                        </View>
                       )}
                       {entry.outcome === "ACTIVITY" && (
-                        <Activity size={20} color={colors.info} />
+                        <View
+                          style={{
+                            width: 32,
+                            height: 32,
+                            borderRadius: 16,
+                            backgroundColor: "rgba(255, 107, 53, 0.2)",
+                            justifyContent: "center",
+                            alignItems: "center",
+                          }}
+                        >
+                          <Activity size={18} color="#FF6B35" />
+                        </View>
                       )}
-                      <Text className="text-sm ml-2" style={{ color: colors.textSecondary }}>
-                        {new Date(entry.createdAt).toLocaleDateString()}
+                      <Text
+                        style={{
+                          fontSize: 12,
+                          fontWeight: "600",
+                          color: colors.textSecondary,
+                          textTransform: "uppercase",
+                        }}
+                      >
+                        {entry.outcome}
                       </Text>
                     </View>
                     {entry.achievements.length > 0 && (
-                      <Star size={20} color={colors.warning} fill={colors.warning} />
+                      <Star size={18} color="#FFD700" fill="#FFD700" />
                     )}
                   </View>
-                  <Text className="text-base" style={{ color: colors.text }}>
+
+                  {/* Location */}
+                  {entry.location && (
+                    <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 12 }}>
+                      <MapPin size={14} color={colors.primary} />
+                      <Text style={{ fontSize: 12, color: colors.textSecondary }}>
+                        {entry.location}
+                      </Text>
+                    </View>
+                  )}
+
+                  {/* Summary Text */}
+                  <Text style={{ fontSize: 14, lineHeight: 20, color: colors.text, marginBottom: 12 }}>
                     {entry.userEditedSummary || entry.aiSummary}
                   </Text>
+
+                  {/* Images Gallery */}
+                  {entry.imageUrls && entry.imageUrls.length > 0 && (
+                    <View style={{ marginBottom: 12 }}>
+                      <ScrollView
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        contentContainerStyle={{ gap: 8 }}
+                      >
+                        {entry.imageUrls.map((imageUrl, index) => (
+                          <Image
+                            key={`${entry.id}-img-${index}`}
+                            source={{ uri: imageUrl }}
+                            style={{
+                              width: 120,
+                              height: 120,
+                              borderRadius: 12,
+                              backgroundColor: colors.surface,
+                            }}
+                          />
+                        ))}
+                      </ScrollView>
+                    </View>
+                  )}
+
+                  {/* Achievement Badge */}
+                  {entry.achievements.length > 0 && (
+                    <View style={{ paddingTop: 12, borderTopWidth: 1, borderTopColor: colors.cardBorder }}>
+                      <Text style={{ fontSize: 12, fontWeight: "600", color: colors.textSecondary, marginBottom: 8 }}>
+                        Achievement Unlocked
+                      </Text>
+                      <View style={{ backgroundColor: "rgba(255, 215, 0, 0.15)", borderRadius: 8, padding: 10 }}>
+                        <Text style={{ fontSize: 12, color: "#FFD700" }}>
+                          {entry.achievements[0].description}
+                        </Text>
+                      </View>
+                    </View>
+                  )}
                 </View>
               ))}
             </View>
           ) : (
-            <View
-              style={{
-                flex: 1,
-                justifyContent: "center",
-                alignItems: "center",
-                paddingVertical: 60,
-              }}
-            >
+            <View style={{ paddingHorizontal: 24, paddingVertical: 40, alignItems: "center" }}>
               <View
                 style={{
-                  width: 80,
-                  height: 80,
-                  borderRadius: 40,
+                  width: 60,
+                  height: 60,
+                  borderRadius: 30,
                   backgroundColor: colors.primaryLight,
                   justifyContent: "center",
                   alignItems: "center",
-                  marginBottom: 20,
+                  marginBottom: 12,
                 }}
               >
-                <Plus size={40} color={colors.primary} />
+                <CalendarIcon size={30} color={colors.primary} />
               </View>
-              <Text className="text-lg font-semibold mb-2" style={{ color: colors.text }}>
+              <Text style={{ fontSize: 16, fontWeight: "600", color: colors.text, marginBottom: 4 }}>
                 No entries yet
               </Text>
-              <Text className="text-sm text-center px-8" style={{ color: colors.textSecondary }}>
-                Tap the + button to record your first growth experience
+              <Text style={{ fontSize: 12, textAlign: "center", color: colors.textSecondary }}>
+                Start your journey by recording your first experience
               </Text>
             </View>
           )}
@@ -203,7 +623,7 @@ export default function JournalScreen({ navigation }: Props) {
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
         onSuccess={() => {
-          // Modal handles success message
+          refetch();
         }}
       />
     </View>

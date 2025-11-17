@@ -118,7 +118,7 @@ journalRouter.post("/", zValidator("json", createJournalEntryRequestSchema), asy
     return c.json({ message: "Unauthorized" }, 401);
   }
 
-  const { audioUrl, audioTranscript, aiSummary, userEditedSummary, outcome } = c.req.valid("json");
+  const { audioUrl, audioTranscript, aiSummary, userEditedSummary, outcome, imageUrls, location } = c.req.valid("json");
 
   try {
     // Create journal entry
@@ -130,6 +130,8 @@ journalRouter.post("/", zValidator("json", createJournalEntryRequestSchema), asy
         aiSummary,
         userEditedSummary,
         outcome,
+        imageUrls: imageUrls ? JSON.stringify(imageUrls) : null,
+        location,
       },
     });
 
@@ -208,6 +210,8 @@ journalRouter.get("/", async (c) => {
         aiSummary: entry.aiSummary,
         userEditedSummary: entry.userEditedSummary,
         outcome: entry.outcome,
+        imageUrls: entry.imageUrls ? JSON.parse(entry.imageUrls) : [],
+        location: entry.location,
         createdAt: entry.createdAt.toISOString(),
         updatedAt: entry.updatedAt.toISOString(),
         achievements: entry.achievements.map((ach) => ({
@@ -235,7 +239,7 @@ journalRouter.put("/:id", zValidator("json", updateJournalEntryRequestSchema), a
   }
 
   const { id } = c.req.param();
-  const { userEditedSummary, outcome } = c.req.valid("json");
+  const { userEditedSummary, outcome, imageUrls, location } = c.req.valid("json");
 
   try {
     // Verify entry belongs to user
@@ -259,6 +263,14 @@ journalRouter.put("/:id", zValidator("json", updateJournalEntryRequestSchema), a
       updateData.outcome = outcome;
     }
 
+    if (imageUrls) {
+      updateData.imageUrls = JSON.stringify(imageUrls);
+    }
+
+    if (location) {
+      updateData.location = location;
+    }
+
     const updatedEntry = await db.journalEntry.update({
       where: { id },
       data: updateData,
@@ -267,6 +279,8 @@ journalRouter.put("/:id", zValidator("json", updateJournalEntryRequestSchema), a
     return c.json({
       id: updatedEntry.id,
       userEditedSummary: updatedEntry.userEditedSummary,
+      imageUrls: updatedEntry.imageUrls ? JSON.parse(updatedEntry.imageUrls) : [],
+      location: updatedEntry.location,
     });
   } catch (error) {
     console.error("Update journal entry error:", error);

@@ -549,6 +549,8 @@ export const createJournalEntryRequestSchema = z.object({
   aiSummary: z.string(),
   userEditedSummary: z.string().optional(),
   outcome: z.enum(["YES", "NO", "ACTIVITY"]),
+  imageUrls: z.array(z.string()).optional(), // Array of image URLs
+  location: z.string().optional(), // Location/place name
 });
 export type CreateJournalEntryRequest = z.infer<typeof createJournalEntryRequestSchema>;
 export const createJournalEntryResponseSchema = z.object({
@@ -572,6 +574,8 @@ export const getJournalEntriesResponseSchema = z.object({
       aiSummary: z.string(),
       userEditedSummary: z.string().nullable(),
       outcome: z.string(),
+      imageUrls: z.array(z.string()).optional(), // Array of image URLs
+      location: z.string().nullable(), // Location/place name
       createdAt: z.string(),
       updatedAt: z.string(),
       achievements: z.array(
@@ -591,11 +595,15 @@ export type GetJournalEntriesResponse = z.infer<typeof getJournalEntriesResponse
 export const updateJournalEntryRequestSchema = z.object({
   userEditedSummary: z.string(),
   outcome: z.enum(["YES", "NO", "ACTIVITY"]).optional(),
+  imageUrls: z.array(z.string()).optional(),
+  location: z.string().optional(),
 });
 export type UpdateJournalEntryRequest = z.infer<typeof updateJournalEntryRequestSchema>;
 export const updateJournalEntryResponseSchema = z.object({
   id: z.string(),
   userEditedSummary: z.string(),
+  imageUrls: z.array(z.string()).optional(),
+  location: z.string().nullable(),
 });
 export type UpdateJournalEntryResponse = z.infer<typeof updateJournalEntryResponseSchema>;
 
