@@ -7,6 +7,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "@/navigation/types";
 import { api } from "@/lib/api";
+import { useTheme } from "@/contexts/ThemeContext";
 
 type Props = NativeStackScreenProps<RootStackParamList, "SendQuestToFriend">;
 
@@ -27,6 +28,7 @@ interface UserQuest {
 
 export default function SendQuestToFriendScreen({ navigation, route }: Props) {
   const { friendId, friendName } = route.params;
+  const { colors } = useTheme();
   const [selectedQuestId, setSelectedQuestId] = useState<string | null>(null);
   const [message, setMessage] = useState("");
   const queryClient = useQueryClient();
@@ -99,8 +101,8 @@ export default function SendQuestToFriendScreen({ navigation, route }: Props) {
   ];
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
-      <LinearGradient colors={["#0A0A0F", "#1A1A24", "#2A1A34"]} style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: colors.backgroundSolid }}>
+      <LinearGradient colors={colors.background as any} style={{ flex: 1 }}>
         <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
           {/* Header */}
           <View
@@ -116,9 +118,9 @@ export default function SendQuestToFriendScreen({ navigation, route }: Props) {
               onPress={() => navigation.goBack()}
               style={{ position: "absolute", left: 20 }}
             >
-              <ChevronLeft size={28} color="white" />
+              <ChevronLeft size={28} color={colors.text} />
             </Pressable>
-            <Text style={{ fontSize: 20, fontWeight: "bold", color: "white" }}>
+            <Text style={{ fontSize: 20, fontWeight: "bold", color: colors.text }}>
               Send Quest to {friendName}
             </Text>
           </View>
@@ -138,67 +140,67 @@ export default function SendQuestToFriendScreen({ navigation, route }: Props) {
                 borderColor: "rgba(0, 217, 255, 0.3)",
               }}
             >
-              <Text style={{ color: "#00D9FF", fontSize: 16, fontWeight: "600", marginBottom: 8 }}>
+              <Text style={{ color: colors.info, fontSize: 16, fontWeight: "600", marginBottom: 8 }}>
                 Challenge Your Friend!
               </Text>
-              <Text style={{ color: "rgba(255, 255, 255, 0.8)", fontSize: 14, lineHeight: 20 }}>
+              <Text style={{ color: colors.text, fontSize: 14, lineHeight: 20 }}>
                 Select a quest from your list to send to {friendName}. They can accept and compete with you!
               </Text>
             </View>
 
             {/* Optional Message */}
             <View style={{ marginBottom: 20 }}>
-              <Text style={{ fontSize: 16, fontWeight: "bold", color: "white", marginBottom: 12 }}>
+              <Text style={{ fontSize: 16, fontWeight: "bold", color: colors.text, marginBottom: 12 }}>
                 Add a Message (Optional)
               </Text>
               <TextInput
                 value={message}
                 onChangeText={setMessage}
                 placeholder="E.g., I bet you can't do this! 😎"
-                placeholderTextColor="rgba(255, 255, 255, 0.3)"
+                placeholderTextColor={colors.textTertiary}
                 multiline
                 numberOfLines={3}
                 style={{
-                  backgroundColor: "rgba(255, 255, 255, 0.05)",
+                  backgroundColor: colors.inputBackground,
                   borderRadius: 12,
                   paddingHorizontal: 16,
                   paddingVertical: 14,
                   fontSize: 15,
-                  color: "white",
+                  color: colors.text,
                   borderWidth: 1,
-                  borderColor: "rgba(255, 255, 255, 0.1)",
+                  borderColor: colors.inputBorder,
                   textAlignVertical: "top",
                   minHeight: 80,
                 }}
                 maxLength={500}
               />
-              <Text style={{ fontSize: 12, color: "rgba(255, 255, 255, 0.4)", marginTop: 6, textAlign: "right" }}>
+              <Text style={{ fontSize: 12, color: colors.textTertiary, marginTop: 6, textAlign: "right" }}>
                 {message.length}/500
               </Text>
             </View>
 
             {/* Quest Selection */}
             <View>
-              <Text style={{ fontSize: 16, fontWeight: "bold", color: "white", marginBottom: 12 }}>
+              <Text style={{ fontSize: 16, fontWeight: "bold", color: colors.text, marginBottom: 12 }}>
                 Select a Quest
               </Text>
 
               {isLoading ? (
                 <View style={{ paddingVertical: 40, alignItems: "center" }}>
-                  <ActivityIndicator size="large" color="#A78BFA" />
+                  <ActivityIndicator size="large" color={colors.primary} />
                 </View>
               ) : allQuests.length === 0 ? (
                 <View
                   style={{
-                    backgroundColor: "rgba(255, 255, 255, 0.05)",
+                    backgroundColor: colors.card,
                     borderRadius: 16,
                     padding: 32,
                     alignItems: "center",
                     borderWidth: 1,
-                    borderColor: "rgba(255, 255, 255, 0.1)",
+                    borderColor: colors.cardBorder,
                   }}
                 >
-                  <Text style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: 15, textAlign: "center" }}>
+                  <Text style={{ color: colors.textSecondary, fontSize: 15, textAlign: "center" }}>
                     No quests available. Create or complete a quest first!
                   </Text>
                 </View>
@@ -213,15 +215,15 @@ export default function SendQuestToFriendScreen({ navigation, route }: Props) {
                       onPress={() => setSelectedQuestId(quest.id)}
                       style={{
                         backgroundColor: isSelected
-                          ? "rgba(0, 217, 255, 0.1)"
-                          : "rgba(255, 255, 255, 0.05)",
+                          ? colors.info + "20"
+                          : colors.card,
                         borderRadius: 16,
                         padding: 16,
                         marginBottom: 12,
                         borderWidth: 2,
                         borderColor: isSelected
-                          ? "rgba(0, 217, 255, 0.5)"
-                          : "rgba(255, 255, 255, 0.1)",
+                          ? colors.info + "50"
+                          : colors.cardBorder,
                       }}
                     >
                       {/* Quest Title */}
@@ -229,7 +231,7 @@ export default function SendQuestToFriendScreen({ navigation, route }: Props) {
                         style={{
                           fontSize: 18,
                           fontWeight: "bold",
-                          color: "white",
+                          color: colors.text,
                           marginBottom: 8,
                         }}
                       >
@@ -240,7 +242,7 @@ export default function SendQuestToFriendScreen({ navigation, route }: Props) {
                       <Text
                         style={{
                           fontSize: 14,
-                          color: "rgba(255, 255, 255, 0.7)",
+                          color: colors.textSecondary,
                           marginBottom: 12,
                           lineHeight: 20,
                         }}
@@ -259,7 +261,7 @@ export default function SendQuestToFriendScreen({ navigation, route }: Props) {
                             borderRadius: 8,
                           }}
                         >
-                          <Text style={{ color: "white", fontSize: 12, fontWeight: "600" }}>
+                          <Text style={{ color: colors.text, fontSize: 12, fontWeight: "600" }}>
                             {quest.category}
                           </Text>
                         </View>
@@ -271,7 +273,7 @@ export default function SendQuestToFriendScreen({ navigation, route }: Props) {
                             borderRadius: 8,
                           }}
                         >
-                          <Text style={{ color: "white", fontSize: 12, fontWeight: "600" }}>
+                          <Text style={{ color: colors.text, fontSize: 12, fontWeight: "600" }}>
                             {quest.difficulty}
                           </Text>
                         </View>
@@ -324,9 +326,9 @@ export default function SendQuestToFriendScreen({ navigation, route }: Props) {
               paddingHorizontal: 24,
               paddingTop: 16,
               paddingBottom: 32,
-              backgroundColor: "#0A0A0F",
+              backgroundColor: colors.backgroundSolid,
               borderTopWidth: 1,
-              borderTopColor: "rgba(255, 255, 255, 0.1)",
+              borderTopColor: colors.cardBorder,
             }}
           >
             <Pressable
@@ -345,10 +347,10 @@ export default function SendQuestToFriendScreen({ navigation, route }: Props) {
               <LinearGradient
                 colors={
                   !selectedQuestId
-                    ? ["#666", "#666"]
+                    ? [colors.textTertiary, colors.textTertiary]
                     : shareQuestMutation.isPending
-                    ? ["#666", "#666"]
-                    : ["#00D9FF", "#00A8CC"]
+                    ? [colors.textTertiary, colors.textTertiary]
+                    : [colors.info, colors.info + "CC"]
                 }
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
@@ -362,15 +364,15 @@ export default function SendQuestToFriendScreen({ navigation, route }: Props) {
               />
               {shareQuestMutation.isPending ? (
                 <>
-                  <ActivityIndicator size="small" color="white" />
-                  <Text style={{ color: "white", fontWeight: "bold", fontSize: 18 }}>
+                  <ActivityIndicator size="small" color={colors.text} />
+                  <Text style={{ color: colors.text, fontWeight: "bold", fontSize: 18 }}>
                     Sending...
                   </Text>
                 </>
               ) : (
                 <>
-                  <Send size={22} color="white" />
-                  <Text style={{ color: "white", fontWeight: "bold", fontSize: 18 }}>
+                  <Send size={22} color={colors.text} />
+                  <Text style={{ color: colors.text, fontWeight: "bold", fontSize: 18 }}>
                     Send Quest to {friendName}
                   </Text>
                 </>

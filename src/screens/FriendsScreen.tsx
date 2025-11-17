@@ -7,6 +7,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "@/navigation/types";
 import { api } from "@/lib/api";
+import { useTheme } from "@/contexts/ThemeContext";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Friends">;
 
@@ -52,6 +53,7 @@ interface Recommendation {
 }
 
 export default function FriendsScreen({ navigation }: Props) {
+  const { colors } = useTheme();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState<"friends" | "requests" | "recommendations" | "search">("friends");
   const queryClient = useQueryClient();
@@ -162,12 +164,12 @@ export default function FriendsScreen({ navigation }: Props) {
     <View
       key={friend.id}
       style={{
-        backgroundColor: "rgba(255, 255, 255, 0.05)",
+        backgroundColor: colors.card,
         borderRadius: 16,
         padding: 16,
         marginBottom: 12,
         borderWidth: 1,
-        borderColor: "rgba(255, 255, 255, 0.1)",
+        borderColor: colors.cardBorder,
       }}
     >
       <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
@@ -182,23 +184,23 @@ export default function FriendsScreen({ navigation }: Props) {
               width: 56,
               height: 56,
               borderRadius: 28,
-              backgroundColor: "rgba(126, 63, 228, 0.3)",
+              backgroundColor: colors.primaryLight,
               alignItems: "center",
               justifyContent: "center",
             }}
           >
-            <Users size={28} color="#A78BFA" />
+            <Users size={28} color={colors.primary} />
           </View>
         )}
         <View style={{ flex: 1 }}>
-          <Text style={{ fontSize: 18, fontWeight: "bold", color: "white", marginBottom: 4 }}>
+          <Text style={{ fontSize: 18, fontWeight: "bold", color: colors.text, marginBottom: 4 }}>
             {friend.displayName}
           </Text>
-          <Text style={{ fontSize: 14, color: "rgba(255, 255, 255, 0.6)" }}>
+          <Text style={{ fontSize: 14, color: colors.textSecondary }}>
             {friend.email}
           </Text>
           {friend.bio && (
-            <Text style={{ fontSize: 13, color: "rgba(255, 255, 255, 0.5)", marginTop: 4 }}>
+            <Text style={{ fontSize: 13, color: colors.textTertiary, marginTop: 4 }}>
               {friend.bio}
             </Text>
           )}
@@ -210,14 +212,14 @@ export default function FriendsScreen({ navigation }: Props) {
               navigation.navigate("SendQuestToFriend", { friendId: friend.id, friendName: friend.displayName });
             }}
             style={{
-              backgroundColor: "rgba(0, 217, 255, 0.2)",
+              backgroundColor: colors.info + "33",
               borderRadius: 12,
               padding: 10,
               borderWidth: 1,
-              borderColor: "rgba(0, 217, 255, 0.3)",
+              borderColor: colors.info,
             }}
           >
-            <Send size={20} color="#00D9FF" />
+            <Send size={20} color={colors.info} />
           </Pressable>
           <Pressable
             onPress={() => {
@@ -225,14 +227,14 @@ export default function FriendsScreen({ navigation }: Props) {
               navigation.navigate("CreateCustomQuest", { friendId: friend.id, friendName: friend.displayName });
             }}
             style={{
-              backgroundColor: "rgba(126, 63, 228, 0.2)",
+              backgroundColor: colors.primaryLight,
               borderRadius: 12,
               padding: 10,
               borderWidth: 1,
-              borderColor: "rgba(126, 63, 228, 0.3)",
+              borderColor: colors.primary,
             }}
           >
-            <Sparkles size={20} color="#7E3FE4" />
+            <Sparkles size={20} color={colors.primary} />
           </Pressable>
         </View>
       </View>
@@ -243,12 +245,12 @@ export default function FriendsScreen({ navigation }: Props) {
     <View
       key={request.id}
       style={{
-        backgroundColor: "rgba(255, 255, 255, 0.05)",
+        backgroundColor: colors.card,
         borderRadius: 16,
         padding: 16,
         marginBottom: 12,
         borderWidth: 1,
-        borderColor: "rgba(255, 215, 0, 0.3)",
+        borderColor: colors.cardBorder,
       }}
     >
       <View style={{ flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 12 }}>
@@ -263,19 +265,19 @@ export default function FriendsScreen({ navigation }: Props) {
               width: 56,
               height: 56,
               borderRadius: 28,
-              backgroundColor: "rgba(255, 215, 0, 0.3)",
+              backgroundColor: colors.warning + "33",
               alignItems: "center",
               justifyContent: "center",
             }}
           >
-            <UserPlus size={28} color="#FFD700" />
+            <UserPlus size={28} color={colors.warning} />
           </View>
         )}
         <View style={{ flex: 1 }}>
-          <Text style={{ fontSize: 18, fontWeight: "bold", color: "white", marginBottom: 4 }}>
+          <Text style={{ fontSize: 18, fontWeight: "bold", color: colors.text, marginBottom: 4 }}>
             {request.displayName}
           </Text>
-          <Text style={{ fontSize: 14, color: "rgba(255, 255, 255, 0.6)" }}>
+          <Text style={{ fontSize: 14, color: colors.textSecondary }}>
             {request.email}
           </Text>
         </View>
@@ -286,7 +288,7 @@ export default function FriendsScreen({ navigation }: Props) {
           disabled={acceptRequestMutation.isPending}
           style={{
             flex: 1,
-            backgroundColor: "rgba(76, 175, 80, 0.2)",
+            backgroundColor: colors.success + "33",
             borderRadius: 12,
             padding: 12,
             flexDirection: "row",
@@ -294,11 +296,11 @@ export default function FriendsScreen({ navigation }: Props) {
             justifyContent: "center",
             gap: 8,
             borderWidth: 1,
-            borderColor: "rgba(76, 175, 80, 0.3)",
+            borderColor: colors.success,
           }}
         >
-          <Check size={18} color="#4CAF50" />
-          <Text style={{ color: "#4CAF50", fontWeight: "600", fontSize: 15 }}>
+          <Check size={18} color={colors.success} />
+          <Text style={{ color: colors.success, fontWeight: "600", fontSize: 15 }}>
             Accept
           </Text>
         </Pressable>
@@ -307,7 +309,7 @@ export default function FriendsScreen({ navigation }: Props) {
           disabled={declineRequestMutation.isPending}
           style={{
             flex: 1,
-            backgroundColor: "rgba(255, 107, 53, 0.2)",
+            backgroundColor: colors.secondary + "33",
             borderRadius: 12,
             padding: 12,
             flexDirection: "row",
@@ -315,11 +317,11 @@ export default function FriendsScreen({ navigation }: Props) {
             justifyContent: "center",
             gap: 8,
             borderWidth: 1,
-            borderColor: "rgba(255, 107, 53, 0.3)",
+            borderColor: colors.secondary,
           }}
         >
-          <X size={18} color="#FF6B35" />
-          <Text style={{ color: "#FF6B35", fontWeight: "600", fontSize: 15 }}>
+          <X size={18} color={colors.secondary} />
+          <Text style={{ color: colors.secondary, fontWeight: "600", fontSize: 15 }}>
             Decline
           </Text>
         </Pressable>
@@ -331,12 +333,12 @@ export default function FriendsScreen({ navigation }: Props) {
     <View
       key={user.id}
       style={{
-        backgroundColor: "rgba(255, 255, 255, 0.05)",
-        borderRadius: 16,
-        padding: 16,
-        marginBottom: 12,
-        borderWidth: 1,
-        borderColor: "rgba(0, 217, 255, 0.3)",
+      backgroundColor: colors.card,
+      borderRadius: 16,
+      padding: 16,
+      marginBottom: 12,
+      borderWidth: 1,
+      borderColor: colors.cardBorder,
       }}
     >
       <View style={{ flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 8 }}>
@@ -351,27 +353,27 @@ export default function FriendsScreen({ navigation }: Props) {
               width: 56,
               height: 56,
               borderRadius: 28,
-              backgroundColor: "rgba(0, 217, 255, 0.3)",
+              backgroundColor: colors.info + "33",
               alignItems: "center",
               justifyContent: "center",
             }}
           >
-            <Text style={{ fontSize: 24, fontWeight: "bold", color: "#00D9FF" }}>
+            <Text style={{ fontSize: 24, fontWeight: "bold", color: colors.info }}>
               {user.displayName.charAt(0).toUpperCase()}
             </Text>
           </View>
         )}
         <View style={{ flex: 1 }}>
-          <Text style={{ fontSize: 18, fontWeight: "bold", color: "white", marginBottom: 4 }}>
+          <Text style={{ fontSize: 18, fontWeight: "bold", color: colors.text, marginBottom: 4 }}>
             {user.displayName}
           </Text>
           {user.sharedInterests.length > 0 && (
-            <Text style={{ fontSize: 13, color: "#00D9FF", marginBottom: 4 }}>
+            <Text style={{ fontSize: 13, color: colors.info, marginBottom: 4 }}>
               {user.sharedInterests.length} shared interest{user.sharedInterests.length > 1 ? "s" : ""}
             </Text>
           )}
           {user.location && (
-            <Text style={{ fontSize: 12, color: "rgba(255, 255, 255, 0.5)" }}>
+            <Text style={{ fontSize: 12, color: colors.textTertiary }}>
               📍 {user.location}
             </Text>
           )}
@@ -380,23 +382,23 @@ export default function FriendsScreen({ navigation }: Props) {
           onPress={() => sendRequestMutation.mutate(user.id)}
           disabled={sendRequestMutation.isPending}
           style={{
-            backgroundColor: "rgba(0, 217, 255, 0.2)",
+            backgroundColor: colors.info + "33",
             borderRadius: 12,
             paddingHorizontal: 16,
             paddingVertical: 10,
             borderWidth: 1,
-            borderColor: "rgba(0, 217, 255, 0.4)",
+            borderColor: colors.info,
             flexDirection: "row",
             alignItems: "center",
             gap: 6,
           }}
         >
           {sendRequestMutation.isPending ? (
-            <ActivityIndicator size="small" color="#00D9FF" />
+            <ActivityIndicator size="small" color={colors.info} />
           ) : (
             <>
-              <UserPlus size={18} color="#00D9FF" />
-              <Text style={{ color: "#00D9FF", fontSize: 14, fontWeight: "600" }}>Add</Text>
+              <UserPlus size={18} color={colors.info} />
+              <Text style={{ color: colors.info, fontSize: 14, fontWeight: "600" }}>Add</Text>
             </>
           )}
         </Pressable>
@@ -407,15 +409,15 @@ export default function FriendsScreen({ navigation }: Props) {
             <View
               key={interest}
               style={{
-                backgroundColor: "rgba(0, 217, 255, 0.15)",
+                backgroundColor: colors.info + "26",
                 paddingHorizontal: 10,
                 paddingVertical: 4,
                 borderRadius: 12,
                 borderWidth: 1,
-                borderColor: "rgba(0, 217, 255, 0.3)",
+                borderColor: colors.info,
               }}
             >
-              <Text style={{ color: "#00D9FF", fontSize: 11, fontWeight: "600" }}>
+              <Text style={{ color: colors.info, fontSize: 11, fontWeight: "600" }}>
                 {interest}
               </Text>
             </View>
@@ -433,12 +435,12 @@ export default function FriendsScreen({ navigation }: Props) {
       <View
         key={user.id}
         style={{
-          backgroundColor: "rgba(255, 255, 255, 0.05)",
-          borderRadius: 16,
-          padding: 16,
-          marginBottom: 12,
-          borderWidth: 1,
-          borderColor: "rgba(255, 255, 255, 0.1)",
+        backgroundColor: colors.card,
+        borderRadius: 16,
+        padding: 16,
+        marginBottom: 12,
+        borderWidth: 1,
+        borderColor: colors.cardBorder,
         }}
       >
         <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
@@ -447,29 +449,29 @@ export default function FriendsScreen({ navigation }: Props) {
               source={{ uri: user.avatar }}
               style={{ width: 56, height: 56, borderRadius: 28 }}
             />
-          ) : (
-            <View
-              style={{
-                width: 56,
-                height: 56,
-                borderRadius: 28,
-                backgroundColor: "rgba(0, 217, 255, 0.3)",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <Users size={28} color="#00D9FF" />
-            </View>
-          )}
-          <View style={{ flex: 1 }}>
-            <Text style={{ fontSize: 18, fontWeight: "bold", color: "white", marginBottom: 4 }}>
+        ) : (
+          <View
+            style={{
+              width: 56,
+              height: 56,
+              borderRadius: 28,
+              backgroundColor: colors.info + "33",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Users size={28} color={colors.info} />
+          </View>
+        )}
+        <View style={{ flex: 1 }}>
+          <Text style={{ fontSize: 18, fontWeight: "bold", color: colors.text, marginBottom: 4 }}>
               {user.displayName}
             </Text>
-            <Text style={{ fontSize: 14, color: "rgba(255, 255, 255, 0.6)" }}>
+          <Text style={{ fontSize: 14, color: colors.textSecondary }}>
               {user.email}
             </Text>
             {user.bio && (
-              <Text style={{ fontSize: 13, color: "rgba(255, 255, 255, 0.5)", marginTop: 4 }}>
+            <Text style={{ fontSize: 13, color: colors.textTertiary, marginTop: 4 }}>
                 {user.bio}
               </Text>
             )}
@@ -477,40 +479,40 @@ export default function FriendsScreen({ navigation }: Props) {
           {isFriend ? (
             <View
               style={{
-                backgroundColor: "rgba(76, 175, 80, 0.2)",
+              backgroundColor: colors.success + "33",
                 borderRadius: 12,
                 padding: 10,
                 borderWidth: 1,
-                borderColor: "rgba(76, 175, 80, 0.3)",
+              borderColor: colors.success,
               }}
             >
-              <Check size={20} color="#4CAF50" />
+            <Check size={20} color={colors.success} />
             </View>
           ) : isPending ? (
             <View
               style={{
-                backgroundColor: "rgba(255, 215, 0, 0.2)",
+              backgroundColor: colors.warning + "33",
                 borderRadius: 12,
                 padding: 10,
                 borderWidth: 1,
-                borderColor: "rgba(255, 215, 0, 0.3)",
+              borderColor: colors.warning,
               }}
             >
-              <Text style={{ color: "#FFD700", fontSize: 12, fontWeight: "600" }}>Pending</Text>
+            <Text style={{ color: colors.warning, fontSize: 12, fontWeight: "600" }}>Pending</Text>
             </View>
           ) : (
             <Pressable
               onPress={() => sendRequestMutation.mutate(user.id)}
               disabled={sendRequestMutation.isPending}
               style={{
-                backgroundColor: "rgba(126, 63, 228, 0.2)",
+              backgroundColor: colors.primaryLight,
                 borderRadius: 12,
                 padding: 10,
                 borderWidth: 1,
-                borderColor: "rgba(126, 63, 228, 0.3)",
+              borderColor: colors.primary,
               }}
             >
-              <UserPlus size={20} color="#A78BFA" />
+            <UserPlus size={20} color={colors.primary} />
             </Pressable>
           )}
         </View>
@@ -519,8 +521,8 @@ export default function FriendsScreen({ navigation }: Props) {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
-      <LinearGradient colors={["#0A0A0F", "#1A1A24", "#2A1A34"]} style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: colors.backgroundSolid }}>
+      <LinearGradient colors={colors.background as any} style={{ flex: 1 }}>
         <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
           {/* Header */}
           <View
@@ -530,15 +532,17 @@ export default function FriendsScreen({ navigation }: Props) {
               flexDirection: "row",
               alignItems: "center",
               justifyContent: "center",
+              borderBottomWidth: 1,
+              borderBottomColor: colors.cardBorder,
             }}
           >
             <Pressable
               onPress={() => navigation.goBack()}
               style={{ position: "absolute", left: 20 }}
             >
-              <ChevronLeft size={28} color="white" />
+              <ChevronLeft size={28} color={colors.text} />
             </Pressable>
-            <Text style={{ fontSize: 20, fontWeight: "bold", color: "white" }}>
+            <Text style={{ fontSize: 20, fontWeight: "bold", color: colors.text }}>
               Friends
             </Text>
           </View>
@@ -553,64 +557,64 @@ export default function FriendsScreen({ navigation }: Props) {
             <Pressable
               onPress={() => setActiveTab("friends")}
               style={{
-                backgroundColor: activeTab === "friends" ? "rgba(126, 63, 228, 0.3)" : "rgba(255, 255, 255, 0.05)",
+                backgroundColor: activeTab === "friends" ? colors.primaryLight : colors.surface,
                 borderRadius: 12,
                 paddingHorizontal: 16,
                 paddingVertical: 12,
                 alignItems: "center",
                 borderWidth: 1,
-                borderColor: activeTab === "friends" ? "rgba(126, 63, 228, 0.5)" : "rgba(255, 255, 255, 0.1)",
+                borderColor: activeTab === "friends" ? colors.primary : colors.cardBorder,
               }}
             >
-              <Text style={{ color: "white", fontWeight: "600", fontSize: 14 }}>
+              <Text style={{ color: colors.text, fontWeight: "600", fontSize: 14 }}>
                 Friends ({friends.length})
               </Text>
             </Pressable>
             <Pressable
               onPress={() => setActiveTab("recommendations")}
               style={{
-                backgroundColor: activeTab === "recommendations" ? "rgba(0, 217, 255, 0.3)" : "rgba(255, 255, 255, 0.05)",
+                backgroundColor: activeTab === "recommendations" ? colors.info + "33" : colors.surface,
                 borderRadius: 12,
                 paddingHorizontal: 16,
                 paddingVertical: 12,
                 alignItems: "center",
                 borderWidth: 1,
-                borderColor: activeTab === "recommendations" ? "rgba(0, 217, 255, 0.5)" : "rgba(255, 255, 255, 0.1)",
+                borderColor: activeTab === "recommendations" ? colors.info : colors.cardBorder,
               }}
             >
-              <Text style={{ color: "white", fontWeight: "600", fontSize: 14 }}>
+              <Text style={{ color: colors.text, fontWeight: "600", fontSize: 14 }}>
                 Suggested
               </Text>
             </Pressable>
             <Pressable
               onPress={() => setActiveTab("requests")}
               style={{
-                backgroundColor: activeTab === "requests" ? "rgba(255, 215, 0, 0.3)" : "rgba(255, 255, 255, 0.05)",
+                backgroundColor: activeTab === "requests" ? colors.warning + "33" : colors.surface,
                 borderRadius: 12,
                 paddingHorizontal: 16,
                 paddingVertical: 12,
                 alignItems: "center",
                 borderWidth: 1,
-                borderColor: activeTab === "requests" ? "rgba(255, 215, 0, 0.5)" : "rgba(255, 255, 255, 0.1)",
+                borderColor: activeTab === "requests" ? colors.warning : colors.cardBorder,
               }}
             >
-              <Text style={{ color: "white", fontWeight: "600", fontSize: 14 }}>
+              <Text style={{ color: colors.text, fontWeight: "600", fontSize: 14 }}>
                 Requests {requests.length > 0 && `(${requests.length})`}
               </Text>
             </Pressable>
             <Pressable
               onPress={() => setActiveTab("search")}
               style={{
-                backgroundColor: activeTab === "search" ? "rgba(255, 107, 53, 0.3)" : "rgba(255, 255, 255, 0.05)",
+                backgroundColor: activeTab === "search" ? colors.secondary + "33" : colors.surface,
                 borderRadius: 12,
                 paddingHorizontal: 16,
                 paddingVertical: 12,
                 alignItems: "center",
                 borderWidth: 1,
-                borderColor: activeTab === "search" ? "rgba(255, 107, 53, 0.5)" : "rgba(255, 255, 255, 0.1)",
+                borderColor: activeTab === "search" ? colors.secondary : colors.cardBorder,
               }}
             >
-              <Text style={{ color: "white", fontWeight: "600", fontSize: 14 }}>
+              <Text style={{ color: colors.text, fontWeight: "600", fontSize: 14 }}>
                 Search
               </Text>
             </Pressable>
@@ -621,27 +625,27 @@ export default function FriendsScreen({ navigation }: Props) {
             <View style={{ paddingHorizontal: 20, marginBottom: 16 }}>
               <View
                 style={{
-                  backgroundColor: "rgba(255, 255, 255, 0.05)",
+                  backgroundColor: colors.inputBackground,
                   borderRadius: 12,
                   flexDirection: "row",
                   alignItems: "center",
                   paddingHorizontal: 16,
                   paddingVertical: 12,
                   borderWidth: 1,
-                  borderColor: "rgba(255, 255, 255, 0.1)",
+                  borderColor: colors.inputBorder,
                 }}
               >
-                <Search size={20} color="rgba(255, 255, 255, 0.5)" />
+                <Search size={20} color={colors.textSecondary} />
                 <TextInput
                   value={searchQuery}
                   onChangeText={setSearchQuery}
                   placeholder="Search by name or email..."
-                  placeholderTextColor="rgba(255, 255, 255, 0.3)"
+                  placeholderTextColor={colors.textTertiary}
                   style={{
                     flex: 1,
                     marginLeft: 12,
                     fontSize: 16,
-                    color: "white",
+                    color: colors.text,
                   }}
                 />
               </View>
@@ -653,19 +657,19 @@ export default function FriendsScreen({ navigation }: Props) {
             style={{ flex: 1 }}
             contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40 }}
             refreshControl={
-              <RefreshControl refreshing={false} onRefresh={handleRefresh} tintColor="#A78BFA" />
+              <RefreshControl refreshing={false} onRefresh={handleRefresh} tintColor={colors.primary} />
             }
           >
             {activeTab === "friends" && (
               <>
                 {friendsLoading ? (
                   <View style={{ paddingVertical: 40, alignItems: "center" }}>
-                    <ActivityIndicator size="large" color="#A78BFA" />
+                    <ActivityIndicator size="large" color={colors.primary} />
                   </View>
                 ) : friends.length === 0 ? (
                   <View style={{ paddingVertical: 60, alignItems: "center" }}>
-                    <Users size={64} color="rgba(255, 255, 255, 0.3)" />
-                    <Text style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: 16, marginTop: 16, textAlign: "center" }}>
+                    <Users size={64} color={colors.textSecondary} />
+                    <Text style={{ color: colors.textSecondary, fontSize: 16, marginTop: 16, textAlign: "center" }}>
                       No friends yet. Search for users to add friends!
                     </Text>
                   </View>
@@ -679,21 +683,21 @@ export default function FriendsScreen({ navigation }: Props) {
               <>
                 {recommendationsLoading ? (
                   <View style={{ paddingVertical: 40, alignItems: "center" }}>
-                    <ActivityIndicator size="large" color="#00D9FF" />
+                    <ActivityIndicator size="large" color={colors.info} />
                   </View>
                 ) : recommendations.length === 0 ? (
                   <View style={{ paddingVertical: 60, alignItems: "center" }}>
-                    <Users size={64} color="rgba(255, 255, 255, 0.3)" />
-                    <Text style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: 16, marginTop: 16, textAlign: "center" }}>
+                    <Users size={64} color={colors.textSecondary} />
+                    <Text style={{ color: colors.textSecondary, fontSize: 16, marginTop: 16, textAlign: "center" }}>
                       No recommendations available right now
                     </Text>
-                    <Text style={{ color: "rgba(255, 255, 255, 0.4)", fontSize: 14, marginTop: 8, textAlign: "center" }}>
+                    <Text style={{ color: colors.textTertiary, fontSize: 14, marginTop: 8, textAlign: "center" }}>
                       Complete your profile to get better suggestions
                     </Text>
                   </View>
                 ) : (
                   <>
-                    <Text style={{ fontSize: 16, fontWeight: "bold", color: "white", marginBottom: 12 }}>
+                    <Text style={{ fontSize: 16, fontWeight: "bold", color: colors.text, marginBottom: 12 }}>
                       People you may know
                     </Text>
                     {recommendations.map(renderRecommendation)}
@@ -706,12 +710,12 @@ export default function FriendsScreen({ navigation }: Props) {
               <>
                 {requestsLoading ? (
                   <View style={{ paddingVertical: 40, alignItems: "center" }}>
-                    <ActivityIndicator size="large" color="#A78BFA" />
+                    <ActivityIndicator size="large" color={colors.primary} />
                   </View>
                 ) : requests.length === 0 ? (
                   <View style={{ paddingVertical: 60, alignItems: "center" }}>
-                    <UserPlus size={64} color="rgba(255, 255, 255, 0.3)" />
-                    <Text style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: 16, marginTop: 16, textAlign: "center" }}>
+                    <UserPlus size={64} color={colors.textSecondary} />
+                    <Text style={{ color: colors.textSecondary, fontSize: 16, marginTop: 16, textAlign: "center" }}>
                       No pending friend requests
                     </Text>
                   </View>
@@ -725,20 +729,20 @@ export default function FriendsScreen({ navigation }: Props) {
               <>
                 {searchQuery.length < 2 ? (
                   <View style={{ paddingVertical: 60, alignItems: "center" }}>
-                    <Search size={64} color="rgba(255, 255, 255, 0.3)" />
-                    <Text style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: 16, marginTop: 16, textAlign: "center" }}>
+                    <Search size={64} color={colors.textSecondary} />
+                    <Text style={{ color: colors.textSecondary, fontSize: 16, marginTop: 16, textAlign: "center" }}>
                       Enter at least 2 characters to search
                     </Text>
                   </View>
                 ) : searchLoading ? (
                   <View style={{ paddingVertical: 40, alignItems: "center" }}>
-                    <ActivityIndicator size="large" color="#A78BFA" />
+                    <ActivityIndicator size="large" color={colors.primary} />
                   </View>
                 ) : searchResults.length === 0 ? (
                   <View style={{ paddingVertical: 60, alignItems: "center" }}>
-                    <Search size={64} color="rgba(255, 255, 255, 0.3)" />
-                    <Text style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: 16, marginTop: 16, textAlign: "center" }}>
-                      No users found matching &quot;{searchQuery}&quot;
+                    <Search size={64} color={colors.textSecondary} />
+                    <Text style={{ color: colors.textSecondary, fontSize: 16, marginTop: 16, textAlign: "center" }}>
+                      No users found matching "{searchQuery}"
                     </Text>
                   </View>
                 ) : (

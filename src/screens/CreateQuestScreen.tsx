@@ -274,13 +274,13 @@ export default function CreateQuestScreen({ navigation }: Props) {
                         justifyContent: "center",
                       }}
                     >
-                      <Sparkles size={32} color="white" />
+                      <Sparkles size={32} color={colors.text} />
                     </View>
                     <View style={{ flex: 1 }}>
-                      <Text style={{ fontSize: 22, fontWeight: "bold", color: "white", marginBottom: 4 }}>
+                      <Text style={{ fontSize: 22, fontWeight: "bold", color: colors.text, marginBottom: 4 }}>
                         Generate with AI
                       </Text>
-                      <Text style={{ fontSize: 14, color: "rgba(255, 255, 255, 0.9)" }}>
+                      <Text style={{ fontSize: 14, color: colors.text }}>
                         Let AI create a personalized quest
                       </Text>
                     </View>
@@ -292,15 +292,15 @@ export default function CreateQuestScreen({ navigation }: Props) {
               <View style={{ paddingHorizontal: 24, marginBottom: 20 }}>
                 <Pressable
                   onPress={() => setShowCustomForm(true)}
-                  style={{
-                    backgroundColor: "rgba(255, 255, 255, 0.05)",
-                    borderRadius: 24,
-                    padding: 24,
-                    borderWidth: 1,
-                    borderColor: "rgba(255, 255, 255, 0.1)",
-                  }}
-                >
-                  <View style={{ flexDirection: "row", alignItems: "center", gap: 16 }}>
+                    style={{
+                      backgroundColor: colors.card,
+                      borderRadius: 24,
+                      padding: 24,
+                      borderWidth: 1,
+                      borderColor: colors.cardBorder,
+                    }}
+                  >
+                    <View style={{ flexDirection: "row", alignItems: "center", gap: 16 }}>
                     <View
                       style={{
                         width: 60,
@@ -311,13 +311,13 @@ export default function CreateQuestScreen({ navigation }: Props) {
                         justifyContent: "center",
                       }}
                     >
-                      <Star size={28} color="#FF6B35" fill="#FF6B35" />
+                      <Star size={28} color={colors.secondary} fill={colors.secondary} />
                     </View>
                     <View style={{ flex: 1 }}>
-                      <Text style={{ fontSize: 22, fontWeight: "bold", color: "white", marginBottom: 4 }}>
+                      <Text style={{ fontSize: 22, fontWeight: "bold", color: colors.text, marginBottom: 4 }}>
                         Create Custom Quest
                       </Text>
-                      <Text style={{ fontSize: 14, color: "rgba(255, 255, 255, 0.6)" }}>
+                      <Text style={{ fontSize: 14, color: colors.textSecondary }}>
                         Design your own challenge
                       </Text>
                     </View>
@@ -329,15 +329,15 @@ export default function CreateQuestScreen({ navigation }: Props) {
               <View style={{ paddingHorizontal: 24, marginBottom: 20 }}>
                 <Pressable
                   onPress={() => setShowSendToFriends(true)}
-                  style={{
-                    backgroundColor: "rgba(255, 255, 255, 0.05)",
-                    borderRadius: 24,
-                    padding: 24,
-                    borderWidth: 1,
-                    borderColor: "rgba(255, 255, 255, 0.1)",
-                  }}
-                >
-                  <View style={{ flexDirection: "row", alignItems: "center", gap: 16 }}>
+                    style={{
+                      backgroundColor: colors.card,
+                      borderRadius: 24,
+                      padding: 24,
+                      borderWidth: 1,
+                      borderColor: colors.cardBorder,
+                    }}
+                  >
+                    <View style={{ flexDirection: "row", alignItems: "center", gap: 16 }}>
                     <View
                       style={{
                         width: 60,
@@ -348,13 +348,13 @@ export default function CreateQuestScreen({ navigation }: Props) {
                         justifyContent: "center",
                       }}
                     >
-                      <Users size={28} color="#00D9FF" />
+                      <Users size={28} color={colors.info} />
                     </View>
                     <View style={{ flex: 1 }}>
-                      <Text style={{ fontSize: 22, fontWeight: "bold", color: "white", marginBottom: 4 }}>
+                      <Text style={{ fontSize: 22, fontWeight: "bold", color: colors.text, marginBottom: 4 }}>
                         Send Quest to Friends
                       </Text>
-                      <Text style={{ fontSize: 14, color: "rgba(255, 255, 255, 0.6)" }}>
+                      <Text style={{ fontSize: 14, color: colors.textSecondary }}>
                         Challenge your friends
                       </Text>
                     </View>
@@ -406,43 +406,43 @@ export default function CreateQuestScreen({ navigation }: Props) {
                   keyboardShouldPersistTaps="handled"
                 >
                   {/* Title */}
-                  <Text style={{ fontSize: 28, fontWeight: "bold", color: "white", marginBottom: 8 }}>
+                  <Text style={{ fontSize: 28, fontWeight: "bold", color: colors.text, marginBottom: 8 }}>
                     Describe Your Quest
                   </Text>
-                  <Text style={{ fontSize: 16, color: "rgba(255, 255, 255, 0.6)", marginBottom: 32 }}>
+                  <Text style={{ fontSize: 16, color: colors.textSecondary, marginBottom: 32 }}>
                     Type or record what you want to do
                   </Text>
 
                   {/* Quest Action Input - 3D Glass Card */}
                   <View
                     style={{
-                      backgroundColor: "rgba(255, 255, 255, 0.05)",
+                      backgroundColor: colors.card,
                       borderRadius: 20,
                       padding: 20,
                       marginBottom: 24,
                       borderWidth: 1,
-                      borderColor: "rgba(255, 255, 255, 0.1)",
+                      borderColor: colors.cardBorder,
                     }}
                   >
-                    <Text style={{ fontSize: 16, fontWeight: "600", color: "white", marginBottom: 12 }}>
+                    <Text style={{ fontSize: 16, fontWeight: "600", color: colors.text, marginBottom: 12 }}>
                       Quest Description
                     </Text>
                     <TextInput
                       value={questAction}
                       onChangeText={setQuestAction}
                       placeholder="E.g., Ask 10 strangers for directions"
-                      placeholderTextColor="rgba(255, 255, 255, 0.3)"
+                      placeholderTextColor={colors.textTertiary}
                       multiline
                       numberOfLines={4}
                       style={{
-                        backgroundColor: "rgba(255, 255, 255, 0.03)",
+                        backgroundColor: colors.inputBackground,
                         borderRadius: 12,
                         paddingHorizontal: 16,
                         paddingVertical: 14,
                         fontSize: 16,
-                        color: "white",
+                        color: colors.text,
                         borderWidth: 1,
-                        borderColor: "rgba(255, 255, 255, 0.1)",
+                        borderColor: colors.inputBorder,
                         textAlignVertical: "top",
                         minHeight: 120,
                       }}
@@ -497,7 +497,7 @@ export default function CreateQuestScreen({ navigation }: Props) {
                         </>
                       )}
                     </Pressable>
-                    <Text style={{ fontSize: 12, color: "rgba(255, 255, 255, 0.4)", marginTop: 8, textAlign: "center" }}>
+                    <Text style={{ fontSize: 12, color: colors.textTertiary, marginTop: 8, textAlign: "center" }}>
                       AI will transcribe your audio into a quest
                     </Text>
                   </View>
@@ -515,9 +515,9 @@ export default function CreateQuestScreen({ navigation }: Props) {
                     paddingHorizontal: 24,
                     paddingTop: 16,
                     paddingBottom: 32,
-                    backgroundColor: "#0A0A0F",
+                    backgroundColor: colors.backgroundSolid,
                     borderTopWidth: 1,
-                    borderTopColor: "rgba(255, 255, 255, 0.1)",
+                    borderTopColor: colors.cardBorder,
                   }}
                 >
                   <Pressable
@@ -544,13 +544,13 @@ export default function CreateQuestScreen({ navigation }: Props) {
                     />
                     {generateMutation.isPending ? (
                       <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-                        <ActivityIndicator size="small" color="white" />
+                        <ActivityIndicator size="small" color={colors.text} />
                         <Text
                           style={{
-                            color: "white",
+                            color: colors.text,
                             fontWeight: "bold",
                             fontSize: 18,
-                            textShadowColor: "rgba(0, 0, 0, 0.75)",
+                            textShadowColor: colors.shadow,
                             textShadowOffset: { width: 0, height: 2 },
                             textShadowRadius: 4,
                           }}
@@ -561,10 +561,10 @@ export default function CreateQuestScreen({ navigation }: Props) {
                     ) : (
                       <Text
                         style={{
-                          color: "white",
+                          color: colors.text,
                           fontWeight: "bold",
                           fontSize: 18,
-                          textShadowColor: "rgba(0, 0, 0, 0.5)",
+                          textShadowColor: colors.shadow,
                           textShadowOffset: { width: 0, height: 1 },
                           textShadowRadius: 3,
                         }}
@@ -585,11 +585,11 @@ export default function CreateQuestScreen({ navigation }: Props) {
   // AI Form Screen - Dark 3D Glass Theme
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor: "#0A0A0F" }}
+      style={{ flex: 1, backgroundColor: colors.backgroundSolid }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       keyboardVerticalOffset={0}
     >
-      <LinearGradient colors={["#0A0A0F", "#1A1A24", "#2A1A34"]} style={{ flex: 1 }}>
+      <LinearGradient colors={colors.background as any} style={{ flex: 1 }}>
         <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
           {/* Header */}
           <View
@@ -605,9 +605,9 @@ export default function CreateQuestScreen({ navigation }: Props) {
               onPress={() => setShowAIForm(false)}
               style={{ position: "absolute", left: 20 }}
             >
-              <ChevronLeft size={28} color="white" />
+              <ChevronLeft size={28} color={colors.text} />
             </Pressable>
-            <Text style={{ fontSize: 20, fontWeight: "bold", color: "white" }}>
+            <Text style={{ fontSize: 20, fontWeight: "bold", color: colors.text }}>
               Generate with AI
             </Text>
           </View>
@@ -635,19 +635,19 @@ export default function CreateQuestScreen({ navigation }: Props) {
                     elevation: 8,
                   }}
                 >
-                  <Sparkles size={40} color="white" />
+                  <Sparkles size={40} color={colors.text} />
                 </LinearGradient>
-                <Text style={{ fontSize: 20, fontWeight: "bold", color: "white", marginTop: 16 }}>
+                <Text style={{ fontSize: 20, fontWeight: "bold", color: colors.text, marginTop: 16 }}>
                   AI Quest Generator
                 </Text>
-                <Text style={{ fontSize: 14, color: "rgba(255, 255, 255, 0.6)", textAlign: "center", marginTop: 8 }}>
+                <Text style={{ fontSize: 14, color: colors.textSecondary, textAlign: "center", marginTop: 8 }}>
                   Let AI create a personalized challenge for you
                 </Text>
               </View>
 
               {/* Location Type Selection */}
               <View style={{ marginBottom: 24 }}>
-                <Text style={{ fontSize: 18, fontWeight: "bold", color: "white", marginBottom: 12 }}>
+                <Text style={{ fontSize: 18, fontWeight: "bold", color: colors.text, marginBottom: 12 }}>
                   Quest Location
                 </Text>
                 <View style={{ gap: 12 }}>
@@ -678,10 +678,10 @@ export default function CreateQuestScreen({ navigation }: Props) {
                       <MapPin size={24} color={selectedLocationType === "CURRENT" ? "#00D9FF" : "rgba(255, 255, 255, 0.6)"} />
                     </View>
                     <View style={{ flex: 1 }}>
-                      <Text style={{ fontSize: 16, fontWeight: "bold", color: "white", marginBottom: 4 }}>
+                      <Text style={{ fontSize: 16, fontWeight: "bold", color: colors.text, marginBottom: 4 }}>
                         📍 Use My Location
                       </Text>
-                      <Text style={{ fontSize: 13, color: "rgba(255, 255, 255, 0.6)", lineHeight: 18 }}>
+                      <Text style={{ fontSize: 13, color: colors.textSecondary, lineHeight: 18 }}>
                         Find quests near me (within 10 miles)
                       </Text>
                     </View>
@@ -691,12 +691,12 @@ export default function CreateQuestScreen({ navigation }: Props) {
                           width: 24,
                           height: 24,
                           borderRadius: 12,
-                          backgroundColor: "#00D9FF",
+                          backgroundColor: colors.info,
                           alignItems: "center",
                           justifyContent: "center",
                         }}
                       >
-                        <Text style={{ color: "white", fontSize: 16, fontWeight: "bold" }}>✓</Text>
+                        <Text style={{ color: colors.text, fontSize: 16, fontWeight: "bold" }}>✓</Text>
                       </View>
                     )}
                   </Pressable>
@@ -728,10 +728,10 @@ export default function CreateQuestScreen({ navigation }: Props) {
                       <Globe size={24} color={selectedLocationType === "CUSTOM" ? "#FFD700" : "rgba(255, 255, 255, 0.6)"} />
                     </View>
                     <View style={{ flex: 1 }}>
-                      <Text style={{ fontSize: 16, fontWeight: "bold", color: "white", marginBottom: 4 }}>
+                      <Text style={{ fontSize: 16, fontWeight: "bold", color: colors.text, marginBottom: 4 }}>
                         🌍 Custom Location
                       </Text>
-                      <Text style={{ fontSize: 13, color: "rgba(255, 255, 255, 0.6)", lineHeight: 18 }}>
+                      <Text style={{ fontSize: 13, color: colors.textSecondary, lineHeight: 18 }}>
                         Specify a place (e.g., beach, mall, airport)
                       </Text>
                     </View>
@@ -741,12 +741,12 @@ export default function CreateQuestScreen({ navigation }: Props) {
                           width: 24,
                           height: 24,
                           borderRadius: 12,
-                          backgroundColor: "#FFD700",
+                          backgroundColor: colors.warning,
                           alignItems: "center",
                           justifyContent: "center",
                         }}
                       >
-                        <Text style={{ color: "white", fontSize: 16, fontWeight: "bold" }}>✓</Text>
+                        <Text style={{ color: colors.text, fontSize: 16, fontWeight: "bold" }}>✓</Text>
                       </View>
                     )}
                   </Pressable>
@@ -778,10 +778,10 @@ export default function CreateQuestScreen({ navigation }: Props) {
                       <Star size={24} color={selectedLocationType === "NONE" ? "#A78BFA" : "rgba(255, 255, 255, 0.6)"} />
                     </View>
                     <View style={{ flex: 1 }}>
-                      <Text style={{ fontSize: 16, fontWeight: "bold", color: "white", marginBottom: 4 }}>
+                      <Text style={{ fontSize: 16, fontWeight: "bold", color: colors.text, marginBottom: 4 }}>
                         ⭐ No Specific Location
                       </Text>
-                      <Text style={{ fontSize: 13, color: "rgba(255, 255, 255, 0.6)", lineHeight: 18 }}>
+                      <Text style={{ fontSize: 13, color: colors.textSecondary, lineHeight: 18 }}>
                         Quest can be done anywhere
                       </Text>
                     </View>
@@ -809,16 +809,16 @@ export default function CreateQuestScreen({ navigation }: Props) {
                       value={customLocation}
                       onChangeText={setCustomLocation}
                       placeholder="E.g., Santa Monica Beach, Mall of America, Airport..."
-                      placeholderTextColor="rgba(255, 255, 255, 0.3)"
+                      placeholderTextColor={colors.textTertiary}
                       style={{
-                        backgroundColor: "rgba(255, 255, 255, 0.05)",
+                        backgroundColor: colors.inputBackground,
                         borderRadius: 12,
                         paddingHorizontal: 16,
                         paddingVertical: 14,
                         fontSize: 16,
-                        color: "white",
+                        color: colors.text,
                         borderWidth: 1,
-                        borderColor: "rgba(255, 215, 0, 0.3)",
+                        borderColor: colors.inputBorder,
                       }}
                     />
                   </View>
@@ -827,7 +827,7 @@ export default function CreateQuestScreen({ navigation }: Props) {
 
               {/* Category Selection */}
               <View style={{ marginBottom: 24 }}>
-                <Text style={{ fontSize: 18, fontWeight: "bold", color: "white", marginBottom: 12 }}>
+                <Text style={{ fontSize: 18, fontWeight: "bold", color: colors.text, marginBottom: 12 }}>
                   Select Category
                 </Text>
                 <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>
@@ -866,7 +866,7 @@ export default function CreateQuestScreen({ navigation }: Props) {
 
               {/* Difficulty Selection */}
               <View style={{ marginBottom: 24 }}>
-                <Text style={{ fontSize: 18, fontWeight: "bold", color: "white", marginBottom: 12 }}>
+                <Text style={{ fontSize: 18, fontWeight: "bold", color: colors.text, marginBottom: 12 }}>
                   Select Difficulty
                 </Text>
                 <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>
@@ -905,10 +905,10 @@ export default function CreateQuestScreen({ navigation }: Props) {
 
               {/* Quest Type Selection */}
               <View style={{ marginBottom: 24 }}>
-                <Text style={{ fontSize: 18, fontWeight: "bold", color: "white", marginBottom: 4 }}>
+                <Text style={{ fontSize: 18, fontWeight: "bold", color: colors.text, marginBottom: 4 }}>
                   Quest Type
                 </Text>
-                <Text style={{ fontSize: 14, color: "rgba(255, 255, 255, 0.6)", marginBottom: 12 }}>
+                <Text style={{ fontSize: 14, color: colors.textSecondary, marginBottom: 12 }}>
                   Choose your challenge style
                 </Text>
 
@@ -940,10 +940,10 @@ export default function CreateQuestScreen({ navigation }: Props) {
                       <ThumbsDown size={24} color={selectedQuestType === "REJECTION" ? "#FF6B35" : "rgba(255, 255, 255, 0.6)"} />
                     </View>
                     <View style={{ flex: 1 }}>
-                      <Text style={{ fontSize: 16, fontWeight: "bold", color: "white", marginBottom: 4 }}>
+                      <Text style={{ fontSize: 16, fontWeight: "bold", color: colors.text, marginBottom: 4 }}>
                         🎯 Rejection Challenge
                       </Text>
-                      <Text style={{ fontSize: 13, color: "rgba(255, 255, 255, 0.6)", lineHeight: 18 }}>
+                      <Text style={{ fontSize: 13, color: colors.textSecondary, lineHeight: 18 }}>
                         Track YES/NO responses from asking people
                       </Text>
                     </View>
@@ -953,12 +953,12 @@ export default function CreateQuestScreen({ navigation }: Props) {
                           width: 24,
                           height: 24,
                           borderRadius: 12,
-                          backgroundColor: "#FF6B35",
+                          backgroundColor: colors.secondary,
                           alignItems: "center",
                           justifyContent: "center",
                         }}
                       >
-                        <Text style={{ color: "white", fontSize: 16, fontWeight: "bold" }}>✓</Text>
+                        <Text style={{ color: colors.text, fontSize: 16, fontWeight: "bold" }}>✓</Text>
                       </View>
                     )}
                   </Pressable>
@@ -990,10 +990,10 @@ export default function CreateQuestScreen({ navigation }: Props) {
                       <Star size={24} color={selectedQuestType === "ACTION" ? "#FFD700" : "rgba(255, 255, 255, 0.6)"} fill={selectedQuestType === "ACTION" ? "#FFD700" : "transparent"} />
                     </View>
                     <View style={{ flex: 1 }}>
-                      <Text style={{ fontSize: 16, fontWeight: "bold", color: "white", marginBottom: 4 }}>
+                      <Text style={{ fontSize: 16, fontWeight: "bold", color: colors.text, marginBottom: 4 }}>
                         ⭐ Action Challenge
                       </Text>
-                      <Text style={{ fontSize: 13, color: "rgba(255, 255, 255, 0.6)", lineHeight: 18 }}>
+                      <Text style={{ fontSize: 13, color: colors.textSecondary, lineHeight: 18 }}>
                         Complete actions like applying or networking
                       </Text>
                     </View>
@@ -1003,12 +1003,12 @@ export default function CreateQuestScreen({ navigation }: Props) {
                           width: 24,
                           height: 24,
                           borderRadius: 12,
-                          backgroundColor: "#FFD700",
+                          backgroundColor: colors.warning,
                           alignItems: "center",
                           justifyContent: "center",
                         }}
                       >
-                        <Text style={{ color: "white", fontSize: 16, fontWeight: "bold" }}>✓</Text>
+                        <Text style={{ color: colors.text, fontSize: 16, fontWeight: "bold" }}>✓</Text>
                       </View>
                     )}
                   </Pressable>
@@ -1017,31 +1017,31 @@ export default function CreateQuestScreen({ navigation }: Props) {
 
               {/* Add Context */}
               <View>
-                <Text style={{ fontSize: 18, fontWeight: "bold", color: "white", marginBottom: 4 }}>
+                <Text style={{ fontSize: 18, fontWeight: "bold", color: colors.text, marginBottom: 4 }}>
                   Add Personal Context{" "}
-                  <Text style={{ fontSize: 14, fontWeight: "normal", color: "rgba(255, 255, 255, 0.4)" }}>
+                  <Text style={{ fontSize: 14, fontWeight: "normal", color: colors.textTertiary }}>
                     (Optional)
                   </Text>
                 </Text>
-                <Text style={{ fontSize: 14, color: "rgba(255, 255, 255, 0.6)", marginBottom: 12 }}>
+                <Text style={{ fontSize: 14, color: colors.textSecondary, marginBottom: 12 }}>
                   Tell AI about your goals for tailored quests
                 </Text>
                 <TextInput
                   value={customPrompt}
                   onChangeText={setCustomPrompt}
                   placeholder="E.g., I'm a software developer looking for a job..."
-                  placeholderTextColor="rgba(255, 255, 255, 0.3)"
+                  placeholderTextColor={colors.textTertiary}
                   multiline
                   numberOfLines={4}
                   style={{
-                    backgroundColor: "rgba(255, 255, 255, 0.05)",
+                    backgroundColor: colors.inputBackground,
                     borderRadius: 12,
                     paddingHorizontal: 16,
                     paddingVertical: 14,
                     fontSize: 16,
-                    color: "white",
+                    color: colors.text,
                     borderWidth: 1,
-                    borderColor: "rgba(255, 255, 255, 0.1)",
+                    borderColor: colors.inputBorder,
                     textAlignVertical: "top",
                     minHeight: 100,
                   }}
@@ -1060,9 +1060,9 @@ export default function CreateQuestScreen({ navigation }: Props) {
               paddingHorizontal: 24,
               paddingTop: 16,
               paddingBottom: 32,
-              backgroundColor: "#0A0A0F",
+              backgroundColor: colors.backgroundSolid,
               borderTopWidth: 1,
-              borderTopColor: "rgba(255, 255, 255, 0.1)",
+              borderTopColor: colors.cardBorder,
             }}
           >
             <Pressable
@@ -1078,10 +1078,10 @@ export default function CreateQuestScreen({ navigation }: Props) {
               <LinearGradient
                 colors={
                   !selectedCategory || !selectedDifficulty
-                    ? ["#666", "#666"]
+                    ? [colors.textTertiary, colors.textTertiary]
                     : generateMutation.isPending
-                    ? ["#666", "#666"]
-                    : ["#7E3FE4", "#9D5FE4"]
+                    ? [colors.textTertiary, colors.textTertiary]
+                    : [colors.primary, colors.primary + "E4"]
                 }
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
@@ -1095,13 +1095,13 @@ export default function CreateQuestScreen({ navigation }: Props) {
               />
               {generateMutation.isPending ? (
                 <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-                  <ActivityIndicator size="small" color="white" />
+                  <ActivityIndicator size="small" color={colors.text} />
                   <Text
                     style={{
-                      color: "white",
+                      color: colors.text,
                       fontWeight: "bold",
                       fontSize: 18,
-                      textShadowColor: "rgba(0, 0, 0, 0.75)",
+                      textShadowColor: colors.shadow,
                       textShadowOffset: { width: 0, height: 2 },
                       textShadowRadius: 4,
                     }}
@@ -1112,10 +1112,10 @@ export default function CreateQuestScreen({ navigation }: Props) {
               ) : (
                 <Text
                   style={{
-                    color: "white",
+                    color: colors.text,
                     fontWeight: "bold",
                     fontSize: 18,
-                    textShadowColor: "rgba(0, 0, 0, 0.5)",
+                    textShadowColor: colors.shadow,
                     textShadowOffset: { width: 0, height: 1 },
                     textShadowRadius: 3,
                   }}

@@ -474,7 +474,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
     return (
       <View style={{ flex: 1, backgroundColor: colors.backgroundSolid }}>
         <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-          <ActivityIndicator size="large" color="#7E3FE4" />
+          <ActivityIndicator size="large" color={colors.primary} />
         </View>
       </View>
     );
@@ -490,7 +490,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
             </Text>
             <Pressable
               onPress={() => navigation.goBack()}
-              style={{ backgroundColor: "#7E3FE4", paddingHorizontal: 32, paddingVertical: 16, borderRadius: 999 }}
+              style={{ backgroundColor: colors.primary, paddingHorizontal: 32, paddingVertical: 16, borderRadius: 999 }}
             >
               <Text style={{ color: colors.text, fontWeight: "bold", fontSize: 18 }}>Go Back</Text>
             </Pressable>
@@ -513,7 +513,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
             </Text>
             <Pressable
               onPress={() => navigation.goBack()}
-              style={{ backgroundColor: "#7E3FE4", paddingHorizontal: 32, paddingVertical: 16, borderRadius: 999 }}
+              style={{ backgroundColor: colors.primary, paddingHorizontal: 32, paddingVertical: 16, borderRadius: 999 }}
             >
               <Text style={{ color: colors.text, fontWeight: "bold", fontSize: 18 }}>Go Back</Text>
             </Pressable>
@@ -740,11 +740,11 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
           <View
             style={{
               height: 8,
-              backgroundColor: "rgba(255, 255, 255, 0.05)",
+              backgroundColor: colors.surface,
               borderRadius: 999,
               overflow: "hidden",
               borderWidth: 1,
-              borderColor: "rgba(126, 63, 228, 0.2)",
+              borderColor: colors.cardBorder,
             }}
           >
             <LinearGradient
@@ -764,12 +764,12 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
           <View style={{ paddingHorizontal: 20, paddingTop: 16 }}>
             <View
               style={{
-                backgroundColor: "rgba(255, 255, 255, 0.05)",
+                backgroundColor: colors.card,
                 borderRadius: 24,
                 padding: 24,
                 borderWidth: 1,
-                borderColor: "rgba(126, 63, 228, 0.3)",
-                shadowColor: "#7E3FE4",
+                borderColor: colors.cardBorder,
+                shadowColor: colors.primary,
                 shadowOffset: { width: 0, height: 4 },
                 shadowOpacity: 0.3,
                 shadowRadius: 12,
@@ -981,7 +981,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
 
               {/* See More */}
               <Pressable onPress={() => setShowMore(!showMore)}>
-                <Text style={{ color: "#7E3FE4", fontSize: 16, fontWeight: "600" }}>
+                <Text style={{ color: colors.primary, fontSize: 16, fontWeight: "600" }}>
                   {showMore ? "See less" : "See more"}
                 </Text>
               </Pressable>
@@ -1071,7 +1071,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                   disabled={isRegenerating}
                   style={{
                     marginTop: 16,
-                    backgroundColor: isRegenerating ? "#9CA3AF" : "#8B5CF6",
+                    backgroundColor: isRegenerating ? colors.textTertiary : colors.primary,
                     paddingVertical: 14,
                     paddingHorizontal: 20,
                     borderRadius: 12,
@@ -1083,15 +1083,15 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                 >
                   {isRegenerating ? (
                     <>
-                      <ActivityIndicator color="white" size="small" />
-                      <Text style={{ color: "white", fontSize: 16, fontWeight: "600" }}>
+                      <ActivityIndicator color={colors.text} size="small" />
+                      <Text style={{ color: colors.text, fontSize: 16, fontWeight: "600" }}>
                         Regenerating...
                       </Text>
                     </>
                   ) : (
                     <>
-                      <Sparkles size={20} color="white" />
-                      <Text style={{ color: "white", fontSize: 16, fontWeight: "600" }}>
+                      <Sparkles size={20} color={colors.text} />
+                      <Text style={{ color: colors.text, fontSize: 16, fontWeight: "600" }}>
                         Regenerate Quest ({selectedCategory} • {selectedDifficulty})
                       </Text>
                     </>
@@ -1103,7 +1103,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
 
           {/* Bottom Text */}
           <View style={{ paddingHorizontal: 20, paddingTop: 16 }}>
-            <Text style={{ color: "rgba(255, 255, 255, 0.5)", fontSize: 13, textAlign: "center", lineHeight: 18 }}>
+            <Text style={{ color: colors.textTertiary, fontSize: 13, textAlign: "center", lineHeight: 18 }}>
               1 slot for your quests • 1 slot for friend quests{"\n"}
               Complete quests to unlock new ones from the queue
             </Text>
@@ -1119,9 +1119,9 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
             right: 0,
             paddingHorizontal: 20,
             paddingVertical: 20,
-            backgroundColor: "#0A0A0F",
+            backgroundColor: colors.backgroundSolid,
             borderTopWidth: 1,
-            borderTopColor: "rgba(126, 63, 228, 0.2)",
+            borderTopColor: colors.cardBorder,
           }}
         >
           {quest.goalType === "TAKE_ACTION" ? (
@@ -1154,11 +1154,11 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                 }}
               />
               {recordMutation.isPending ? (
-                <ActivityIndicator size="small" color="white" />
+                <ActivityIndicator size="small" color={colors.text} />
               ) : (
                 <>
-                  <Star size={28} color="white" fill="white" />
-                  <Text style={{ color: "white", fontSize: 20, fontWeight: "bold" }}>
+                  <Star size={28} color={colors.text} fill={colors.text} />
+                  <Text style={{ color: colors.text, fontSize: 20, fontWeight: "bold" }}>
                     I Did It!
                   </Text>
                 </>
@@ -1195,9 +1195,9 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                   }}
                 />
                 {recordMutation.isPending ? (
-                  <ActivityIndicator size="small" color="white" />
+                  <ActivityIndicator size="small" color={colors.text} />
                 ) : (
-                  <Text style={{ color: "white", fontSize: 20, fontWeight: "bold" }}>YES</Text>
+                  <Text style={{ color: colors.text, fontSize: 20, fontWeight: "bold" }}>YES</Text>
                 )}
               </Pressable>
 
@@ -1229,9 +1229,9 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                   }}
                 />
                 {recordMutation.isPending ? (
-                  <ActivityIndicator size="small" color="white" />
+                  <ActivityIndicator size="small" color={colors.text} />
                 ) : (
-                  <Text style={{ color: "white", fontSize: 20, fontWeight: "bold" }}>NO</Text>
+                  <Text style={{ color: colors.text, fontSize: 20, fontWeight: "bold" }}>NO</Text>
                 )}
               </Pressable>
             </View>
@@ -1242,7 +1242,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
       {/* Completion Modal - Sequential Pages with 3D Glassmorphism Design */}
       <Modal visible={showCompletion} transparent animationType="fade" onRequestClose={() => {}}>
         <LinearGradient
-          colors={["#0A0A0F", "#1A1A24", "#2A1A34"]}
+          colors={colors.background as any}
           style={{ flex: 1 }}
         >
           <Pressable
@@ -1254,7 +1254,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
           <SafeAreaView style={{ flex: 1 }}>
             {/* Floating Confetti Particles */}
             {confettiAnims.map((anim, index) => {
-              const colors = ["#FFD700", "#FF6B35", "#00D9FF", "#7E3FE4", "#4CAF50"];
+              const confettiColors = ["#FFD700", "#FF6B35", "#00D9FF", "#7E3FE4", "#4CAF50"];
               const size = 8 + Math.random() * 8;
               const leftPosition = Math.random() * 100;
 
@@ -1267,7 +1267,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                     width: size,
                     height: size,
                     borderRadius: size / 2,
-                    backgroundColor: colors[index % colors.length],
+                    backgroundColor: confettiColors[index % confettiColors.length],
                     opacity: anim.interpolate({
                       inputRange: [0, 0.5, 1],
                       outputRange: [0, 1, 0],
@@ -1357,7 +1357,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                       elevation: 10,
                     }}
                   >
-                    <Trophy size={70} color="white" />
+                    <Trophy size={70} color={colors.text} />
                   </LinearGradient>
                 </Animated.View>
 
@@ -1366,7 +1366,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                   style={{
                     fontSize: 40,
                     fontWeight: "bold",
-                    color: "white",
+                    color: colors.text,
                     marginBottom: 16,
                     textAlign: "center",
                     opacity: celebrationAnim,
@@ -1386,7 +1386,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                 <Animated.Text
                   style={{
                     fontSize: 18,
-                    color: "rgba(255, 255, 255, 0.9)",
+                    color: colors.text,
                     textAlign: "center",
                     marginBottom: 48,
                     opacity: celebrationAnim,
@@ -1399,12 +1399,12 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                 <Animated.View
                   style={{
                     width: "100%",
-                    backgroundColor: "rgba(255, 255, 255, 0.05)",
+                    backgroundColor: colors.card,
                     borderRadius: 24,
                     padding: 24,
                     borderWidth: 2,
-                    borderColor: "rgba(126, 63, 228, 0.3)",
-                    shadowColor: "#7E3FE4",
+                    borderColor: colors.cardBorder,
+                    shadowColor: colors.primary,
                     shadowOffset: { width: 0, height: 8 },
                     shadowOpacity: 0.4,
                     shadowRadius: 16,
@@ -1424,7 +1424,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                     style={{
                       fontSize: 20,
                       fontWeight: "bold",
-                      color: "white",
+                      color: colors.text,
                       marginBottom: 24,
                       textAlign: "center",
                     }}
@@ -1447,10 +1447,10 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                     >
                       <Text
                         style={{
-                          color: "#FFFFFF",
+                          color: colors.text,
                           fontSize: 28,
                           fontWeight: "bold",
-                          textShadowColor: "rgba(255, 215, 0, 0.8)",
+                          textShadowColor: colors.warning + "80",
                           textShadowOffset: { width: 0, height: 3 },
                           textShadowRadius: 8,
                         }}
@@ -1459,10 +1459,10 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                       </Text>
                       <Text
                         style={{
-                          color: "#FFFFFF",
+                          color: colors.text,
                           fontSize: 16,
                           fontWeight: "600",
-                          textShadowColor: "rgba(0, 0, 0, 0.7)",
+                          textShadowColor: colors.shadow,
                           textShadowOffset: { width: 0, height: 1 },
                           textShadowRadius: 3,
                         }}
@@ -1483,10 +1483,10 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                     >
                       <Text
                         style={{
-                          color: "#FFFFFF",
+                          color: colors.text,
                           fontSize: 28,
                           fontWeight: "bold",
-                          textShadowColor: "rgba(255, 107, 53, 0.8)",
+                          textShadowColor: colors.secondary + "80",
                           textShadowOffset: { width: 0, height: 3 },
                           textShadowRadius: 8,
                         }}
@@ -1495,10 +1495,10 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                       </Text>
                       <Text
                         style={{
-                          color: "#FFFFFF",
+                          color: colors.text,
                           fontSize: 16,
                           fontWeight: "600",
-                          textShadowColor: "rgba(0, 0, 0, 0.7)",
+                          textShadowColor: colors.shadow,
                           textShadowOffset: { width: 0, height: 1 },
                           textShadowRadius: 3,
                         }}
@@ -1523,10 +1523,10 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                     >
                       <Text
                         style={{
-                          color: "#FFFFFF",
+                          color: colors.text,
                           fontSize: 28,
                           fontWeight: "bold",
-                          textShadowColor: "rgba(126, 63, 228, 0.8)",
+                          textShadowColor: colors.primary + "80",
                           textShadowOffset: { width: 0, height: 3 },
                           textShadowRadius: 8,
                         }}
@@ -1535,10 +1535,10 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                       </Text>
                       <Text
                         style={{
-                          color: "#FFFFFF",
+                          color: colors.text,
                           fontSize: 16,
                           fontWeight: "600",
-                          textShadowColor: "rgba(0, 0, 0, 0.7)",
+                          textShadowColor: colors.shadow,
                           textShadowOffset: { width: 0, height: 1 },
                           textShadowRadius: 3,
                         }}
@@ -1559,10 +1559,10 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                     >
                       <Text
                         style={{
-                          color: "#FFFFFF",
+                          color: colors.text,
                           fontSize: 28,
                           fontWeight: "bold",
-                          textShadowColor: "rgba(0, 217, 255, 0.8)",
+                          textShadowColor: colors.info + "80",
                           textShadowOffset: { width: 0, height: 3 },
                           textShadowRadius: 8,
                         }}
@@ -1571,10 +1571,10 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                       </Text>
                       <Text
                         style={{
-                          color: "#FFFFFF",
+                          color: colors.text,
                           fontSize: 16,
                           fontWeight: "600",
-                          textShadowColor: "rgba(0, 0, 0, 0.7)",
+                          textShadowColor: colors.shadow,
                           textShadowOffset: { width: 0, height: 1 },
                           textShadowRadius: 3,
                         }}
@@ -1597,7 +1597,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                     onPress={handleShareToCommunity}
                     disabled={shareToCommunityMutation.isPending}
                     style={{
-                      backgroundColor: "#7E3FE4",
+                      backgroundColor: colors.primary,
                       paddingVertical: 16,
                       paddingHorizontal: 32,
                       borderRadius: 24,
@@ -1605,7 +1605,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                       alignItems: "center",
                       justifyContent: "center",
                       gap: 12,
-                      shadowColor: "#7E3FE4",
+                      shadowColor: colors.primary,
                       shadowOffset: { width: 0, height: 4 },
                       shadowOpacity: 0.4,
                       shadowRadius: 12,
@@ -1614,13 +1614,13 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                     }}
                   >
                     {shareToCommunityMutation.isPending ? (
-                      <ActivityIndicator size="small" color="white" />
+                      <ActivityIndicator size="small" color={colors.text} />
                     ) : (
                       <>
-                        <Share2 size={22} color="white" />
+                        <Share2 size={22} color={colors.text} />
                         <Text
                           style={{
-                            color: "white",
+                            color: colors.text,
                             fontSize: 18,
                             fontWeight: "700",
                           }}
@@ -1637,11 +1637,11 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                   style={{
                     marginTop: 24,
                     fontSize: 18,
-                    color: "#FFFFFF",
+                    color: colors.text,
                     fontWeight: "600",
                     textAlign: "center",
                     opacity: celebrationAnim,
-                    textShadowColor: "rgba(0, 0, 0, 0.8)",
+                    textShadowColor: colors.shadow,
                     textShadowOffset: { width: 0, height: 2 },
                     textShadowRadius: 6,
                   }}
@@ -1666,7 +1666,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
         <View
           style={{
             flex: 1,
-            backgroundColor: "rgba(0, 0, 0, 0.8)",
+            backgroundColor: colors.modalOverlay,
             alignItems: "center",
             justifyContent: "center",
           }}
@@ -1704,7 +1704,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                   justifyContent: "center",
                 }}
               >
-                <Trophy size={60} color="white" />
+                <Trophy size={60} color={colors.text} />
               </LinearGradient>
             </Animated.View>
 
@@ -1713,7 +1713,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
               style={{
                 fontSize: 28,
                 fontWeight: "bold",
-                color: "white",
+                color: colors.text,
                 marginBottom: 16,
               }}
             >
@@ -1723,7 +1723,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
             <Text
               style={{
                 fontSize: 16,
-                color: "#D1D5DB",
+                color: colors.textSecondary,
                 textAlign: "center",
               }}
             >
@@ -1743,14 +1743,14 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
         <Pressable
           style={{
             flex: 1,
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            backgroundColor: colors.modalOverlay,
             justifyContent: "flex-end",
           }}
           onPress={() => setShowCategoryModal(false)}
         >
           <Pressable
             style={{
-              backgroundColor: "white",
+              backgroundColor: colors.card,
               borderTopLeftRadius: 24,
               borderTopRightRadius: 24,
               padding: 24,
@@ -1758,7 +1758,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
             }}
             onPress={(e) => e.stopPropagation()}
           >
-            <Text style={{ fontSize: 24, fontWeight: "bold", marginBottom: 20, textAlign: "center" }}>
+            <Text style={{ fontSize: 24, fontWeight: "bold", marginBottom: 20, textAlign: "center", color: colors.text }}>
               Select Category
             </Text>
             <ScrollView>
@@ -1770,7 +1770,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                     setShowCategoryModal(false);
                   }}
                   style={{
-                    backgroundColor: selectedCategory === category ? getCategoryColor(category) + "20" : "#F3F4F6",
+                    backgroundColor: selectedCategory === category ? getCategoryColor(category) + "20" : colors.surface,
                     padding: 16,
                     borderRadius: 12,
                     marginBottom: 12,
@@ -1782,7 +1782,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                     style={{
                       fontSize: 16,
                       fontWeight: selectedCategory === category ? "700" : "600",
-                      color: selectedCategory === category ? getCategoryColor(category) : "#374151",
+                      color: selectedCategory === category ? getCategoryColor(category) : colors.text,
                       textAlign: "center",
                     }}
                   >
@@ -1805,21 +1805,21 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
         <Pressable
           style={{
             flex: 1,
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            backgroundColor: colors.modalOverlay,
             justifyContent: "flex-end",
           }}
           onPress={() => setShowDifficultyModal(false)}
         >
           <Pressable
             style={{
-              backgroundColor: "white",
+              backgroundColor: colors.card,
               borderTopLeftRadius: 24,
               borderTopRightRadius: 24,
               padding: 24,
             }}
             onPress={(e) => e.stopPropagation()}
           >
-            <Text style={{ fontSize: 24, fontWeight: "bold", marginBottom: 20, textAlign: "center" }}>
+            <Text style={{ fontSize: 24, fontWeight: "bold", marginBottom: 20, textAlign: "center", color: colors.text }}>
               Select Difficulty
             </Text>
             {["EASY", "MEDIUM", "HARD", "EXPERT"].map((difficulty) => (
@@ -1830,7 +1830,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                   setShowDifficultyModal(false);
                 }}
                 style={{
-                  backgroundColor: selectedDifficulty === difficulty ? getDifficultyColor(difficulty) + "30" : "#F3F4F6",
+                  backgroundColor: selectedDifficulty === difficulty ? getDifficultyColor(difficulty) + "30" : colors.surface,
                   padding: 16,
                   borderRadius: 12,
                   marginBottom: 12,
@@ -1842,7 +1842,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                   style={{
                     fontSize: 16,
                     fontWeight: selectedDifficulty === difficulty ? "700" : "600",
-                    color: selectedDifficulty === difficulty ? getDifficultyColor(difficulty) : "#374151",
+                    color: selectedDifficulty === difficulty ? getDifficultyColor(difficulty) : colors.text,
                     textAlign: "center",
                   }}
                 >

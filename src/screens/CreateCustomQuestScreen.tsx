@@ -25,6 +25,7 @@ import {
 } from "lucide-react-native";
 import type { RootStackScreenProps } from "@/navigation/types";
 import { api } from "@/lib/api";
+import { useTheme } from "@/contexts/ThemeContext";
 import type {
   CreateCustomQuestRequest,
   CreateCustomQuestResponse,
@@ -36,6 +37,7 @@ type Props = RootStackScreenProps<"CreateCustomQuest">;
 
 export default function CreateCustomQuestScreen({ route, navigation }: Props) {
   const { friendId, friendName } = route.params;
+  const { colors } = useTheme();
   const queryClient = useQueryClient();
 
   // State
@@ -231,8 +233,8 @@ export default function CreateCustomQuestScreen({ route, navigation }: Props) {
   ];
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
-      <LinearGradient colors={["#0A0A0F", "#1A1A24", "#2A1A34"]} style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: colors.backgroundSolid }}>
+      <LinearGradient colors={colors.background as any} style={{ flex: 1 }}>
         <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
           <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 120 }}>
             {/* Header */}
@@ -246,10 +248,10 @@ export default function CreateCustomQuestScreen({ route, navigation }: Props) {
               }}
             >
               <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: 28, fontWeight: "900", color: "white" }}>
+                <Text style={{ fontSize: 28, fontWeight: "900", color: colors.text }}>
                   Create Custom Quest
                 </Text>
-                <Text style={{ fontSize: 14, color: "rgba(255, 255, 255, 0.6)", marginTop: 4 }}>
+                <Text style={{ fontSize: 14, color: colors.textSecondary, marginTop: 4 }}>
                   For {friendName}
                 </Text>
               </View>
@@ -259,12 +261,12 @@ export default function CreateCustomQuestScreen({ route, navigation }: Props) {
                   width: 40,
                   height: 40,
                   borderRadius: 20,
-                  backgroundColor: "rgba(255, 255, 255, 0.1)",
+                  backgroundColor: colors.surface,
                   alignItems: "center",
                   justifyContent: "center",
                 }}
               >
-                <X size={24} color="white" />
+                <X size={24} color={colors.text} />
               </Pressable>
             </View>
 
@@ -273,29 +275,29 @@ export default function CreateCustomQuestScreen({ route, navigation }: Props) {
               style={{
                 marginHorizontal: 20,
                 marginBottom: 20,
-                backgroundColor: "rgba(255, 255, 255, 0.05)",
+                backgroundColor: colors.card,
                 borderRadius: 16,
                 padding: 16,
                 borderWidth: 1,
-                borderColor: "rgba(126, 63, 228, 0.3)",
+                borderColor: colors.cardBorder,
               }}
             >
               <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 8 }}>
-                <Gift size={20} color="#FFD700" />
-                <Text style={{ fontSize: 16, fontWeight: "700", color: "white", marginLeft: 8 }}>
+                <Gift size={20} color={colors.warning} />
+                <Text style={{ fontSize: 16, fontWeight: "700", color: colors.text, marginLeft: 8 }}>
                   Your Balance
                 </Text>
               </View>
               <View style={{ flexDirection: "row", gap: 16 }}>
                 <View style={{ flex: 1 }}>
-                  <Text style={{ fontSize: 12, color: "rgba(255, 255, 255, 0.6)" }}>XP</Text>
-                  <Text style={{ fontSize: 24, fontWeight: "bold", color: "#7E3FE4" }}>
+                  <Text style={{ fontSize: 12, color: colors.textSecondary }}>XP</Text>
+                  <Text style={{ fontSize: 24, fontWeight: "bold", color: colors.primary }}>
                     {maxGiftXP}
                   </Text>
                 </View>
                 <View style={{ flex: 1 }}>
-                  <Text style={{ fontSize: 12, color: "rgba(255, 255, 255, 0.6)" }}>Points</Text>
-                  <Text style={{ fontSize: 24, fontWeight: "bold", color: "#00D9FF" }}>
+                  <Text style={{ fontSize: 12, color: colors.textSecondary }}>Points</Text>
+                  <Text style={{ fontSize: 24, fontWeight: "bold", color: colors.info }}>
                     {maxGiftPoints}
                   </Text>
                 </View>
@@ -313,7 +315,7 @@ export default function CreateCustomQuestScreen({ route, navigation }: Props) {
                 flexDirection: "row",
                 marginHorizontal: 20,
                 marginBottom: 20,
-                backgroundColor: "rgba(255, 255, 255, 0.05)",
+                backgroundColor: colors.surface,
                 borderRadius: 12,
                 padding: 4,
               }}
@@ -324,13 +326,13 @@ export default function CreateCustomQuestScreen({ route, navigation }: Props) {
                   flex: 1,
                   paddingVertical: 12,
                   borderRadius: 8,
-                  backgroundColor: inputMode === "text" ? "#7E3FE4" : "transparent",
+                  backgroundColor: inputMode === "text" ? colors.primary : "transparent",
                   alignItems: "center",
                 }}
               >
                 <Text
                   style={{
-                    color: inputMode === "text" ? "white" : "rgba(255, 255, 255, 0.6)",
+                    color: inputMode === "text" ? colors.text : colors.textSecondary,
                     fontWeight: "700",
                   }}
                 >
@@ -343,13 +345,13 @@ export default function CreateCustomQuestScreen({ route, navigation }: Props) {
                   flex: 1,
                   paddingVertical: 12,
                   borderRadius: 8,
-                  backgroundColor: inputMode === "voice" ? "#7E3FE4" : "transparent",
+                  backgroundColor: inputMode === "voice" ? colors.primary : "transparent",
                   alignItems: "center",
                 }}
               >
                 <Text
                   style={{
-                    color: inputMode === "voice" ? "white" : "rgba(255, 255, 255, 0.6)",
+                    color: inputMode === "voice" ? colors.text : colors.textSecondary,
                     fontWeight: "700",
                   }}
                 >
@@ -361,29 +363,29 @@ export default function CreateCustomQuestScreen({ route, navigation }: Props) {
             {/* Text Input */}
             {inputMode === "text" && (
               <View style={{ marginHorizontal: 20, marginBottom: 20 }}>
-                <Text style={{ fontSize: 16, fontWeight: "700", color: "white", marginBottom: 12 }}>
+                <Text style={{ fontSize: 16, fontWeight: "700", color: colors.text, marginBottom: 12 }}>
                   Quest Description
                 </Text>
                 <TextInput
                   value={textDescription}
                   onChangeText={setTextDescription}
                   placeholder="Describe the quest you want your friend to complete..."
-                  placeholderTextColor="rgba(255, 255, 255, 0.3)"
+                  placeholderTextColor={colors.textTertiary}
                   multiline
                   numberOfLines={6}
                   style={{
-                    backgroundColor: "rgba(255, 255, 255, 0.05)",
+                    backgroundColor: colors.inputBackground,
                     borderRadius: 16,
                     padding: 16,
                     fontSize: 16,
-                    color: "white",
+                    color: colors.text,
                     borderWidth: 1,
-                    borderColor: "rgba(126, 63, 228, 0.3)",
+                    borderColor: colors.inputBorder,
                     textAlignVertical: "top",
                     minHeight: 150,
                   }}
                 />
-                <Text style={{ fontSize: 12, color: "rgba(255, 255, 255, 0.4)", marginTop: 8 }}>
+                <Text style={{ fontSize: 12, color: colors.textTertiary, marginTop: 8 }}>
                   {textDescription.length} / 500 characters
                 </Text>
               </View>
@@ -392,7 +394,7 @@ export default function CreateCustomQuestScreen({ route, navigation }: Props) {
             {/* Voice Input */}
             {inputMode === "voice" && (
               <View style={{ marginHorizontal: 20, marginBottom: 20 }}>
-                <Text style={{ fontSize: 16, fontWeight: "700", color: "white", marginBottom: 12 }}>
+                <Text style={{ fontSize: 16, fontWeight: "700", color: colors.text, marginBottom: 12 }}>
                   Voice Recording
                 </Text>
 
@@ -400,26 +402,26 @@ export default function CreateCustomQuestScreen({ route, navigation }: Props) {
                   <Pressable
                     onPress={isRecording ? stopRecording : startRecording}
                     style={{
-                      backgroundColor: isRecording ? "#EF4444" : "rgba(126, 63, 228, 0.2)",
+                      backgroundColor: isRecording ? colors.error : colors.primaryLight,
                       borderRadius: 16,
                       padding: 32,
                       alignItems: "center",
                       borderWidth: 2,
-                      borderColor: isRecording ? "#EF4444" : "#7E3FE4",
+                      borderColor: isRecording ? colors.error : colors.primary,
                     }}
                   >
-                    {isRecording ? <MicOff size={48} color="white" /> : <Mic size={48} color="#7E3FE4" />}
+                    {isRecording ? <MicOff size={48} color={colors.text} /> : <Mic size={48} color={colors.primary} />}
                     <Text
                       style={{
                         fontSize: 18,
                         fontWeight: "700",
-                        color: "white",
+                        color: colors.text,
                         marginTop: 16,
                       }}
                     >
                       {isRecording ? "Tap to Stop Recording" : "Tap to Record"}
                     </Text>
-                    <Text style={{ fontSize: 14, color: "rgba(255, 255, 255, 0.6)", marginTop: 4 }}>
+                    <Text style={{ fontSize: 14, color: colors.textSecondary, marginTop: 4 }}>
                       {isRecording ? "Recording..." : "Describe your quest idea"}
                     </Text>
                   </Pressable>
@@ -428,14 +430,14 @@ export default function CreateCustomQuestScreen({ route, navigation }: Props) {
                 {isTranscribing && (
                   <View
                     style={{
-                      backgroundColor: "rgba(255, 255, 255, 0.05)",
+                      backgroundColor: colors.card,
                       borderRadius: 16,
                       padding: 32,
                       alignItems: "center",
                     }}
                   >
-                    <ActivityIndicator size="large" color="#7E3FE4" />
-                    <Text style={{ fontSize: 16, color: "white", marginTop: 16 }}>
+                    <ActivityIndicator size="large" color={colors.primary} />
+                    <Text style={{ fontSize: 16, color: colors.text, marginTop: 16 }}>
                       Transcribing...
                     </Text>
                   </View>
@@ -444,11 +446,11 @@ export default function CreateCustomQuestScreen({ route, navigation }: Props) {
                 {audioTranscript && (
                   <View
                     style={{
-                      backgroundColor: "rgba(255, 255, 255, 0.05)",
+                      backgroundColor: colors.card,
                       borderRadius: 16,
                       padding: 16,
                       borderWidth: 1,
-                      borderColor: "rgba(126, 63, 228, 0.3)",
+                      borderColor: colors.cardBorder,
                     }}
                   >
                     <View
@@ -459,7 +461,7 @@ export default function CreateCustomQuestScreen({ route, navigation }: Props) {
                         marginBottom: 12,
                       }}
                     >
-                      <Text style={{ fontSize: 14, fontWeight: "700", color: "#4CAF50" }}>
+                      <Text style={{ fontSize: 14, fontWeight: "700", color: colors.success }}>
                         ✓ Transcribed
                       </Text>
                       <Pressable
@@ -468,10 +470,10 @@ export default function CreateCustomQuestScreen({ route, navigation }: Props) {
                           setInputMode("text");
                         }}
                       >
-                        <Text style={{ fontSize: 14, color: "#7E3FE4" }}>Re-record</Text>
+                        <Text style={{ fontSize: 14, color: colors.primary }}>Re-record</Text>
                       </Pressable>
                     </View>
-                    <Text style={{ fontSize: 16, color: "white", lineHeight: 24 }}>
+                    <Text style={{ fontSize: 16, color: colors.text, lineHeight: 24 }}>
                       {audioTranscript}
                     </Text>
                   </View>
@@ -485,19 +487,19 @@ export default function CreateCustomQuestScreen({ route, navigation }: Props) {
                 style={{
                   marginHorizontal: 20,
                   marginBottom: 20,
-                  backgroundColor: "rgba(255, 255, 255, 0.05)",
-                  borderRadius: 16,
-                  padding: 20,
-                  borderWidth: 1,
-                  borderColor: "rgba(255, 215, 0, 0.3)",
-                }}
-              >
-                <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 16 }}>
-                  <Gift size={24} color="#FFD700" />
-                  <Text style={{ fontSize: 18, fontWeight: "700", color: "white", marginLeft: 8 }}>
-                    Gift Rewards
-                  </Text>
-                </View>
+                backgroundColor: colors.card,
+                borderRadius: 16,
+                padding: 20,
+                borderWidth: 1,
+                borderColor: colors.cardBorder,
+              }}
+            >
+              <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 16 }}>
+                <Gift size={24} color={colors.warning} />
+                <Text style={{ fontSize: 18, fontWeight: "700", color: colors.text, marginLeft: 8 }}>
+                  Gift Rewards
+                </Text>
+              </View>
 
                 {/* Gift XP */}
                 {maxGiftXP > 0 && (
@@ -510,10 +512,10 @@ export default function CreateCustomQuestScreen({ route, navigation }: Props) {
                         marginBottom: 8,
                       }}
                     >
-                      <Text style={{ fontSize: 14, color: "rgba(255, 255, 255, 0.6)" }}>
+                      <Text style={{ fontSize: 14, color: colors.textSecondary }}>
                         Gift XP
                       </Text>
-                      <Text style={{ fontSize: 20, fontWeight: "bold", color: "#7E3FE4" }}>
+                      <Text style={{ fontSize: 20, fontWeight: "bold", color: colors.primary }}>
                         {giftXP}
                       </Text>
                     </View>
@@ -524,9 +526,9 @@ export default function CreateCustomQuestScreen({ route, navigation }: Props) {
                       step={10}
                       value={giftXP}
                       onValueChange={setGiftXP}
-                      minimumTrackTintColor="#7E3FE4"
-                      maximumTrackTintColor="rgba(255, 255, 255, 0.2)"
-                      thumbTintColor="#7E3FE4"
+                      minimumTrackTintColor={colors.primary}
+                      maximumTrackTintColor={colors.surface}
+                      thumbTintColor={colors.primary}
                     />
                   </View>
                 )}
@@ -542,10 +544,10 @@ export default function CreateCustomQuestScreen({ route, navigation }: Props) {
                         marginBottom: 8,
                       }}
                     >
-                      <Text style={{ fontSize: 14, color: "rgba(255, 255, 255, 0.6)" }}>
+                      <Text style={{ fontSize: 14, color: colors.textSecondary }}>
                         Gift Points
                       </Text>
-                      <Text style={{ fontSize: 20, fontWeight: "bold", color: "#00D9FF" }}>
+                      <Text style={{ fontSize: 20, fontWeight: "bold", color: colors.info }}>
                         {giftPoints}
                       </Text>
                     </View>
@@ -556,14 +558,14 @@ export default function CreateCustomQuestScreen({ route, navigation }: Props) {
                       step={10}
                       value={giftPoints}
                       onValueChange={setGiftPoints}
-                      minimumTrackTintColor="#00D9FF"
-                      maximumTrackTintColor="rgba(255, 255, 255, 0.2)"
-                      thumbTintColor="#00D9FF"
+                      minimumTrackTintColor={colors.info}
+                      maximumTrackTintColor={colors.surface}
+                      thumbTintColor={colors.info}
                     />
                   </View>
                 )}
 
-                <Text style={{ fontSize: 12, color: "rgba(255, 255, 255, 0.4)", marginTop: 12 }}>
+                <Text style={{ fontSize: 12, color: colors.textTertiary, marginTop: 12 }}>
                   💡 Your XP and Points will be deducted and added to the quest reward
                 </Text>
               </View>
@@ -577,21 +579,21 @@ export default function CreateCustomQuestScreen({ route, navigation }: Props) {
                   flexDirection: "row",
                   alignItems: "center",
                   justifyContent: "space-between",
-                  backgroundColor: "rgba(255, 255, 255, 0.05)",
+                  backgroundColor: colors.surface,
                   borderRadius: 12,
                   padding: 16,
                 }}
               >
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <Sparkles size={20} color="#7E3FE4" />
-                  <Text style={{ fontSize: 16, fontWeight: "700", color: "white", marginLeft: 8 }}>
+                  <Sparkles size={20} color={colors.primary} />
+                  <Text style={{ fontSize: 16, fontWeight: "700", color: colors.text, marginLeft: 8 }}>
                     Advanced Options
                   </Text>
                 </View>
                 {showAdvanced ? (
-                  <ChevronUp size={20} color="rgba(255, 255, 255, 0.6)" />
+                  <ChevronUp size={20} color={colors.textSecondary} />
                 ) : (
-                  <ChevronDown size={20} color="rgba(255, 255, 255, 0.6)" />
+                  <ChevronDown size={20} color={colors.textSecondary} />
                 )}
               </Pressable>
 
@@ -604,15 +606,15 @@ export default function CreateCustomQuestScreen({ route, navigation }: Props) {
                       flexDirection: "row",
                       justifyContent: "space-between",
                       alignItems: "center",
-                      backgroundColor: "rgba(255, 255, 255, 0.03)",
+                      backgroundColor: colors.inputBackground,
                       borderRadius: 12,
                       padding: 16,
                     }}
                   >
-                    <Text style={{ fontSize: 14, color: "rgba(255, 255, 255, 0.6)" }}>
+                    <Text style={{ fontSize: 14, color: colors.textSecondary }}>
                       Category
                     </Text>
-                    <Text style={{ fontSize: 14, fontWeight: "700", color: "white" }}>
+                    <Text style={{ fontSize: 14, fontWeight: "700", color: colors.text }}>
                       {category}
                     </Text>
                   </Pressable>
@@ -624,15 +626,15 @@ export default function CreateCustomQuestScreen({ route, navigation }: Props) {
                       flexDirection: "row",
                       justifyContent: "space-between",
                       alignItems: "center",
-                      backgroundColor: "rgba(255, 255, 255, 0.03)",
+                      backgroundColor: colors.inputBackground,
                       borderRadius: 12,
                       padding: 16,
                     }}
                   >
-                    <Text style={{ fontSize: 14, color: "rgba(255, 255, 255, 0.6)" }}>
+                    <Text style={{ fontSize: 14, color: colors.textSecondary }}>
                       Difficulty
                     </Text>
-                    <Text style={{ fontSize: 14, fontWeight: "700", color: "white" }}>
+                    <Text style={{ fontSize: 14, fontWeight: "700", color: colors.text }}>
                       {difficulty}
                     </Text>
                   </Pressable>
@@ -644,15 +646,15 @@ export default function CreateCustomQuestScreen({ route, navigation }: Props) {
                       flexDirection: "row",
                       justifyContent: "space-between",
                       alignItems: "center",
-                      backgroundColor: "rgba(255, 255, 255, 0.03)",
+                      backgroundColor: colors.inputBackground,
                       borderRadius: 12,
                       padding: 16,
                     }}
                   >
-                    <Text style={{ fontSize: 14, color: "rgba(255, 255, 255, 0.6)" }}>
+                    <Text style={{ fontSize: 14, color: colors.textSecondary }}>
                       Goal Type
                     </Text>
-                    <Text style={{ fontSize: 14, fontWeight: "700", color: "white" }}>
+                    <Text style={{ fontSize: 14, fontWeight: "700", color: colors.text }}>
                       {goalType.replace("_", " ")}
                     </Text>
                   </Pressable>
@@ -660,7 +662,7 @@ export default function CreateCustomQuestScreen({ route, navigation }: Props) {
                   {/* Goal Count */}
                   <View
                     style={{
-                      backgroundColor: "rgba(255, 255, 255, 0.03)",
+                      backgroundColor: colors.inputBackground,
                       borderRadius: 12,
                       padding: 16,
                     }}
@@ -673,10 +675,10 @@ export default function CreateCustomQuestScreen({ route, navigation }: Props) {
                         marginBottom: 8,
                       }}
                     >
-                      <Text style={{ fontSize: 14, color: "rgba(255, 255, 255, 0.6)" }}>
+                      <Text style={{ fontSize: 14, color: colors.textSecondary }}>
                         Goal Count
                       </Text>
-                      <Text style={{ fontSize: 18, fontWeight: "bold", color: "white" }}>
+                      <Text style={{ fontSize: 18, fontWeight: "bold", color: colors.text }}>
                         {goalCount}
                       </Text>
                     </View>
@@ -687,9 +689,9 @@ export default function CreateCustomQuestScreen({ route, navigation }: Props) {
                       step={1}
                       value={goalCount}
                       onValueChange={setGoalCount}
-                      minimumTrackTintColor="#7E3FE4"
-                      maximumTrackTintColor="rgba(255, 255, 255, 0.2)"
-                      thumbTintColor="#7E3FE4"
+                      minimumTrackTintColor={colors.primary}
+                      maximumTrackTintColor={colors.surface}
+                      thumbTintColor={colors.primary}
                     />
                   </View>
                 </View>
@@ -698,25 +700,25 @@ export default function CreateCustomQuestScreen({ route, navigation }: Props) {
 
             {/* Optional Message */}
             <View style={{ marginHorizontal: 20, marginBottom: 20 }}>
-              <Text style={{ fontSize: 16, fontWeight: "700", color: "white", marginBottom: 12 }}>
+              <Text style={{ fontSize: 16, fontWeight: "700", color: colors.text, marginBottom: 12 }}>
                 Optional Message
               </Text>
               <TextInput
                 value={message}
                 onChangeText={setMessage}
                 placeholder="Add a personal note to your friend..."
-                placeholderTextColor="rgba(255, 255, 255, 0.3)"
+                placeholderTextColor={colors.textTertiary}
                 multiline
                 numberOfLines={3}
                 maxLength={500}
                 style={{
-                  backgroundColor: "rgba(255, 255, 255, 0.05)",
+                  backgroundColor: colors.inputBackground,
                   borderRadius: 16,
                   padding: 16,
                   fontSize: 14,
-                  color: "white",
+                  color: colors.text,
                   borderWidth: 1,
-                  borderColor: "rgba(126, 63, 228, 0.3)",
+                  borderColor: colors.inputBorder,
                   textAlignVertical: "top",
                   minHeight: 80,
                 }}
@@ -733,16 +735,16 @@ export default function CreateCustomQuestScreen({ route, navigation }: Props) {
               right: 0,
               padding: 20,
               paddingBottom: 40,
-              backgroundColor: "#0A0A0F",
+              backgroundColor: colors.backgroundSolid,
               borderTopWidth: 1,
-              borderTopColor: "rgba(255, 255, 255, 0.1)",
+              borderTopColor: colors.cardBorder,
             }}
           >
             <Pressable
               onPress={handleCreateQuest}
               disabled={createQuestMutation.isPending}
               style={{
-                backgroundColor: createQuestMutation.isPending ? "rgba(126, 63, 228, 0.5)" : "#7E3FE4",
+                backgroundColor: createQuestMutation.isPending ? colors.primary + "50" : colors.primary,
                 borderRadius: 16,
                 paddingVertical: 18,
                 flexDirection: "row",
@@ -752,11 +754,11 @@ export default function CreateCustomQuestScreen({ route, navigation }: Props) {
               }}
             >
               {createQuestMutation.isPending ? (
-                <ActivityIndicator size="small" color="white" />
+                <ActivityIndicator size="small" color={colors.text} />
               ) : (
                 <>
-                  <Send size={20} color="white" />
-                  <Text style={{ fontSize: 18, fontWeight: "700", color: "white" }}>
+                  <Send size={20} color={colors.text} />
+                  <Text style={{ fontSize: 18, fontWeight: "700", color: colors.text }}>
                     Create & Send Quest
                   </Text>
                 </>
@@ -769,20 +771,20 @@ export default function CreateCustomQuestScreen({ route, navigation }: Props) {
             <View
               style={{
                 flex: 1,
-                backgroundColor: "rgba(0, 0, 0, 0.7)",
+                backgroundColor: colors.modalOverlay,
                 justifyContent: "flex-end",
               }}
             >
               <View
                 style={{
-                  backgroundColor: "#1A1A24",
+                  backgroundColor: colors.card,
                   borderTopLeftRadius: 24,
                   borderTopRightRadius: 24,
                   padding: 24,
                   paddingBottom: 40,
                 }}
               >
-                <Text style={{ fontSize: 22, fontWeight: "bold", color: "white", marginBottom: 20 }}>
+                <Text style={{ fontSize: 22, fontWeight: "bold", color: colors.text, marginBottom: 20 }}>
                   Select Category
                 </Text>
                 <View style={{ gap: 12 }}>
@@ -797,7 +799,7 @@ export default function CreateCustomQuestScreen({ route, navigation }: Props) {
                         flexDirection: "row",
                         alignItems: "center",
                         justifyContent: "space-between",
-                        backgroundColor: "rgba(255, 255, 255, 0.05)",
+                        backgroundColor: colors.surface,
                         borderRadius: 12,
                         padding: 16,
                         borderWidth: category === cat.value ? 2 : 0,
@@ -814,7 +816,7 @@ export default function CreateCustomQuestScreen({ route, navigation }: Props) {
                             marginRight: 12,
                           }}
                         />
-                        <Text style={{ fontSize: 16, fontWeight: "600", color: "white" }}>
+                        <Text style={{ fontSize: 16, fontWeight: "600", color: colors.text }}>
                           {cat.label}
                         </Text>
                       </View>
@@ -833,20 +835,20 @@ export default function CreateCustomQuestScreen({ route, navigation }: Props) {
             <View
               style={{
                 flex: 1,
-                backgroundColor: "rgba(0, 0, 0, 0.7)",
+                backgroundColor: colors.modalOverlay,
                 justifyContent: "flex-end",
               }}
             >
               <View
                 style={{
-                  backgroundColor: "#1A1A24",
+                  backgroundColor: colors.card,
                   borderTopLeftRadius: 24,
                   borderTopRightRadius: 24,
                   padding: 24,
                   paddingBottom: 40,
                 }}
               >
-                <Text style={{ fontSize: 22, fontWeight: "bold", color: "white", marginBottom: 20 }}>
+                <Text style={{ fontSize: 22, fontWeight: "bold", color: colors.text, marginBottom: 20 }}>
                   Select Difficulty
                 </Text>
                 <View style={{ gap: 12 }}>
@@ -861,7 +863,7 @@ export default function CreateCustomQuestScreen({ route, navigation }: Props) {
                         flexDirection: "row",
                         alignItems: "center",
                         justifyContent: "space-between",
-                        backgroundColor: "rgba(255, 255, 255, 0.05)",
+                        backgroundColor: colors.surface,
                         borderRadius: 12,
                         padding: 16,
                         borderWidth: difficulty === diff.value ? 2 : 0,
@@ -878,7 +880,7 @@ export default function CreateCustomQuestScreen({ route, navigation }: Props) {
                             marginRight: 12,
                           }}
                         />
-                        <Text style={{ fontSize: 16, fontWeight: "600", color: "white" }}>
+                        <Text style={{ fontSize: 16, fontWeight: "600", color: colors.text }}>
                           {diff.label}
                         </Text>
                       </View>
@@ -897,20 +899,20 @@ export default function CreateCustomQuestScreen({ route, navigation }: Props) {
             <View
               style={{
                 flex: 1,
-                backgroundColor: "rgba(0, 0, 0, 0.7)",
+                backgroundColor: colors.modalOverlay,
                 justifyContent: "flex-end",
               }}
             >
               <View
                 style={{
-                  backgroundColor: "#1A1A24",
+                  backgroundColor: colors.card,
                   borderTopLeftRadius: 24,
                   borderTopRightRadius: 24,
                   padding: 24,
                   paddingBottom: 40,
                 }}
               >
-                <Text style={{ fontSize: 22, fontWeight: "bold", color: "white", marginBottom: 20 }}>
+                <Text style={{ fontSize: 22, fontWeight: "bold", color: colors.text, marginBottom: 20 }}>
                   Select Goal Type
                 </Text>
                 <View style={{ gap: 12 }}>
@@ -922,11 +924,11 @@ export default function CreateCustomQuestScreen({ route, navigation }: Props) {
                         setShowGoalTypeModal(false);
                       }}
                       style={{
-                        backgroundColor: "rgba(255, 255, 255, 0.05)",
+                        backgroundColor: colors.surface,
                         borderRadius: 12,
                         padding: 16,
                         borderWidth: goalType === gt.value ? 2 : 0,
-                        borderColor: "#7E3FE4",
+                        borderColor: colors.primary,
                       }}
                     >
                       <View
@@ -937,13 +939,13 @@ export default function CreateCustomQuestScreen({ route, navigation }: Props) {
                         }}
                       >
                         <View>
-                          <Text style={{ fontSize: 16, fontWeight: "600", color: "white" }}>
+                          <Text style={{ fontSize: 16, fontWeight: "600", color: colors.text }}>
                             {gt.label}
                           </Text>
                           <Text
                             style={{
                               fontSize: 12,
-                              color: "rgba(255, 255, 255, 0.6)",
+                              color: colors.textSecondary,
                               marginTop: 4,
                             }}
                           >
@@ -951,7 +953,7 @@ export default function CreateCustomQuestScreen({ route, navigation }: Props) {
                           </Text>
                         </View>
                         {goalType === gt.value && (
-                          <Text style={{ fontSize: 20, color: "#7E3FE4" }}>✓</Text>
+                          <Text style={{ fontSize: 20, color: colors.primary }}>✓</Text>
                         )}
                       </View>
                     </Pressable>

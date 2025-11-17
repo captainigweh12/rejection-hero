@@ -15,6 +15,7 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "@/navigation/types";
 import { api } from "@/lib/api";
 import { useSession } from "@/lib/useSession";
+import { useTheme } from "@/contexts/ThemeContext";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Support">;
 
@@ -29,6 +30,7 @@ const ISSUE_CATEGORIES = [
 
 export default function SupportScreen({ navigation }: Props) {
   const { data: sessionData } = useSession();
+  const { colors } = useTheme();
   const [subject, setSubject] = useState("");
   const [category, setCategory] = useState("");
   const [description, setDescription] = useState("");
@@ -95,8 +97,8 @@ export default function SupportScreen({ navigation }: Props) {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
-      <LinearGradient colors={["#0A0A0F", "#1A1A24", "#2A1A34"]} style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: colors.backgroundSolid }}>
+      <LinearGradient colors={colors.background as any} style={{ flex: 1 }}>
         <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
           {/* Header */}
           <View
@@ -106,13 +108,13 @@ export default function SupportScreen({ navigation }: Props) {
               paddingHorizontal: 20,
               paddingVertical: 16,
               borderBottomWidth: 1,
-              borderBottomColor: "rgba(126, 63, 228, 0.2)",
+              borderBottomColor: colors.cardBorder,
             }}
           >
             <Pressable onPress={() => navigation.goBack()} style={{ marginRight: 16 }}>
-              <ArrowLeft size={24} color="white" />
+              <ArrowLeft size={24} color={colors.text} />
             </Pressable>
-            <Text style={{ fontSize: 24, fontWeight: "bold", color: "white", flex: 1 }}>
+            <Text style={{ fontSize: 24, fontWeight: "bold", color: colors.text, flex: 1 }}>
               Support
             </Text>
           </View>
@@ -122,12 +124,12 @@ export default function SupportScreen({ navigation }: Props) {
             <View style={{ paddingHorizontal: 20, paddingTop: 24 }}>
               <View
                 style={{
-                  backgroundColor: "rgba(255, 255, 255, 0.05)",
+                  backgroundColor: colors.card,
                   borderRadius: 20,
                   padding: 24,
                   borderWidth: 2,
-                  borderColor: "rgba(126, 63, 228, 0.4)",
-                  shadowColor: "#7E3FE4",
+                  borderColor: colors.cardBorder,
+                  shadowColor: colors.primary,
                   shadowOffset: { width: 0, height: 4 },
                   shadowOpacity: 0.3,
                   shadowRadius: 8,
@@ -153,12 +155,12 @@ export default function SupportScreen({ navigation }: Props) {
                       width: 74,
                       height: 74,
                       borderRadius: 37,
-                      backgroundColor: "#1A1A24",
+                      backgroundColor: colors.card,
                       alignItems: "center",
                       justifyContent: "center",
                     }}
                   >
-                    <HelpCircle size={36} color="#7E3FE4" />
+                    <HelpCircle size={36} color={colors.primary} />
                   </View>
                 </LinearGradient>
 
@@ -166,7 +168,7 @@ export default function SupportScreen({ navigation }: Props) {
                   style={{
                     fontSize: 22,
                     fontWeight: "bold",
-                    color: "white",
+                    color: colors.text,
                     textAlign: "center",
                     marginBottom: 8,
                   }}
@@ -176,7 +178,7 @@ export default function SupportScreen({ navigation }: Props) {
                 <Text
                   style={{
                     fontSize: 15,
-                    color: "rgba(255, 255, 255, 0.7)",
+                    color: colors.textSecondary,
                     textAlign: "center",
                     lineHeight: 22,
                   }}
@@ -192,7 +194,7 @@ export default function SupportScreen({ navigation }: Props) {
                 style={{
                   fontSize: 18,
                   fontWeight: "bold",
-                  color: "white",
+                  color: colors.text,
                   marginBottom: 16,
                 }}
               >
@@ -205,7 +207,7 @@ export default function SupportScreen({ navigation }: Props) {
                   style={{
                     fontSize: 14,
                     fontWeight: "600",
-                    color: "rgba(255, 255, 255, 0.8)",
+                    color: colors.text,
                     marginBottom: 8,
                   }}
                 >
@@ -213,24 +215,24 @@ export default function SupportScreen({ navigation }: Props) {
                 </Text>
                 <View
                   style={{
-                    backgroundColor: "rgba(255, 255, 255, 0.05)",
+                    backgroundColor: colors.inputBackground,
                     borderRadius: 16,
                     borderWidth: 1,
-                    borderColor: "rgba(255, 255, 255, 0.1)",
+                    borderColor: colors.inputBorder,
                     flexDirection: "row",
                     alignItems: "center",
                     paddingHorizontal: 16,
                   }}
                 >
-                  <Mail size={20} color="rgba(255, 255, 255, 0.5)" />
+                  <Mail size={20} color={colors.textSecondary} />
                   <TextInput
                     value={subject}
                     onChangeText={setSubject}
                     placeholder="Brief summary of your issue"
-                    placeholderTextColor="rgba(255, 255, 255, 0.4)"
+                    placeholderTextColor={colors.textTertiary}
                     style={{
                       flex: 1,
-                      color: "white",
+                      color: colors.text,
                       fontSize: 16,
                       paddingVertical: 16,
                       paddingHorizontal: 12,
@@ -245,7 +247,7 @@ export default function SupportScreen({ navigation }: Props) {
                   style={{
                     fontSize: 14,
                     fontWeight: "600",
-                    color: "rgba(255, 255, 255, 0.8)",
+                    color: colors.text,
                     marginBottom: 8,
                   }}
                 >
@@ -259,16 +261,16 @@ export default function SupportScreen({ navigation }: Props) {
                       style={{
                         backgroundColor:
                           category === cat.id
-                            ? "rgba(126, 63, 228, 0.3)"
-                            : "rgba(255, 255, 255, 0.05)",
+                            ? colors.primaryLight
+                            : colors.surface,
                         borderRadius: 12,
                         paddingVertical: 10,
                         paddingHorizontal: 14,
                         borderWidth: 2,
                         borderColor:
                           category === cat.id
-                            ? "rgba(126, 63, 228, 0.6)"
-                            : "rgba(255, 255, 255, 0.1)",
+                            ? colors.primary
+                            : colors.cardBorder,
                         flexDirection: "row",
                         alignItems: "center",
                         gap: 6,
@@ -279,7 +281,7 @@ export default function SupportScreen({ navigation }: Props) {
                         style={{
                           fontSize: 14,
                           fontWeight: "600",
-                          color: category === cat.id ? "#7E3FE4" : "rgba(255, 255, 255, 0.8)",
+                          color: category === cat.id ? colors.primary : colors.text,
                         }}
                       >
                         {cat.label}
@@ -295,7 +297,7 @@ export default function SupportScreen({ navigation }: Props) {
                   style={{
                     fontSize: 14,
                     fontWeight: "600",
-                    color: "rgba(255, 255, 255, 0.8)",
+                    color: colors.text,
                     marginBottom: 8,
                   }}
                 >
@@ -303,20 +305,20 @@ export default function SupportScreen({ navigation }: Props) {
                 </Text>
                 <View
                   style={{
-                    backgroundColor: "rgba(255, 255, 255, 0.05)",
+                    backgroundColor: colors.inputBackground,
                     borderRadius: 16,
                     borderWidth: 1,
-                    borderColor: "rgba(255, 255, 255, 0.1)",
+                    borderColor: colors.inputBorder,
                     paddingHorizontal: 16,
                     paddingTop: 16,
                   }}
                 >
                   <View style={{ flexDirection: "row", alignItems: "flex-start", marginBottom: 8 }}>
-                    <MessageSquare size={20} color="rgba(255, 255, 255, 0.5)" />
+                    <MessageSquare size={20} color={colors.textSecondary} />
                     <Text
                       style={{
                         fontSize: 12,
-                        color: "rgba(255, 255, 255, 0.5)",
+                        color: colors.textSecondary,
                         marginLeft: 8,
                       }}
                     >
@@ -327,11 +329,11 @@ export default function SupportScreen({ navigation }: Props) {
                     value={description}
                     onChangeText={setDescription}
                     placeholder="What seems to be the problem? Include any steps to reproduce the issue, error messages, or screenshots you may have..."
-                    placeholderTextColor="rgba(255, 255, 255, 0.4)"
+                    placeholderTextColor={colors.textTertiary}
                     multiline
                     numberOfLines={8}
                     style={{
-                      color: "white",
+                      color: colors.text,
                       fontSize: 16,
                       paddingVertical: 8,
                       textAlignVertical: "top",
@@ -351,8 +353,8 @@ export default function SupportScreen({ navigation }: Props) {
                   flexDirection: "row",
                   alignItems: "center",
                   justifyContent: "center",
-                  backgroundColor: sent ? "#4CAF50" : "#7E3FE4",
-                  shadowColor: sent ? "#4CAF50" : "#7E3FE4",
+                  backgroundColor: sent ? colors.success : colors.primary,
+                  shadowColor: sent ? colors.success : colors.primary,
                   shadowOffset: { width: 0, height: 4 },
                   shadowOpacity: 0.4,
                   shadowRadius: 8,
@@ -361,15 +363,15 @@ export default function SupportScreen({ navigation }: Props) {
                 }}
               >
                 {sending ? (
-                  <ActivityIndicator color="white" />
+                  <ActivityIndicator color={colors.text} />
                 ) : sent ? (
                   <>
-                    <CheckCircle size={24} color="white" />
+                    <CheckCircle size={24} color={colors.text} />
                     <Text
                       style={{
                         fontSize: 18,
                         fontWeight: "bold",
-                        color: "white",
+                        color: colors.text,
                         marginLeft: 12,
                       }}
                     >
@@ -378,12 +380,12 @@ export default function SupportScreen({ navigation }: Props) {
                   </>
                 ) : (
                   <>
-                    <Send size={24} color="white" />
+                    <Send size={24} color={colors.text} />
                     <Text
                       style={{
                         fontSize: 18,
                         fontWeight: "bold",
-                        color: "white",
+                        color: colors.text,
                         marginLeft: 12,
                       }}
                     >
@@ -398,21 +400,21 @@ export default function SupportScreen({ navigation }: Props) {
             <View style={{ paddingHorizontal: 20, paddingTop: 32 }}>
               <View
                 style={{
-                  backgroundColor: "rgba(0, 217, 255, 0.1)",
+                  backgroundColor: colors.info + "20",
                   borderRadius: 16,
                   padding: 16,
                   borderLeftWidth: 4,
-                  borderLeftColor: "#00D9FF",
+                  borderLeftColor: colors.info,
                 }}
               >
                 <Text
                   style={{
                     fontSize: 14,
-                    color: "rgba(255, 255, 255, 0.8)",
+                    color: colors.text,
                     lineHeight: 20,
                   }}
                 >
-                  <Text style={{ fontWeight: "bold", color: "#00D9FF" }}>💡 Tip:</Text> You&apos;ll
+                  <Text style={{ fontWeight: "bold", color: colors.info }}>💡 Tip:</Text> You&apos;ll
                   receive a confirmation email once your ticket is submitted. Our support team
                   typically responds within 24 hours.
                 </Text>

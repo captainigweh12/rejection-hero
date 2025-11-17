@@ -7,11 +7,13 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "@/navigation/types";
 import { api } from "@/lib/api";
 import { useSession } from "@/lib/useSession";
+import { useTheme } from "@/contexts/ThemeContext";
 
 type Props = NativeStackScreenProps<RootStackParamList, "InviteWarriors">;
 
 export default function InviteWarriorsScreen({ navigation }: Props) {
   const { data: sessionData } = useSession();
+  const { colors } = useTheme();
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [sending, setSending] = useState(false);
@@ -62,8 +64,8 @@ export default function InviteWarriorsScreen({ navigation }: Props) {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
-      <LinearGradient colors={["#0A0A0F", "#1A1A24", "#2A1A34"]} style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: colors.backgroundSolid }}>
+      <LinearGradient colors={colors.background as any} style={{ flex: 1 }}>
         <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
           {/* Header */}
           <View
@@ -73,13 +75,13 @@ export default function InviteWarriorsScreen({ navigation }: Props) {
               paddingHorizontal: 20,
               paddingVertical: 16,
               borderBottomWidth: 1,
-              borderBottomColor: "rgba(126, 63, 228, 0.2)",
+              borderBottomColor: colors.cardBorder,
             }}
           >
             <Pressable onPress={() => navigation.goBack()} style={{ marginRight: 16 }}>
-              <ArrowLeft size={24} color="white" />
+              <ArrowLeft size={24} color={colors.text} />
             </Pressable>
-            <Text style={{ fontSize: 24, fontWeight: "bold", color: "white", flex: 1 }}>
+            <Text style={{ fontSize: 24, fontWeight: "bold", color: colors.text, flex: 1 }}>
               Invite Warriors
             </Text>
           </View>
