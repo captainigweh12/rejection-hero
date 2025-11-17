@@ -503,12 +503,9 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
       <View style={{
         paddingHorizontal: 20,
         paddingVertical: 12,
-        backgroundColor: "rgba(126, 63, 228, 0.1)",
-        borderRadius: 12,
+        backgroundColor: "transparent",
         marginHorizontal: 16,
         marginBottom: 12,
-        borderWidth: 1,
-        borderColor: "rgba(126, 63, 228, 0.3)",
       }}>
         <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
           <Text style={{ color: "rgba(255, 255, 255, 0.8)", fontSize: 13, fontWeight: "600" }}>
