@@ -1777,3 +1777,29 @@ See `ENV_SETUP.md` for complete environment variable setup guide.
   - Added error logging to auth middleware
   - Returns 500 status with error message instead of crashing
 - **Testing**: Monitor backend logs when calling profile endpoint to see detailed error information
+
+### 2025-11-17: Enhanced Login Debugging & Authentication Logging
+- **Issue**: Users experiencing login issues
+- **Fix**: Added comprehensive logging to login and signup flows
+- **Changes**:
+  - Added detailed console logs in `LoginWithEmailPassword.tsx`:
+    - Login process start/end logging
+    - Backend URL verification logging
+    - Auth result logging with full response
+    - Error logging with detailed messages
+    - Session refetch status logging
+  - Same logging pattern added to signup flow
+  - Logs prefixed with 🔐 emoji for easy filtering
+  - User-friendly error alerts with instruction to check logs
+- **How to Debug Login Issues**:
+  1. Open LOGS tab in Vibecode app
+  2. Try to log in or sign up
+  3. Look for messages starting with "🔐 [Login]" or "🔐 [SignUp]"
+  4. Check for error messages, backend URL, and auth results
+  5. Share logs with support if issues persist
+- **Backend Status**: Auth endpoints working correctly (/api/auth/*)
+  - Email/password authentication enabled
+  - Google OAuth enabled
+  - Session management working
+  - Backend URL: https://preview-ltlbnamezcje.share.sandbox.dev
+

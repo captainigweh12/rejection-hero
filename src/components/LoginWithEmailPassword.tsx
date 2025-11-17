@@ -40,27 +40,38 @@ export default function LoginWithEmailPassword() {
       return;
     }
 
+    console.log("🔐 [Login] Starting sign in process...");
+    console.log("🔐 [Login] Backend URL:", process.env.EXPO_PUBLIC_VIBECODE_BACKEND_URL);
+
     setIsLoading(true);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
     try {
+      console.log("🔐 [Login] Calling authClient.signIn.email...");
       const result = await authClient.signIn.email({
         email,
         password,
       });
 
+      console.log("🔐 [Login] Auth result:", JSON.stringify(result, null, 2));
+
       if (result.error) {
+        console.error("🔐 [Login] Sign in error:", result.error);
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
         Alert.alert("Sign In Failed", result.error.message || "Please check your credentials");
       } else {
+        console.log("🔐 [Login] Sign in successful!");
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         setEmail("");
         setPassword("");
+        console.log("🔐 [Login] Refetching session...");
         await refetch();
+        console.log("🔐 [Login] Session refetched");
       }
     } catch (error) {
+      console.error("🔐 [Login] Unexpected error:", error);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert("Error", "An unexpected error occurred");
+      Alert.alert("Error", "An unexpected error occurred. Check logs for details.");
       console.error(error);
     } finally {
       setIsLoading(false);
@@ -73,30 +84,41 @@ export default function LoginWithEmailPassword() {
       return;
     }
 
+    console.log("🔐 [SignUp] Starting sign up process...");
+    console.log("🔐 [SignUp] Backend URL:", process.env.EXPO_PUBLIC_VIBECODE_BACKEND_URL);
+
     setIsLoading(true);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
     try {
+      console.log("🔐 [SignUp] Calling authClient.signUp.email...");
       const result = await authClient.signUp.email({
         email,
         password,
         name,
       });
 
+      console.log("🔐 [SignUp] Auth result:", JSON.stringify(result, null, 2));
+
       if (result.error) {
+        console.error("🔐 [SignUp] Sign up error:", result.error);
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
         Alert.alert("Sign Up Failed", result.error.message || "Please try again");
       } else {
+        console.log("🔐 [SignUp] Sign up successful!");
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         setEmail("");
         setPassword("");
         setName("");
         setIsSignUp(false);
+        console.log("🔐 [SignUp] Refetching session...");
         await refetch();
+        console.log("🔐 [SignUp] Session refetched");
       }
     } catch (error) {
+      console.error("🔐 [SignUp] Unexpected error:", error);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert("Error", "An unexpected error occurred");
+      Alert.alert("Error", "An unexpected error occurred. Check logs for details.");
       console.error(error);
     } finally {
       setIsLoading(false);
