@@ -8,6 +8,8 @@ import { KeyboardProvider } from "react-native-keyboard-controller";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider, useTheme } from "@/contexts/ThemeContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useEffect } from "react";
 
 /*
 IMPORTANT NOTICE: DO NOT REMOVE
@@ -33,6 +35,26 @@ const openai_api_key = Constants.expoConfig.extra.apikey;
 // Create a wrapper component that has access to theme
 function AppContent() {
   const { isDayMode, colors } = useTheme();
+
+  // Clear any stale navigation state on mount to prevent navigation errors
+  useEffect(() => {
+    const clearStaleNavigationState = async () => {
+      try {
+        const keys = await AsyncStorage.getAllKeys();
+        const navigationKeys = keys.filter(key =>
+          key.includes('navigation') ||
+          key.includes('NAVIGATION_STATE')
+        );
+        if (navigationKeys.length > 0) {
+          await AsyncStorage.multiRemove(navigationKeys);
+          console.log('Cleared stale navigation state');
+        }
+      } catch (error) {
+        console.log('Could not clear navigation state:', error);
+      }
+    };
+    clearStaleNavigationState();
+  }, []);
 
   // Create custom navigation theme based on current app theme
   const navigationTheme = isDayMode
