@@ -12,6 +12,8 @@ import {
   type GetSmartQuestSuggestionsResponse,
   generateMapQuestsRequestSchema,
   type GenerateMapQuestsResponse,
+  refreshAllQuestsRequestSchema,
+  type RefreshAllQuestsResponse,
 } from "@/shared/contracts";
 import { type AppType } from "../types";
 import { db } from "../db";
@@ -206,6 +208,92 @@ questsRouter.post("/generate", zValidator("json", generateQuestRequestSchema), a
       dateContext: quest.dateContext,
     },
   } satisfies GenerateQuestResponse);
+});
+
+// ============================================
+// POST /api/quests/refresh-all - Refresh all queued quests
+// ============================================
+questsRouter.post("/refresh-all", zValidator("json", refreshAllQuestsRequestSchema), async (c) => {
+  const user = c.get("user");
+
+  if (!user) {
+    return c.json({ message: "Unauthorized" }, 401);
+  }
+
+  const { count = 3, userLocation, userLatitude, userLongitude } = c.req.valid("json");
+
+  try {
+    const newQuests = [];
+
+    // Generate multiple quests in sequence
+    for (let i = 0; i < count; i++) {
+      const questData = await generateQuestWithAI(
+        undefined, // category - let AI choose
+        undefined, // difficulty - let AI choose
+        undefined, // customPrompt
+        user.id,
+        userLocation,
+        userLatitude,
+        userLongitude,
+        undefined // preferredQuestType
+      );
+
+      // Create quest in database
+      const quest = await db.quest.create({
+        data: {
+          title: questData.title,
+          description: questData.description,
+          category: questData.category,
+          difficulty: questData.difficulty,
+          goalType: questData.goalType,
+          goalCount: questData.goalCount,
+          xpReward: questData.xpReward,
+          pointReward: questData.pointReward,
+          isAIGenerated: true,
+          location: questData.location,
+          latitude: questData.latitude,
+          longitude: questData.longitude,
+          timeContext: questData.timeContext,
+          dateContext: questData.dateContext,
+        },
+      });
+
+      // Create user quest
+      const userQuest = await db.userQuest.create({
+        data: {
+          userId: user.id,
+          questId: quest.id,
+          status: "QUEUED",
+        },
+      });
+
+      newQuests.push({
+        userQuestId: userQuest.id,
+        quest: {
+          id: quest.id,
+          title: quest.title,
+          description: quest.description,
+          category: quest.category,
+          difficulty: quest.difficulty,
+          xpReward: quest.xpReward,
+          pointReward: quest.pointReward,
+        },
+      });
+    }
+
+    return c.json({
+      success: true,
+      message: `Successfully generated ${count} new quests`,
+      newQuestCount: count,
+      quests: newQuests,
+    } satisfies RefreshAllQuestsResponse);
+  } catch (error) {
+    console.error("Error refreshing quests:", error);
+    return c.json(
+      { message: "Failed to generate quests. Please try again." },
+      500
+    );
+  }
 });
 
 // ============================================

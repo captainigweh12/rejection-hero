@@ -43,6 +43,7 @@ import {
   Heart,
   Send,
   Trash2,
+  RefreshCw,
 } from "lucide-react-native";
 import type { BottomTabScreenProps } from "@/navigation/types";
 import { api } from "@/lib/api";
@@ -72,6 +73,7 @@ export default function HomeScreen({ navigation }: Props) {
   const [selectedFriendQuest, setSelectedFriendQuest] = useState<any>(null);
   const [supportMessage, setSupportMessage] = useState("");
   const [showFriendsQuests, setShowFriendsQuests] = useState(true);
+  const [isRefreshingQuests, setIsRefreshingQuests] = useState(false);
 
   console.log("[HomeScreen] Rendering - User logged in:", !!sessionData?.user);
 
@@ -157,6 +159,27 @@ export default function HomeScreen({ navigation }: Props) {
         },
       ]
     );
+  };
+
+  const handleRefreshAllQuests = async () => {
+    setIsRefreshingQuests(true);
+    try {
+      const response = await api.post<any>("/api/quests/refresh-all", {
+        count: 3,
+      });
+
+      if (response.success) {
+        console.log(`[HomeScreen] Refreshed quests: ${response.newQuestCount} new quests generated`);
+        // Refetch quests to update the UI
+        refetchQuests();
+        Alert.alert("Success", `Generated ${response.newQuestCount} new quests!`);
+      }
+    } catch (error) {
+      console.error("[HomeScreen] Refresh quests error:", error);
+      Alert.alert("Error", "Failed to refresh quests. Please try again.");
+    } finally {
+      setIsRefreshingQuests(false);
+    }
   };
 
   const getCategoryColor = (category: string) => {
@@ -854,9 +877,28 @@ export default function HomeScreen({ navigation }: Props) {
         {/* Queued Quests Section */}
         {queuedQuests.length > 0 && (
           <View style={{ paddingHorizontal: 24, paddingTop: 24 }}>
-            <Text style={{ color: colors.text, fontSize: 20, fontWeight: "bold", marginBottom: 12 }}>
-              Quest Queue
-            </Text>
+            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+              <Text style={{ color: colors.text, fontSize: 20, fontWeight: "bold" }}>
+                Quest Queue
+              </Text>
+              <Pressable
+                onPress={handleRefreshAllQuests}
+                disabled={isRefreshingQuests}
+                style={{
+                  backgroundColor: "rgba(0, 217, 255, 0.2)",
+                  padding: 8,
+                  borderRadius: 8,
+                  borderWidth: 1,
+                  borderColor: "rgba(0, 217, 255, 0.3)",
+                }}
+              >
+                {isRefreshingQuests ? (
+                  <ActivityIndicator size={18} color="#00D9FF" />
+                ) : (
+                  <RefreshCw size={18} color="#00D9FF" />
+                )}
+              </Pressable>
+            </View>
             {queuedQuests.map((userQuest, index) => {
               const quest = userQuest.quest;
               return (

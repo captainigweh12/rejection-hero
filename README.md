@@ -80,6 +80,12 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
   - Confirmation alert before deletion
   - Automatically refreshes queue after deletion
   - Cannot delete active quests, only queued ones
+- **Refresh All Quests Button** 🔄 **NEW!**:
+  - Cyan refresh button next to "Quest Queue" title
+  - Generates 3 new AI quests at once
+  - Shows loading spinner while generating
+  - Automatically refreshes the queue display
+  - Success alert confirms generation
 - **Tap to view quest details** - Fixed navigation to queued quests
 - Smart queue management - automatically starts next quest when slot opens
 - Visual feedback when slots are full

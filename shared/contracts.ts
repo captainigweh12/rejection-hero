@@ -268,6 +268,33 @@ export const recordQuestActionResponseSchema = z.object({
 });
 export type RecordQuestActionResponse = z.infer<typeof recordQuestActionResponseSchema>;
 
+// POST /api/quests/refresh-all - Refresh all queued quests
+export const refreshAllQuestsRequestSchema = z.object({
+  count: z.number().min(1).max(10).optional().default(3), // Generate 3 quests by default
+  userLocation: z.string().optional(),
+  userLatitude: z.number().optional(),
+  userLongitude: z.number().optional(),
+});
+export type RefreshAllQuestsRequest = z.infer<typeof refreshAllQuestsRequestSchema>;
+export const refreshAllQuestsResponseSchema = z.object({
+  success: z.boolean(),
+  message: z.string(),
+  newQuestCount: z.number(),
+  quests: z.array(z.object({
+    userQuestId: z.string(),
+    quest: z.object({
+      id: z.string(),
+      title: z.string(),
+      description: z.string(),
+      category: z.string(),
+      difficulty: z.string(),
+      xpReward: z.number(),
+      pointReward: z.number(),
+    }),
+  })),
+});
+export type RefreshAllQuestsResponse = z.infer<typeof refreshAllQuestsResponseSchema>;
+
 // POST /api/quests/generate-map-quests - Generate quests for map within 5 miles
 export const generateMapQuestsRequestSchema = z.object({
   latitude: z.number(),
