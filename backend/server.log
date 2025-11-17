@@ -242,3 +242,6 @@ Failed to find Response internal state key
 <-- GET /api/live/active
 🔐 [Auth Middleware] GET /api/live/active - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
 --> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+--> GET /api/live/active [32m200[0m 4ms
