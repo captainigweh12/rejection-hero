@@ -67,11 +67,19 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 7. Real-Time Courage Boosts
 8. Warm-up Zone
 
-**Quest Queue Section** ✨ FIXED!
+**Quest Queue Section** ✨ UPDATED!
 - Shows all queued quests waiting to be started
 - Appears at the bottom of the home screen when quests are in queue
+- **Theme-Aware Colors**: Text colors now properly adapt to light/dark mode
+  - Quest descriptions use `colors.textSecondary` for consistent theme support
+  - Border colors use `colors.cardBorder` for proper theme integration
 - Displays quest number in queue (#1, #2, etc.)
 - Shows rewards (XP and points) for each quest
+- **Delete Functionality** 🗑️:
+  - Red trash icon button on each queued quest
+  - Confirmation alert before deletion
+  - Automatically refreshes queue after deletion
+  - Cannot delete active quests, only queued ones
 - **Tap to view quest details** - Fixed navigation to queued quests
 - Smart queue management - automatically starts next quest when slot opens
 - Visual feedback when slots are full

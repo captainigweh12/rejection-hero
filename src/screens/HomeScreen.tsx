@@ -42,6 +42,7 @@ import {
   MessageCircle,
   Heart,
   Send,
+  Trash2,
 } from "lucide-react-native";
 import type { BottomTabScreenProps } from "@/navigation/types";
 import { api } from "@/lib/api";
@@ -74,7 +75,7 @@ export default function HomeScreen({ navigation }: Props) {
 
   console.log("[HomeScreen] Rendering - User logged in:", !!sessionData?.user);
 
-  const { data: questsData, isLoading: questsLoading, error: questsError } = useQuery<GetUserQuestsResponse>({
+  const { data: questsData, isLoading: questsLoading, error: questsError, refetch: refetchQuests } = useQuery<GetUserQuestsResponse>({
     queryKey: ["quests"],
     queryFn: async () => {
       return api.get<GetUserQuestsResponse>("/api/quests");
@@ -128,6 +129,30 @@ export default function HomeScreen({ navigation }: Props) {
           style: "destructive",
           onPress: async () => {
             await authClient.signOut();
+          },
+        },
+      ]
+    );
+  };
+
+  const handleDeleteQuest = async (userQuestId: string, questTitle: string) => {
+    Alert.alert(
+      "Delete Quest",
+      `Are you sure you want to delete "${questTitle}" from your queue?`,
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await api.delete(`/api/quests/${userQuestId}`);
+              // Refetch quests to update the UI
+              refetchQuests();
+            } catch (error) {
+              Alert.alert("Error", "Failed to delete quest. Please try again.");
+              console.error("Delete quest error:", error);
+            }
           },
         },
       ]
@@ -859,7 +884,7 @@ export default function HomeScreen({ navigation }: Props) {
                   }}
                 >
                   <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-                    <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                    <View style={{ flexDirection: "row", alignItems: "center", gap: 8, flex: 1 }}>
                       <View
                         style={{
                           backgroundColor: "rgba(255, 215, 0, 0.2)",
@@ -891,12 +916,26 @@ export default function HomeScreen({ navigation }: Props) {
                         </Text>
                       </View>
                     </View>
+
+                    {/* Delete Button */}
+                    <Pressable
+                      onPress={() => handleDeleteQuest(userQuest.id, quest.title)}
+                      style={{
+                        backgroundColor: "rgba(255, 59, 48, 0.2)",
+                        padding: 8,
+                        borderRadius: 8,
+                        borderWidth: 1,
+                        borderColor: "rgba(255, 59, 48, 0.3)",
+                      }}
+                    >
+                      <Trash2 size={18} color="#FF3B30" />
+                    </Pressable>
                   </View>
 
                   <Text style={{ color: colors.text, fontSize: 18, fontWeight: "bold", marginBottom: 8 }}>
                     {quest.title}
                   </Text>
-                  <Text style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: 14, marginBottom: 12 }}>
+                  <Text style={{ color: colors.textSecondary, fontSize: 14, marginBottom: 12 }}>
                     {quest.description}
                   </Text>
 
@@ -936,7 +975,7 @@ export default function HomeScreen({ navigation }: Props) {
                         marginTop: 12,
                         paddingTop: 12,
                         borderTopWidth: 1,
-                        borderTopColor: "rgba(255, 255, 255, 0.1)",
+                        borderTopColor: colors.cardBorder,
                       }}
                     >
                       <Text style={{ color: "#00D9FF", fontSize: 12, textAlign: "center" }}>
