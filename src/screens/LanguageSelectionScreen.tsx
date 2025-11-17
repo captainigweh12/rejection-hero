@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, Pressable, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { LinearGradient } from "expo-linear-gradient";
 import { ChevronLeft, Check } from "lucide-react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "@/navigation/types";
@@ -23,7 +24,7 @@ export default function LanguageSelectionScreen({ navigation }: Props) {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
+    <LinearGradient colors={colors.background as any} style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
         {/* Header */}
         <View
@@ -140,6 +141,6 @@ export default function LanguageSelectionScreen({ navigation }: Props) {
           </View>
         </ScrollView>
       </SafeAreaView>
-    </View>
+    </LinearGradient>
   );
 }

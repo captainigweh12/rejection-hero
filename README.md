@@ -1819,4 +1819,23 @@ See `ENV_SETUP.md` for complete environment variable setup guide.
   - `FeedScreen.tsx`: Removed stories ScrollView and related code
   - `CommunityScreen.tsx`: Added stories section to Friends tab
 
+### 2025-11-17: Feed Screen Theme Integration
+- **Update**: Converted FeedScreen.tsx to use dynamic theme colors from ThemeContext
+- **Changes**:
+  - Added `useTheme` hook import and usage
+  - Replaced all hardcoded colors with theme color variables:
+    - Background: `colors.backgroundSolid` (was "#0A0A0F")
+    - Card backgrounds: `colors.card` (was "rgba(255, 255, 255, 0.05)")
+    - Text: `colors.text` (was "white")
+    - Secondary text: `colors.textSecondary` (was "rgba(255, 255, 255, 0.6)")
+    - Tertiary text: `colors.textTertiary` (was "#888")
+    - Borders: `colors.cardBorder`, `colors.inputBorder` (was "rgba(126, 63, 228, 0.3)")
+    - Primary color: `colors.primary` (was "#7E3FE4")
+    - Success color: `colors.success` (was "#4CAF50")
+    - Secondary color: `colors.secondary` (was "#FF6B35")
+    - Modal overlay: `colors.modalOverlay` (was "rgba(0, 0, 0, 0.85)")
+    - Surface backgrounds: `colors.surface` (was "rgba(255, 255, 255, 0.05)")
+- **Result**: Feed screen now fully supports light/dark mode theme switching
+- **Files Modified**: `/home/user/workspace/src/screens/FeedScreen.tsx`
+
 

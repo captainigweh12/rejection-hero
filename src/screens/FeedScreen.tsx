@@ -20,6 +20,7 @@ import { api } from "@/lib/api";
 import PostCard from "@/components/PostCard";
 import { useSession } from "@/lib/useSession";
 import CreateStoryModal from "@/components/CreateStoryModal";
+import { useTheme } from "@/contexts/ThemeContext";
 
 interface Post {
   id: string;
@@ -90,6 +91,7 @@ interface FeedScreenProps {
 }
 
 export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) {
+  const { colors } = useTheme();
   const queryClient = useQueryClient();
   const { data: sessionData } = useSession();
   const [showCreatePost, setShowCreatePost] = useState(false);
@@ -241,18 +243,18 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
   const privacyIcon = (privacy: string) => {
     switch (privacy) {
       case "PUBLIC":
-        return <Globe size={16} color="#888" />;
+        return <Globe size={16} color={colors.textTertiary} />;
       case "FRIENDS":
-        return <Users size={16} color="#888" />;
+        return <Users size={16} color={colors.textTertiary} />;
       case "GROUPS":
-        return <Lock size={16} color="#888" />;
+        return <Lock size={16} color={colors.textTertiary} />;
       default:
-        return <Globe size={16} color="#888" />;
+        return <Globe size={16} color={colors.textTertiary} />;
     }
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
+    <View style={{ flex: 1, backgroundColor: colors.backgroundSolid }}>
       {/* What's on your mind - Facebook Style */}
       <View style={{ paddingHorizontal: 16, paddingTop: 8 }}>
         <TouchableOpacity
@@ -264,11 +266,11 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
           }}
           activeOpacity={0.7}
           style={{
-            backgroundColor: "rgba(255, 255, 255, 0.05)",
+            backgroundColor: colors.card,
             borderRadius: 16,
             padding: 12,
             borderWidth: 1,
-            borderColor: "rgba(126, 63, 228, 0.2)",
+            borderColor: colors.inputBorder,
           }}
         >
           <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
@@ -284,22 +286,22 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
                   width: 44,
                   height: 44,
                   borderRadius: 22,
-                  backgroundColor: "#7E3FE4",
+                  backgroundColor: colors.primary,
                   alignItems: "center",
                   justifyContent: "center",
                 }}
               >
-                <Text style={{ color: "white", fontSize: 18, fontWeight: "bold" }}>
+                <Text style={{ color: colors.text, fontSize: 18, fontWeight: "bold" }}>
                   {sessionData?.user?.name?.charAt(0).toUpperCase() || "?"}
                 </Text>
               </View>
             )}
             {/* Input Placeholder */}
-            <Text style={{ flex: 1, color: "#888", fontSize: 16 }}>
+            <Text style={{ flex: 1, color: colors.textTertiary, fontSize: 16 }}>
               What&apos;s on your mind?
             </Text>
             {/* Photo Icon */}
-            <ImageIcon size={24} color="#4CAF50" />
+            <ImageIcon size={24} color={colors.success} />
           </View>
         </TouchableOpacity>
       </View>
@@ -307,7 +309,7 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
       {/* Posts Feed */}
       {feedLoading ? (
         <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-          <ActivityIndicator size="large" color="#7E3FE4" />
+          <ActivityIndicator size="large" color={colors.primary} />
         </View>
       ) : (
         <FlatList
@@ -324,13 +326,13 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
                 refetchFeed();
                 refetchMoments();
               }}
-              tintColor="#7E3FE4"
+              tintColor={colors.primary}
             />
           }
           ListEmptyComponent={
             <View style={{ alignItems: "center", paddingVertical: 40 }}>
-              <Text style={{ color: "#888", fontSize: 16 }}>No posts yet</Text>
-              <Text style={{ color: "#666", fontSize: 14, marginTop: 8 }}>
+              <Text style={{ color: colors.textSecondary, fontSize: 16 }}>No posts yet</Text>
+              <Text style={{ color: colors.textTertiary, fontSize: 14, marginTop: 8 }}>
                 Be the first to share something!
               </Text>
             </View>
@@ -347,17 +349,17 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
       >
         <View style={{
           flex: 1,
-          backgroundColor: "rgba(0, 0, 0, 0.85)",
+          backgroundColor: colors.modalOverlay,
           justifyContent: "center",
           alignItems: "center",
           paddingHorizontal: 20,
         }}>
           <SafeAreaView style={{ width: "100%", maxWidth: 500 }}>
             <View style={{
-              backgroundColor: "#1A1A24",
+              backgroundColor: colors.backgroundSolid,
               borderRadius: 20,
               borderWidth: 1,
-              borderColor: "rgba(126, 63, 228, 0.3)",
+              borderColor: colors.cardBorder,
               maxHeight: "85%",
               width: "100%",
             }}>
@@ -371,30 +373,30 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
                   paddingTop: 20,
                   paddingBottom: 16,
                   borderBottomWidth: 1,
-                  borderBottomColor: "rgba(126, 63, 228, 0.2)",
+                  borderBottomColor: colors.inputBorder,
                 }}
               >
                 <TouchableOpacity onPress={() => setShowCreatePost(false)}>
-                  <X size={24} color="white" />
+                  <X size={24} color={colors.text} />
                 </TouchableOpacity>
-                <Text style={{ fontSize: 18, fontWeight: "700", color: "white" }}>
+                <Text style={{ fontSize: 18, fontWeight: "700", color: colors.text }}>
                   Create post
                 </Text>
                 <TouchableOpacity
                   onPress={handleCreatePost}
                   disabled={createPostMutation.isPending || !postContent.trim()}
                   style={{
-                    backgroundColor: !postContent.trim() ? "rgba(126, 63, 228, 0.3)" : "#7E3FE4",
+                    backgroundColor: !postContent.trim() ? colors.primaryLight : colors.primary,
                     paddingHorizontal: 16,
                     paddingVertical: 6,
                     borderRadius: 8,
                   }}
                 >
                   {createPostMutation.isPending ? (
-                    <ActivityIndicator size="small" color="white" />
+                    <ActivityIndicator size="small" color={colors.text} />
                   ) : (
                     <Text style={{
-                      color: "white",
+                      color: colors.text,
                       fontWeight: "600",
                       fontSize: 14,
                       opacity: !postContent.trim() ? 0.5 : 1
@@ -424,18 +426,18 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
                           width: 44,
                           height: 44,
                           borderRadius: 22,
-                          backgroundColor: "#7E3FE4",
+                          backgroundColor: colors.primary,
                           alignItems: "center",
                           justifyContent: "center",
                         }}
                       >
-                        <Text style={{ color: "white", fontSize: 18, fontWeight: "bold" }}>
+                        <Text style={{ color: colors.text, fontSize: 18, fontWeight: "bold" }}>
                           {sessionData?.user?.name?.charAt(0).toUpperCase() || "?"}
                         </Text>
                       </View>
                     )}
                     <View style={{ flex: 1 }}>
-                      <Text style={{ color: "white", fontSize: 15, fontWeight: "600", marginBottom: 6 }}>
+                      <Text style={{ color: colors.text, fontSize: 15, fontWeight: "600", marginBottom: 6 }}>
                         {sessionData?.user?.name || "Anonymous"}
                       </Text>
                       {/* Privacy Selector - Compact */}
@@ -452,19 +454,19 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
                               borderRadius: 6,
                               backgroundColor:
                                 postPrivacy === privacy
-                                  ? "rgba(126, 63, 228, 0.3)"
-                                  : "rgba(255, 255, 255, 0.05)",
+                                  ? colors.primaryLight
+                                  : colors.surface,
                               borderWidth: 1,
                               borderColor:
                                 postPrivacy === privacy
-                                  ? "#7E3FE4"
-                                  : "rgba(126, 63, 228, 0.2)",
+                                  ? colors.primary
+                                  : colors.inputBorder,
                             }}
                           >
                             {privacyIcon(privacy)}
                             <Text
                               style={{
-                                color: postPrivacy === privacy ? "#7E3FE4" : "#888",
+                                color: postPrivacy === privacy ? colors.primary : colors.textTertiary,
                                 marginLeft: 4,
                                 fontSize: 11,
                                 fontWeight: postPrivacy === privacy ? "600" : "400",
@@ -485,11 +487,11 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
                     value={postContent}
                     onChangeText={setPostContent}
                     placeholder="What's on your mind?"
-                    placeholderTextColor="#666"
+                    placeholderTextColor={colors.textTertiary}
                     multiline
                     autoFocus
                     style={{
-                      color: "white",
+                      color: colors.text,
                       fontSize: 16,
                       minHeight: 120,
                       maxHeight: 200,
@@ -501,12 +503,12 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
                   {/* Selected Images */}
                   {selectedImages.length > 0 && (
                     <View style={{
-                      backgroundColor: "rgba(255, 255, 255, 0.05)",
+                      backgroundColor: colors.surface,
                       borderRadius: 12,
                       padding: 8,
                       marginBottom: 12,
                       borderWidth: 1,
-                      borderColor: "rgba(126, 63, 228, 0.2)",
+                      borderColor: colors.inputBorder,
                     }}>
                       <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
                         {selectedImages.map((uri, index) => (
@@ -531,7 +533,7 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
                                 justifyContent: "center",
                               }}
                             >
-                              <X size={16} color="white" />
+                              <X size={16} color={colors.text} />
                             </TouchableOpacity>
                           </View>
                         ))}
@@ -546,7 +548,7 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
                   paddingBottom: 20,
                 }}>
                   <Text style={{
-                    color: "#888",
+                    color: colors.textSecondary,
                     fontSize: 13,
                     fontWeight: "600",
                     marginBottom: 10,
@@ -570,8 +572,8 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
                         minWidth: 100,
                       }}
                     >
-                      <ImageIcon size={18} color="#4CAF50" />
-                      <Text style={{ color: "#4CAF50", marginLeft: 6, fontWeight: "600", fontSize: 13 }}>
+                      <ImageIcon size={18} color={colors.success} />
+                      <Text style={{ color: colors.success, marginLeft: 6, fontWeight: "600", fontSize: 13 }}>
                         Photo
                       </Text>
                     </TouchableOpacity>
@@ -592,8 +594,8 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
                         minWidth: 100,
                       }}
                     >
-                      <Camera size={18} color="#FF6B35" />
-                      <Text style={{ color: "#FF6B35", marginLeft: 6, fontWeight: "600", fontSize: 13 }}>
+                      <Camera size={18} color={colors.secondary} />
+                      <Text style={{ color: colors.secondary, marginLeft: 6, fontWeight: "600", fontSize: 13 }}>
                         Camera
                       </Text>
                     </TouchableOpacity>
@@ -670,7 +672,7 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
                       height: 36,
                       borderRadius: 18,
                       borderWidth: 2,
-                      borderColor: "#7E3FE4",
+                      borderColor: colors.primary,
                       overflow: "hidden",
                     }}
                   >
@@ -684,22 +686,22 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
                         style={{
                           width: "100%",
                           height: "100%",
-                          backgroundColor: "#7E3FE4",
+                          backgroundColor: colors.primary,
                           alignItems: "center",
                           justifyContent: "center",
                         }}
                       >
-                        <Text style={{ color: "white", fontSize: 16, fontWeight: "700" }}>
+                        <Text style={{ color: colors.text, fontSize: 16, fontWeight: "700" }}>
                           {selectedMoment.userName?.charAt(0).toUpperCase() || "?"}
                         </Text>
                       </View>
                     )}
                   </View>
                   <View>
-                    <Text style={{ color: "white", fontSize: 16, fontWeight: "700" }}>
+                    <Text style={{ color: colors.text, fontSize: 16, fontWeight: "700" }}>
                       {selectedMoment.userName || "Anonymous"}
                     </Text>
-                    <Text style={{ color: "rgba(255, 255, 255, 0.7)", fontSize: 13 }}>
+                    <Text style={{ color: colors.textSecondary, fontSize: 13 }}>
                       {new Date(selectedMoment.moments[momentIndex].createdAt).toLocaleTimeString([], {
                         hour: "2-digit",
                         minute: "2-digit",
@@ -711,7 +713,7 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
                   onPress={() => setSelectedMoment(null)}
                   style={{ padding: 8 }}
                 >
-                  <X size={28} color="white" strokeWidth={2.5} />
+                  <X size={28} color={colors.text} strokeWidth={2.5} />
                 </TouchableOpacity>
               </View>
 
@@ -760,7 +762,7 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
                     borderRadius: 12,
                   }}
                 >
-                  <Text style={{ color: "white", fontSize: 15 }}>
+                  <Text style={{ color: colors.text, fontSize: 15 }}>
                     {selectedMoment.moments[momentIndex].content}
                   </Text>
                 </View>

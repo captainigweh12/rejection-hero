@@ -36,49 +36,44 @@ export default function SettingsScreen({ navigation }: Props) {
 
   const getThemeDisplay = () => {
     switch (theme) {
-      case "light":
-        return t("settings.themeLight");
-      case "dark":
-        return t("settings.themeDark");
-      case "system":
-        return t("settings.themeSystem");
+      case "day":
+        return "Day Mode";
+      case "night":
+        return "Night Mode";
     }
   };
 
-  const cycleTheme = () => {
-    const themes = ["system", "light", "dark"] as const;
-    const currentIndex = themes.indexOf(theme);
-    const nextIndex = (currentIndex + 1) % themes.length;
-    setTheme(themes[nextIndex]);
+  const toggleTheme = () => {
+    setTheme(theme === "day" ? "night" : "day");
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
+    <View style={{ flex: 1, backgroundColor: colors.backgroundSolid }}>
       <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
         <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 32 }}>
           {/* Header */}
           <View style={{ paddingHorizontal: 20, paddingTop: 24 }}>
-            <Text style={{ fontSize: 32, fontWeight: "bold", color: "white", marginBottom: 8 }}>
+            <Text style={{ fontSize: 32, fontWeight: "bold", color: colors.text, marginBottom: 8 }}>
               {t("settings.title")}
             </Text>
-            <Text style={{ fontSize: 16, color: "rgba(255, 255, 255, 0.6)" }}>
+            <Text style={{ fontSize: 16, color: colors.textSecondary }}>
               {t("settings.account")}
             </Text>
           </View>
 
           {/* Appearance */}
           <View style={{ paddingHorizontal: 20, paddingTop: 24 }}>
-            <Text style={{ fontSize: 20, fontWeight: "bold", marginBottom: 12, color: "white" }}>
+            <Text style={{ fontSize: 20, fontWeight: "bold", marginBottom: 12, color: colors.text }}>
               {t("settings.appearance")}
             </Text>
             <Pressable
-              onPress={cycleTheme}
+              onPress={toggleTheme}
               style={{
-                backgroundColor: "rgba(255, 255, 255, 0.05)",
+                backgroundColor: colors.card,
                 borderRadius: 16,
                 padding: 20,
                 borderWidth: 1,
-                borderColor: "rgba(126, 63, 228, 0.3)",
+                borderColor: colors.cardBorder,
                 shadowColor: colors.shadow,
                 shadowOffset: { width: 0, height: 2 },
                 shadowOpacity: 0.1,
@@ -88,76 +83,57 @@ export default function SettingsScreen({ navigation }: Props) {
             >
               <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
                 <View style={{ flexDirection: "row", alignItems: "center", gap: 16 }}>
-                  {theme === "light" ? (
-                    <View
-                      style={{
-                        width: 48,
-                        height: 48,
-                        borderRadius: 24,
-                        backgroundColor: "rgba(255, 255, 255, 0.03)",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
+                  <View
+                    style={{
+                      width: 48,
+                      height: 48,
+                      borderRadius: 24,
+                      backgroundColor: colors.surface,
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    {theme === "day" ? (
                       <Sun size={24} color="#FF6B35" />
-                    </View>
-                  ) : theme === "dark" ? (
-                    <View
-                      style={{
-                        width: 48,
-                        height: 48,
-                        borderRadius: 24,
-                        backgroundColor: "rgba(255, 255, 255, 0.03)",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <Moon size={24} color="#00D9FF" />
-                    </View>
-                  ) : (
-                    <View
-                      style={{
-                        width: 48,
-                        height: 48,
-                        borderRadius: 24,
-                        backgroundColor: "rgba(255, 255, 255, 0.03)",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <Smartphone size={24} color="#7E3FE4" />
-                    </View>
-                  )}
+                    ) : (
+                      <Moon size={24} color="#7E3FE4" />
+                    )}
+                  </View>
                   <View>
-                    <Text style={{ fontWeight: "600", fontSize: 16, color: "white", marginBottom: 4 }}>
+                    <Text style={{ fontWeight: "600", fontSize: 16, color: colors.text, marginBottom: 4 }}>
                       {t("settings.theme")}
                     </Text>
-                    <Text style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: 14 }}>
+                    <Text style={{ color: colors.textSecondary, fontSize: 14 }}>
                       {getThemeDisplay()}
                     </Text>
                   </View>
                 </View>
-                <ChevronRight size={20} color="rgba(255, 255, 255, 0.6)" />
+                <Switch
+                  value={theme === "day"}
+                  onValueChange={toggleTheme}
+                  trackColor={{ false: colors.border, true: colors.primary + "80" }}
+                  thumbColor={theme === "day" ? "#FF6B35" : colors.primary}
+                />
               </View>
             </Pressable>
           </View>
 
           {/* Preferences */}
           <View style={{ paddingHorizontal: 20, paddingTop: 24 }}>
-            <Text style={{ fontSize: 20, fontWeight: "bold", marginBottom: 12, color: "white" }}>
+            <Text style={{ fontSize: 20, fontWeight: "bold", marginBottom: 12, color: colors.text }}>
               {t("settings.preferences")}
             </Text>
             <Pressable
               onPress={() => navigation.navigate("LanguageSelection")}
               style={{
-                backgroundColor: "rgba(255, 255, 255, 0.05)",
+                backgroundColor: colors.card,
                 borderRadius: 16,
                 padding: 20,
                 flexDirection: "row",
                 alignItems: "center",
                 justifyContent: "space-between",
                 borderWidth: 1,
-                borderColor: "rgba(126, 63, 228, 0.3)",
+                borderColor: colors.cardBorder,
                 shadowColor: colors.shadow,
                 shadowOffset: { width: 0, height: 2 },
                 shadowOpacity: 0.1,
@@ -171,7 +147,7 @@ export default function SettingsScreen({ navigation }: Props) {
                     width: 48,
                     height: 48,
                     borderRadius: 24,
-                    backgroundColor: "rgba(255, 255, 255, 0.03)",
+                    backgroundColor: colors.surface,
                     alignItems: "center",
                     justifyContent: "center",
                   }}
@@ -179,30 +155,30 @@ export default function SettingsScreen({ navigation }: Props) {
                   <Globe size={24} color="#00D9FF" />
                 </View>
                 <View>
-                  <Text style={{ fontWeight: "600", fontSize: 16, color: "white", marginBottom: 4 }}>
+                  <Text style={{ fontWeight: "600", fontSize: 16, color: colors.text, marginBottom: 4 }}>
                     {t("settings.language")}
                   </Text>
-                  <Text style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: 14 }}>
+                  <Text style={{ color: colors.textSecondary, fontSize: 14 }}>
                     {languages[language].flag} {languages[language].nativeName}
                   </Text>
                 </View>
               </View>
-              <ChevronRight size={20} color="rgba(255, 255, 255, 0.6)" />
+              <ChevronRight size={20} color={colors.textSecondary} />
             </Pressable>
           </View>
 
           {/* Live Features */}
           <View style={{ paddingHorizontal: 20, paddingTop: 24 }}>
-            <Text style={{ fontSize: 20, fontWeight: "bold", marginBottom: 12, color: "white" }}>
+            <Text style={{ fontSize: 20, fontWeight: "bold", marginBottom: 12, color: colors.text }}>
               {t("settings.liveFeatures")}
             </Text>
             <View
               style={{
-                backgroundColor: "rgba(255, 255, 255, 0.05)",
+                backgroundColor: colors.card,
                 borderRadius: 16,
                 padding: 20,
                 borderWidth: 1,
-                borderColor: "rgba(126, 63, 228, 0.3)",
+                borderColor: colors.cardBorder,
                 shadowColor: colors.shadow,
                 shadowOffset: { width: 0, height: 2 },
                 shadowOpacity: 0.1,
@@ -216,7 +192,7 @@ export default function SettingsScreen({ navigation }: Props) {
                     width: 48,
                     height: 48,
                     borderRadius: 24,
-                    backgroundColor: "rgba(255, 255, 255, 0.03)",
+                    backgroundColor: colors.surface,
                     alignItems: "center",
                     justifyContent: "center",
                   }}
@@ -224,10 +200,10 @@ export default function SettingsScreen({ navigation }: Props) {
                   <Video size={24} color="#FF3B30" />
                 </View>
                 <View style={{ flex: 1 }}>
-                  <Text style={{ fontWeight: "600", fontSize: 16, marginBottom: 4, color: "white" }}>
+                  <Text style={{ fontWeight: "600", fontSize: 16, marginBottom: 4, color: colors.text }}>
                     {t("settings.enableLivestreaming")}
                   </Text>
-                  <Text style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: 14 }}>
+                  <Text style={{ color: colors.textSecondary, fontSize: 14 }}>
                     Stream your quest challenges live to the community
                   </Text>
                 </View>
@@ -240,7 +216,7 @@ export default function SettingsScreen({ navigation }: Props) {
                   }, 100);
                 }}
                 style={{
-                  backgroundColor: "#7E3FE4",
+                  backgroundColor: colors.primary,
                   paddingVertical: 14,
                   borderRadius: 12,
                   alignItems: "center",
@@ -253,19 +229,19 @@ export default function SettingsScreen({ navigation }: Props) {
 
           {/* Notifications */}
           <View style={{ paddingHorizontal: 20, paddingTop: 24 }}>
-            <Text style={{ fontSize: 20, fontWeight: "bold", marginBottom: 12, color: "white" }}>
+            <Text style={{ fontSize: 20, fontWeight: "bold", marginBottom: 12, color: colors.text }}>
               {t("settings.notifications")}
             </Text>
             <View
               style={{
-                backgroundColor: "rgba(255, 255, 255, 0.05)",
+                backgroundColor: colors.card,
                 borderRadius: 16,
                 padding: 20,
                 flexDirection: "row",
                 alignItems: "center",
                 justifyContent: "space-between",
                 borderWidth: 1,
-                borderColor: "rgba(126, 63, 228, 0.3)",
+                borderColor: colors.cardBorder,
                 shadowColor: colors.shadow,
                 shadowOffset: { width: 0, height: 2 },
                 shadowOpacity: 0.1,
@@ -279,7 +255,7 @@ export default function SettingsScreen({ navigation }: Props) {
                     width: 48,
                     height: 48,
                     borderRadius: 24,
-                    backgroundColor: "rgba(255, 255, 255, 0.03)",
+                    backgroundColor: colors.surface,
                     alignItems: "center",
                     justifyContent: "center",
                   }}
@@ -287,10 +263,10 @@ export default function SettingsScreen({ navigation }: Props) {
                   <Bell size={24} color="#FF6B35" />
                 </View>
                 <View style={{ flex: 1 }}>
-                  <Text style={{ fontWeight: "600", fontSize: 16, color: "white", marginBottom: 4 }}>
+                  <Text style={{ fontWeight: "600", fontSize: 16, color: colors.text, marginBottom: 4 }}>
                     {t("settings.questReminders")}
                   </Text>
-                  <Text style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: 14 }}>
+                  <Text style={{ color: colors.textSecondary, fontSize: 14 }}>
                     Get notified about active quests
                   </Text>
                 </View>
@@ -298,27 +274,27 @@ export default function SettingsScreen({ navigation }: Props) {
               <Switch
                 value={questReminders}
                 onValueChange={setQuestReminders}
-                trackColor={{ false: colors.border, true: "#7E3FE4" + "80" }}
-                thumbColor={questReminders ? "#7E3FE4" : colors.surface}
+                trackColor={{ false: colors.border, true: colors.primary + "80" }}
+                thumbColor={questReminders ? colors.primary : colors.surface}
               />
             </View>
           </View>
 
           {/* Legal */}
           <View style={{ paddingHorizontal: 20, paddingTop: 24 }}>
-            <Text style={{ fontSize: 20, fontWeight: "bold", marginBottom: 12, color: "white" }}>
+            <Text style={{ fontSize: 20, fontWeight: "bold", marginBottom: 12, color: colors.text }}>
               {t("settings.legal")}
             </Text>
             <Pressable
               style={{
-                backgroundColor: "rgba(255, 255, 255, 0.05)",
+                backgroundColor: colors.card,
                 borderRadius: 16,
                 padding: 20,
                 flexDirection: "row",
                 alignItems: "center",
                 justifyContent: "space-between",
                 borderWidth: 1,
-                borderColor: "rgba(126, 63, 228, 0.3)",
+                borderColor: colors.cardBorder,
                 shadowColor: colors.shadow,
                 shadowOffset: { width: 0, height: 2 },
                 shadowOpacity: 0.1,
@@ -332,7 +308,7 @@ export default function SettingsScreen({ navigation }: Props) {
                     width: 48,
                     height: 48,
                     borderRadius: 24,
-                    backgroundColor: "rgba(255, 255, 255, 0.03)",
+                    backgroundColor: colors.surface,
                     alignItems: "center",
                     justifyContent: "center",
                   }}
@@ -340,27 +316,27 @@ export default function SettingsScreen({ navigation }: Props) {
                   <Shield size={24} color="#4CAF50" />
                 </View>
                 <View>
-                  <Text style={{ fontWeight: "600", fontSize: 16, color: "white", marginBottom: 4 }}>
+                  <Text style={{ fontWeight: "600", fontSize: 16, color: colors.text, marginBottom: 4 }}>
                     {t("settings.safetyGuidelines")}
                   </Text>
-                  <Text style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: 14 }}>
+                  <Text style={{ color: colors.textSecondary, fontSize: 14 }}>
                     Learn about safe challenges
                   </Text>
                 </View>
               </View>
-              <ChevronRight size={20} color="rgba(255, 255, 255, 0.6)" />
+              <ChevronRight size={20} color={colors.textSecondary} />
             </Pressable>
           </View>
 
           {/* Account Actions */}
           <View style={{ paddingHorizontal: 20, paddingTop: 24 }}>
-            <Text style={{ fontSize: 20, fontWeight: "bold", marginBottom: 12, color: "white" }}>
+            <Text style={{ fontSize: 20, fontWeight: "bold", marginBottom: 12, color: colors.text }}>
               {t("settings.accountActions")}
             </Text>
             <Pressable
               onPress={handleLogout}
               style={{
-                backgroundColor: "rgba(255, 255, 255, 0.05)",
+                backgroundColor: colors.card,
                 borderRadius: 16,
                 padding: 20,
                 borderWidth: 2,

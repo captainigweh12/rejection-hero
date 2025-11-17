@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, ScrollView, Pressable, TextInput, ActivityIndicator, Image, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { LinearGradient } from "expo-linear-gradient";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Search, UserPlus, X, ArrowLeft } from "lucide-react-native";
 import type { RootStackScreenProps } from "@/navigation/types";
@@ -60,7 +61,7 @@ export default function SearchUsersScreen({ navigation }: Props) {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
+    <LinearGradient colors={colors.background as any} style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
         {/* Header */}
         <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 20, paddingVertical: 16, gap: 12 }}>
@@ -227,6 +228,6 @@ export default function SearchUsersScreen({ navigation }: Props) {
           )}
         </ScrollView>
       </SafeAreaView>
-    </View>
+    </LinearGradient>
   );
 }

@@ -193,8 +193,8 @@ export default function HomeScreen({ navigation }: Props) {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
-      <LinearGradient colors={["#0A0A0F", "#1A1A24", "#2A1A34"]} style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: colors.backgroundSolid }}>
+      <LinearGradient colors={colors.background as any} style={{ flex: 1 }}>
         <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
           <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 96 }}>
         {/* Gaming-Style Header with Profile */}
@@ -202,7 +202,7 @@ export default function HomeScreen({ navigation }: Props) {
           <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
             {/* Left: Hamburger Menu */}
             <Pressable onPress={() => setShowMenu(true)} style={{ width: 40 }}>
-              <Menu size={24} color="#fff" />
+              <Menu size={24} color={colors.text} />
             </Pressable>
 
             {/* Center: Modern Gaming Logo with Gradient */}
@@ -212,9 +212,9 @@ export default function HomeScreen({ navigation }: Props) {
               end={{ x: 1, y: 0 }}
               style={{ borderRadius: 12, padding: 2 }}
             >
-              <View style={{ backgroundColor: "#0A0A0F", borderRadius: 10, paddingHorizontal: 12, paddingVertical: 6 }}>
+              <View style={{ backgroundColor: colors.backgroundSolid, borderRadius: 10, paddingHorizontal: 12, paddingVertical: 6 }}>
                 <Text style={{
-                  color: "white",
+                  color: colors.text,
                   fontSize: 20,
                   fontWeight: "900",
                   letterSpacing: 1,
@@ -227,7 +227,7 @@ export default function HomeScreen({ navigation }: Props) {
 
             {/* Right: Notifications */}
             <Pressable style={{ width: 40, alignItems: "flex-end" }}>
-              <Bell size={24} color="#fff" />
+              <Bell size={24} color={colors.text} />
             </Pressable>
           </View>
 
@@ -235,12 +235,12 @@ export default function HomeScreen({ navigation }: Props) {
           <Pressable
             onPress={() => navigation.navigate("ProfileTab")}
             style={{
-              backgroundColor: "rgba(255, 255, 255, 0.05)",
+              backgroundColor: colors.card,
               borderRadius: 20,
               padding: 16,
               borderWidth: 2,
-              borderColor: "rgba(126, 63, 228, 0.4)",
-              shadowColor: "#7E3FE4",
+              borderColor: colors.cardBorder,
+              shadowColor: colors.primary,
               shadowOffset: { width: 0, height: 4 },
               shadowOpacity: 0.3,
               shadowRadius: 8,
@@ -266,7 +266,7 @@ export default function HomeScreen({ navigation }: Props) {
                       width: "100%",
                       height: "100%",
                       borderRadius: 37,
-                      backgroundColor: "#1A1A24",
+                      backgroundColor: colors.backgroundSolid,
                       alignItems: "center",
                       justifyContent: "center",
                       overflow: "hidden",
@@ -289,7 +289,7 @@ export default function HomeScreen({ navigation }: Props) {
                           justifyContent: "center",
                         }}
                       >
-                        <User size={36} color="#fff" strokeWidth={2.5} />
+                        <User size={36} color={colors.text} strokeWidth={2.5} />
                       </LinearGradient>
                     )}
                   </View>
@@ -306,7 +306,7 @@ export default function HomeScreen({ navigation }: Props) {
                     paddingHorizontal: 8,
                     paddingVertical: 4,
                     borderWidth: 2,
-                    borderColor: "#1A1A24",
+                    borderColor: colors.backgroundSolid,
                     shadowColor: "#FFD700",
                     shadowOffset: { width: 0, height: 2 },
                     shadowOpacity: 0.6,
@@ -322,7 +322,7 @@ export default function HomeScreen({ navigation }: Props) {
 
               {/* User Info & Stats */}
               <View style={{ flex: 1 }}>
-                <Text style={{ color: "white", fontSize: 20, fontWeight: "bold", marginBottom: 4 }}>
+                <Text style={{ color: colors.text, fontSize: 20, fontWeight: "bold", marginBottom: 4 }}>
                   {sessionData?.user?.name || "Quest Warrior"}
                 </Text>
 
@@ -394,7 +394,7 @@ export default function HomeScreen({ navigation }: Props) {
                   <View
                     style={{
                       height: 6,
-                      backgroundColor: "rgba(255, 255, 255, 0.1)",
+                      backgroundColor: colors.cardBorder,
                       borderRadius: 3,
                       overflow: "hidden",
                     }}
@@ -409,7 +409,7 @@ export default function HomeScreen({ navigation }: Props) {
                       }}
                     />
                   </View>
-                  <Text style={{ color: "rgba(255, 255, 255, 0.5)", fontSize: 10, marginTop: 2 }}>
+                  <Text style={{ color: colors.textSecondary, fontSize: 10, marginTop: 2 }}>
                     {(statsData?.totalXP || 0) % 100}/100 XP to Level {Math.floor((statsData?.totalXP || 0) / 100) + 2}
                   </Text>
                 </View>
@@ -417,7 +417,7 @@ export default function HomeScreen({ navigation }: Props) {
                 {/* Confidence Meter - NEW */}
                 <View style={{ marginTop: 12 }}>
                   <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
-                    <Text style={{ color: "rgba(255, 255, 255, 0.7)", fontSize: 12, fontWeight: "600" }}>
+                    <Text style={{ color: colors.textSecondary, fontSize: 12, fontWeight: "600" }}>
                       Confidence Level
                     </Text>
                     <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
@@ -445,7 +445,7 @@ export default function HomeScreen({ navigation }: Props) {
                   <View
                     style={{
                       height: 6,
-                      backgroundColor: "rgba(255, 255, 255, 0.1)",
+                      backgroundColor: colors.cardBorder,
                       borderRadius: 3,
                       overflow: "hidden",
                     }}
@@ -467,13 +467,13 @@ export default function HomeScreen({ navigation }: Props) {
 
           {/* Active Quests */}
           <View style={{ paddingHorizontal: 24, paddingVertical: 8, marginTop: 20 }}>
-            <Text style={{ color: "white", fontSize: 20, fontWeight: "bold", marginBottom: 12 }}>
+            <Text style={{ color: colors.text, fontSize: 20, fontWeight: "bold", marginBottom: 12 }}>
               My Active Quests
             </Text>
             {questsLoading ? (
               <View style={{ alignItems: "center", paddingVertical: 32 }}>
-                <ActivityIndicator size="large" color="#FF6B35" />
-                <Text style={{ color: "rgba(255, 255, 255, 0.7)", marginTop: 16 }}>Loading quests...</Text>
+                <ActivityIndicator size="large" color={colors.secondary} />
+                <Text style={{ color: colors.textSecondary, marginTop: 16 }}>Loading quests...</Text>
               </View>
             ) : activeQuests.length === 0 ? (
               <View
@@ -481,13 +481,13 @@ export default function HomeScreen({ navigation }: Props) {
                   padding: 32,
                   borderRadius: 24,
                   alignItems: "center",
-                  backgroundColor: "rgba(255, 255, 255, 0.05)",
+                  backgroundColor: colors.card,
                   borderWidth: 1,
-                  borderColor: "rgba(126, 63, 228, 0.3)",
+                  borderColor: colors.cardBorder,
                 }}
               >
-                <Text style={{ color: "white", fontSize: 20, fontWeight: "bold", marginBottom: 8 }}>No Active Quests</Text>
-                <Text style={{ color: "rgba(255, 255, 255, 0.7)", textAlign: "center", marginBottom: 24 }}>
+                <Text style={{ color: colors.text, fontSize: 20, fontWeight: "bold", marginBottom: 8 }}>No Active Quests</Text>
+                <Text style={{ color: colors.textSecondary, textAlign: "center", marginBottom: 24 }}>
                   Start your rejection challenge journey! Tap the Create button to generate a quest
                   with AI.
                 </Text>
@@ -500,11 +500,11 @@ export default function HomeScreen({ navigation }: Props) {
                     flexDirection: "row",
                     alignItems: "center",
                     gap: 8,
-                    backgroundColor: "#FF6B35",
+                    backgroundColor: colors.secondary,
                   }}
                 >
-                  <Plus size={20} color="#fff" />
-                  <Text style={{ color: "white", fontWeight: "bold" }}>Create Quest</Text>
+                  <Plus size={20} color={colors.text} />
+                  <Text style={{ color: colors.text, fontWeight: "bold" }}>Create Quest</Text>
                 </Pressable>
               </View>
             ) : (
@@ -522,9 +522,9 @@ export default function HomeScreen({ navigation }: Props) {
                       onPress={() => navigation.navigate("QuestDetail", { userQuestId: userQuest.id })}
                       className="mb-4 rounded-3xl overflow-hidden"
                       style={{
-                        backgroundColor: "rgba(255, 255, 255, 0.05)",
+                        backgroundColor: colors.card,
                         borderWidth: 1,
-                        borderColor: "rgba(126, 63, 228, 0.3)",
+                        borderColor: colors.cardBorder,
                       }}
                     >
                       <View className="p-6">
@@ -557,10 +557,10 @@ export default function HomeScreen({ navigation }: Props) {
                         </View>
 
                         {/* Title */}
-                        <Text className="text-white text-2xl font-bold mb-2">{quest.title}</Text>
+                        <Text className="text-2xl font-bold mb-2" style={{ color: colors.text }}>{quest.title}</Text>
 
                         {/* Description */}
-                        <Text className="text-white/70 text-sm mb-4" numberOfLines={2}>
+                        <Text className="text-sm mb-4" style={{ color: colors.textSecondary }} numberOfLines={2}>
                           {quest.description}
                         </Text>
 
@@ -573,7 +573,7 @@ export default function HomeScreen({ navigation }: Props) {
                             borderColor: "#00D9FF",
                           }}
                         >
-                          <Text className="text-white text-center font-bold">
+                          <Text className="text-center font-bold" style={{ color: colors.text }}>
                             Goal: Collect {quest.goalCount} {quest.goalType === "COLLECT_NOS" ? "NO's" : "YES's"}
                           </Text>
                         </View>
@@ -623,16 +623,16 @@ export default function HomeScreen({ navigation }: Props) {
 
           {/* Fear Zones Analyzer - NEW */}
           <View style={{ paddingHorizontal: 24, marginTop: 20 }}>
-            <Text style={{ color: "white", fontSize: 18, fontWeight: "bold", marginBottom: 12 }}>
+            <Text style={{ color: colors.text, fontSize: 18, fontWeight: "bold", marginBottom: 12 }}>
               Fear Zones
             </Text>
             <View
               style={{
-                backgroundColor: "rgba(255, 255, 255, 0.05)",
+                backgroundColor: colors.card,
                 borderRadius: 16,
                 padding: 16,
                 borderWidth: 1,
-                borderColor: "rgba(255, 255, 255, 0.1)",
+                borderColor: colors.cardBorder,
               }}
             >
               <View style={{ flexDirection: "row", justifyContent: "space-between", gap: 12 }}>
@@ -664,7 +664,7 @@ export default function HomeScreen({ navigation }: Props) {
                       marginBottom: 4,
                     }}
                   />
-                  <Text style={{ color: "rgba(255, 255, 255, 0.7)", fontSize: 11, textAlign: "center" }}>
+                  <Text style={{ color: colors.textSecondary, fontSize: 11, textAlign: "center" }}>
                     Easy Zone
                   </Text>
                 </View>
@@ -697,7 +697,7 @@ export default function HomeScreen({ navigation }: Props) {
                       marginBottom: 4,
                     }}
                   />
-                  <Text style={{ color: "rgba(255, 255, 255, 0.7)", fontSize: 11, textAlign: "center" }}>
+                  <Text style={{ color: colors.textSecondary, fontSize: 11, textAlign: "center" }}>
                     Growth Zone
                   </Text>
                 </View>
@@ -730,7 +730,7 @@ export default function HomeScreen({ navigation }: Props) {
                       marginBottom: 4,
                     }}
                   />
-                  <Text style={{ color: "rgba(255, 255, 255, 0.7)", fontSize: 11, textAlign: "center" }}>
+                  <Text style={{ color: colors.textSecondary, fontSize: 11, textAlign: "center" }}>
                     Fear Zone
                   </Text>
                 </View>
@@ -752,23 +752,23 @@ export default function HomeScreen({ navigation }: Props) {
                   borderRadius: 16,
                   padding: 16,
                   borderWidth: 1,
-                  borderColor: "rgba(126, 63, 228, 0.5)",
+                  borderColor: colors.cardBorder,
                 }}
               >
                 <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 8 }}>
-                  <FileText size={20} color="#7E3FE4" />
-                  <Text style={{ color: "#7E3FE4", fontSize: 14, fontWeight: "bold", marginLeft: 8 }}>
+                  <FileText size={20} color={colors.primary} />
+                  <Text style={{ color: colors.primary, fontSize: 14, fontWeight: "bold", marginLeft: 8 }}>
                     Reflection of the Day
                   </Text>
                 </View>
-                <Text style={{ color: "white", fontSize: 15, lineHeight: 22, marginBottom: 8 }}>
+                <Text style={{ color: colors.text, fontSize: 15, lineHeight: 22, marginBottom: 8 }}>
                   {reflectionPrompt.prompt}
                 </Text>
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <Text style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: 12 }}>
+                  <Text style={{ color: colors.textSecondary, fontSize: 12 }}>
                     Tap to journal
                   </Text>
-                  <ChevronRight size={16} color="rgba(255, 255, 255, 0.6)" style={{ marginLeft: 4 }} />
+                  <ChevronRight size={16} color={colors.textSecondary} style={{ marginLeft: 4 }} />
                 </View>
               </LinearGradient>
             </Pressable>
@@ -792,7 +792,7 @@ export default function HomeScreen({ navigation }: Props) {
                     Weekly NO Forecast
                   </Text>
                 </View>
-                <Text style={{ color: "white", fontSize: 14, lineHeight: 20, marginBottom: 12 }}>
+                <Text style={{ color: colors.text, fontSize: 14, lineHeight: 20, marginBottom: 12 }}>
                   {weeklyForecast.forecast}
                 </Text>
                 <View
@@ -801,11 +801,11 @@ export default function HomeScreen({ navigation }: Props) {
                     justifyContent: "space-between",
                     paddingTop: 12,
                     borderTopWidth: 1,
-                    borderTopColor: "rgba(255, 255, 255, 0.1)",
+                    borderTopColor: colors.cardBorder,
                   }}
                 >
                   <View>
-                    <Text style={{ color: "rgba(255, 255, 255, 0.5)", fontSize: 11 }}>
+                    <Text style={{ color: colors.textSecondary, fontSize: 11 }}>
                       Suggested Target
                     </Text>
                     <Text style={{ color: "#00D9FF", fontSize: 18, fontWeight: "bold" }}>
@@ -813,7 +813,7 @@ export default function HomeScreen({ navigation }: Props) {
                     </Text>
                   </View>
                   <View>
-                    <Text style={{ color: "rgba(255, 255, 255, 0.5)", fontSize: 11 }}>
+                    <Text style={{ color: colors.textSecondary, fontSize: 11 }}>
                       Trending
                     </Text>
                     <Text style={{ color: "#FFD700", fontSize: 14, fontWeight: "bold", textTransform: "capitalize" }}>
@@ -829,7 +829,7 @@ export default function HomeScreen({ navigation }: Props) {
         {/* Queued Quests Section */}
         {queuedQuests.length > 0 && (
           <View style={{ paddingHorizontal: 24, paddingTop: 24 }}>
-            <Text style={{ color: "white", fontSize: 20, fontWeight: "bold", marginBottom: 12 }}>
+            <Text style={{ color: colors.text, fontSize: 20, fontWeight: "bold", marginBottom: 12 }}>
               Quest Queue
             </Text>
             {queuedQuests.map((userQuest, index) => {
@@ -850,12 +850,12 @@ export default function HomeScreen({ navigation }: Props) {
                     }
                   }}
                   style={{
-                    backgroundColor: "rgba(255, 255, 255, 0.03)",
+                    backgroundColor: colors.card,
                     borderRadius: 20,
                     padding: 16,
                     marginBottom: 12,
                     borderWidth: 1,
-                    borderColor: "rgba(255, 255, 255, 0.1)",
+                    borderColor: colors.cardBorder,
                   }}
                 >
                   <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
