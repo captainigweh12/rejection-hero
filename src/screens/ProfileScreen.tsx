@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, Pressable, ActivityIndicator, ScrollView, Alert, TextInput, Image, Modal } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
@@ -64,6 +64,36 @@ export default function ProfileScreen({ navigation }: Props) {
     enabled: !!sessionData?.user,
   });
 
+  // Initialize state from profile data when it loads
+  useEffect(() => {
+    if (profileData) {
+      setUserContext(profileData.userContext || "");
+      setGoals(profileData.userGoals || "");
+      // Convert interests array to comma-separated string for display
+      setInterests(profileData.interests?.join(", ") || "");
+    }
+  }, [profileData]);
+
+  // Save profile mutation
+  const saveProfileMutation = useMutation({
+    mutationFn: async (data: { userContext?: string; userGoals?: string; interests?: string[] }) => {
+      return api.post("/api/profile", {
+        displayName: profileData?.displayName || sessionData?.user?.email?.split("@")[0] || "Warrior",
+        userContext: data.userContext,
+        userGoals: data.userGoals,
+        interests: data.interests,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["profile"] });
+      setIsEditingAbout(false);
+      Alert.alert("Success", "Your profile information has been saved!");
+    },
+    onError: (error: any) => {
+      Alert.alert("Error", error?.message || "Failed to save profile. Please try again.");
+    },
+  });
+
   const handleLogout = async () => {
     Alert.alert(
       "Sign Out",
@@ -82,12 +112,17 @@ export default function ProfileScreen({ navigation }: Props) {
   };
 
   const handleSaveContext = () => {
-    // TODO: Save user context to backend for AI quest generation
-    setIsEditingAbout(false);
-    Alert.alert(
-      "Context Saved",
-      "Your information will help Ben create more personalized quests for you!"
-    );
+    // Convert interests string to array (split by comma and trim)
+    const interestsArray = interests
+      .split(",")
+      .map((item) => item.trim())
+      .filter((item) => item.length > 0);
+
+    saveProfileMutation.mutate({
+      userContext: userContext.trim() || undefined,
+      userGoals: goals.trim() || undefined,
+      interests: interestsArray.length > 0 ? interestsArray : undefined,
+    });
   };
 
   const handleGenerateAvatar = async (style: string) => {
@@ -164,7 +199,7 @@ export default function ProfileScreen({ navigation }: Props) {
     );
   }
 
-  const username = sessionData.user.email?.split("@")[0] || "Warrior";
+  const username = profileData?.displayName || sessionData.user.email?.split("@")[0] || "Warrior";
   const level = Math.floor((statsData?.totalXP || 0) / 100) + 1;
   const xpProgress = ((statsData?.totalXP || 0) % 100) / 100;
 
@@ -1170,18 +1205,26 @@ export default function ProfileScreen({ navigation }: Props) {
 
                     <Pressable
                       onPress={handleSaveContext}
+                      disabled={saveProfileMutation.isPending}
                       style={{
-                        backgroundColor: colors.primary,
+                        backgroundColor: saveProfileMutation.isPending ? colors.surface : colors.primary,
                         paddingVertical: 16,
                         borderRadius: 12,
                         flexDirection: "row",
                         alignItems: "center",
                         justifyContent: "center",
                         gap: 8,
+                        opacity: saveProfileMutation.isPending ? 0.6 : 1,
                       }}
                     >
-                      <Save size={20} color={colors.text} />
-                      <Text style={{ color: colors.text, fontWeight: "bold", fontSize: 16 }}>Save Context</Text>
+                      {saveProfileMutation.isPending ? (
+                        <ActivityIndicator size="small" color={colors.text} />
+                      ) : (
+                        <Save size={20} color={colors.text} />
+                      )}
+                      <Text style={{ color: colors.text, fontWeight: "bold", fontSize: 16 }}>
+                        {saveProfileMutation.isPending ? "Saving..." : "Save Context"}
+                      </Text>
                     </Pressable>
                   </View>
                 ) : (

@@ -21,6 +21,7 @@ import PostCard from "@/components/PostCard";
 import { useSession } from "@/lib/useSession";
 import CreateStoryModal from "@/components/CreateStoryModal";
 import { useTheme } from "@/contexts/ThemeContext";
+import type { GetProfileResponse } from "@/shared/contracts";
 
 interface Post {
   id: string;
@@ -98,6 +99,15 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
   const [showCreateMoment, setShowCreateMoment] = useState(false);
   const [selectedMoment, setSelectedMoment] = useState<MomentsUser | null>(null);
   const [momentIndex, setMomentIndex] = useState(0);
+
+  // Fetch profile data for current user
+  const { data: profileData } = useQuery<GetProfileResponse>({
+    queryKey: ["profile"],
+    queryFn: async () => {
+      return api.get<GetProfileResponse>("/api/profile");
+    },
+    enabled: !!sessionData?.user,
+  });
 
   // Create post state
   const [postContent, setPostContent] = useState("");
@@ -275,9 +285,9 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
         >
           <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
             {/* User Avatar */}
-            {sessionData?.user?.image ? (
+            {profileData?.avatar ? (
               <Image
-                source={{ uri: sessionData.user.image }}
+                source={{ uri: profileData.avatar }}
                 style={{ width: 44, height: 44, borderRadius: 22 }}
               />
             ) : (
@@ -292,7 +302,7 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
                 }}
               >
                 <Text style={{ color: colors.text, fontSize: 18, fontWeight: "bold" }}>
-                  {sessionData?.user?.name?.charAt(0).toUpperCase() || "?"}
+                  {profileData?.displayName?.charAt(0).toUpperCase() || sessionData?.user?.email?.split("@")[0]?.charAt(0).toUpperCase() || "?"}
                 </Text>
               </View>
             )}
@@ -415,9 +425,9 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
                 <View style={{ paddingHorizontal: 20, paddingTop: 16, paddingBottom: 12 }}>
                   <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
                     {/* Avatar */}
-                    {sessionData?.user?.image ? (
+                    {profileData?.avatar ? (
                       <Image
-                        source={{ uri: sessionData.user.image }}
+                        source={{ uri: profileData.avatar }}
                         style={{ width: 44, height: 44, borderRadius: 22 }}
                       />
                     ) : (
@@ -432,13 +442,13 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
                         }}
                       >
                         <Text style={{ color: colors.text, fontSize: 18, fontWeight: "bold" }}>
-                          {sessionData?.user?.name?.charAt(0).toUpperCase() || "?"}
+                          {profileData?.displayName?.charAt(0).toUpperCase() || sessionData?.user?.email?.split("@")[0]?.charAt(0).toUpperCase() || "?"}
                         </Text>
                       </View>
                     )}
                     <View style={{ flex: 1 }}>
                       <Text style={{ color: colors.text, fontSize: 15, fontWeight: "600", marginBottom: 6 }}>
-                        {sessionData?.user?.name || "Anonymous"}
+                        {profileData?.displayName || sessionData?.user?.email?.split("@")[0] || "Anonymous"}
                       </Text>
                       {/* Privacy Selector - Compact */}
                       <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
