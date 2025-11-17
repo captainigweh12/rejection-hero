@@ -893,7 +893,7 @@ export default function HomeScreen({ navigation }: Props) {
                     </View>
                   </View>
 
-                  <Text style={{ color: "white", fontSize: 18, fontWeight: "bold", marginBottom: 8 }}>
+                  <Text style={{ color: colors.text, fontSize: 18, fontWeight: "bold", marginBottom: 8 }}>
                     {quest.title}
                   </Text>
                   <Text style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: 14, marginBottom: 12 }}>
@@ -986,7 +986,7 @@ export default function HomeScreen({ navigation }: Props) {
         animationType="slide"
         onRequestClose={() => setShowMenu(false)}
       >
-        <View style={{ flex: 1, backgroundColor: "rgba(0, 0, 0, 0.7)" }}>
+        <View style={{ flex: 1, backgroundColor: colors.modalOverlay }}>
           <Pressable
             style={{ flex: 1 }}
             onPress={() => setShowMenu(false)}
@@ -999,12 +999,9 @@ export default function HomeScreen({ navigation }: Props) {
               left: 0,
               top: 0,
               bottom: 0,
+              backgroundColor: colors.backgroundSolid,
             }}
           >
-            <LinearGradient
-              colors={["#0A0A0F", "#1A1A24", "#2A1A34"]}
-              style={{ flex: 1 }}
-            >
               <SafeAreaView style={{ flex: 1 }} edges={["top", "bottom"]}>
                 <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 20 }}>
                   {/* Header with 3D Glass Effect */}
@@ -1016,10 +1013,10 @@ export default function HomeScreen({ navigation }: Props) {
                       justifyContent: "space-between",
                       alignItems: "center",
                       borderBottomWidth: 1,
-                      borderBottomColor: "rgba(126, 63, 228, 0.2)",
+                      borderBottomColor: colors.border,
                     }}
                   >
-                    <Text style={{ fontSize: 32, fontWeight: "bold", color: "white" }}>
+                    <Text style={{ fontSize: 32, fontWeight: "bold", color: colors.text }}>
                       Menu
                     </Text>
                     <Pressable
@@ -1028,14 +1025,14 @@ export default function HomeScreen({ navigation }: Props) {
                         width: 40,
                         height: 40,
                         borderRadius: 20,
-                        backgroundColor: "rgba(255, 255, 255, 0.1)",
+                        backgroundColor: colors.surface,
                         alignItems: "center",
                         justifyContent: "center",
                         borderWidth: 1,
-                        borderColor: "rgba(255, 255, 255, 0.2)",
+                        borderColor: colors.border,
                       }}
                     >
-                      <X size={24} color="white" />
+                      <X size={24} color={colors.text} />
                     </Pressable>
                   </View>
 
@@ -1045,11 +1042,11 @@ export default function HomeScreen({ navigation }: Props) {
                       marginHorizontal: 20,
                       marginTop: 20,
                       padding: 20,
-                      backgroundColor: "rgba(255, 255, 255, 0.05)",
+                      backgroundColor: colors.card,
                       borderRadius: 20,
                       borderWidth: 2,
-                      borderColor: "rgba(126, 63, 228, 0.4)",
-                      shadowColor: "#7E3FE4",
+                      borderColor: colors.cardBorder,
+                      shadowColor: colors.primary,
                       shadowOffset: { width: 0, height: 4 },
                       shadowOpacity: 0.3,
                       shadowRadius: 8,
@@ -1082,21 +1079,21 @@ export default function HomeScreen({ navigation }: Props) {
                         </LinearGradient>
                       )}
                       <View style={{ flex: 1 }}>
-                        <Text style={{ fontSize: 20, fontWeight: "bold", color: "white", marginBottom: 4 }}>
+                        <Text style={{ fontSize: 20, fontWeight: "bold", color: colors.text, marginBottom: 4 }}>
                           {sessionData?.user?.name || "Quest Warrior"}
                         </Text>
                         <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
                           <View
                             style={{
-                              backgroundColor: "rgba(126, 63, 228, 0.3)",
+                              backgroundColor: colors.primaryLight,
                               paddingHorizontal: 12,
                               paddingVertical: 4,
                               borderRadius: 12,
                               borderWidth: 1,
-                              borderColor: "rgba(126, 63, 228, 0.5)",
+                              borderColor: colors.border,
                             }}
                           >
-                            <Text style={{ fontSize: 13, fontWeight: "600", color: "#7E3FE4" }}>
+                            <Text style={{ fontSize: 13, fontWeight: "600", color: colors.primary }}>
                               Level {Math.floor((statsData?.totalXP || 0) / 100) + 1}
                             </Text>
                           </View>
@@ -1125,7 +1122,7 @@ export default function HomeScreen({ navigation }: Props) {
 
                   {/* PROFILE Section */}
                   <View style={{ paddingHorizontal: 20, paddingTop: 24, paddingBottom: 12 }}>
-                    <Text style={{ fontSize: 13, fontWeight: "700", color: "rgba(255, 255, 255, 0.6)", letterSpacing: 1 }}>
+                    <Text style={{ fontSize: 13, fontWeight: "700", color: colors.textSecondary, letterSpacing: 1 }}>
                       PROFILE
                     </Text>
                   </View>
@@ -1138,7 +1135,7 @@ export default function HomeScreen({ navigation }: Props) {
                         navigation.navigate("ProfileTab");
                       }}
                       style={{
-                        backgroundColor: "rgba(255, 255, 255, 0.05)",
+                        backgroundColor: colors.card,
                         borderRadius: 16,
                         padding: 16,
                         flexDirection: "row",
@@ -1167,10 +1164,10 @@ export default function HomeScreen({ navigation }: Props) {
                       >
                         <User size={24} color="#FF6B35" />
                       </View>
-                      <Text style={{ fontSize: 16, color: "white", fontWeight: "600", flex: 1 }}>
+                      <Text style={{ fontSize: 16, color: colors.text, fontWeight: "600", flex: 1 }}>
                         Profile
                       </Text>
-                      <ChevronRight size={20} color="rgba(255, 255, 255, 0.5)" />
+                      <ChevronRight size={20} color={colors.textSecondary} />
                     </Pressable>
 
                     {/* Settings */}
@@ -1180,7 +1177,7 @@ export default function HomeScreen({ navigation }: Props) {
                         navigation.navigate("Settings");
                       }}
                       style={{
-                        backgroundColor: "rgba(255, 255, 255, 0.05)",
+                        backgroundColor: colors.card,
                         borderRadius: 16,
                         padding: 16,
                         flexDirection: "row",
@@ -1209,10 +1206,10 @@ export default function HomeScreen({ navigation }: Props) {
                       >
                         <Settings size={24} color="#00D9FF" />
                       </View>
-                      <Text style={{ fontSize: 16, color: "white", fontWeight: "600", flex: 1 }}>
+                      <Text style={{ fontSize: 16, color: colors.text, fontWeight: "600", flex: 1 }}>
                         Settings
                       </Text>
-                      <ChevronRight size={20} color="rgba(255, 255, 255, 0.5)" />
+                      <ChevronRight size={20} color={colors.textSecondary} />
                     </Pressable>
 
                     {/* Support */}
@@ -1222,7 +1219,7 @@ export default function HomeScreen({ navigation }: Props) {
                         navigation.navigate("Support");
                       }}
                       style={{
-                        backgroundColor: "rgba(255, 255, 255, 0.05)",
+                        backgroundColor: colors.card,
                         borderRadius: 16,
                         padding: 16,
                         flexDirection: "row",
@@ -1251,10 +1248,10 @@ export default function HomeScreen({ navigation }: Props) {
                       >
                         <HelpCircle size={24} color="#4CAF50" />
                       </View>
-                      <Text style={{ fontSize: 16, color: "white", fontWeight: "600", flex: 1 }}>
+                      <Text style={{ fontSize: 16, color: colors.text, fontWeight: "600", flex: 1 }}>
                         Support
                       </Text>
-                      <ChevronRight size={20} color="rgba(255, 255, 255, 0.5)" />
+                      <ChevronRight size={20} color={colors.textSecondary} />
                     </Pressable>
 
                     {/* Invite Warriors */}
@@ -1264,7 +1261,7 @@ export default function HomeScreen({ navigation }: Props) {
                         navigation.navigate("InviteWarriors");
                       }}
                       style={{
-                        backgroundColor: "rgba(255, 255, 255, 0.05)",
+                        backgroundColor: colors.card,
                         borderRadius: 16,
                         padding: 16,
                         flexDirection: "row",
@@ -1293,10 +1290,10 @@ export default function HomeScreen({ navigation }: Props) {
                       >
                         <UserPlus size={24} color="#FFD700" />
                       </View>
-                      <Text style={{ fontSize: 16, color: "white", fontWeight: "600", flex: 1 }}>
+                      <Text style={{ fontSize: 16, color: colors.text, fontWeight: "600", flex: 1 }}>
                         Invite Warriors
                       </Text>
-                      <ChevronRight size={20} color="rgba(255, 255, 255, 0.5)" />
+                      <ChevronRight size={20} color={colors.textSecondary} />
                     </Pressable>
                   </View>
 
@@ -1315,7 +1312,7 @@ export default function HomeScreen({ navigation }: Props) {
                         navigation.navigate("QuestCalendar");
                       }}
                       style={{
-                        backgroundColor: "rgba(255, 255, 255, 0.05)",
+                        backgroundColor: colors.card,
                         borderRadius: 16,
                         padding: 16,
                         flexDirection: "row",
@@ -1344,10 +1341,10 @@ export default function HomeScreen({ navigation }: Props) {
                       >
                         <Calendar size={24} color="#7E3FE4" />
                       </View>
-                      <Text style={{ fontSize: 16, color: "white", fontWeight: "600", flex: 1 }}>
+                      <Text style={{ fontSize: 16, color: colors.text, fontWeight: "600", flex: 1 }}>
                         Quest Calendar
                       </Text>
-                      <ChevronRight size={20} color="rgba(255, 255, 255, 0.5)" />
+                      <ChevronRight size={20} color={colors.textSecondary} />
                     </Pressable>
 
                     {/* Leaderboard */}
@@ -1357,7 +1354,7 @@ export default function HomeScreen({ navigation }: Props) {
                         navigation.navigate("GrowthAchievements");
                       }}
                       style={{
-                        backgroundColor: "rgba(255, 255, 255, 0.05)",
+                        backgroundColor: colors.card,
                         borderRadius: 16,
                         padding: 16,
                         flexDirection: "row",
@@ -1386,10 +1383,10 @@ export default function HomeScreen({ navigation }: Props) {
                       >
                         <Trophy size={24} color="#FFD700" />
                       </View>
-                      <Text style={{ fontSize: 16, color: "white", fontWeight: "600", flex: 1 }}>
+                      <Text style={{ fontSize: 16, color: colors.text, fontWeight: "600", flex: 1 }}>
                         Leaderboard
                       </Text>
-                      <ChevronRight size={20} color="rgba(255, 255, 255, 0.5)" />
+                      <ChevronRight size={20} color={colors.textSecondary} />
                     </Pressable>
 
                     {/* Explore World */}
@@ -1399,7 +1396,7 @@ export default function HomeScreen({ navigation }: Props) {
                         navigation.navigate("MapTab");
                       }}
                       style={{
-                        backgroundColor: "rgba(255, 255, 255, 0.05)",
+                        backgroundColor: colors.card,
                         borderRadius: 16,
                         padding: 16,
                         flexDirection: "row",
@@ -1428,10 +1425,10 @@ export default function HomeScreen({ navigation }: Props) {
                       >
                         <Globe size={24} color="#00D9FF" />
                       </View>
-                      <Text style={{ fontSize: 16, color: "white", fontWeight: "600", flex: 1 }}>
+                      <Text style={{ fontSize: 16, color: colors.text, fontWeight: "600", flex: 1 }}>
                         Explore World
                       </Text>
-                      <ChevronRight size={20} color="rgba(255, 255, 255, 0.5)" />
+                      <ChevronRight size={20} color={colors.textSecondary} />
                     </Pressable>
 
                     {/* Manage Categories */}
@@ -1441,7 +1438,7 @@ export default function HomeScreen({ navigation }: Props) {
                         navigation.navigate("ManageCategories");
                       }}
                       style={{
-                        backgroundColor: "rgba(255, 255, 255, 0.05)",
+                        backgroundColor: colors.card,
                         borderRadius: 16,
                         padding: 16,
                         flexDirection: "row",
@@ -1470,10 +1467,10 @@ export default function HomeScreen({ navigation }: Props) {
                       >
                         <FolderOpen size={24} color="#FF6B35" />
                       </View>
-                      <Text style={{ fontSize: 16, color: "white", fontWeight: "600", flex: 1 }}>
+                      <Text style={{ fontSize: 16, color: colors.text, fontWeight: "600", flex: 1 }}>
                         Manage Categories
                       </Text>
-                      <ChevronRight size={20} color="rgba(255, 255, 255, 0.5)" />
+                      <ChevronRight size={20} color={colors.textSecondary} />
                     </Pressable>
                   </View>
 
@@ -1492,7 +1489,7 @@ export default function HomeScreen({ navigation }: Props) {
                         navigation.navigate("Friends");
                       }}
                       style={{
-                        backgroundColor: "rgba(255, 255, 255, 0.05)",
+                        backgroundColor: colors.card,
                         borderRadius: 16,
                         padding: 16,
                         flexDirection: "row",
@@ -1521,10 +1518,10 @@ export default function HomeScreen({ navigation }: Props) {
                       >
                         <Users size={24} color="#7E3FE4" />
                       </View>
-                      <Text style={{ fontSize: 16, color: "white", fontWeight: "600", flex: 1 }}>
+                      <Text style={{ fontSize: 16, color: colors.text, fontWeight: "600", flex: 1 }}>
                         Friends
                       </Text>
-                      <ChevronRight size={20} color="rgba(255, 255, 255, 0.5)" />
+                      <ChevronRight size={20} color={colors.textSecondary} />
                     </Pressable>
                   </View>
 
@@ -1551,7 +1548,6 @@ export default function HomeScreen({ navigation }: Props) {
                   </View>
                 </ScrollView>
               </SafeAreaView>
-            </LinearGradient>
           </View>
         </View>
       </Modal>
@@ -1642,7 +1638,7 @@ export default function HomeScreen({ navigation }: Props) {
                           alignItems: "center",
                         }}
                       >
-                        <Text style={{ color: "white", fontWeight: "bold", fontSize: 16 }}>Enable</Text>
+                        <Text style={{ color: colors.text, fontWeight: "bold", fontSize: 16 }}>Enable</Text>
                       </Pressable>
                     </View>
                   </View>

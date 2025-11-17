@@ -1896,13 +1896,23 @@ See `ENV_SETUP.md` for complete environment variable setup guide.
   - `/home/user/workspace/src/contexts/ThemeContext.tsx` - Already had full theme system
   - `/home/user/workspace/src/screens/ProfileScreen.tsx` - Added theme toggle UI
   - `/home/user/workspace/App.tsx` - Integrated NavigationContainer theme
+  - `/home/user/workspace/src/screens/HomeScreen.tsx` - Fixed hamburger menu to use theme colors
   - All major screens already using ThemeContext colors
+- **Light Mode Fix** 🔧:
+  - Fixed hamburger menu using hardcoded dark colors that were invisible in light mode
+  - Replaced hardcoded "white" text with `colors.text` throughout menu
+  - Replaced hardcoded card backgrounds (`rgba(255, 255, 255, 0.05)`) with `colors.card`
+  - Replaced hardcoded opacity colors with theme colors (`colors.textSecondary`)
+  - Menu now properly displays in both light and dark modes with perfect contrast
+  - Text is fully readable in Day mode (dark text on light backgrounds)
+  - All menu items (Profile, Settings, Support, etc.) dynamically adapt to selected theme
 - **User Experience**:
   - Toggle accessible in Profile → About tab
   - One-tap theme switching
   - Instant visual feedback
   - Remembers choice across sessions
   - Professional appearance in both modes
+  - Perfect contrast and readability in all screens including hamburger menu
 
 
 
