@@ -34,6 +34,7 @@ import {
 import type { RootStackScreenProps } from "@/navigation/types";
 import { api } from "@/lib/api";
 import { useSession } from "@/lib/useSession";
+import { useTheme } from "@/contexts/ThemeContext";
 import type { GetGroupQuestsResponse, GetUserQuestsResponse, CreateGroupQuestRequest } from "@/shared/contracts";
 
 type Props = RootStackScreenProps<"GroupQuests">;
@@ -49,6 +50,7 @@ interface CreateGroupQuestModalProps {
 function CreateGroupQuestModal({ visible, onClose, groupId, onSuccess }: CreateGroupQuestModalProps) {
   const { data: sessionData } = useSession();
   const queryClient = useQueryClient();
+  const { colors } = useTheme();
 
   const [creationType, setCreationType] = useState<"existing" | "custom">("existing");
   const [customQuestText, setCustomQuestText] = useState("");
@@ -163,17 +165,17 @@ function CreateGroupQuestModal({ visible, onClose, groupId, onSuccess }: CreateG
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty.toLowerCase()) {
-      case "easy": return "#4CAF50";
-      case "medium": return "#FFD700";
-      case "hard": return "#FF6B35";
+      case "easy": return colors.success;
+      case "medium": return colors.warning;
+      case "hard": return colors.secondary;
       case "expert": return "#FF4081";
-      default: return "#7E3FE4";
+      default: return colors.primary;
     }
   };
 
   return (
     <Modal visible={visible} animationType="slide" transparent={false} onRequestClose={resetAndClose}>
-      <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
+      <View style={{ flex: 1, backgroundColor: colors.backgroundSolid }}>
         <SafeAreaView edges={["top"]} style={{ flex: 1 }}>
           <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
             {/* Header */}
@@ -185,22 +187,22 @@ function CreateGroupQuestModal({ visible, onClose, groupId, onSuccess }: CreateG
                 paddingHorizontal: 20,
                 paddingVertical: 16,
                 borderBottomWidth: 1,
-                borderBottomColor: "rgba(255, 255, 255, 0.1)",
+                borderBottomColor: colors.cardBorder,
               }}
             >
-              <Text style={{ fontSize: 20, fontWeight: "700", color: "white" }}>Create Group Quest</Text>
+              <Text style={{ fontSize: 20, fontWeight: "700", color: colors.text }}>Create Group Quest</Text>
               <Pressable
                 onPress={resetAndClose}
                 style={{
                   width: 36,
                   height: 36,
                   borderRadius: 18,
-                  backgroundColor: "rgba(255, 255, 255, 0.1)",
+                  backgroundColor: colors.surface,
                   alignItems: "center",
                   justifyContent: "center",
                 }}
               >
-                <X size={20} color="white" />
+                <X size={20} color={colors.text} />
               </Pressable>
             </View>
 
@@ -213,7 +215,7 @@ function CreateGroupQuestModal({ visible, onClose, groupId, onSuccess }: CreateG
                     flex: 1,
                     height: 4,
                     borderRadius: 2,
-                    backgroundColor: step >= s ? "#7E3FE4" : "rgba(255, 255, 255, 0.1)",
+                    backgroundColor: step >= s ? colors.primary : colors.surface,
                   }}
                 />
               ))}
@@ -224,7 +226,7 @@ function CreateGroupQuestModal({ visible, onClose, groupId, onSuccess }: CreateG
               {step === 1 && (
                 <View style={{ padding: 20 }}>
                   {/* Quest Type Selector */}
-                  <Text style={{ color: "white", fontSize: 16, fontWeight: "600", marginBottom: 12 }}>
+                  <Text style={{ color: colors.text, fontSize: 16, fontWeight: "600", marginBottom: 12 }}>
                     Choose Quest Type
                   </Text>
                   <View style={{ flexDirection: "row", gap: 12, marginBottom: 24 }}>
@@ -234,14 +236,14 @@ function CreateGroupQuestModal({ visible, onClose, groupId, onSuccess }: CreateG
                         flex: 1,
                         padding: 16,
                         borderRadius: 12,
-                        backgroundColor: creationType === "existing" ? "rgba(126, 63, 228, 0.2)" : "rgba(255, 255, 255, 0.05)",
+                        backgroundColor: creationType === "existing" ? colors.primaryLight : colors.surface,
                         borderWidth: 2,
-                        borderColor: creationType === "existing" ? "#7E3FE4" : "rgba(255, 255, 255, 0.1)",
+                        borderColor: creationType === "existing" ? colors.primary : colors.cardBorder,
                         alignItems: "center",
                       }}
                     >
-                      <Target size={24} color={creationType === "existing" ? "#7E3FE4" : "rgba(255, 255, 255, 0.5)"} />
-                      <Text style={{ color: creationType === "existing" ? "white" : "rgba(255, 255, 255, 0.6)", fontSize: 13, fontWeight: "600", marginTop: 8, textAlign: "center" }}>
+                      <Target size={24} color={creationType === "existing" ? colors.primary : colors.textTertiary} />
+                      <Text style={{ color: creationType === "existing" ? colors.text : colors.textSecondary, fontSize: 13, fontWeight: "600", marginTop: 8, textAlign: "center" }}>
                         From My Quests
                       </Text>
                     </Pressable>
@@ -251,14 +253,14 @@ function CreateGroupQuestModal({ visible, onClose, groupId, onSuccess }: CreateG
                         flex: 1,
                         padding: 16,
                         borderRadius: 12,
-                        backgroundColor: creationType === "custom" ? "rgba(126, 63, 228, 0.2)" : "rgba(255, 255, 255, 0.05)",
+                        backgroundColor: creationType === "custom" ? colors.primaryLight : colors.surface,
                         borderWidth: 2,
-                        borderColor: creationType === "custom" ? "#7E3FE4" : "rgba(255, 255, 255, 0.1)",
+                        borderColor: creationType === "custom" ? colors.primary : colors.cardBorder,
                         alignItems: "center",
                       }}
                     >
-                      <Plus size={24} color={creationType === "custom" ? "#7E3FE4" : "rgba(255, 255, 255, 0.5)"} />
-                      <Text style={{ color: creationType === "custom" ? "white" : "rgba(255, 255, 255, 0.6)", fontSize: 13, fontWeight: "600", marginTop: 8, textAlign: "center" }}>
+                      <Plus size={24} color={creationType === "custom" ? colors.primary : colors.textTertiary} />
+                      <Text style={{ color: creationType === "custom" ? colors.text : colors.textSecondary, fontSize: 13, fontWeight: "600", marginTop: 8, textAlign: "center" }}>
                         Create Custom
                       </Text>
                     </Pressable>
@@ -267,15 +269,15 @@ function CreateGroupQuestModal({ visible, onClose, groupId, onSuccess }: CreateG
                   {/* Existing Quest Selection */}
                   {creationType === "existing" && (
                     <>
-                      <Text style={{ color: "white", fontSize: 16, fontWeight: "600", marginBottom: 16 }}>
+                      <Text style={{ color: colors.text, fontSize: 16, fontWeight: "600", marginBottom: 16 }}>
                         Select a Quest
                       </Text>
                       {questsLoading ? (
-                        <ActivityIndicator size="large" color="#7E3FE4" />
+                        <ActivityIndicator size="large" color={colors.primary} />
                       ) : allQuests.length === 0 ? (
                         <View style={{ padding: 40, alignItems: "center" }}>
-                          <Target size={48} color="rgba(255, 255, 255, 0.3)" />
-                          <Text style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: 15, marginTop: 16, textAlign: "center" }}>
+                          <Target size={48} color={colors.textTertiary} />
+                          <Text style={{ color: colors.textSecondary, fontSize: 15, marginTop: 16, textAlign: "center" }}>
                             You don&apos;t have any quests yet. Try creating a custom quest instead!
                           </Text>
                         </View>
@@ -286,11 +288,11 @@ function CreateGroupQuestModal({ visible, onClose, groupId, onSuccess }: CreateG
                               key={q.quest.id}
                               onPress={() => setSelectedQuestId(q.quest.id)}
                               style={{
-                                backgroundColor: selectedQuestId === q.quest.id ? "rgba(126, 63, 228, 0.2)" : "rgba(255, 255, 255, 0.05)",
+                                backgroundColor: selectedQuestId === q.quest.id ? colors.primaryLight : colors.surface,
                                 borderRadius: 16,
                                 padding: 16,
                                 borderWidth: 2,
-                                borderColor: selectedQuestId === q.quest.id ? "#7E3FE4" : "rgba(255, 255, 255, 0.1)",
+                                borderColor: selectedQuestId === q.quest.id ? colors.primary : colors.cardBorder,
                               }}
                             >
                               <View style={{ flexDirection: "row", alignItems: "flex-start", gap: 12 }}>
@@ -299,19 +301,19 @@ function CreateGroupQuestModal({ visible, onClose, groupId, onSuccess }: CreateG
                                     width: 24,
                                     height: 24,
                                     borderRadius: 12,
-                                    backgroundColor: selectedQuestId === q.quest.id ? "#7E3FE4" : "rgba(255, 255, 255, 0.1)",
+                                    backgroundColor: selectedQuestId === q.quest.id ? colors.primary : colors.surface,
                                     alignItems: "center",
                                     justifyContent: "center",
                                     marginTop: 2,
                                   }}
                                 >
-                                  {selectedQuestId === q.quest.id && <Check size={16} color="white" />}
+                                  {selectedQuestId === q.quest.id && <Check size={16} color={colors.text} />}
                                 </View>
                                 <View style={{ flex: 1 }}>
-                                  <Text style={{ color: "white", fontSize: 16, fontWeight: "700", marginBottom: 4 }}>
+                                  <Text style={{ color: colors.text, fontSize: 16, fontWeight: "700", marginBottom: 4 }}>
                                     {q.quest.title}
                                   </Text>
-                                  <Text style={{ color: "rgba(255, 255, 255, 0.7)", fontSize: 14, marginBottom: 8 }}>
+                                  <Text style={{ color: colors.textSecondary, fontSize: 14, marginBottom: 8 }}>
                                     {q.quest.description}
                                   </Text>
                                   <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
@@ -327,14 +329,14 @@ function CreateGroupQuestModal({ visible, onClose, groupId, onSuccess }: CreateG
                                         {q.quest.difficulty}
                                       </Text>
                                     </View>
-                                    <View style={{ backgroundColor: "rgba(0, 217, 255, 0.2)", paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 }}>
-                                      <Text style={{ color: "#00D9FF", fontSize: 12, fontWeight: "600" }}>
+                                    <View style={{ backgroundColor: colors.info + "30", paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 }}>
+                                      <Text style={{ color: colors.info, fontSize: 12, fontWeight: "600" }}>
                                         {q.quest.category}
                                       </Text>
                                     </View>
                                     <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-                                      <Star size={14} color="#FFD700" />
-                                      <Text style={{ color: "rgba(255, 255, 255, 0.8)", fontSize: 12 }}>
+                                      <Star size={14} color={colors.warning} />
+                                      <Text style={{ color: colors.text, fontSize: 12 }}>
                                         {q.quest.xpReward} XP
                                       </Text>
                                     </View>
@@ -351,34 +353,34 @@ function CreateGroupQuestModal({ visible, onClose, groupId, onSuccess }: CreateG
                   {/* Custom Quest Creation */}
                   {creationType === "custom" && (
                     <>
-                      <Text style={{ color: "white", fontSize: 16, fontWeight: "600", marginBottom: 12 }}>
+                      <Text style={{ color: colors.text, fontSize: 16, fontWeight: "600", marginBottom: 12 }}>
                         Describe Your Quest
                       </Text>
-                      <Text style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: 14, marginBottom: 16 }}>
+                      <Text style={{ color: colors.textSecondary, fontSize: 14, marginBottom: 16 }}>
                         Enter a description for the custom group quest. AI safety filters will ensure it&apos;s appropriate.
                       </Text>
                       <TextInput
                         value={customQuestText}
                         onChangeText={setCustomQuestText}
                         placeholder="e.g., Ask 3 strangers for directions to a nearby coffee shop"
-                        placeholderTextColor="rgba(255, 255, 255, 0.3)"
+                        placeholderTextColor={colors.textTertiary}
                         multiline
                         numberOfLines={4}
                         style={{
-                          backgroundColor: "rgba(255, 255, 255, 0.05)",
+                          backgroundColor: colors.inputBackground,
                           borderRadius: 12,
                           borderWidth: 2,
-                          borderColor: customQuestText.trim() ? "#7E3FE4" : "rgba(255, 255, 255, 0.1)",
+                          borderColor: customQuestText.trim() ? colors.primary : colors.inputBorder,
                           padding: 16,
-                          color: "white",
+                          color: colors.text,
                           fontSize: 15,
                           minHeight: 120,
                           textAlignVertical: "top",
                         }}
                       />
                       {customQuestText.trim() && (
-                        <View style={{ marginTop: 12, padding: 12, backgroundColor: "rgba(126, 63, 228, 0.1)", borderRadius: 8, borderLeftWidth: 3, borderLeftColor: "#7E3FE4" }}>
-                          <Text style={{ color: "rgba(255, 255, 255, 0.8)", fontSize: 13 }}>
+                        <View style={{ marginTop: 12, padding: 12, backgroundColor: colors.primaryLight, borderRadius: 8, borderLeftWidth: 3, borderLeftColor: colors.primary }}>
+                          <Text style={{ color: colors.text, fontSize: 13 }}>
                             ✓ Quest will be checked by AI safety filters before creation
                           </Text>
                         </View>
@@ -391,18 +393,18 @@ function CreateGroupQuestModal({ visible, onClose, groupId, onSuccess }: CreateG
               {/* Step 2: Assignment Type */}
               {step === 2 && (
                 <View style={{ padding: 20 }}>
-                  <Text style={{ color: "white", fontSize: 16, fontWeight: "600", marginBottom: 16 }}>
+                  <Text style={{ color: colors.text, fontSize: 16, fontWeight: "600", marginBottom: 16 }}>
                     Who can join this quest?
                   </Text>
                   <View style={{ gap: 12 }}>
                     <Pressable
                       onPress={() => setAssignmentType("all")}
                       style={{
-                        backgroundColor: assignmentType === "all" ? "rgba(126, 63, 228, 0.2)" : "rgba(255, 255, 255, 0.05)",
+                        backgroundColor: assignmentType === "all" ? colors.primaryLight : colors.surface,
                         borderRadius: 16,
                         padding: 20,
                         borderWidth: 2,
-                        borderColor: assignmentType === "all" ? "#7E3FE4" : "rgba(255, 255, 255, 0.1)",
+                        borderColor: assignmentType === "all" ? colors.primary : colors.cardBorder,
                       }}
                     >
                       <View style={{ flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 8 }}>
@@ -411,18 +413,18 @@ function CreateGroupQuestModal({ visible, onClose, groupId, onSuccess }: CreateG
                             width: 48,
                             height: 48,
                             borderRadius: 24,
-                            backgroundColor: "rgba(0, 217, 255, 0.2)",
+                            backgroundColor: colors.info + "30",
                             alignItems: "center",
                             justifyContent: "center",
                           }}
                         >
-                          <Globe size={24} color="#00D9FF" />
+                          <Globe size={24} color={colors.info} />
                         </View>
                         <View style={{ flex: 1 }}>
-                          <Text style={{ color: "white", fontSize: 18, fontWeight: "700", marginBottom: 4 }}>
+                          <Text style={{ color: colors.text, fontSize: 18, fontWeight: "700", marginBottom: 4 }}>
                             Open to All
                           </Text>
-                          <Text style={{ color: "rgba(255, 255, 255, 0.7)", fontSize: 14 }}>
+                          <Text style={{ color: colors.textSecondary, fontSize: 14 }}>
                             Any group member can join this quest
                           </Text>
                         </View>
@@ -432,12 +434,12 @@ function CreateGroupQuestModal({ visible, onClose, groupId, onSuccess }: CreateG
                               width: 24,
                               height: 24,
                               borderRadius: 12,
-                              backgroundColor: "#7E3FE4",
+                              backgroundColor: colors.primary,
                               alignItems: "center",
                               justifyContent: "center",
                             }}
                           >
-                            <Check size={16} color="white" />
+                            <Check size={16} color={colors.text} />
                           </View>
                         )}
                       </View>
@@ -446,11 +448,11 @@ function CreateGroupQuestModal({ visible, onClose, groupId, onSuccess }: CreateG
                     <Pressable
                       onPress={() => setAssignmentType("assigned")}
                       style={{
-                        backgroundColor: assignmentType === "assigned" ? "rgba(126, 63, 228, 0.2)" : "rgba(255, 255, 255, 0.05)",
+                        backgroundColor: assignmentType === "assigned" ? colors.primaryLight : colors.surface,
                         borderRadius: 16,
                         padding: 20,
                         borderWidth: 2,
-                        borderColor: assignmentType === "assigned" ? "#7E3FE4" : "rgba(255, 255, 255, 0.1)",
+                        borderColor: assignmentType === "assigned" ? colors.primary : colors.cardBorder,
                       }}
                     >
                       <View style={{ flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 8 }}>
@@ -459,18 +461,18 @@ function CreateGroupQuestModal({ visible, onClose, groupId, onSuccess }: CreateG
                             width: 48,
                             height: 48,
                             borderRadius: 24,
-                            backgroundColor: "rgba(255, 215, 0, 0.2)",
+                            backgroundColor: colors.warning + "30",
                             alignItems: "center",
                             justifyContent: "center",
                           }}
                         >
-                          <UserCheck size={24} color="#FFD700" />
+                          <UserCheck size={24} color={colors.warning} />
                         </View>
                         <View style={{ flex: 1 }}>
-                          <Text style={{ color: "white", fontSize: 18, fontWeight: "700", marginBottom: 4 }}>
+                          <Text style={{ color: colors.text, fontSize: 18, fontWeight: "700", marginBottom: 4 }}>
                             Assigned Only
                           </Text>
-                          <Text style={{ color: "rgba(255, 255, 255, 0.7)", fontSize: 14 }}>
+                          <Text style={{ color: colors.textSecondary, fontSize: 14 }}>
                             Only specific members can participate
                           </Text>
                         </View>
@@ -480,12 +482,12 @@ function CreateGroupQuestModal({ visible, onClose, groupId, onSuccess }: CreateG
                               width: 24,
                               height: 24,
                               borderRadius: 12,
-                              backgroundColor: "#7E3FE4",
+                              backgroundColor: colors.primary,
                               alignItems: "center",
                               justifyContent: "center",
                             }}
                           >
-                            <Check size={16} color="white" />
+                            <Check size={16} color={colors.text} />
                           </View>
                         )}
                       </View>
@@ -497,11 +499,11 @@ function CreateGroupQuestModal({ visible, onClose, groupId, onSuccess }: CreateG
               {/* Step 3: Select Members (only if assigned) */}
               {step === 3 && (
                 <View style={{ padding: 20 }}>
-                  <Text style={{ color: "white", fontSize: 16, fontWeight: "600", marginBottom: 16 }}>
+                  <Text style={{ color: colors.text, fontSize: 16, fontWeight: "600", marginBottom: 16 }}>
                     Select Members ({selectedMemberIds.length} selected)
                   </Text>
                   {membersLoading ? (
-                    <ActivityIndicator size="large" color="#7E3FE4" />
+                    <ActivityIndicator size="large" color={colors.primary} />
                   ) : (
                     <View style={{ gap: 12 }}>
                       {groupData?.group.members
@@ -512,12 +514,12 @@ function CreateGroupQuestModal({ visible, onClose, groupId, onSuccess }: CreateG
                             onPress={() => toggleMember(member.userId)}
                             style={{
                               backgroundColor: selectedMemberIds.includes(member.userId)
-                                ? "rgba(126, 63, 228, 0.2)"
-                                : "rgba(255, 255, 255, 0.05)",
+                                ? colors.primaryLight
+                                : colors.surface,
                               borderRadius: 16,
                               padding: 16,
                               borderWidth: 2,
-                              borderColor: selectedMemberIds.includes(member.userId) ? "#7E3FE4" : "rgba(255, 255, 255, 0.1)",
+                              borderColor: selectedMemberIds.includes(member.userId) ? colors.primary : colors.cardBorder,
                             }}
                           >
                             <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
@@ -526,7 +528,7 @@ function CreateGroupQuestModal({ visible, onClose, groupId, onSuccess }: CreateG
                                   width: 48,
                                   height: 48,
                                   borderRadius: 24,
-                                  backgroundColor: "#7E3FE4" + "20",
+                                  backgroundColor: colors.primaryLight,
                                   alignItems: "center",
                                   justifyContent: "center",
                                 }}
@@ -534,26 +536,26 @@ function CreateGroupQuestModal({ visible, onClose, groupId, onSuccess }: CreateG
                                 {member.avatar ? (
                                   <Image source={{ uri: member.avatar }} style={{ width: 48, height: 48, borderRadius: 24 }} />
                                 ) : (
-                                  <Text style={{ fontSize: 18, fontWeight: "bold", color: "#7E3FE4" }}>
+                                  <Text style={{ fontSize: 18, fontWeight: "bold", color: colors.primary }}>
                                     {member.displayName.charAt(0).toUpperCase()}
                                   </Text>
                                 )}
                               </View>
                               <View style={{ flex: 1 }}>
-                                <Text style={{ color: "white", fontSize: 16, fontWeight: "700" }}>{member.displayName}</Text>
-                                <Text style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: 13 }}>{member.role}</Text>
+                                <Text style={{ color: colors.text, fontSize: 16, fontWeight: "700" }}>{member.displayName}</Text>
+                                <Text style={{ color: colors.textSecondary, fontSize: 13 }}>{member.role}</Text>
                               </View>
                               <View
                                 style={{
                                   width: 24,
                                   height: 24,
                                   borderRadius: 12,
-                                  backgroundColor: selectedMemberIds.includes(member.userId) ? "#7E3FE4" : "rgba(255, 255, 255, 0.1)",
+                                  backgroundColor: selectedMemberIds.includes(member.userId) ? colors.primary : colors.surface,
                                   alignItems: "center",
                                   justifyContent: "center",
                                 }}
                               >
-                                {selectedMemberIds.includes(member.userId) && <Check size={16} color="white" />}
+                                {selectedMemberIds.includes(member.userId) && <Check size={16} color={colors.text} />}
                               </View>
                             </View>
                           </Pressable>
@@ -569,7 +571,7 @@ function CreateGroupQuestModal({ visible, onClose, groupId, onSuccess }: CreateG
               style={{
                 padding: 20,
                 borderTopWidth: 1,
-                borderTopColor: "rgba(255, 255, 255, 0.1)",
+                borderTopColor: colors.cardBorder,
                 gap: 12,
               }}
             >
@@ -577,13 +579,13 @@ function CreateGroupQuestModal({ visible, onClose, groupId, onSuccess }: CreateG
                 <Pressable
                   onPress={() => setStep((step - 1) as 1 | 2)}
                   style={{
-                    backgroundColor: "rgba(255, 255, 255, 0.1)",
+                    backgroundColor: colors.surface,
                     paddingVertical: 16,
                     borderRadius: 16,
                     alignItems: "center",
                   }}
                 >
-                  <Text style={{ color: "white", fontSize: 16, fontWeight: "700" }}>Back</Text>
+                  <Text style={{ color: colors.text, fontSize: 16, fontWeight: "700" }}>Back</Text>
                 </Pressable>
               )}
               <Pressable
@@ -596,8 +598,8 @@ function CreateGroupQuestModal({ visible, onClose, groupId, onSuccess }: CreateG
                 style={{
                   backgroundColor:
                     (step === 1 && !selectedQuestId) || (step === 3 && selectedMemberIds.length === 0)
-                      ? "rgba(126, 63, 228, 0.3)"
-                      : "#7E3FE4",
+                      ? colors.primaryLight
+                      : colors.primary,
                   paddingVertical: 16,
                   borderRadius: 16,
                   alignItems: "center",
@@ -605,9 +607,9 @@ function CreateGroupQuestModal({ visible, onClose, groupId, onSuccess }: CreateG
                 }}
               >
                 {createMutation.isPending ? (
-                  <ActivityIndicator size="small" color="white" />
+                  <ActivityIndicator size="small" color={colors.text} />
                 ) : (
-                  <Text style={{ color: "white", fontSize: 16, fontWeight: "700" }}>
+                  <Text style={{ color: colors.text, fontSize: 16, fontWeight: "700" }}>
                     {step === 2 && assignmentType === "all" ? "Create Quest" : step === 3 ? "Create Quest" : "Next"}
                   </Text>
                 )}
@@ -624,6 +626,7 @@ export default function GroupQuestsScreen({ navigation, route }: Props) {
   const { groupId, groupName } = route.params;
   const { data: sessionData } = useSession();
   const queryClient = useQueryClient();
+  const { colors } = useTheme();
 
   const [showCreateModal, setShowCreateModal] = useState(false);
 
@@ -661,54 +664,54 @@ export default function GroupQuestsScreen({ navigation, route }: Props) {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "completed":
-        return "#10B981";
+        return colors.success;
       case "in_progress":
-        return "#00D9FF";
+        return colors.info;
       case "failed":
-        return "#FF3B30";
+        return colors.error;
       default:
-        return "#7E3FE4";
+        return colors.primary;
     }
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "completed":
-        return <CheckCircle size={20} color="#10B981" />;
+        return <CheckCircle size={20} color={colors.success} />;
       case "failed":
-        return <XCircle size={20} color="#FF3B30" />;
+        return <XCircle size={20} color={colors.error} />;
       case "in_progress":
-        return <Clock size={20} color="#00D9FF" />;
+        return <Clock size={20} color={colors.info} />;
       default:
-        return <User size={20} color="#7E3FE4" />;
+        return <User size={20} color={colors.primary} />;
     }
   };
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty.toLowerCase()) {
       case "easy":
-        return "#4CAF50";
+        return colors.success;
       case "medium":
-        return "#FFD700";
+        return colors.warning;
       case "hard":
-        return "#FF6B35";
+        return colors.secondary;
       case "expert":
         return "#FF4081";
       default:
-        return "#7E3FE4";
+        return colors.primary;
     }
   };
 
   if (isLoading) {
     return (
-      <View style={{ flex: 1, backgroundColor: "#0A0A0F", alignItems: "center", justifyContent: "center" }}>
-        <ActivityIndicator size="large" color="#7E3FE4" />
+      <View style={{ flex: 1, backgroundColor: colors.backgroundSolid, alignItems: "center", justifyContent: "center" }}>
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
+    <View style={{ flex: 1, backgroundColor: colors.backgroundSolid }}>
       <SafeAreaView edges={["top"]} style={{ flex: 1 }}>
         {/* Header */}
         <View
@@ -719,22 +722,22 @@ export default function GroupQuestsScreen({ navigation, route }: Props) {
             paddingHorizontal: 20,
             paddingVertical: 16,
             borderBottomWidth: 1,
-            borderBottomColor: "rgba(255, 255, 255, 0.1)",
+            borderBottomColor: colors.cardBorder,
           }}
         >
           <Pressable onPress={() => navigation.goBack()}>
-            <ArrowLeft size={24} color="white" />
+            <ArrowLeft size={24} color={colors.text} />
           </Pressable>
           <View style={{ flex: 1, marginLeft: 16 }}>
-            <Text style={{ fontSize: 18, fontWeight: "700", color: "white" }}>{groupName}</Text>
-            <Text style={{ fontSize: 13, color: "rgba(255, 255, 255, 0.6)", marginTop: 2 }}>
+            <Text style={{ fontSize: 18, fontWeight: "700", color: colors.text }}>{groupName}</Text>
+            <Text style={{ fontSize: 13, color: colors.textSecondary, marginTop: 2 }}>
               Group Quests
             </Text>
           </View>
           <Pressable
             onPress={() => setShowCreateModal(true)}
             style={{
-              backgroundColor: "#7E3FE4",
+              backgroundColor: colors.primary,
               width: 40,
               height: 40,
               borderRadius: 20,
@@ -742,31 +745,31 @@ export default function GroupQuestsScreen({ navigation, route }: Props) {
               justifyContent: "center",
             }}
           >
-            <Plus size={24} color="white" />
+            <Plus size={24} color={colors.text} />
           </Pressable>
         </View>
 
         <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1 }}>
           {groupQuests.length === 0 ? (
             <View style={{ padding: 40, alignItems: "center" }}>
-              <Target size={64} color="rgba(255, 255, 255, 0.3)" />
-              <Text style={{ color: "white", fontSize: 20, fontWeight: "700", marginTop: 16, textAlign: "center" }}>
+              <Target size={64} color={colors.textTertiary} />
+              <Text style={{ color: colors.text, fontSize: 20, fontWeight: "700", marginTop: 16, textAlign: "center" }}>
                 No Group Quests Yet
               </Text>
-              <Text style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: 15, marginTop: 8, textAlign: "center" }}>
+              <Text style={{ color: colors.textSecondary, fontSize: 15, marginTop: 8, textAlign: "center" }}>
                 Create a group quest to challenge your members!
               </Text>
               <Pressable
                 onPress={() => setShowCreateModal(true)}
                 style={{
-                  backgroundColor: "#7E3FE4",
+                  backgroundColor: colors.primary,
                   paddingHorizontal: 24,
                   paddingVertical: 12,
                   borderRadius: 16,
                   marginTop: 24,
                 }}
               >
-                <Text style={{ color: "white", fontSize: 16, fontWeight: "700" }}>Create Group Quest</Text>
+                <Text style={{ color: colors.text, fontSize: 16, fontWeight: "700" }}>Create Group Quest</Text>
               </Pressable>
             </View>
           ) : (
@@ -779,19 +782,19 @@ export default function GroupQuestsScreen({ navigation, route }: Props) {
                     Alert.alert("Quest Detail", "Group quest detail screen coming soon!");
                   }}
                   style={{
-                    backgroundColor: "rgba(255, 255, 255, 0.05)",
+                    backgroundColor: colors.card,
                     borderRadius: 16,
                     padding: 16,
                     borderWidth: 1,
-                    borderColor: "rgba(126, 63, 228, 0.3)",
+                    borderColor: colors.cardBorder,
                   }}
                 >
                   {/* Quest Info */}
                   <View style={{ marginBottom: 12 }}>
-                    <Text style={{ fontSize: 18, fontWeight: "700", color: "white", marginBottom: 4 }}>
+                    <Text style={{ fontSize: 18, fontWeight: "700", color: colors.text, marginBottom: 4 }}>
                       {gq.quest.title}
                     </Text>
-                    <Text style={{ fontSize: 14, color: "rgba(255, 255, 255, 0.7)", lineHeight: 20 }}>
+                    <Text style={{ fontSize: 14, color: colors.textSecondary, lineHeight: 20 }}>
                       {gq.quest.description}
                     </Text>
                   </View>
@@ -810,14 +813,14 @@ export default function GroupQuestsScreen({ navigation, route }: Props) {
                         {gq.quest.difficulty}
                       </Text>
                     </View>
-                    <View style={{ backgroundColor: "rgba(0, 217, 255, 0.2)", paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 }}>
-                      <Text style={{ color: "#00D9FF", fontSize: 12, fontWeight: "600" }}>
+                    <View style={{ backgroundColor: colors.info + "30", paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 }}>
+                      <Text style={{ color: colors.info, fontSize: 12, fontWeight: "600" }}>
                         {gq.quest.category}
                       </Text>
                     </View>
                     {gq.assignmentType === "assigned" && (
-                      <View style={{ backgroundColor: "rgba(255, 215, 0, 0.2)", paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 }}>
-                        <Text style={{ color: "#FFD700", fontSize: 12, fontWeight: "600" }}>
+                      <View style={{ backgroundColor: colors.warning + "30", paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 }}>
+                        <Text style={{ color: colors.warning, fontSize: 12, fontWeight: "600" }}>
                           Assigned Only
                         </Text>
                       </View>
@@ -827,21 +830,21 @@ export default function GroupQuestsScreen({ navigation, route }: Props) {
                   {/* Rewards */}
                   <View style={{ flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 12 }}>
                     <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-                      <Star size={16} color="#FFD700" />
-                      <Text style={{ color: "rgba(255, 255, 255, 0.8)", fontSize: 13 }}>
+                      <Star size={16} color={colors.warning} />
+                      <Text style={{ color: colors.text, fontSize: 13 }}>
                         {gq.quest.xpReward} XP
                       </Text>
                     </View>
                     <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-                      <Trophy size={16} color="#00D9FF" />
-                      <Text style={{ color: "rgba(255, 255, 255, 0.8)", fontSize: 13 }}>
+                      <Trophy size={16} color={colors.info} />
+                      <Text style={{ color: colors.text, fontSize: 13 }}>
                         {gq.quest.pointReward} pts
                       </Text>
                     </View>
                     {gq.quest.location && (
                       <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-                        <MapPin size={16} color="#7E3FE4" />
-                        <Text style={{ color: "rgba(255, 255, 255, 0.8)", fontSize: 13, flex: 1 }} numberOfLines={1}>
+                        <MapPin size={16} color={colors.primary} />
+                        <Text style={{ color: colors.text, fontSize: 13, flex: 1 }} numberOfLines={1}>
                           {gq.quest.location}
                         </Text>
                       </View>
@@ -852,19 +855,19 @@ export default function GroupQuestsScreen({ navigation, route }: Props) {
                   <View
                     style={{
                       borderTopWidth: 1,
-                      borderTopColor: "rgba(255, 255, 255, 0.1)",
+                      borderTopColor: colors.cardBorder,
                       paddingTop: 12,
                     }}
                   >
                     {/* Participant Count and Status */}
                     <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
                       <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-                        <Users size={16} color="#7E3FE4" />
-                        <Text style={{ color: "rgba(255, 255, 255, 0.8)", fontSize: 14, fontWeight: "600" }}>
+                        <Users size={16} color={colors.primary} />
+                        <Text style={{ color: colors.text, fontSize: 14, fontWeight: "600" }}>
                           {gq.participants.length} Participants
                         </Text>
                       </View>
-                      <Text style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: 12 }}>
+                      <Text style={{ color: colors.textSecondary, fontSize: 12 }}>
                         {gq.participants.filter((p) => p.status === "completed").length} completed
                       </Text>
                     </View>
@@ -878,12 +881,12 @@ export default function GroupQuestsScreen({ navigation, route }: Props) {
                             width: 44,
                             height: 44,
                             borderRadius: 22,
-                            backgroundColor: "#0A0A0F",
+                            backgroundColor: colors.backgroundSolid,
                             alignItems: "center",
                             justifyContent: "center",
                             marginLeft: index === 0 ? 0 : -12,
                             borderWidth: 2,
-                            borderColor: "#0A0A0F",
+                            borderColor: colors.backgroundSolid,
                             position: "relative",
                             zIndex: 10 - index,
                           }}
@@ -919,7 +922,7 @@ export default function GroupQuestsScreen({ navigation, route }: Props) {
                               width: 16,
                               height: 16,
                               borderRadius: 8,
-                              backgroundColor: "#0A0A0F",
+                              backgroundColor: colors.backgroundSolid,
                               alignItems: "center",
                               justifyContent: "center",
                               borderWidth: 1.5,
@@ -927,13 +930,13 @@ export default function GroupQuestsScreen({ navigation, route }: Props) {
                             }}
                           >
                             {participant.status === "completed" && (
-                              <CheckCircle size={10} color="#10B981" fill="#10B981" />
+                              <CheckCircle size={10} color={colors.success} fill={colors.success} />
                             )}
                             {participant.status === "failed" && (
-                              <XCircle size={10} color="#FF3B30" fill="#FF3B30" />
+                              <XCircle size={10} color={colors.error} fill={colors.error} />
                             )}
                             {participant.status === "in_progress" && (
-                              <Clock size={10} color="#00D9FF" fill="#00D9FF" />
+                              <Clock size={10} color={colors.info} fill={colors.info} />
                             )}
                           </View>
                         </View>
@@ -944,15 +947,15 @@ export default function GroupQuestsScreen({ navigation, route }: Props) {
                             width: 44,
                             height: 44,
                             borderRadius: 22,
-                            backgroundColor: "rgba(126, 63, 228, 0.2)",
+                            backgroundColor: colors.primaryLight,
                             alignItems: "center",
                             justifyContent: "center",
                             marginLeft: -12,
                             borderWidth: 2,
-                            borderColor: "#0A0A0F",
+                            borderColor: colors.backgroundSolid,
                           }}
                         >
-                          <Text style={{ color: "#7E3FE4", fontSize: 13, fontWeight: "700" }}>
+                          <Text style={{ color: colors.primary, fontSize: 13, fontWeight: "700" }}>
                             +{gq.participants.length - 5}
                           </Text>
                         </View>
@@ -961,27 +964,27 @@ export default function GroupQuestsScreen({ navigation, route }: Props) {
 
                     {/* Progress Summary */}
                     {gq.participants.length > 0 && (
-                      <View style={{ backgroundColor: "rgba(255, 255, 255, 0.03)", padding: 10, borderRadius: 10, marginBottom: 12 }}>
+                      <View style={{ backgroundColor: colors.surface, padding: 10, borderRadius: 10, marginBottom: 12 }}>
                         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-around" }}>
                           <View style={{ alignItems: "center" }}>
-                            <Text style={{ color: "#10B981", fontSize: 18, fontWeight: "700" }}>
+                            <Text style={{ color: colors.success, fontSize: 18, fontWeight: "700" }}>
                               {gq.participants.filter((p) => p.status === "completed").length}
                             </Text>
-                            <Text style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: 11 }}>Completed</Text>
+                            <Text style={{ color: colors.textSecondary, fontSize: 11 }}>Completed</Text>
                           </View>
-                          <View style={{ width: 1, height: 30, backgroundColor: "rgba(255, 255, 255, 0.1)" }} />
+                          <View style={{ width: 1, height: 30, backgroundColor: colors.cardBorder }} />
                           <View style={{ alignItems: "center" }}>
-                            <Text style={{ color: "#00D9FF", fontSize: 18, fontWeight: "700" }}>
+                            <Text style={{ color: colors.info, fontSize: 18, fontWeight: "700" }}>
                               {gq.participants.filter((p) => p.status === "in_progress").length}
                             </Text>
-                            <Text style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: 11 }}>In Progress</Text>
+                            <Text style={{ color: colors.textSecondary, fontSize: 11 }}>In Progress</Text>
                           </View>
-                          <View style={{ width: 1, height: 30, backgroundColor: "rgba(255, 255, 255, 0.1)" }} />
+                          <View style={{ width: 1, height: 30, backgroundColor: colors.cardBorder }} />
                           <View style={{ alignItems: "center" }}>
-                            <Text style={{ color: "#FF3B30", fontSize: 18, fontWeight: "700" }}>
+                            <Text style={{ color: colors.error, fontSize: 18, fontWeight: "700" }}>
                               {gq.participants.filter((p) => p.status === "failed").length}
                             </Text>
-                            <Text style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: 11 }}>Failed</Text>
+                            <Text style={{ color: colors.textSecondary, fontSize: 11 }}>Failed</Text>
                           </View>
                         </View>
                       </View>
@@ -993,7 +996,7 @@ export default function GroupQuestsScreen({ navigation, route }: Props) {
                         onPress={() => handleJoinQuest(gq.id)}
                         disabled={joinQuestMutation.isPending}
                         style={{
-                          backgroundColor: "#7E3FE4",
+                          backgroundColor: colors.primary,
                           paddingVertical: 12,
                           borderRadius: 12,
                           alignItems: "center",
@@ -1001,9 +1004,9 @@ export default function GroupQuestsScreen({ navigation, route }: Props) {
                         }}
                       >
                         {joinQuestMutation.isPending ? (
-                          <ActivityIndicator size="small" color="white" />
+                          <ActivityIndicator size="small" color={colors.text} />
                         ) : (
-                          <Text style={{ color: "white", fontSize: 14, fontWeight: "700" }}>Join Quest</Text>
+                          <Text style={{ color: colors.text, fontSize: 14, fontWeight: "700" }}>Join Quest</Text>
                         )}
                       </Pressable>
                     )}
@@ -1013,13 +1016,13 @@ export default function GroupQuestsScreen({ navigation, route }: Props) {
                           Alert.alert("Start Quest", "Group quest starting functionality will navigate to quest detail screen (coming soon!)");
                         }}
                         style={{
-                          backgroundColor: "#10B981",
+                          backgroundColor: colors.success,
                           paddingVertical: 12,
                           borderRadius: 12,
                           alignItems: "center",
                         }}
                       >
-                        <Text style={{ color: "white", fontSize: 14, fontWeight: "700" }}>Start Quest</Text>
+                        <Text style={{ color: colors.text, fontSize: 14, fontWeight: "700" }}>Start Quest</Text>
                       </Pressable>
                     )}
                     {gq.userParticipation && gq.userParticipation.status === "in_progress" && (
@@ -1028,41 +1031,41 @@ export default function GroupQuestsScreen({ navigation, route }: Props) {
                           Alert.alert("Continue Quest", "Group quest detail screen coming soon!");
                         }}
                         style={{
-                          backgroundColor: "#00D9FF",
+                          backgroundColor: colors.info,
                           paddingVertical: 12,
                           borderRadius: 12,
                           alignItems: "center",
                         }}
                       >
-                        <Text style={{ color: "white", fontSize: 14, fontWeight: "700" }}>Continue Quest</Text>
+                        <Text style={{ color: colors.text, fontSize: 14, fontWeight: "700" }}>Continue Quest</Text>
                       </Pressable>
                     )}
                     {gq.userParticipation && gq.userParticipation.status === "completed" && (
                       <View
                         style={{
-                          backgroundColor: "rgba(16, 185, 129, 0.2)",
+                          backgroundColor: colors.success + "30",
                           paddingVertical: 12,
                           borderRadius: 12,
                           alignItems: "center",
                           borderWidth: 1,
-                          borderColor: "#10B981",
+                          borderColor: colors.success,
                         }}
                       >
-                        <Text style={{ color: "#10B981", fontSize: 14, fontWeight: "700" }}>✓ Completed</Text>
+                        <Text style={{ color: colors.success, fontSize: 14, fontWeight: "700" }}>✓ Completed</Text>
                       </View>
                     )}
                     {gq.userParticipation && gq.userParticipation.status === "failed" && (
                       <View
                         style={{
-                          backgroundColor: "rgba(255, 59, 48, 0.2)",
+                          backgroundColor: colors.error + "30",
                           paddingVertical: 12,
                           borderRadius: 12,
                           alignItems: "center",
                           borderWidth: 1,
-                          borderColor: "#FF3B30",
+                          borderColor: colors.error,
                         }}
                       >
-                        <Text style={{ color: "#FF3B30", fontSize: 14, fontWeight: "700" }}>✗ Failed</Text>
+                        <Text style={{ color: colors.error, fontSize: 14, fontWeight: "700" }}>✗ Failed</Text>
                       </View>
                     )}
                   </View>

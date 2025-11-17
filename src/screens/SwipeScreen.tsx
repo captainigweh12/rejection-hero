@@ -63,21 +63,21 @@ export default function SwipeScreen({ navigation }: Props) {
 
   if (!sessionData?.user) {
     return (
-      <LinearGradient colors={["#0A0A0F", "#1A1A24", "#2A1A34"]} className="flex-1">
+      <LinearGradient colors={colors.background} className="flex-1">
         <View className="flex-1 items-center justify-center px-8">
-          <Users size={64} color="#FF6B35" />
-          <Text className="text-white text-3xl font-bold mb-4 text-center mt-6">
+          <Users size={64} color={colors.secondary} />
+          <Text style={{ color: colors.text }} className="text-3xl font-bold mb-4 text-center mt-6">
             Join the Community
           </Text>
-          <Text className="text-white/70 text-lg text-center mb-8">
+          <Text style={{ color: colors.textSecondary }} className="text-lg text-center mb-8">
             Log in to connect with others, swipe to find matches, and build your network.
           </Text>
           <Pressable
             onPress={() => navigation.navigate("LoginModalScreen")}
-            style={{ backgroundColor: "#FF6B35" }}
+            style={{ backgroundColor: colors.secondary }}
             className="px-8 py-4 rounded-full"
           >
-            <Text className="text-white font-bold text-xl">Get Started</Text>
+            <Text style={{ color: colors.text }} className="font-bold text-xl">Get Started</Text>
           </Pressable>
         </View>
       </LinearGradient>
@@ -86,10 +86,10 @@ export default function SwipeScreen({ navigation }: Props) {
 
   if (isLoading) {
     return (
-      <LinearGradient colors={["#0A0A0F", "#1A1A24", "#2A1A34"]} className="flex-1">
+      <LinearGradient colors={colors.background} className="flex-1">
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#7E3FE4" />
-          <Text className="text-white/70 text-lg mt-4">Loading profiles...</Text>
+          <ActivityIndicator size="large" color={colors.primary} />
+          <Text style={{ color: colors.textSecondary }} className="text-lg mt-4">Loading profiles...</Text>
         </View>
       </LinearGradient>
     );
@@ -135,11 +135,11 @@ export default function SwipeScreen({ navigation }: Props) {
   }
 
   return (
-    <LinearGradient colors={["#0A0A0F", "#1A1A24", "#2A1A34"]} className="flex-1">
+    <LinearGradient colors={colors.background} className="flex-1">
       {/* Header */}
       <View className="pt-4 pb-2 px-6">
-        <Text className="text-white text-3xl font-bold text-center">Go for No</Text>
-        <Text className="text-white/50 text-sm text-center mt-1">
+        <Text style={{ color: colors.text }} className="text-3xl font-bold text-center">Go for No</Text>
+        <Text style={{ color: colors.textTertiary }} className="text-sm text-center mt-1">
           Swipe LEFT for Yes • Swipe RIGHT for No
         </Text>
       </View>

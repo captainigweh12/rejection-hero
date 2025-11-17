@@ -24,6 +24,7 @@ import {
 import type { BottomTabScreenProps } from "@/navigation/types";
 import { api } from "@/lib/api";
 import { useSession } from "@/lib/useSession";
+import { useTheme } from "@/contexts/ThemeContext";
 import type {
   GetActiveLiveStreamsResponse,
   StartLiveStreamResponse,
@@ -40,6 +41,7 @@ type Props = BottomTabScreenProps<"LiveTab">;
 export default function LiveScreen({ navigation }: Props) {
   const { data: sessionData } = useSession();
   const queryClient = useQueryClient();
+  const { colors } = useTheme();
   const [isStreaming, setIsStreaming] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [isVideoOff, setIsVideoOff] = useState(false);
@@ -313,12 +315,12 @@ export default function LiveScreen({ navigation }: Props) {
             width: 40,
             height: 40,
             borderRadius: 20,
-            backgroundColor: "rgba(0, 0, 0, 0.7)",
+            backgroundColor: colors.modalOverlay,
             alignItems: "center",
             justifyContent: "center",
           }}
         >
-          <X size={24} color="white" />
+          <X size={24} color={colors.text} />
         </Pressable>
 
         {/* Viewer Count */}
@@ -329,15 +331,15 @@ export default function LiveScreen({ navigation }: Props) {
             right: 20,
             flexDirection: "row",
             alignItems: "center",
-            backgroundColor: "rgba(0, 0, 0, 0.7)",
+            backgroundColor: colors.modalOverlay,
             paddingHorizontal: 12,
             paddingVertical: 8,
             borderRadius: 20,
             gap: 6,
           }}
         >
-          <Users size={16} color="white" />
-          <Text style={{ color: "white", fontWeight: "bold", fontSize: 14 }}>
+          <Users size={16} color={colors.text} />
+          <Text style={{ color: colors.text, fontWeight: "bold", fontSize: 14 }}>
             {viewingStream.viewerCount}
           </Text>
         </View>
@@ -384,7 +386,7 @@ export default function LiveScreen({ navigation }: Props) {
             }}
           >
             <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 8 }}>
-              <Text style={{ color: "white", fontSize: 11, fontWeight: "700", textTransform: "uppercase", letterSpacing: 1 }}>
+              <Text style={{ color: colors.text, fontSize: 11, fontWeight: "700", textTransform: "uppercase", letterSpacing: 1 }}>
                 {viewingStream.userQuest.quest.category}
               </Text>
               <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
@@ -792,12 +794,12 @@ export default function LiveScreen({ navigation }: Props) {
             width: 40,
             height: 40,
             borderRadius: 20,
-            backgroundColor: "rgba(0, 0, 0, 0.7)",
+            backgroundColor: colors.modalOverlay,
             alignItems: "center",
             justifyContent: "center",
           }}
         >
-          <X size={24} color="white" />
+          <X size={24} color={colors.text} />
         </Pressable>
 
         {/* Control Buttons */}
@@ -910,7 +912,7 @@ export default function LiveScreen({ navigation }: Props) {
             }}
           >
             <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 8 }}>
-              <Text style={{ color: "white", fontSize: 11, fontWeight: "700", textTransform: "uppercase", letterSpacing: 1 }}>
+              <Text style={{ color: colors.text, fontSize: 11, fontWeight: "700", textTransform: "uppercase", letterSpacing: 1 }}>
                 {activeQuest.quest.category}
               </Text>
               <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
@@ -1342,7 +1344,7 @@ export default function LiveScreen({ navigation }: Props) {
                           right: 12,
                           flexDirection: "row",
                           alignItems: "center",
-                          backgroundColor: "rgba(0, 0, 0, 0.7)",
+                          backgroundColor: colors.modalOverlay,
                           paddingHorizontal: 10,
                           paddingVertical: 6,
                           borderRadius: 6,

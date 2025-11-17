@@ -7,6 +7,7 @@ import { Sparkles, X, ChevronLeft, Star, ThumbsDown, Mic, MapPin, Globe, Users, 
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "@/navigation/types";
 import { api } from "@/lib/api";
+import { useTheme } from "@/contexts/ThemeContext";
 import type { GenerateQuestRequest, GenerateQuestResponse } from "@/shared/contracts";
 import { Audio } from "expo-av";
 
@@ -19,6 +20,7 @@ type QuestType = "REJECTION" | "ACTION";
 type LocationType = "CURRENT" | "CUSTOM" | "NONE";
 
 export default function CreateQuestScreen({ navigation }: Props) {
+  const { colors } = useTheme();
   const [showAIForm, setShowAIForm] = useState(false);
   const [showCustomForm, setShowCustomForm] = useState(false);
   const [showSendToFriends, setShowSendToFriends] = useState(false);
@@ -183,32 +185,32 @@ export default function CreateQuestScreen({ navigation }: Props) {
   };
 
   const getCategoryColor = (category: string) => {
-    const colors: Record<string, string> = {
-      SALES: "#FF6B35",
-      SOCIAL: "#00D9FF",
-      ENTREPRENEURSHIP: "#7E3FE4",
+    const categoryColors: Record<string, string> = {
+      SALES: colors.secondary,
+      SOCIAL: colors.info,
+      ENTREPRENEURSHIP: colors.primary,
       DATING: "#FF4081",
-      CONFIDENCE: "#FFD700",
-      CAREER: "#4CAF50",
+      CONFIDENCE: colors.warning,
+      CAREER: colors.success,
     };
-    return colors[category] || "#7E3FE4";
+    return categoryColors[category] || colors.primary;
   };
 
   const getDifficultyColor = (difficulty: string) => {
-    const colors: Record<string, string> = {
-      EASY: "#4CAF50",
-      MEDIUM: "#FFD700",
-      HARD: "#FF6B35",
+    const difficultyColors: Record<string, string> = {
+      EASY: colors.success,
+      MEDIUM: colors.warning,
+      HARD: colors.secondary,
       EXPERT: "#FF4081",
     };
-    return colors[difficulty] || "#FFD700";
+    return difficultyColors[difficulty] || colors.warning;
   };
 
   // Main selection screen - Dark 3D Glass Theme
   if (!showAIForm && !showCustomForm && !showSendToFriends) {
     return (
-      <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
-        <LinearGradient colors={["#0A0A0F", "#1A1A24", "#2A1A34"]} style={{ flex: 1 }}>
+      <View style={{ flex: 1, backgroundColor: colors.backgroundSolid }}>
+        <LinearGradient colors={colors.background} style={{ flex: 1 }}>
           <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
             {/* Header */}
             <View
@@ -224,9 +226,9 @@ export default function CreateQuestScreen({ navigation }: Props) {
                 onPress={() => navigation.goBack()}
                 style={{ position: "absolute", left: 20 }}
               >
-                <ChevronLeft size={28} color="white" />
+                <ChevronLeft size={28} color={colors.text} />
               </Pressable>
-              <Text style={{ fontSize: 20, fontWeight: "bold", color: "white" }}>
+              <Text style={{ fontSize: 20, fontWeight: "bold", color: colors.text }}>
                 Create Quest
               </Text>
             </View>
@@ -234,10 +236,10 @@ export default function CreateQuestScreen({ navigation }: Props) {
             <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 40 }}>
               {/* Title Section */}
               <View style={{ paddingHorizontal: 24, paddingTop: 12, paddingBottom: 24 }}>
-                <Text style={{ fontSize: 32, fontWeight: "bold", color: "white", marginBottom: 8 }}>
+                <Text style={{ fontSize: 32, fontWeight: "bold", color: colors.text, marginBottom: 8 }}>
                   Add New Quest
                 </Text>
-                <Text style={{ fontSize: 16, color: "rgba(255, 255, 255, 0.6)" }}>
+                <Text style={{ fontSize: 16, color: colors.textSecondary }}>
                   Choose how to create your challenge
                 </Text>
               </View>
@@ -252,7 +254,7 @@ export default function CreateQuestScreen({ navigation }: Props) {
                   }}
                 >
                   <LinearGradient
-                    colors={["#7E3FE4", "#9D5FE4"]}
+                    colors={[colors.primary, colors.primary + "CC"]}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
                     style={{
@@ -267,7 +269,7 @@ export default function CreateQuestScreen({ navigation }: Props) {
                         width: 60,
                         height: 60,
                         borderRadius: 30,
-                        backgroundColor: "rgba(255, 255, 255, 0.2)",
+                        backgroundColor: colors.surfaceHover,
                         alignItems: "center",
                         justifyContent: "center",
                       }}
@@ -304,7 +306,7 @@ export default function CreateQuestScreen({ navigation }: Props) {
                         width: 60,
                         height: 60,
                         borderRadius: 30,
-                        backgroundColor: "rgba(255, 107, 53, 0.2)",
+                        backgroundColor: colors.secondary + "30",
                         alignItems: "center",
                         justifyContent: "center",
                       }}
@@ -341,7 +343,7 @@ export default function CreateQuestScreen({ navigation }: Props) {
                         width: 60,
                         height: 60,
                         borderRadius: 30,
-                        backgroundColor: "rgba(0, 217, 255, 0.2)",
+                        backgroundColor: colors.info + "30",
                         alignItems: "center",
                         justifyContent: "center",
                       }}
@@ -369,8 +371,8 @@ export default function CreateQuestScreen({ navigation }: Props) {
   // Custom Quest Form - Simplified with Voice Recording
   if (showCustomForm) {
     return (
-      <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
-        <LinearGradient colors={["#0A0A0F", "#1A1A24", "#2A1A34"]} style={{ flex: 1 }}>
+      <View style={{ flex: 1, backgroundColor: colors.backgroundSolid }}>
+        <LinearGradient colors={colors.background} style={{ flex: 1 }}>
           <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
             {/* Header */}
             <View
@@ -386,9 +388,9 @@ export default function CreateQuestScreen({ navigation }: Props) {
                 onPress={() => setShowCustomForm(false)}
                 style={{ position: "absolute", left: 20 }}
               >
-                <ChevronLeft size={28} color="white" />
+                <ChevronLeft size={28} color={colors.text} />
               </Pressable>
-              <Text style={{ fontSize: 20, fontWeight: "bold", color: "white" }}>
+              <Text style={{ fontSize: 20, fontWeight: "bold", color: colors.text }}>
                 Custom Quest
               </Text>
             </View>
@@ -529,7 +531,7 @@ export default function CreateQuestScreen({ navigation }: Props) {
                     }}
                   >
                     <LinearGradient
-                      colors={generateMutation.isPending ? ["#666", "#666"] : ["#FF6B35", "#FF8C61"]}
+                      colors={generateMutation.isPending ? [colors.textTertiary, colors.textTertiary] : [colors.secondary, colors.secondary + "CC"]}
                       start={{ x: 0, y: 0 }}
                       end={{ x: 1, y: 0 }}
                       style={{
@@ -657,7 +659,7 @@ export default function CreateQuestScreen({ navigation }: Props) {
                       borderRadius: 16,
                       padding: 16,
                       borderWidth: 2,
-                      borderColor: selectedLocationType === "CURRENT" ? "#00D9FF" : "rgba(255, 255, 255, 0.1)",
+                      borderColor: selectedLocationType === "CURRENT" ? colors.info : colors.cardBorder,
                       flexDirection: "row",
                       alignItems: "center",
                       gap: 12,
@@ -668,7 +670,7 @@ export default function CreateQuestScreen({ navigation }: Props) {
                         width: 48,
                         height: 48,
                         borderRadius: 24,
-                        backgroundColor: selectedLocationType === "CURRENT" ? "rgba(0, 217, 255, 0.2)" : "rgba(255, 255, 255, 0.05)",
+                        backgroundColor: selectedLocationType === "CURRENT" ? colors.info + "30" : colors.surface,
                         alignItems: "center",
                         justifyContent: "center",
                       }}
@@ -707,7 +709,7 @@ export default function CreateQuestScreen({ navigation }: Props) {
                       borderRadius: 16,
                       padding: 16,
                       borderWidth: 2,
-                      borderColor: selectedLocationType === "CUSTOM" ? "#FFD700" : "rgba(255, 255, 255, 0.1)",
+                      borderColor: selectedLocationType === "CUSTOM" ? colors.warning : colors.cardBorder,
                       flexDirection: "row",
                       alignItems: "center",
                       gap: 12,
@@ -718,7 +720,7 @@ export default function CreateQuestScreen({ navigation }: Props) {
                         width: 48,
                         height: 48,
                         borderRadius: 24,
-                        backgroundColor: selectedLocationType === "CUSTOM" ? "rgba(255, 215, 0, 0.2)" : "rgba(255, 255, 255, 0.05)",
+                        backgroundColor: selectedLocationType === "CUSTOM" ? colors.warning + "30" : colors.surface,
                         alignItems: "center",
                         justifyContent: "center",
                       }}
@@ -757,7 +759,7 @@ export default function CreateQuestScreen({ navigation }: Props) {
                       borderRadius: 16,
                       padding: 16,
                       borderWidth: 2,
-                      borderColor: selectedLocationType === "NONE" ? "#7E3FE4" : "rgba(255, 255, 255, 0.1)",
+                      borderColor: selectedLocationType === "NONE" ? colors.primary : colors.cardBorder,
                       flexDirection: "row",
                       alignItems: "center",
                       gap: 12,
@@ -768,7 +770,7 @@ export default function CreateQuestScreen({ navigation }: Props) {
                         width: 48,
                         height: 48,
                         borderRadius: 24,
-                        backgroundColor: selectedLocationType === "NONE" ? "rgba(126, 63, 228, 0.2)" : "rgba(255, 255, 255, 0.05)",
+                        backgroundColor: selectedLocationType === "NONE" ? colors.primaryLight : colors.surface,
                         alignItems: "center",
                         justifyContent: "center",
                       }}
@@ -789,7 +791,7 @@ export default function CreateQuestScreen({ navigation }: Props) {
                           width: 24,
                           height: 24,
                           borderRadius: 12,
-                          backgroundColor: "#7E3FE4",
+                          backgroundColor: colors.primary,
                           alignItems: "center",
                           justifyContent: "center",
                         }}
@@ -852,7 +854,7 @@ export default function CreateQuestScreen({ navigation }: Props) {
                         style={{
                           fontWeight: "600",
                           fontSize: 14,
-                          color: selectedCategory === category ? "white" : "rgba(255, 255, 255, 0.6)",
+                          color: selectedCategory === category ? colors.text : colors.textSecondary,
                         }}
                       >
                         {category}
@@ -891,7 +893,7 @@ export default function CreateQuestScreen({ navigation }: Props) {
                         style={{
                           fontWeight: "600",
                           fontSize: 14,
-                          color: selectedDifficulty === difficulty ? "white" : "rgba(255, 255, 255, 0.6)",
+                          color: selectedDifficulty === difficulty ? colors.text : colors.textSecondary,
                         }}
                       >
                         {difficulty}
@@ -919,7 +921,7 @@ export default function CreateQuestScreen({ navigation }: Props) {
                       borderRadius: 16,
                       padding: 16,
                       borderWidth: 2,
-                      borderColor: selectedQuestType === "REJECTION" ? "#FF6B35" : "rgba(255, 255, 255, 0.1)",
+                      borderColor: selectedQuestType === "REJECTION" ? colors.secondary : colors.cardBorder,
                       flexDirection: "row",
                       alignItems: "center",
                       gap: 12,
@@ -930,7 +932,7 @@ export default function CreateQuestScreen({ navigation }: Props) {
                         width: 48,
                         height: 48,
                         borderRadius: 24,
-                        backgroundColor: selectedQuestType === "REJECTION" ? "rgba(255, 107, 53, 0.2)" : "rgba(255, 255, 255, 0.05)",
+                        backgroundColor: selectedQuestType === "REJECTION" ? colors.secondary + "30" : colors.surface,
                         alignItems: "center",
                         justifyContent: "center",
                       }}
