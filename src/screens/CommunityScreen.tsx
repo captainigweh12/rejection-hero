@@ -430,7 +430,25 @@ export default function CommunityScreen({ navigation }: Props) {
           <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 100 }}>
             {/* Friends Tab */}
             {activeTab === "friends" && (
-            <View style={{ paddingHorizontal: 20 }}>
+            <View>
+              {/* Stories/Moments Bar */}
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={{
+                  borderBottomWidth: 1,
+                  borderBottomColor: "rgba(126, 63, 228, 0.2)",
+                  marginBottom: 20,
+                }}
+                contentContainerStyle={{ paddingHorizontal: 12, paddingVertical: 12, gap: 10, paddingBottom: 16 }}
+              >
+                {/* Stories will be populated from FeedScreen data */}
+                <Text style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: 14, padding: 20 }}>
+                  Stories coming soon...
+                </Text>
+              </ScrollView>
+
+              <View style={{ paddingHorizontal: 20 }}>
               {/* Friend Requests */}
               {requests.length > 0 && (
                 <View style={{ marginBottom: 24 }}>
@@ -613,6 +631,7 @@ export default function CommunityScreen({ navigation }: Props) {
                   </Pressable>
                 ))
               )}
+            </View>
             </View>
           )}
 

@@ -1803,3 +1803,20 @@ See `ENV_SETUP.md` for complete environment variable setup guide.
   - Session management working
   - Backend URL: https://preview-ltlbnamezcje.share.sandbox.dev
 
+### 2025-11-17: Moved Stories from Feed to Friends Tab
+- **Issue**: Stories section cluttering the main feed
+- **Changes**:
+  - Removed entire stories/moments section from Feed tab
+  - Added stories section to Friends tab in Community screen
+  - Feed tab now shows only posts for cleaner layout
+  - Stories placeholder added to Friends tab (ready for full implementation)
+- **UI Improvements**:
+  - Feed tab loads faster without stories
+  - Cleaner separation of content types
+  - Stories now contextually placed with friends
+  - Removed spacing slider (no longer needed)
+- **Files Modified**:
+  - `FeedScreen.tsx`: Removed stories ScrollView and related code
+  - `CommunityScreen.tsx`: Added stories section to Friends tab
+
+
