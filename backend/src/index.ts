@@ -29,6 +29,7 @@ import { gohighlevelRouter } from "./routes/gohighlevel";
 import { supportRouter } from "./routes/support";
 import { categoriesRouter } from "./routes/categories";
 import { audioRouter } from "./routes/audio";
+import { authRouter } from "./routes/auth";
 import { type AppType } from "./types";
 
 // AppType context adds user and session to the context, will be null if the user or session is null
@@ -61,6 +62,10 @@ app.use("*", async (c, next) => {
     return next();
   }
 });
+
+// Mount custom auth routes BEFORE Better Auth handler (so they take precedence)
+console.log("🔐 Mounting custom password reset routes at /api/auth");
+app.route("/api/auth", authRouter);
 
 // Better Auth handler
 // Handles all authentication endpoints: /api/auth/sign-in, /api/auth/sign-up, etc.

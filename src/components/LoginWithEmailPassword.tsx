@@ -10,6 +10,7 @@ import { authClient } from "@/lib/authClient";
 import { useSession } from "@/lib/useSession";
 import { api } from "@/lib/api";
 import type { RootStackParamList } from "@/navigation/types";
+import ForgotPasswordScreen from "./ForgotPasswordScreen";
 
 export default function LoginWithEmailPassword() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -19,6 +20,7 @@ export default function LoginWithEmailPassword() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isCheckingOnboarding, setIsCheckingOnboarding] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
   const { data: session, refetch } = useSession();
 
   // Close modal when user is logged in (AuthWrapper will handle navigation)
@@ -158,6 +160,18 @@ export default function LoginWithEmailPassword() {
     );
   }
 
+  // Show forgot password screen
+  if (showForgotPassword) {
+    return (
+      <LinearGradient colors={["#0A0A0F", "#1A1A24", "#2A1A34"]} className="flex-1">
+        <ForgotPasswordScreen
+          onBack={() => setShowForgotPassword(false)}
+          onSuccess={() => setShowForgotPassword(false)}
+        />
+      </LinearGradient>
+    );
+  }
+
   return (
     <LinearGradient colors={["#0A0A0F", "#1A1A24", "#2A1A34"]} className="flex-1">
       <KeyboardAwareScrollView
@@ -279,6 +293,19 @@ export default function LoginWithEmailPassword() {
                 )}
               </LinearGradient>
             </Pressable>
+
+            {/* Forgot Password Button - Only show on sign in */}
+            {!isSignUp && (
+              <Pressable
+                onPress={() => setShowForgotPassword(true)}
+                disabled={isLoading}
+                className="mb-4"
+              >
+                <Text className="text-cyan-300 text-center text-sm font-medium">
+                  Forgot Password?
+                </Text>
+              </Pressable>
+            )}
 
             {/* Toggle Sign Up/Sign In */}
             <Pressable

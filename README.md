@@ -1170,6 +1170,13 @@ To enable Google sign-in, you need to configure authorized redirect URIs in your
   - Login endpoint: `POST /api/auth/sign-in/email`
   - Session management: `GET /api/auth/get-session`
   - All database tables created and operational
+  - **Password Reset** ✨ NEW! - Forgot Password Flow
+    - Forgot Password endpoint: `POST /api/auth/forgot-password`
+    - Password Reset endpoint: `POST /api/auth/reset-password`
+    - Email delivery via GoHighLevel integration
+    - Secure reset tokens with 24-hour expiration
+    - Beautiful "Forgot Password?" UI on login screen
+    - Confirmation emails sent upon successful reset
 - **OpenAI API**: AI quest generation, Whisper transcription, text summarization
 - **Resend API**: Email functionality
 - **Google Maps API**: Location services
@@ -1951,6 +1958,39 @@ See `ENV_SETUP.md` for complete environment variable setup guide.
   - Google OAuth enabled
   - Session management working
   - Backend URL: https://preview-ltlbnamezcje.share.sandbox.dev
+
+### 2025-11-17: Password Reset Feature with GoHighLevel Integration ✨ NEW!
+- **Feature**: Complete password recovery flow with email verification
+- **Frontend Changes**:
+  - New `ForgotPasswordScreen.tsx` component with beautiful UI
+  - "Forgot Password?" link added to login screen (appears only in sign-in mode)
+  - Seamless navigation between login and forgot password screens
+  - Security notice and email validation on frontend
+- **Backend Implementation**:
+  - `POST /api/auth/forgot-password` - Request password reset with email
+  - `POST /api/auth/reset-password` - Complete password reset with token
+  - Secure reset tokens with SHA-256 hashing
+  - 24-hour token expiration for security
+  - Database storage of verification tokens
+- **GoHighLevel Integration**:
+  - Automatic contact creation/update on password reset request
+  - Email delivery via GoHighLevel API
+  - Beautiful HTML email templates with Rejection Hero branding
+  - Confirmation email sent after successful password reset
+  - Professional security notice in emails
+- **Security Features**:
+  - Tokens generated using crypto.randomBytes(32)
+  - Non-revealing success messages (same response for existing/non-existing emails)
+  - Email validation on both frontend and backend
+  - Password requirements enforced (minimum 8 characters)
+  - Tokens expire after 24 hours
+  - One-time use tokens (deleted after successful reset)
+- **How to Test**:
+  1. Click "Forgot Password?" on login screen
+  2. Enter your email address
+  3. Check GoHighLevel/email for reset link
+  4. Click link to reset password
+  5. Use new password to log in
 
 ### 2025-11-17: Moved Stories from Feed to Friends Tab
 - **Issue**: Stories section cluttering the main feed

@@ -5,6 +5,33 @@
 
 import { z } from "zod";
 
+// ==========================================
+// Auth Routes - Password Reset
+// ==========================================
+
+// POST /api/auth/forgot-password
+export const forgotPasswordRequestSchema = z.object({
+  email: z.string().email("Invalid email address"),
+});
+export type ForgotPasswordRequest = z.infer<typeof forgotPasswordRequestSchema>;
+export const forgotPasswordResponseSchema = z.object({
+  success: z.boolean(),
+  message: z.string(),
+});
+export type ForgotPasswordResponse = z.infer<typeof forgotPasswordResponseSchema>;
+
+// POST /api/auth/reset-password
+export const resetPasswordRequestSchema = z.object({
+  token: z.string(),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+});
+export type ResetPasswordRequest = z.infer<typeof resetPasswordRequestSchema>;
+export const resetPasswordResponseSchema = z.object({
+  success: z.boolean(),
+  message: z.string(),
+});
+export type ResetPasswordResponse = z.infer<typeof resetPasswordResponseSchema>;
+
 // GET /api/sample
 export const getSampleResponseSchema = z.object({
   message: z.string(),
