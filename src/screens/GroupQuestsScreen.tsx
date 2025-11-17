@@ -163,10 +163,10 @@ function CreateGroupQuestModal({ visible, onClose, groupId, onSuccess }: CreateG
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty.toLowerCase()) {
-      case "easy": return "#10B981";
+      case "easy": return "#4CAF50";
       case "medium": return "#FFD700";
       case "hard": return "#FF6B35";
-      case "expert": return "#FF3B30";
+      case "expert": return "#FF4081";
       default: return "#7E3FE4";
     }
   };
@@ -687,13 +687,13 @@ export default function GroupQuestsScreen({ navigation, route }: Props) {
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty.toLowerCase()) {
       case "easy":
-        return "#10B981";
+        return "#4CAF50";
       case "medium":
         return "#FFD700";
       case "hard":
         return "#FF6B35";
       case "expert":
-        return "#FF3B30";
+        return "#FF4081";
       default:
         return "#7E3FE4";
     }

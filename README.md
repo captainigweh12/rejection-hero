@@ -1555,6 +1555,29 @@ See `ENV_SETUP.md` for complete environment variable setup guide.
 
 ## Recent Updates
 
+### 2025-11-17: Fixed Quest Card Color Themes 🎨
+- **Issue Fixed**: Inconsistent color themes across quest cards in different screens
+- **Changes Made**:
+  - **QuestCalendarScreen.tsx**: Updated EXPERT difficulty from `#FF3B30` (red) to `#FF4081` (pink)
+  - **QuestCalendarScreen.tsx**: Updated DATING category from `#FF3B9A` to `#FF4081` for consistency
+  - **GroupQuestsScreen.tsx**: Updated both `getDifficultyColor` functions:
+    - EASY: Changed from `#10B981` (emerald) to `#4CAF50` (green)
+    - EXPERT: Changed from `#FF3B30` (red) to `#FF4081` (pink)
+- **Standardized Color Palette**:
+  - **Categories**:
+    - SALES: `#FF6B35` (orange)
+    - SOCIAL: `#00D9FF` (cyan)
+    - ENTREPRENEURSHIP: `#7E3FE4` (purple)
+    - DATING: `#FF4081` (pink)
+    - CONFIDENCE: `#FFD700` (gold)
+    - CAREER: `#4CAF50` (green)
+  - **Difficulties**:
+    - EASY: `#4CAF50` (green)
+    - MEDIUM: `#FFD700` (gold)
+    - HARD: `#FF6B35` (orange)
+    - EXPERT: `#FF4081` (pink)
+- **Result**: All quest cards now use consistent colors across the entire app for a cohesive visual experience
+
 ### 2025-11-16: Brand New Journal Modal - Built From Scratch ✨
 - **Complete Rebuild**: Deleted old modal and created entirely new component
 - **Clean State Management**: Uses `currentStep` (1, 2, 3) instead of string-based steps

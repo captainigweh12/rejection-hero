@@ -83,7 +83,7 @@ export default function QuestCalendarScreen({ navigation }: Props) {
       SALES: "#FF6B35",
       SOCIAL: "#00D9FF",
       ENTREPRENEURSHIP: "#7E3FE4",
-      DATING: "#FF3B9A",
+      DATING: "#FF4081",
       CONFIDENCE: "#FFD700",
       CAREER: "#4CAF50",
     };
@@ -95,7 +95,7 @@ export default function QuestCalendarScreen({ navigation }: Props) {
       EASY: "#4CAF50",
       MEDIUM: "#FFD700",
       HARD: "#FF6B35",
-      EXPERT: "#FF3B30",
+      EXPERT: "#FF4081",
     };
     return colors[difficulty] || "#7E3FE4";
   };
