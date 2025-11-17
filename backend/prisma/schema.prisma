@@ -376,6 +376,8 @@ model JournalEntry {
   aiSummary         String             // AI-generated summary
   userEditedSummary String?            // User's modified version of the summary
   outcome           String             // YES, NO, ACTIVITY
+  imageUrls         String?            // JSON array of image URLs
+  location          String?            // Optional location/place name
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
   user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
