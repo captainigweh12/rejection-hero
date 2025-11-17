@@ -12,7 +12,6 @@ import {
   Alert,
   Image,
 } from "react-native";
-import Slider from "@react-native-community/slider";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Plus, X, Image as ImageIcon, Globe, Users, Lock, Camera } from "lucide-react-native";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -97,7 +96,6 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
   const [showCreateMoment, setShowCreateMoment] = useState(false);
   const [selectedMoment, setSelectedMoment] = useState<MomentsUser | null>(null);
   const [momentIndex, setMomentIndex] = useState(0);
-  const [storiesPostSpacing, setStoriesPostSpacing] = useState(20); // Adjustable spacing
 
   // Create post state
   const [postContent, setPostContent] = useState("");
@@ -313,7 +311,7 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
         style={{
           borderBottomWidth: 1,
           borderBottomColor: "rgba(126, 63, 228, 0.2)",
-          marginBottom: storiesPostSpacing,
+          marginBottom: 16,
         }}
         contentContainerStyle={{ paddingHorizontal: 12, paddingVertical: 12, gap: 10, paddingBottom: 16 }}
       >
@@ -498,47 +496,6 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
           </TouchableOpacity>
         ))}
       </ScrollView>
-
-      {/* Spacing Adjuster Slider */}
-      <View style={{
-        paddingHorizontal: 20,
-        paddingVertical: 12,
-        backgroundColor: "transparent",
-        marginHorizontal: 16,
-        marginBottom: 12,
-      }}>
-        <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-          <Text style={{ color: "rgba(255, 255, 255, 0.8)", fontSize: 13, fontWeight: "600" }}>
-            Spacing: {storiesPostSpacing}px
-          </Text>
-          <TouchableOpacity
-            onPress={() => setStoriesPostSpacing(20)}
-            style={{
-              paddingHorizontal: 12,
-              paddingVertical: 4,
-              backgroundColor: "rgba(126, 63, 228, 0.2)",
-              borderRadius: 8,
-            }}
-          >
-            <Text style={{ color: "#7E3FE4", fontSize: 12, fontWeight: "600" }}>Reset</Text>
-          </TouchableOpacity>
-        </View>
-        <Slider
-          style={{ width: "100%", height: 40 }}
-          minimumValue={0}
-          maximumValue={100}
-          step={1}
-          value={storiesPostSpacing}
-          onValueChange={setStoriesPostSpacing}
-          minimumTrackTintColor="#7E3FE4"
-          maximumTrackTintColor="rgba(255, 255, 255, 0.2)"
-          thumbTintColor="#7E3FE4"
-        />
-        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-          <Text style={{ color: "rgba(255, 255, 255, 0.5)", fontSize: 11 }}>0px</Text>
-          <Text style={{ color: "rgba(255, 255, 255, 0.5)", fontSize: 11 }}>100px</Text>
-        </View>
-      </View>
 
       {/* Posts Feed */}
       {feedLoading ? (
