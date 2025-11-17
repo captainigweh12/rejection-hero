@@ -30,7 +30,7 @@ type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 
 type FetchOptions = {
   method: HttpMethod;
-  body?: object; // Request body, will be JSON stringified before sending
+  body?: object | FormData; // Request body, will be JSON stringified before sending (or sent as-is for FormData)
 };
 
 /**
@@ -46,6 +46,7 @@ type FetchOptions = {
  * Features:
  * - Automatic authentication: Attaches session cookies from authClient
  * - JSON handling: Automatically stringifies request bodies and parses responses
+ * - FormData support: Automatically detects FormData and sets correct headers
  * - Error handling: Throws descriptive errors with status codes and messages
  * - Type safety: Returns strongly-typed responses using TypeScript generics
  *
@@ -61,19 +62,24 @@ const fetchFn = async <T>(path: string, options: FetchOptions): Promise<T> => {
     headers.set("Cookie", cookies);
   }
 
+  // Detect if body is FormData
+  const isFormData = body instanceof FormData;
+
   // Step 2: Make the HTTP request
   try {
     // Construct the full URL by combining the base backend URL with the endpoint path
     const response = await fetch(`${BACKEND_URL}${path}`, {
       method,
       headers: {
-        // Always send JSON content type since our API uses JSON
-        "Content-Type": "application/json",
+        // Only set Content-Type for JSON, let browser set it for FormData
+        ...(!isFormData ? { "Content-Type": "application/json" } : {}),
         // Include authentication cookies if available
         ...(cookies ? { Cookie: cookies } : {}),
       },
-      // Stringify the body if present (for POST, PUT, PATCH requests)
-      body: body ? JSON.stringify(body) : undefined,
+      // Stringify the body if it's JSON, or send FormData as-is
+      body: body
+        ? (isFormData ? body : JSON.stringify(body))
+        : undefined,
       // Include credentials for better iOS compatibility
       credentials: "include",
     });

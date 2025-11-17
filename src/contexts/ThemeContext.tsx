@@ -5,7 +5,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 type Theme = "day" | "night";
 
 interface ThemeColors {
-  background: string[];
+  background: readonly [string, string, ...string[]];
   backgroundSolid: string;
   card: string;
   cardBorder: string;
@@ -37,7 +37,7 @@ interface ThemeContextType {
 
 // Day Theme (Light Mode)
 const dayColors: ThemeColors = {
-  background: ["#F8F9FA", "#E9ECEF", "#DEE2E6"],
+  background: ["#F8F9FA", "#E9ECEF", "#DEE2E6"] as const,
   backgroundSolid: "#F8F9FA",
   card: "#FFFFFF",
   cardBorder: "rgba(126, 63, 228, 0.2)",
@@ -62,7 +62,7 @@ const dayColors: ThemeColors = {
 
 // Night Theme (Dark Mode) - Current theme
 const nightColors: ThemeColors = {
-  background: ["#0A0A0F", "#1A1A24", "#2A1A34"],
+  background: ["#0A0A0F", "#1A1A24", "#2A1A34"] as const,
   backgroundSolid: "#0A0A0F",
   card: "rgba(255, 255, 255, 0.05)",
   cardBorder: "rgba(126, 63, 228, 0.3)",

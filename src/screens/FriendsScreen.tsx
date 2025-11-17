@@ -742,7 +742,7 @@ export default function FriendsScreen({ navigation }: Props) {
                   <View style={{ paddingVertical: 60, alignItems: "center" }}>
                     <Search size={64} color={colors.textSecondary} />
                     <Text style={{ color: colors.textSecondary, fontSize: 16, marginTop: 16, textAlign: "center" }}>
-                      No users found matching "{searchQuery}"
+                      No users found matching &quot;{searchQuery}&quot;
                     </Text>
                   </View>
                 ) : (
