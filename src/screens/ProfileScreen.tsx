@@ -170,7 +170,7 @@ export default function ProfileScreen({ navigation }: Props) {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.backgroundSolid }}>
-      <LinearGradient colors={["#0A0A0F", "#1A1A24", "#2A1A34"]} style={{ flex: 1 }}>
+      <LinearGradient colors={colors.background as any} style={{ flex: 1 }}>
         <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
           <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 100 }}>
             {/* Hero Header with Gradient */}
@@ -268,20 +268,20 @@ export default function ProfileScreen({ navigation }: Props) {
                     position: "absolute",
                     top: -10,
                     right: -10,
-                    backgroundColor: "#FFD700",
+                    backgroundColor: colors.warning,
                     paddingHorizontal: 16,
                     paddingVertical: 8,
                     borderRadius: 20,
                     borderWidth: 3,
                     borderColor: colors.text,
-                    shadowColor: "#000",
+                    shadowColor: colors.shadow,
                     shadowOffset: { width: 0, height: 2 },
                     shadowOpacity: 0.3,
                     shadowRadius: 4,
                     elevation: 5,
                   }}
                 >
-                  <Text style={{ color: "#000", fontWeight: "900", fontSize: 16 }}>LV {level}</Text>
+                  <Text style={{ color: colors.backgroundSolid, fontWeight: "900", fontSize: 16 }}>LV {level}</Text>
                 </View>
               </View>
 
@@ -294,7 +294,7 @@ export default function ProfileScreen({ navigation }: Props) {
                   color: colors.text,
                   textTransform: "uppercase",
                   letterSpacing: 2,
-                  textShadowColor: "rgba(0, 0, 0, 0.3)",
+                  textShadowColor: colors.shadow,
                   textShadowOffset: { width: 0, height: 2 },
                   textShadowRadius: 4,
                 }}
@@ -316,7 +316,7 @@ export default function ProfileScreen({ navigation }: Props) {
                     style={{
                       width: `${xpProgress * 100}%`,
                       height: "100%",
-                      backgroundColor: "#FFD700",
+                      backgroundColor: colors.warning,
                     }}
                   />
                 </View>
@@ -340,7 +340,7 @@ export default function ProfileScreen({ navigation }: Props) {
                   alignItems: "center",
                   borderWidth: 1,
                   borderColor: colors.cardBorder,
-                  shadowColor: "#000",
+                  shadowColor: colors.shadow,
                   shadowOffset: { width: 0, height: 4 },
                   shadowOpacity: 0.3,
                   shadowRadius: 8,
@@ -376,7 +376,7 @@ export default function ProfileScreen({ navigation }: Props) {
                   alignItems: "center",
                   borderWidth: 1,
                   borderColor: colors.cardBorder,
-                  shadowColor: "#000",
+                  shadowColor: colors.shadow,
                   shadowOffset: { width: 0, height: 4 },
                   shadowOpacity: 0.3,
                   shadowRadius: 8,
@@ -412,7 +412,7 @@ export default function ProfileScreen({ navigation }: Props) {
                   alignItems: "center",
                   borderWidth: 1,
                   borderColor: colors.cardBorder,
-                  shadowColor: "#000",
+                  shadowColor: colors.shadow,
                   shadowOffset: { width: 0, height: 4 },
                   shadowOpacity: 0.3,
                   shadowRadius: 8,
@@ -536,9 +536,9 @@ export default function ProfileScreen({ navigation }: Props) {
                       justifyContent: "center",
                     }}
                   >
-                    <Video size={24} color="white" />
+                    <Video size={24} color={colors.text} />
                   </View>
-                  <Text style={{ fontSize: 20, fontWeight: "bold", color: "white", flex: 1 }}>
+                  <Text style={{ fontSize: 20, fontWeight: "bold", color: colors.text, flex: 1 }}>
                     Go Live
                   </Text>
                   <View
@@ -549,22 +549,22 @@ export default function ProfileScreen({ navigation }: Props) {
                       borderRadius: 12,
                     }}
                   >
-                    <Text style={{ color: "white", fontSize: 12, fontWeight: "700" }}>BETA</Text>
+                    <Text style={{ color: colors.text, fontSize: 12, fontWeight: "700" }}>BETA</Text>
                   </View>
                 </View>
-                <Text style={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14, marginBottom: 16, lineHeight: 20 }}>
+                <Text style={{ color: colors.text, fontSize: 14, marginBottom: 16, lineHeight: 20 }}>
                   Stream your quest challenges live and connect with the rejection therapy community!
                 </Text>
                 <Pressable
                   onPress={() => navigation.navigate("LiveTab")}
                   style={{
-                    backgroundColor: "white",
+                    backgroundColor: colors.text,
                     paddingVertical: 14,
                     borderRadius: 12,
                     alignItems: "center",
                   }}
                 >
-                  <Text style={{ color: "#FF0000", fontWeight: "bold", fontSize: 16 }}>Start Streaming</Text>
+                  <Text style={{ color: colors.error, fontWeight: "bold", fontSize: 16 }}>Start Streaming</Text>
                 </Pressable>
               </LinearGradient>
 
@@ -734,13 +734,13 @@ export default function ProfileScreen({ navigation }: Props) {
                       justifyContent: "center",
                     }}
                   >
-                    <TrendingUp size={32} color="white" />
+                    <TrendingUp size={32} color={colors.text} />
                   </View>
                   <View style={{ flex: 1 }}>
-                    <Text style={{ fontSize: 24, fontWeight: "900", color: "white", marginBottom: 4 }}>
+                    <Text style={{ fontSize: 24, fontWeight: "900", color: colors.text, marginBottom: 4 }}>
                       #{Math.floor(Math.random() * 1000) + 1}
                     </Text>
-                    <Text style={{ fontSize: 14, color: "rgba(255, 255, 255, 0.9)", fontWeight: "600" }}>
+                    <Text style={{ fontSize: 14, color: colors.text, fontWeight: "600" }}>
                       Global Ranking
                     </Text>
                   </View>
@@ -767,9 +767,9 @@ export default function ProfileScreen({ navigation }: Props) {
                     <Text style={{ fontSize: 14, color: colors.textSecondary, fontWeight: "600" }}>
                       Confidence Level
                     </Text>
-                    <Text style={{ fontSize: 20, fontWeight: "bold", color: "#FFD700" }}>
-                      {statsData?.confidenceLevel || 50}%
-                    </Text>
+                      <Text style={{ fontSize: 20, fontWeight: "bold", color: colors.warning }}>
+                        {statsData?.confidenceLevel || 50}%
+                      </Text>
                   </View>
                   <View
                     style={{
@@ -816,7 +816,7 @@ export default function ProfileScreen({ navigation }: Props) {
                           Easy Zone
                         </Text>
                       </View>
-                      <Text style={{ fontSize: 16, fontWeight: "bold", color: "#4CAF50" }}>
+                      <Text style={{ fontSize: 16, fontWeight: "bold", color: colors.success }}>
                         {statsData?.easyZoneCount || 0}
                       </Text>
                     </View>
@@ -832,7 +832,7 @@ export default function ProfileScreen({ navigation }: Props) {
                         style={{
                           width: `${Math.min(((statsData?.easyZoneCount || 0) / 10) * 100, 100)}%`,
                           height: "100%",
-                          backgroundColor: "#4CAF50",
+                          backgroundColor: colors.success,
                         }}
                       />
                     </View>
@@ -858,7 +858,7 @@ export default function ProfileScreen({ navigation }: Props) {
                           Growth Zone
                         </Text>
                       </View>
-                      <Text style={{ fontSize: 16, fontWeight: "bold", color: "#FFD700" }}>
+                      <Text style={{ fontSize: 16, fontWeight: "bold", color: colors.warning }}>
                         {statsData?.growthZoneCount || 0}
                       </Text>
                     </View>
@@ -874,7 +874,7 @@ export default function ProfileScreen({ navigation }: Props) {
                         style={{
                           width: `${Math.min(((statsData?.growthZoneCount || 0) / 10) * 100, 100)}%`,
                           height: "100%",
-                          backgroundColor: "#FFD700",
+                          backgroundColor: colors.warning,
                         }}
                       />
                     </View>
@@ -1267,7 +1267,7 @@ export default function ProfileScreen({ navigation }: Props) {
 
       {/* Avatar Modal */}
       <Modal visible={showAvatarModal} transparent animationType="slide">
-        <View style={{ flex: 1, backgroundColor: "rgba(0, 0, 0, 0.7)", justifyContent: "flex-end" }}>
+        <View style={{ flex: 1, backgroundColor: colors.modalOverlay, justifyContent: "flex-end" }}>
           <View
             style={{
               backgroundColor: colors.card,
@@ -1379,7 +1379,7 @@ export default function ProfileScreen({ navigation }: Props) {
 
       {/* Style Selection Modal */}
       <Modal visible={showStyleModal} transparent animationType="slide">
-        <View style={{ flex: 1, backgroundColor: "rgba(0, 0, 0, 0.7)", justifyContent: "flex-end" }}>
+        <View style={{ flex: 1, backgroundColor: colors.modalOverlay, justifyContent: "flex-end" }}>
           <View
             style={{
               backgroundColor: colors.card,
@@ -1454,7 +1454,7 @@ export default function ProfileScreen({ navigation }: Props) {
           <View
             style={{
               flex: 1,
-              backgroundColor: "rgba(0, 0, 0, 0.8)",
+              backgroundColor: colors.modalOverlay,
               alignItems: "center",
               justifyContent: "center",
               padding: 32,

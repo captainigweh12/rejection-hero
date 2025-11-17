@@ -11,6 +11,7 @@ import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import type { BottomTabScreenProps } from "@/navigation/types";
 import AddJournalModal from "@/components/AddJournalModal";
+import { useTheme } from "@/contexts/ThemeContext";
 
 interface JournalEntry {
   id: string;
@@ -36,6 +37,7 @@ interface GetJournalEntriesResponse {
 type Props = BottomTabScreenProps<"JournalTab">;
 
 export default function JournalScreen({ navigation }: Props) {
+  const { colors } = useTheme();
   const [modalVisible, setModalVisible] = useState(false);
 
   // Fetch journal entries
@@ -63,7 +65,7 @@ export default function JournalScreen({ navigation }: Props) {
   }, [entriesData]);
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
+    <View style={{ flex: 1, backgroundColor: colors.backgroundSolid }}>
       <SafeAreaView edges={["top"]} style={{ flex: 1 }}>
         <ScrollView
           className="flex-1 px-4"
@@ -73,8 +75,8 @@ export default function JournalScreen({ navigation }: Props) {
           {/* Header */}
           <View className="py-6 flex-row justify-between items-center">
             <View>
-              <Text className="text-3xl font-bold text-white">Journal</Text>
-              <Text className="text-base text-white/60 mt-1">
+              <Text className="text-3xl font-bold" style={{ color: colors.text }}>Journal</Text>
+              <Text className="text-base mt-1" style={{ color: colors.textSecondary }}>
                 Record your growth experiences
               </Text>
             </View>
@@ -86,24 +88,24 @@ export default function JournalScreen({ navigation }: Props) {
                 width: 56,
                 height: 56,
                 borderRadius: 28,
-                backgroundColor: "#7E3FE4",
+                backgroundColor: colors.primary,
                 justifyContent: "center",
                 alignItems: "center",
-                shadowColor: "#7E3FE4",
+                shadowColor: colors.primary,
                 shadowOffset: { width: 0, height: 4 },
                 shadowOpacity: 0.3,
                 shadowRadius: 8,
                 elevation: 8,
               }}
             >
-              <Plus size={28} color="white" />
+              <Plus size={28} color={colors.text} />
             </TouchableOpacity>
           </View>
 
           {/* Debug Info */}
           {__DEV__ && (
-            <View style={{ padding: 12, backgroundColor: "rgba(255, 255, 255, 0.05)", marginBottom: 12, borderRadius: 8 }}>
-              <Text className="text-white/60 text-xs">
+            <View style={{ padding: 12, backgroundColor: colors.surface, marginBottom: 12, borderRadius: 8 }}>
+              <Text className="text-xs" style={{ color: colors.textSecondary }}>
                 Debug: {isLoading ? "Loading..." : `${entriesData?.entries?.length || 0} entries`}
                 {error ? ` | Error: ${error}` : ""}
               </Text>
@@ -114,13 +116,13 @@ export default function JournalScreen({ navigation }: Props) {
           {entriesData && entriesData.entries.length > 0 ? (
             <View className="mb-8">
               <View className="flex-row justify-between items-center mb-4">
-                <Text className="text-xl font-bold text-white">
+                <Text className="text-xl font-bold" style={{ color: colors.text }}>
                   Your Entries
                 </Text>
                 <TouchableOpacity
                   onPress={() => navigation.navigate("GrowthAchievements")}
                 >
-                  <Text className="text-[#7E3FE4] font-semibold">
+                  <Text className="font-semibold" style={{ color: colors.primary }}>
                     View Achievements
                   </Text>
                 </TouchableOpacity>
@@ -130,9 +132,9 @@ export default function JournalScreen({ navigation }: Props) {
                 <View
                   key={entry.id}
                   style={{
-                    backgroundColor: "rgba(255, 255, 255, 0.05)",
+                    backgroundColor: colors.card,
                     borderWidth: 1,
-                    borderColor: "rgba(126, 63, 228, 0.3)",
+                    borderColor: colors.cardBorder,
                     borderRadius: 12,
                     padding: 16,
                     marginBottom: 12,
@@ -141,23 +143,23 @@ export default function JournalScreen({ navigation }: Props) {
                   <View className="flex-row items-center justify-between mb-2">
                     <View className="flex-row items-center">
                       {entry.outcome === "YES" && (
-                        <CheckCircle size={20} color="#FF3B30" />
+                        <CheckCircle size={20} color={colors.error} />
                       )}
                       {entry.outcome === "NO" && (
-                        <XCircle size={20} color="#4CAF50" />
+                        <XCircle size={20} color={colors.success} />
                       )}
                       {entry.outcome === "ACTIVITY" && (
-                        <Activity size={20} color="#00D9FF" />
+                        <Activity size={20} color={colors.info} />
                       )}
-                      <Text className="text-white/60 text-sm ml-2">
+                      <Text className="text-sm ml-2" style={{ color: colors.textSecondary }}>
                         {new Date(entry.createdAt).toLocaleDateString()}
                       </Text>
                     </View>
                     {entry.achievements.length > 0 && (
-                      <Star size={20} color="#FFD700" fill="#FFD700" />
+                      <Star size={20} color={colors.warning} fill={colors.warning} />
                     )}
                   </View>
-                  <Text className="text-white text-base">
+                  <Text className="text-base" style={{ color: colors.text }}>
                     {entry.userEditedSummary || entry.aiSummary}
                   </Text>
                 </View>
@@ -177,18 +179,18 @@ export default function JournalScreen({ navigation }: Props) {
                   width: 80,
                   height: 80,
                   borderRadius: 40,
-                  backgroundColor: "rgba(126, 63, 228, 0.1)",
+                  backgroundColor: colors.primaryLight,
                   justifyContent: "center",
                   alignItems: "center",
                   marginBottom: 20,
                 }}
               >
-                <Plus size={40} color="#7E3FE4" />
+                <Plus size={40} color={colors.primary} />
               </View>
-              <Text className="text-white/80 text-lg font-semibold mb-2">
+              <Text className="text-lg font-semibold mb-2" style={{ color: colors.text }}>
                 No entries yet
               </Text>
-              <Text className="text-white/60 text-sm text-center px-8">
+              <Text className="text-sm text-center px-8" style={{ color: colors.textSecondary }}>
                 Tap the + button to record your first growth experience
               </Text>
             </View>

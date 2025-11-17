@@ -7,6 +7,7 @@ import * as Haptics from "expo-haptics";
 
 import { api } from "@/lib/api";
 import { useSession } from "@/lib/useSession";
+import { useTheme } from "@/contexts/ThemeContext";
 
 type OnboardingStep = 1 | 2 | 3;
 
@@ -33,6 +34,7 @@ const GOALS = [
 export default function OnboardingScreen() {
   const navigation = useNavigation();
   const { data: session } = useSession();
+  const { colors } = useTheme();
   const [currentStep, setCurrentStep] = useState<OnboardingStep>(1);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -46,6 +48,10 @@ export default function OnboardingScreen() {
   // Step 3: Goals
   const [selectedGoals, setSelectedGoals] = useState<string[]>([]);
   const [customGoal, setCustomGoal] = useState("");
+
+  const textPrimary = { color: colors.text };
+  const textSecondary = { color: colors.textSecondary };
+  const textTertiary = { color: colors.textTertiary };
 
   const toggleCategory = (categoryId: string) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -158,7 +164,7 @@ export default function OnboardingScreen() {
         <View
           key={step}
           className="flex-1 h-1.5 rounded-full overflow-hidden"
-          style={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }}
+          style={{ backgroundColor: colors.surface }}
         >
           {currentStep >= step && (
             <LinearGradient
@@ -177,15 +183,19 @@ export default function OnboardingScreen() {
     <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
       <View className="items-center mb-6">
         <Text className="text-6xl mb-4">👋</Text>
-        <Text className="text-3xl font-bold text-white text-center mb-2">Welcome to Go for No!</Text>
-        <Text className="text-base text-white/70 text-center px-4">
+        <Text className="text-3xl font-bold text-center mb-2" style={textPrimary}>
+          Welcome to Go for No!
+        </Text>
+        <Text className="text-base text-center px-4" style={textSecondary}>
           Let&apos;s personalize your rejection journey
         </Text>
       </View>
 
       <View className="mt-6">
-        <Text className="text-lg font-semibold text-white mb-3">Create your username</Text>
-        <Text className="text-sm text-white/60 mb-3">
+        <Text className="text-lg font-semibold mb-3" style={textPrimary}>
+          Create your username
+        </Text>
+        <Text className="text-sm mb-3" style={textSecondary}>
           Choose a unique username that others will see. Use only letters, numbers, and underscores.
         </Text>
         <View
@@ -197,26 +207,31 @@ export default function OnboardingScreen() {
           }}
         >
           <View className="flex-row items-center">
-            <Text className="text-white/60 text-lg mr-1">@</Text>
+            <Text className="text-lg mr-1" style={textSecondary}>
+              @
+            </Text>
             <TextInput
               value={username}
               onChangeText={setUsername}
               placeholder="warrior_123"
-              placeholderTextColor="rgba(255, 255, 255, 0.4)"
-              className="text-white text-base flex-1"
+              placeholderTextColor={colors.textTertiary}
+              className="text-base flex-1"
+              style={textPrimary}
               autoCapitalize="none"
               autoCorrect={false}
             />
           </View>
         </View>
-        <Text className="text-xs text-white/40 mt-2">
+        <Text className="text-xs mt-2" style={textTertiary}>
           {username.length > 0 ? `@${username}` : "Your unique tag"}
         </Text>
       </View>
 
       <View className="mt-6">
-        <Text className="text-lg font-semibold text-white mb-3">Tell us about yourself</Text>
-        <Text className="text-sm text-white/60 mb-3">
+        <Text className="text-lg font-semibold mb-3" style={textPrimary}>
+          Tell us about yourself
+        </Text>
+        <Text className="text-sm mb-3" style={textSecondary}>
           Share your background, current situation, or what brings you here. This helps our AI create better quests
           for you.
         </Text>
@@ -232,14 +247,16 @@ export default function OnboardingScreen() {
             value={aboutYou}
             onChangeText={setAboutYou}
             placeholder="e.g., I'm a software developer looking to improve my networking skills and overcome fear of cold calling..."
-            placeholderTextColor="rgba(255, 255, 255, 0.4)"
+            placeholderTextColor={colors.textTertiary}
             multiline
-            className="text-white text-base"
-            style={{ minHeight: 120 }}
+            className="text-base"
+            style={[textPrimary, { minHeight: 120 }]}
             textAlignVertical="top"
           />
         </View>
-        <Text className="text-xs text-white/40 mt-2">{aboutYou.length} characters</Text>
+        <Text className="text-xs mt-2" style={textTertiary}>
+          {aboutYou.length} characters
+        </Text>
       </View>
     </ScrollView>
   );
@@ -248,8 +265,10 @@ export default function OnboardingScreen() {
     <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
       <View className="items-center mb-6">
         <Text className="text-6xl mb-4">🎯</Text>
-        <Text className="text-3xl font-bold text-white text-center mb-2">Pick Your Focus Areas</Text>
-        <Text className="text-base text-white/70 text-center px-4">
+        <Text className="text-3xl font-bold text-center mb-2" style={textPrimary}>
+          Pick Your Focus Areas
+        </Text>
+        <Text className="text-base text-center px-4" style={textSecondary}>
           Select categories you want to work on (choose at least one)
         </Text>
       </View>
@@ -271,10 +290,18 @@ export default function OnboardingScreen() {
               <View className="flex-row items-center">
                 <Text className="text-4xl mr-4">{category.emoji}</Text>
                 <View className="flex-1">
-                  <Text className="text-lg font-bold text-white mb-1">{category.label}</Text>
-                  <Text className="text-sm text-white/60">{category.description}</Text>
+                  <Text className="text-lg font-bold mb-1" style={textPrimary}>
+                    {category.label}
+                  </Text>
+                  <Text className="text-sm" style={textSecondary}>
+                    {category.description}
+                  </Text>
                 </View>
-                {isSelected && <Text className="text-2xl">✓</Text>}
+                {isSelected && (
+                  <Text className="text-2xl" style={textPrimary}>
+                    ✓
+                  </Text>
+                )}
               </View>
             </Pressable>
           );
@@ -287,8 +314,10 @@ export default function OnboardingScreen() {
     <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
       <View className="items-center mb-6">
         <Text className="text-6xl mb-4">🚀</Text>
-        <Text className="text-3xl font-bold text-white text-center mb-2">What Are Your Goals?</Text>
-        <Text className="text-base text-white/70 text-center px-4">
+        <Text className="text-3xl font-bold text-center mb-2" style={textPrimary}>
+          What Are Your Goals?
+        </Text>
+        <Text className="text-base text-center px-4" style={textSecondary}>
           Select what you want to achieve (optional but recommended)
         </Text>
       </View>
@@ -308,17 +337,26 @@ export default function OnboardingScreen() {
               }}
             >
               <Text className="text-2xl mr-3">{goal.emoji}</Text>
-              <Text className={`flex-1 text-base ${isSelected ? "text-white font-semibold" : "text-white/80"}`}>
+              <Text
+                className="flex-1 text-base"
+                style={isSelected ? [textPrimary, { fontWeight: "600" }] : textSecondary}
+              >
                 {goal.label}
               </Text>
-              {isSelected && <Text className="text-xl">✓</Text>}
+              {isSelected && (
+                <Text className="text-xl" style={textPrimary}>
+                  ✓
+                </Text>
+              )}
             </Pressable>
           );
         })}
       </View>
 
       <View className="mt-6">
-        <Text className="text-sm font-semibold text-white/80 mb-3">Or write your own goal:</Text>
+        <Text className="text-sm font-semibold mb-3" style={textSecondary}>
+          Or write your own goal:
+        </Text>
         <View
           className="rounded-xl p-4"
           style={{
@@ -331,10 +369,10 @@ export default function OnboardingScreen() {
             value={customGoal}
             onChangeText={setCustomGoal}
             placeholder="e.g., Get 10 coffee meetings with industry leaders"
-            placeholderTextColor="rgba(255, 255, 255, 0.4)"
-            className="text-white text-base"
+            placeholderTextColor={colors.textTertiary}
+            className="text-base"
             multiline
-            style={{ minHeight: 60 }}
+            style={[textPrimary, { minHeight: 60 }]}
             textAlignVertical="top"
           />
         </View>
@@ -343,7 +381,7 @@ export default function OnboardingScreen() {
   );
 
   return (
-    <LinearGradient colors={["#0A0A0F", "#1A1A24", "#2A1A34"]} className="flex-1">
+    <LinearGradient colors={colors.background} className="flex-1">
       <SafeAreaView edges={["top"]} className="flex-1">
         <View className="flex-1 px-6 pt-6">
           {renderProgressBar()}
@@ -366,7 +404,9 @@ export default function OnboardingScreen() {
                     borderColor: "rgba(255, 255, 255, 0.2)",
                   }}
                 >
-                  <Text className="text-white font-semibold text-base">Back</Text>
+                  <Text className="font-semibold text-base" style={textPrimary}>
+                    Back
+                  </Text>
                 </Pressable>
               )}
 
@@ -381,7 +421,7 @@ export default function OnboardingScreen() {
                   end={{ x: 1, y: 0 }}
                   className="absolute inset-0"
                 />
-                <Text className="text-white font-bold text-base">
+                <Text className="font-bold text-base" style={textPrimary}>
                   {isLoading ? "Saving..." : currentStep === 3 ? "Complete" : "Next"}
                 </Text>
               </Pressable>

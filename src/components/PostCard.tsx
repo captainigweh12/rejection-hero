@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, Image, TextInput, Alert, Modal, ActivityI
 import { Heart, MessageCircle, Send, MoreVertical, Edit2, Trash2, Globe, Users, Lock, X } from "lucide-react-native";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
+import { useTheme } from "@/contexts/ThemeContext";
 
 interface PostCardProps {
   post: {
@@ -42,6 +43,7 @@ interface PostCardProps {
 }
 
 export default function PostCard({ post, currentUserId }: PostCardProps) {
+  const { colors } = useTheme();
   const queryClient = useQueryClient();
   const [showComments, setShowComments] = useState(false);
   const [commentText, setCommentText] = useState("");
@@ -142,13 +144,13 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
   const privacyIcon = () => {
     switch (post.privacy) {
       case "PUBLIC":
-        return <Globe size={13} color="#888" />;
+        return <Globe size={13} color={colors.textTertiary} />;
       case "FRIENDS":
-        return <Users size={13} color="#888" />;
+        return <Users size={13} color={colors.textTertiary} />;
       case "GROUPS":
-        return <Lock size={13} color="#888" />;
+        return <Lock size={13} color={colors.textTertiary} />;
       default:
-        return <Globe size={13} color="#888" />;
+        return <Globe size={13} color={colors.textTertiary} />;
     }
   };
 
@@ -168,12 +170,12 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
   return (
     <View
       style={{
-        backgroundColor: "rgba(255, 255, 255, 0.05)",
+        backgroundColor: colors.card,
         marginBottom: 16,
         borderRadius: 16,
         overflow: "hidden",
         borderWidth: 1,
-        borderColor: "rgba(126, 63, 228, 0.2)",
+        borderColor: colors.cardBorder,
       }}
     >
       {/* Header - Facebook Style */}
@@ -192,12 +194,12 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
               width: 48,
               height: 48,
               borderRadius: 24,
-              backgroundColor: "#7E3FE4",
+              backgroundColor: colors.primary,
               alignItems: "center",
               justifyContent: "center",
               marginRight: 12,
               borderWidth: 2,
-              borderColor: "rgba(126, 63, 228, 0.3)",
+              borderColor: colors.cardBorder,
             }}
           >
             {post.user.avatar ? (
@@ -206,7 +208,7 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
                 style={{ width: 48, height: 48, borderRadius: 24 }}
               />
             ) : (
-              <Text style={{ color: "white", fontSize: 20, fontWeight: "bold" }}>
+              <Text style={{ color: colors.text, fontSize: 20, fontWeight: "bold" }}>
                 {post.user.name?.charAt(0).toUpperCase() || "?"}
               </Text>
             )}
@@ -214,22 +216,22 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
 
           {/* User info */}
           <View style={{ flex: 1 }}>
-            <Text style={{ color: "white", fontSize: 17, fontWeight: "700", marginBottom: 2 }}>
+            <Text style={{ color: colors.text, fontSize: 17, fontWeight: "700", marginBottom: 2 }}>
               {post.user.name || "Anonymous"}
             </Text>
             <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-              <Text style={{ color: "#888", fontSize: 13 }}>
+              <Text style={{ color: colors.textSecondary, fontSize: 13 }}>
                 {timeAgo(post.createdAt)}
               </Text>
-              <Text style={{ color: "#888", fontSize: 13 }}>•</Text>
+              <Text style={{ color: colors.textSecondary, fontSize: 13 }}>•</Text>
               {privacyIcon()}
-              <Text style={{ color: "#888", fontSize: 13 }}>
+              <Text style={{ color: colors.textSecondary, fontSize: 13 }}>
                 {privacyLabel()}
               </Text>
               {post.group && (
                 <>
-                  <Text style={{ color: "#888", fontSize: 13 }}>•</Text>
-                  <Text style={{ color: "#7E3FE4", fontSize: 13, fontWeight: "600" }}>
+                  <Text style={{ color: colors.textSecondary, fontSize: 13 }}>•</Text>
+                  <Text style={{ color: colors.primary, fontSize: 13, fontWeight: "600" }}>
                     {post.group.name}
                   </Text>
                 </>
@@ -242,7 +244,7 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
         {post.user.id === currentUserId && (
           <View>
             <TouchableOpacity onPress={() => setShowMenu(!showMenu)} style={{ padding: 4 }}>
-              <MoreVertical size={22} color="#888" />
+              <MoreVertical size={22} color={colors.textSecondary} />
             </TouchableOpacity>
 
             {/* Dropdown Menu */}
@@ -252,13 +254,13 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
                   position: "absolute",
                   right: 0,
                   top: 35,
-                  backgroundColor: "#1A1A24",
+                  backgroundColor: colors.card,
                   borderRadius: 12,
                   borderWidth: 1,
-                  borderColor: "rgba(126, 63, 228, 0.3)",
+                  borderColor: colors.cardBorder,
                   paddingVertical: 8,
                   minWidth: 150,
-                  shadowColor: "#000",
+                  shadowColor: colors.shadow,
                   shadowOffset: { width: 0, height: 4 },
                   shadowOpacity: 0.3,
                   shadowRadius: 8,
@@ -279,13 +281,13 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
                     gap: 12,
                   }}
                 >
-                  <Edit2 size={18} color="#888" />
-                  <Text style={{ color: "white", fontSize: 15, fontWeight: "600" }}>
+                  <Edit2 size={18} color={colors.textSecondary} />
+                  <Text style={{ color: colors.text, fontSize: 15, fontWeight: "600" }}>
                     Edit post
                   </Text>
                 </TouchableOpacity>
 
-                <View style={{ height: 1, backgroundColor: "rgba(255, 255, 255, 0.1)", marginHorizontal: 12 }} />
+                <View style={{ height: 1, backgroundColor: colors.border, marginHorizontal: 12 }} />
 
                 <TouchableOpacity
                   onPress={() => {
@@ -300,8 +302,8 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
                     gap: 12,
                   }}
                 >
-                  <Trash2 size={18} color="#FF3B30" />
-                  <Text style={{ color: "#FF3B30", fontSize: 15, fontWeight: "600" }}>
+                  <Trash2 size={18} color={colors.error} />
+                  <Text style={{ color: colors.error, fontSize: 15, fontWeight: "600" }}>
                     Delete post
                   </Text>
                 </TouchableOpacity>
@@ -313,7 +315,7 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
 
       {/* Content */}
       <View style={{ paddingHorizontal: 16, paddingBottom: 12 }}>
-        <Text style={{ color: "white", fontSize: 16, lineHeight: 24 }}>
+        <Text style={{ color: colors.text, fontSize: 16, lineHeight: 24 }}>
           {post.content}
         </Text>
       </View>
@@ -355,7 +357,7 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
             paddingHorizontal: 16,
             paddingVertical: 10,
             borderTopWidth: 1,
-            borderTopColor: "rgba(255, 255, 255, 0.1)",
+            borderTopColor: colors.border,
           }}
         >
           {post.likeCount > 0 && (
@@ -365,21 +367,21 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
                   width: 20,
                   height: 20,
                   borderRadius: 10,
-                  backgroundColor: "#FF3B30",
+                  backgroundColor: colors.error,
                   alignItems: "center",
                   justifyContent: "center",
                   marginRight: 6,
                 }}
               >
-                <Heart size={12} color="white" fill="white" />
+                <Heart size={12} color={colors.text} fill={colors.text} />
               </View>
-              <Text style={{ color: "#888", fontSize: 14 }}>
+              <Text style={{ color: colors.textSecondary, fontSize: 14 }}>
                 {post.likeCount}
               </Text>
             </View>
           )}
           {post.commentCount > 0 && (
-            <Text style={{ color: "#888", fontSize: 14 }}>
+            <Text style={{ color: colors.textSecondary, fontSize: 14 }}>
               {post.commentCount} {post.commentCount === 1 ? "comment" : "comments"}
             </Text>
           )}
@@ -394,7 +396,7 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
           paddingHorizontal: 12,
           paddingVertical: 8,
           borderTopWidth: 1,
-          borderTopColor: "rgba(255, 255, 255, 0.1)",
+          borderTopColor: colors.border,
         }}
       >
         {/* Like */}
@@ -411,13 +413,13 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
         >
           <Heart
             size={22}
-            color={post.isLikedByCurrentUser ? "#FF3B30" : "#888"}
-            fill={post.isLikedByCurrentUser ? "#FF3B30" : "none"}
+            color={post.isLikedByCurrentUser ? colors.error : colors.textSecondary}
+            fill={post.isLikedByCurrentUser ? colors.error : "none"}
             strokeWidth={2}
           />
           <Text
             style={{
-              color: post.isLikedByCurrentUser ? "#FF3B30" : "#888",
+              color: post.isLikedByCurrentUser ? colors.error : colors.textSecondary,
               marginLeft: 8,
               fontSize: 15,
               fontWeight: "600",
@@ -439,8 +441,8 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
             borderRadius: 8,
           }}
         >
-          <MessageCircle size={22} color="#888" strokeWidth={2} />
-          <Text style={{ color: "#888", marginLeft: 8, fontSize: 15, fontWeight: "600" }}>
+          <MessageCircle size={22} color={colors.textSecondary} strokeWidth={2} />
+          <Text style={{ color: colors.textSecondary, marginLeft: 8, fontSize: 15, fontWeight: "600" }}>
             Comment
           </Text>
         </TouchableOpacity>
@@ -456,8 +458,8 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
             borderRadius: 8,
           }}
         >
-          <Send size={22} color="#888" strokeWidth={2} />
-          <Text style={{ color: "#888", marginLeft: 8, fontSize: 15, fontWeight: "600" }}>
+          <Send size={22} color={colors.textSecondary} strokeWidth={2} />
+          <Text style={{ color: colors.textSecondary, marginLeft: 8, fontSize: 15, fontWeight: "600" }}>
             Share
           </Text>
         </TouchableOpacity>
@@ -480,7 +482,7 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
                   width: 32,
                   height: 32,
                   borderRadius: 16,
-                  backgroundColor: "#7E3FE4",
+                  backgroundColor: colors.primary,
                   alignItems: "center",
                   justifyContent: "center",
                   marginRight: 10,
@@ -492,7 +494,7 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
                     style={{ width: 32, height: 32, borderRadius: 16 }}
                   />
                 ) : (
-                  <Text style={{ color: "white", fontSize: 14, fontWeight: "bold" }}>
+                  <Text style={{ color: colors.text, fontSize: 14, fontWeight: "bold" }}>
                     {comment.user.name?.charAt(0).toUpperCase() || "?"}
                   </Text>
                 )}
@@ -500,20 +502,20 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
               <View style={{ flex: 1 }}>
                 <View
                   style={{
-                    backgroundColor: "rgba(255, 255, 255, 0.08)",
+                    backgroundColor: colors.surface,
                     borderRadius: 18,
                     paddingHorizontal: 14,
                     paddingVertical: 10,
                   }}
                 >
-                  <Text style={{ color: "white", fontSize: 14, fontWeight: "600", marginBottom: 2 }}>
+                  <Text style={{ color: colors.text, fontSize: 14, fontWeight: "600", marginBottom: 2 }}>
                     {comment.user.name || "Anonymous"}
                   </Text>
-                  <Text style={{ color: "#E0E0E0", fontSize: 15, lineHeight: 20 }}>
+                  <Text style={{ color: colors.text, fontSize: 15, lineHeight: 20 }}>
                     {comment.content}
                   </Text>
                 </View>
-                <Text style={{ color: "#666", fontSize: 12, marginTop: 4, marginLeft: 14 }}>
+                <Text style={{ color: colors.textTertiary, fontSize: 12, marginTop: 4, marginLeft: 14 }}>
                   {timeAgo(comment.createdAt)}
                 </Text>
               </View>
@@ -533,13 +535,13 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
                 width: 32,
                 height: 32,
                 borderRadius: 16,
-                backgroundColor: "#7E3FE4",
+                backgroundColor: colors.primary,
                 alignItems: "center",
                 justifyContent: "center",
                 marginRight: 10,
               }}
             >
-              <Text style={{ color: "white", fontSize: 14, fontWeight: "bold" }}>
+              <Text style={{ color: colors.text, fontSize: 14, fontWeight: "bold" }}>
                 You
               </Text>
             </View>
@@ -548,14 +550,14 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
                 value={commentText}
                 onChangeText={setCommentText}
                 placeholder="Write a comment..."
-                placeholderTextColor="#666"
+                placeholderTextColor={colors.textTertiary}
                 style={{
                   flex: 1,
-                  backgroundColor: "rgba(255, 255, 255, 0.08)",
+                  backgroundColor: colors.surface,
                   borderRadius: 20,
                   paddingHorizontal: 16,
                   paddingVertical: 10,
-                  color: "white",
+                  color: colors.text,
                   fontSize: 15,
                   marginRight: 8,
                 }}
@@ -567,12 +569,12 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
                   width: 36,
                   height: 36,
                   borderRadius: 18,
-                  backgroundColor: commentText.trim() ? "#7E3FE4" : "rgba(126, 63, 228, 0.3)",
+                  backgroundColor: commentText.trim() ? colors.primary : colors.primaryLight,
                   alignItems: "center",
                   justifyContent: "center",
                 }}
               >
-                <Send size={18} color="white" />
+                <Send size={18} color={colors.text} />
               </TouchableOpacity>
             </View>
           </View>
@@ -589,7 +591,7 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
         <View
           style={{
             flex: 1,
-            backgroundColor: "rgba(0, 0, 0, 0.85)",
+            backgroundColor: colors.modalOverlay,
             justifyContent: "center",
             alignItems: "center",
             paddingHorizontal: 20,
@@ -597,10 +599,10 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
         >
           <View
             style={{
-              backgroundColor: "#1A1A24",
+              backgroundColor: colors.backgroundSolid,
               borderRadius: 20,
               borderWidth: 1,
-              borderColor: "rgba(126, 63, 228, 0.3)",
+              borderColor: colors.cardBorder,
               width: "100%",
               maxWidth: 500,
               maxHeight: "80%",
@@ -615,10 +617,10 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
                 paddingHorizontal: 20,
                 paddingVertical: 16,
                 borderBottomWidth: 1,
-                borderBottomColor: "rgba(255, 255, 255, 0.1)",
+                borderBottomColor: colors.border,
               }}
             >
-              <Text style={{ fontSize: 20, fontWeight: "700", color: "white" }}>
+              <Text style={{ fontSize: 20, fontWeight: "700", color: colors.text }}>
                 Edit post
               </Text>
               <TouchableOpacity
@@ -627,12 +629,12 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
                   width: 32,
                   height: 32,
                   borderRadius: 16,
-                  backgroundColor: "rgba(255, 255, 255, 0.1)",
+                  backgroundColor: colors.surface,
                   alignItems: "center",
                   justifyContent: "center",
                 }}
               >
-                <X size={20} color="white" />
+                <X size={20} color={colors.text} />
               </TouchableOpacity>
             </View>
 
@@ -642,18 +644,18 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
                 value={editContent}
                 onChangeText={setEditContent}
                 placeholder="What's on your mind?"
-                placeholderTextColor="#666"
+                placeholderTextColor={colors.textTertiary}
                 multiline
                 style={{
-                  backgroundColor: "rgba(255, 255, 255, 0.05)",
+                  backgroundColor: colors.inputBackground,
                   borderRadius: 12,
                   padding: 16,
-                  color: "white",
+                  color: colors.text,
                   fontSize: 16,
                   minHeight: 150,
                   textAlignVertical: "top",
                   borderWidth: 1,
-                  borderColor: "rgba(126, 63, 228, 0.3)",
+                  borderColor: colors.inputBorder,
                 }}
                 maxLength={5000}
               />
@@ -663,7 +665,7 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
                 onPress={handleEdit}
                 disabled={!editContent.trim() || editMutation.isPending}
                 style={{
-                  backgroundColor: editContent.trim() ? "#7E3FE4" : "rgba(126, 63, 228, 0.3)",
+                  backgroundColor: editContent.trim() ? colors.primary : colors.primaryLight,
                   paddingVertical: 14,
                   borderRadius: 12,
                   alignItems: "center",
@@ -672,9 +674,9 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
                 }}
               >
                 {editMutation.isPending ? (
-                  <ActivityIndicator size="small" color="white" />
+                  <ActivityIndicator size="small" color={colors.text} />
                 ) : (
-                  <Text style={{ color: "white", fontSize: 16, fontWeight: "700" }}>
+                  <Text style={{ color: colors.text, fontSize: 16, fontWeight: "700" }}>
                     Save changes
                   </Text>
                 )}

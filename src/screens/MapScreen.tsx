@@ -9,6 +9,7 @@ import { useSession } from "@/lib/useSession";
 import { useMutation } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import type { GenerateMapQuestsResponse } from "@/shared/contracts";
+import { useTheme } from "@/contexts/ThemeContext";
 
 type Props = BottomTabScreenProps<"MapTab">;
 
@@ -28,6 +29,7 @@ interface QuestMarker {
 }
 
 export default function MapScreen({ navigation }: Props) {
+  const { colors } = useTheme();
   const { data: sessionData } = useSession();
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
   const [loading, setLoading] = useState(true);
@@ -163,7 +165,7 @@ export default function MapScreen({ navigation }: Props) {
 
   if (!sessionData?.user) {
     return (
-      <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
+      <View style={{ flex: 1, backgroundColor: colors.backgroundSolid }}>
         <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
           <View style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 32 }}>
             <View
@@ -174,29 +176,29 @@ export default function MapScreen({ navigation }: Props) {
                 alignItems: "center",
                 justifyContent: "center",
                 marginBottom: 24,
-                backgroundColor: "rgba(0, 217, 255, 0.1)",
+                backgroundColor: colors.primaryLight,
                 borderWidth: 2,
-                borderColor: "#00D9FF",
+                borderColor: colors.info,
               }}
             >
-              <MapPin size={48} color="#00D9FF" />
+              <MapPin size={48} color={colors.info} />
             </View>
-            <Text style={{ color: "white", fontSize: 28, fontWeight: "bold", marginBottom: 16, textAlign: "center" }}>
+            <Text style={{ color: colors.text, fontSize: 28, fontWeight: "bold", marginBottom: 16, textAlign: "center" }}>
               Explore Quest Locations
             </Text>
-            <Text style={{ color: "rgba(255, 255, 255, 0.7)", fontSize: 16, textAlign: "center", marginBottom: 32 }}>
+            <Text style={{ color: colors.textSecondary, fontSize: 16, textAlign: "center", marginBottom: 32 }}>
               Sign in to discover rejection challenges near you and create location-based quests.
             </Text>
             <Pressable
               onPress={() => navigation.navigate("LoginModalScreen")}
               style={{
-                backgroundColor: "#FF6B35",
+                backgroundColor: colors.secondary,
                 paddingHorizontal: 48,
                 paddingVertical: 16,
                 borderRadius: 999,
               }}
             >
-              <Text style={{ color: "white", fontWeight: "bold", fontSize: 18 }}>Get Started</Text>
+              <Text style={{ color: colors.text, fontWeight: "bold", fontSize: 18 }}>Get Started</Text>
             </Pressable>
           </View>
         </SafeAreaView>
@@ -206,11 +208,11 @@ export default function MapScreen({ navigation }: Props) {
 
   if (loading) {
     return (
-      <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
+      <View style={{ flex: 1, backgroundColor: colors.backgroundSolid }}>
         <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
           <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-            <ActivityIndicator size="large" color="#FF6B35" />
-            <Text style={{ color: "rgba(255, 255, 255, 0.7)", marginTop: 16 }}>
+            <ActivityIndicator size="large" color={colors.secondary} />
+            <Text style={{ color: colors.textSecondary, marginTop: 16 }}>
               Getting your location...
             </Text>
           </View>
@@ -221,26 +223,26 @@ export default function MapScreen({ navigation }: Props) {
 
   if (errorMsg || !location) {
     return (
-      <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
+      <View style={{ flex: 1, backgroundColor: colors.backgroundSolid }}>
         <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
           <View style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 32 }}>
-            <MapPin size={64} color="#FF6B35" />
-            <Text style={{ color: "white", fontSize: 24, fontWeight: "bold", marginTop: 24, marginBottom: 16 }}>
+            <MapPin size={64} color={colors.secondary} />
+            <Text style={{ color: colors.text, fontSize: 24, fontWeight: "bold", marginTop: 24, marginBottom: 16 }}>
               Location Access Needed
             </Text>
-            <Text style={{ color: "rgba(255, 255, 255, 0.7)", textAlign: "center", marginBottom: 32 }}>
+            <Text style={{ color: colors.textSecondary, textAlign: "center", marginBottom: 32 }}>
               {errorMsg || "We need your location to show nearby quest opportunities"}
             </Text>
             <Pressable
               onPress={getLocationPermission}
               style={{
-                backgroundColor: "#FF6B35",
+                backgroundColor: colors.secondary,
                 paddingHorizontal: 32,
                 paddingVertical: 16,
                 borderRadius: 999,
               }}
             >
-              <Text style={{ color: "white", fontWeight: "bold" }}>Enable Location</Text>
+              <Text style={{ color: colors.text, fontWeight: "bold" }}>Enable Location</Text>
             </Pressable>
           </View>
         </SafeAreaView>
@@ -249,7 +251,7 @@ export default function MapScreen({ navigation }: Props) {
   }
 
   const getCategoryColor = (category: string) => {
-    const colors: Record<string, string> = {
+    const categoryColors: Record<string, string> = {
       SALES: "#FF6B35",
       SOCIAL: "#00D9FF",
       ENTREPRENEURSHIP: "#7E3FE4",
@@ -257,21 +259,21 @@ export default function MapScreen({ navigation }: Props) {
       CONFIDENCE: "#FFD700",
       CAREER: "#4CAF50",
     };
-    return colors[category] || "#7E3FE4";
+    return categoryColors[category] || "#7E3FE4";
   };
 
   const getDifficultyColor = (difficulty: string) => {
-    const colors: Record<string, string> = {
+    const difficultyColors: Record<string, string> = {
       EASY: "#4CAF50",
       MEDIUM: "#FFD700",
       HARD: "#FF6B35",
       EXPERT: "#FF4081",
     };
-    return colors[difficulty] || "#7E3FE4";
+    return difficultyColors[difficulty] || "#7E3FE4";
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
+    <View style={{ flex: 1, backgroundColor: colors.backgroundSolid }}>
       <MapView
         ref={mapRef}
         provider={PROVIDER_GOOGLE}
@@ -317,14 +319,14 @@ export default function MapScreen({ navigation }: Props) {
             marginHorizontal: 16,
             marginTop: 8,
             padding: 16,
-            backgroundColor: "rgba(10, 10, 15, 0.95)",
+            backgroundColor: colors.card,
             borderRadius: 16,
             borderWidth: 1,
-            borderColor: "rgba(255, 107, 53, 0.3)",
+            borderColor: colors.cardBorder,
           }}
         >
-          <Text style={{ color: "white", fontSize: 20, fontWeight: "bold" }}>Quest Map</Text>
-          <Text style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: 14, marginTop: 4 }}>
+          <Text style={{ color: colors.text, fontSize: 20, fontWeight: "bold" }}>Quest Map</Text>
+          <Text style={{ color: colors.textSecondary, fontSize: 14, marginTop: 4 }}>
             {questMarkers.length > 0
               ? `${questMarkers.length} quests nearby`
               : "Tap Generate to find quests"}
@@ -342,10 +344,10 @@ export default function MapScreen({ navigation }: Props) {
             width: 56,
             height: 56,
             borderRadius: 28,
-            backgroundColor: generateQuestsMutation.isPending ? "#555" : "#7E3FE4",
+            backgroundColor: generateQuestsMutation.isPending ? colors.textTertiary : colors.primary,
             alignItems: "center",
             justifyContent: "center",
-            shadowColor: "#7E3FE4",
+            shadowColor: colors.primary,
             shadowOffset: { width: 0, height: 4 },
             shadowOpacity: 0.5,
             shadowRadius: 8,
@@ -353,9 +355,9 @@ export default function MapScreen({ navigation }: Props) {
           }}
         >
           {generateQuestsMutation.isPending ? (
-            <ActivityIndicator size="small" color="#fff" />
+            <ActivityIndicator size="small" color={colors.text} />
           ) : (
-            <Sparkles size={28} color="#fff" strokeWidth={2.5} />
+            <Sparkles size={28} color={colors.text} strokeWidth={2.5} />
           )}
         </Pressable>
 
@@ -366,19 +368,19 @@ export default function MapScreen({ navigation }: Props) {
             width: 56,
             height: 56,
             borderRadius: 28,
-            backgroundColor: "rgba(10, 10, 15, 0.95)",
+            backgroundColor: colors.card,
             alignItems: "center",
             justifyContent: "center",
             borderWidth: 1,
-            borderColor: "rgba(255, 255, 255, 0.2)",
-            shadowColor: "#000",
+            borderColor: colors.border,
+            shadowColor: colors.shadow,
             shadowOffset: { width: 0, height: 2 },
             shadowOpacity: 0.3,
             shadowRadius: 4,
             elevation: 5,
           }}
         >
-          <Crosshair size={24} color="#fff" />
+          <Crosshair size={24} color={colors.text} />
         </Pressable>
 
         {/* Create Quest Button */}
@@ -388,17 +390,17 @@ export default function MapScreen({ navigation }: Props) {
             width: 56,
             height: 56,
             borderRadius: 28,
-            backgroundColor: "#FF6B35",
+            backgroundColor: colors.secondary,
             alignItems: "center",
             justifyContent: "center",
-            shadowColor: "#FF6B35",
+            shadowColor: colors.secondary,
             shadowOffset: { width: 0, height: 4 },
             shadowOpacity: 0.5,
             shadowRadius: 8,
             elevation: 8,
           }}
         >
-          <Plus size={28} color="#fff" strokeWidth={3} />
+          <Plus size={28} color={colors.text} strokeWidth={3} />
         </Pressable>
       </View>
 
@@ -412,7 +414,7 @@ export default function MapScreen({ navigation }: Props) {
         <View
           style={{
             flex: 1,
-            backgroundColor: "rgba(0, 0, 0, 0.8)",
+            backgroundColor: colors.modalOverlay,
             justifyContent: "flex-end",
           }}
         >
@@ -424,7 +426,7 @@ export default function MapScreen({ navigation }: Props) {
           {selectedQuest && (
             <View
               style={{
-                backgroundColor: "#0A0A0F",
+                backgroundColor: colors.backgroundSolid,
                 borderTopLeftRadius: 24,
                 borderTopRightRadius: 24,
                 paddingHorizontal: 20,
@@ -443,18 +445,18 @@ export default function MapScreen({ navigation }: Props) {
                     top: 20,
                     right: 20,
                     zIndex: 10,
-                    backgroundColor: "rgba(255, 255, 255, 0.1)",
+                    backgroundColor: colors.surface,
                     borderRadius: 20,
                     padding: 8,
                   }}
                 >
-                  <X size={20} color="#fff" />
+                  <X size={20} color={colors.text} />
                 </Pressable>
 
                 {/* Quest Title */}
                 <Text
                   style={{
-                    color: "white",
+                    color: colors.text,
                     fontSize: 24,
                     fontWeight: "bold",
                     marginBottom: 12,
@@ -511,7 +513,7 @@ export default function MapScreen({ navigation }: Props) {
                 {/* Description */}
                 <Text
                   style={{
-                    color: "rgba(255, 255, 255, 0.8)",
+                    color: colors.text,
                     fontSize: 16,
                     lineHeight: 24,
                     marginBottom: 16,
@@ -523,23 +525,23 @@ export default function MapScreen({ navigation }: Props) {
                 {/* Location */}
                 <View
                   style={{
-                    backgroundColor: "rgba(255, 255, 255, 0.05)",
+                    backgroundColor: colors.surface,
                     padding: 12,
                     borderRadius: 12,
                     borderWidth: 1,
-                    borderColor: "rgba(255, 255, 255, 0.1)",
+                    borderColor: colors.border,
                     marginBottom: 16,
                   }}
                 >
                   <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-                    <MapPin size={16} color="#00D9FF" />
-                    <Text style={{ color: "#00D9FF", fontSize: 14, fontWeight: "600" }}>
+                    <MapPin size={16} color={colors.info} />
+                    <Text style={{ color: colors.info, fontSize: 14, fontWeight: "600" }}>
                       Location
                     </Text>
                   </View>
                   <Text
                     style={{
-                      color: "rgba(255, 255, 255, 0.8)",
+                      color: colors.text,
                       fontSize: 14,
                       marginTop: 4,
                     }}
@@ -566,27 +568,27 @@ export default function MapScreen({ navigation }: Props) {
                         XP Reward
                       </Text>
                     </View>
-                    <Text style={{ color: "white", fontSize: 20, fontWeight: "bold", marginTop: 4 }}>
+                    <Text style={{ color: colors.text, fontSize: 20, fontWeight: "bold", marginTop: 4 }}>
                       {selectedQuest.xpReward}
                     </Text>
                   </View>
                   <View
                     style={{
                       flex: 1,
-                      backgroundColor: "rgba(255, 107, 53, 0.1)",
+                      backgroundColor: colors.secondary + "20",
                       padding: 12,
                       borderRadius: 12,
                       borderWidth: 1,
-                      borderColor: "rgba(255, 107, 53, 0.3)",
+                      borderColor: colors.secondary + "30",
                     }}
                   >
                     <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-                      <Trophy size={16} color="#FF6B35" />
-                      <Text style={{ color: "#FF6B35", fontSize: 12, fontWeight: "600" }}>
+                      <Trophy size={16} color={colors.secondary} />
+                      <Text style={{ color: colors.secondary, fontSize: 12, fontWeight: "600" }}>
                         Points
                       </Text>
                     </View>
-                    <Text style={{ color: "white", fontSize: 20, fontWeight: "bold", marginTop: 4 }}>
+                    <Text style={{ color: colors.text, fontSize: 20, fontWeight: "bold", marginTop: 4 }}>
                       {selectedQuest.pointReward}
                     </Text>
                   </View>
@@ -602,7 +604,7 @@ export default function MapScreen({ navigation }: Props) {
                     alignItems: "center",
                   }}
                 >
-                  <Text style={{ color: "white", fontSize: 18, fontWeight: "bold" }}>
+                  <Text style={{ color: colors.text, fontSize: 18, fontWeight: "bold" }}>
                     Accept Quest
                   </Text>
                 </Pressable>

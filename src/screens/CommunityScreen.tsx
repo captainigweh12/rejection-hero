@@ -814,15 +814,15 @@ export default function CommunityScreen({ navigation }: Props) {
               )}
 
               {/* Discover Groups */}
-              <Text style={{ fontSize: 18, fontWeight: "bold", color: "white", marginBottom: 12 }}>
+              <Text style={{ fontSize: 18, fontWeight: "bold", color: colors.text, marginBottom: 12 }}>
                 Discover Groups
               </Text>
               {groupsLoading ? (
-                <ActivityIndicator size="large" color="#7E3FE4" style={{ marginTop: 40 }} />
+                <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 40 }} />
               ) : discoverGroups.length === 0 ? (
                 <View style={{ alignItems: "center", paddingVertical: 60 }}>
-                  <Group size={48} color="rgba(255, 255, 255, 0.6)" />
-                  <Text style={{ fontSize: 16, color: "rgba(255, 255, 255, 0.6)", marginTop: 16, textAlign: "center" }}>
+                  <Group size={48} color={colors.textSecondary} />
+                  <Text style={{ fontSize: 16, color: colors.textSecondary, marginTop: 16, textAlign: "center" }}>
                     No groups to discover. Create your own!
                   </Text>
                   {/* Create Group Button */}
@@ -830,22 +830,22 @@ export default function CommunityScreen({ navigation }: Props) {
                     onPress={() => setShowCreateGroupModal(true)}
                     style={{
                       marginTop: 20,
-                      backgroundColor: "#7E3FE4",
+                      backgroundColor: colors.primary,
                       paddingHorizontal: 24,
                       paddingVertical: 12,
                       borderRadius: 24,
                       flexDirection: "row",
                       alignItems: "center",
                       gap: 8,
-                      shadowColor: "#7E3FE4",
+                      shadowColor: colors.primary,
                       shadowOffset: { width: 0, height: 4 },
                       shadowOpacity: 0.3,
                       shadowRadius: 8,
                       elevation: 5,
                     }}
                   >
-                    <Plus size={20} color="white" />
-                    <Text style={{ color: "white", fontSize: 16, fontWeight: "700" }}>Create Group</Text>
+                    <Plus size={20} color={colors.text} />
+                    <Text style={{ color: colors.text, fontSize: 16, fontWeight: "700" }}>Create Group</Text>
                   </Pressable>
                 </View>
               ) : (
@@ -853,12 +853,12 @@ export default function CommunityScreen({ navigation }: Props) {
                   <Pressable
                     key={group.id}
                     style={{
-                      backgroundColor: "rgba(255, 255, 255, 0.05)",
+                      backgroundColor: colors.card,
                       borderRadius: 16,
                       overflow: "hidden",
                       marginBottom: 12,
                       borderWidth: 1,
-                      borderColor: "rgba(126, 63, 228, 0.3)",
+                      borderColor: colors.cardBorder,
                     }}
                   >
                     {group.coverImage && (
@@ -871,17 +871,17 @@ export default function CommunityScreen({ navigation }: Props) {
                     <View style={{ padding: 16 }}>
                       <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
                         <View style={{ flex: 1 }}>
-                          <Text style={{ fontSize: 18, fontWeight: "700", color: "white", marginBottom: 4 }}>
+                          <Text style={{ fontSize: 18, fontWeight: "700", color: colors.text, marginBottom: 4 }}>
                             {group.name}
                           </Text>
                           {group.description && (
-                            <Text style={{ fontSize: 14, color: "rgba(255, 255, 255, 0.6)", marginBottom: 8 }} numberOfLines={2}>
+                            <Text style={{ fontSize: 14, color: colors.textSecondary, marginBottom: 8 }} numberOfLines={2}>
                               {group.description}
                             </Text>
                           )}
                           <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-                            <UsersRound size={14} color="rgba(255, 255, 255, 0.6)" />
-                            <Text style={{ fontSize: 13, color: "rgba(255, 255, 255, 0.6)" }}>
+                            <UsersRound size={14} color={colors.textSecondary} />
+                            <Text style={{ fontSize: 13, color: colors.textSecondary }}>
                               {group.memberCount} members
                             </Text>
                           </View>
@@ -890,7 +890,7 @@ export default function CommunityScreen({ navigation }: Props) {
                           onPress={() => handleJoinGroup(group.id)}
                           disabled={joinGroupMutation.isPending}
                           style={{
-                            backgroundColor: "#7E3FE4",
+                            backgroundColor: colors.primary,
                             paddingHorizontal: 20,
                             paddingVertical: 10,
                             borderRadius: 20,
@@ -898,9 +898,9 @@ export default function CommunityScreen({ navigation }: Props) {
                           }}
                         >
                           {joinGroupMutation.isPending ? (
-                            <ActivityIndicator size="small" color="white" />
+                            <ActivityIndicator size="small" color={colors.text} />
                           ) : (
-                            <Text style={{ color: "white", fontSize: 14, fontWeight: "700" }}>Join</Text>
+                            <Text style={{ color: colors.text, fontSize: 14, fontWeight: "700" }}>Join</Text>
                           )}
                         </Pressable>
                       </View>

@@ -271,18 +271,18 @@ export default function LiveScreen({ navigation }: Props) {
   // If viewing someone else's stream, show viewer interface
   if (viewingStreamId && viewingStream) {
     return (
-      <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
+      <View style={{ flex: 1, backgroundColor: colors.backgroundSolid }}>
         {/* Camera View Placeholder */}
         <View
           style={{
             flex: 1,
-            backgroundColor: "#1A1A1A",
+            backgroundColor: colors.card,
             alignItems: "center",
             justifyContent: "center",
           }}
         >
-          <Video size={80} color="#555" />
-          <Text style={{ color: "#666", marginTop: 16, fontSize: 16 }}>
+          <Video size={80} color={colors.textTertiary} />
+          <Text style={{ color: colors.textSecondary, marginTop: 16, fontSize: 16 }}>
             {viewingStream.user.name}&apos;s stream
           </Text>
         </View>
@@ -295,14 +295,14 @@ export default function LiveScreen({ navigation }: Props) {
             left: 20,
             flexDirection: "row",
             alignItems: "center",
-            backgroundColor: "#FF0000",
+            backgroundColor: colors.error,
             paddingHorizontal: 12,
             paddingVertical: 6,
             borderRadius: 6,
           }}
         >
-          <Radio size={12} color="white" style={{ marginRight: 6 }} />
-          <Text style={{ color: "white", fontWeight: "bold", fontSize: 14 }}>LIVE</Text>
+          <Radio size={12} color={colors.text} style={{ marginRight: 6 }} />
+          <Text style={{ color: colors.text, fontWeight: "bold", fontSize: 14 }}>LIVE</Text>
         </View>
 
         {/* Close Button */}
@@ -522,10 +522,10 @@ export default function LiveScreen({ navigation }: Props) {
           transparent
           onRequestClose={() => setShowSendQuestModal(false)}
         >
-          <View style={{ flex: 1, backgroundColor: "rgba(0, 0, 0, 0.8)", justifyContent: "flex-end" }}>
+          <View style={{ flex: 1, backgroundColor: colors.modalOverlay, justifyContent: "flex-end" }}>
             <View
               style={{
-                backgroundColor: "#1A1A1A",
+                backgroundColor: colors.backgroundSolid,
                 borderTopLeftRadius: 24,
                 borderTopRightRadius: 24,
                 paddingTop: 20,
@@ -535,28 +535,28 @@ export default function LiveScreen({ navigation }: Props) {
               }}
             >
               <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-                <Text style={{ color: "white", fontSize: 22, fontWeight: "bold" }}>
+                <Text style={{ color: colors.text, fontSize: 22, fontWeight: "bold" }}>
                   Send Quest Challenge
                 </Text>
                 <Pressable onPress={() => setShowSendQuestModal(false)}>
-                  <X size={28} color="white" />
+                  <X size={28} color={colors.text} />
                 </Pressable>
               </View>
 
               <ScrollView showsVerticalScrollIndicator={false}>
-                <Text style={{ color: "rgba(255, 255, 255, 0.7)", fontSize: 14, marginBottom: 16 }}>
+                <Text style={{ color: colors.textSecondary, fontSize: 14, marginBottom: 16 }}>
                   Challenge {viewingStream.user.name} to complete a quest! Boost with diamonds for higher priority.
                 </Text>
 
                 {/* Diamond Balance */}
-                <View style={{ backgroundColor: "rgba(255, 215, 0, 0.1)", borderRadius: 12, padding: 12, marginBottom: 16 }}>
-                  <Text style={{ color: "#FFD700", fontSize: 12, fontWeight: "600" }}>
+                <View style={{ backgroundColor: colors.warning + "20", borderRadius: 12, padding: 12, marginBottom: 16 }}>
+                  <Text style={{ color: colors.warning, fontSize: 12, fontWeight: "600" }}>
                     Your Diamonds: {userStats?.diamonds || 0} 💎
                   </Text>
                 </View>
 
                 {/* Available Quests */}
-                <Text style={{ color: "white", fontSize: 16, fontWeight: "bold", marginBottom: 12 }}>
+                <Text style={{ color: colors.text, fontSize: 16, fontWeight: "bold", marginBottom: 12 }}>
                   Select Quest
                 </Text>
                 {questsData?.activeQuests && questsData.activeQuests.length > 0 ? (
@@ -577,22 +577,22 @@ export default function LiveScreen({ navigation }: Props) {
                           selectedSuggestQuestId === uq.quest.id ? "#FF6B35" : "transparent",
                       }}
                     >
-                      <Text style={{ color: "#FF6B35", fontSize: 11, fontWeight: "600", marginBottom: 4 }}>
+                      <Text style={{ color: colors.secondary, fontSize: 11, fontWeight: "600", marginBottom: 4 }}>
                         {uq.quest.category}
                       </Text>
-                      <Text style={{ color: "white", fontSize: 15, fontWeight: "600" }}>
+                      <Text style={{ color: colors.text, fontSize: 15, fontWeight: "600" }}>
                         {uq.quest.title}
                       </Text>
                     </Pressable>
                   ))
                 ) : (
-                  <Text style={{ color: "#999", fontSize: 14, textAlign: "center", paddingVertical: 20 }}>
+                  <Text style={{ color: colors.textTertiary, fontSize: 14, textAlign: "center", paddingVertical: 20 }}>
                     You don&apos;t have any active quests to share
                   </Text>
                 )}
 
                 {/* Boost Amount */}
-                <Text style={{ color: "white", fontSize: 16, fontWeight: "bold", marginTop: 16, marginBottom: 12 }}>
+                <Text style={{ color: colors.text, fontSize: 16, fontWeight: "bold", marginTop: 16, marginBottom: 12 }}>
                   Boost Priority (Optional)
                 </Text>
                 <View style={{ flexDirection: "row", gap: 10, marginBottom: 16 }}>
@@ -602,7 +602,7 @@ export default function LiveScreen({ navigation }: Props) {
                       onPress={() => setBoostAmount(amount)}
                       style={{
                         flex: 1,
-                        backgroundColor: boostAmount === amount ? "#FFD700" : "rgba(255, 255, 255, 0.1)",
+                        backgroundColor: boostAmount === amount ? colors.warning : colors.surface,
                         paddingVertical: 12,
                         borderRadius: 8,
                         alignItems: "center",
@@ -610,7 +610,7 @@ export default function LiveScreen({ navigation }: Props) {
                     >
                       <Text
                         style={{
-                          color: boostAmount === amount ? "#000" : "white",
+                          color: boostAmount === amount ? colors.backgroundSolid : colors.text,
                           fontSize: 14,
                           fontWeight: "700",
                         }}
@@ -622,24 +622,26 @@ export default function LiveScreen({ navigation }: Props) {
                 </View>
 
                 {/* Message */}
-                <Text style={{ color: "white", fontSize: 16, fontWeight: "bold", marginBottom: 12 }}>
+                <Text style={{ color: colors.text, fontSize: 16, fontWeight: "bold", marginBottom: 12 }}>
                   Add Message (Optional)
                 </Text>
                 <TextInput
                   value={questMessage}
                   onChangeText={setQuestMessage}
                   placeholder="Add a challenge message..."
-                  placeholderTextColor="#666"
+                  placeholderTextColor={colors.textTertiary}
                   multiline
                   style={{
-                    backgroundColor: "rgba(255, 255, 255, 0.1)",
+                    backgroundColor: colors.inputBackground,
                     borderRadius: 12,
                     padding: 12,
-                    color: "white",
+                    color: colors.text,
                     fontSize: 14,
                     minHeight: 80,
                     textAlignVertical: "top",
                     marginBottom: 20,
+                    borderWidth: 1,
+                    borderColor: colors.inputBorder,
                   }}
                 />
 
@@ -648,13 +650,13 @@ export default function LiveScreen({ navigation }: Props) {
                   onPress={handleSuggestQuest}
                   disabled={!selectedSuggestQuestId}
                   style={{
-                    backgroundColor: selectedSuggestQuestId ? "#FF6B35" : "#333",
+                    backgroundColor: selectedSuggestQuestId ? colors.secondary : colors.textTertiary,
                     paddingVertical: 16,
                     borderRadius: 12,
                     alignItems: "center",
                   }}
                 >
-                  <Text style={{ color: selectedSuggestQuestId ? "white" : "#666", fontSize: 16, fontWeight: "bold" }}>
+                  <Text style={{ color: selectedSuggestQuestId ? colors.text : colors.textSecondary, fontSize: 16, fontWeight: "bold" }}>
                     Send Quest {boostAmount > 0 ? `(${boostAmount}💎)` : ""}
                   </Text>
                 </Pressable>
@@ -668,7 +670,7 @@ export default function LiveScreen({ navigation }: Props) {
 
   if (!sessionData?.user) {
     return (
-      <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
+      <View style={{ flex: 1, backgroundColor: colors.backgroundSolid }}>
         <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
           <View style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 32 }}>
             <View
@@ -676,32 +678,32 @@ export default function LiveScreen({ navigation }: Props) {
                 width: 80,
                 height: 80,
                 borderRadius: 40,
-                backgroundColor: "rgba(255, 0, 0, 0.1)",
+                backgroundColor: colors.error + "20",
                 borderWidth: 2,
-                borderColor: "#FF0000",
+                borderColor: colors.error,
                 alignItems: "center",
                 justifyContent: "center",
                 marginBottom: 24,
               }}
             >
-              <Video size={40} color="#FF0000" />
+              <Video size={40} color={colors.error} />
             </View>
-            <Text style={{ color: "white", fontSize: 28, fontWeight: "bold", marginBottom: 16, textAlign: "center" }}>
+            <Text style={{ color: colors.text, fontSize: 28, fontWeight: "bold", marginBottom: 16, textAlign: "center" }}>
               Go Live
             </Text>
-            <Text style={{ color: "rgba(255, 255, 255, 0.7)", fontSize: 16, textAlign: "center", marginBottom: 32 }}>
+            <Text style={{ color: colors.textSecondary, fontSize: 16, textAlign: "center", marginBottom: 32 }}>
               Sign in to start streaming your quest journey or watch others go for their NOs!
             </Text>
             <Pressable
               onPress={() => navigation.navigate("LoginModalScreen")}
               style={{
-                backgroundColor: "#FF6B35",
+                backgroundColor: colors.secondary,
                 paddingHorizontal: 48,
                 paddingVertical: 16,
                 borderRadius: 999,
               }}
             >
-              <Text style={{ color: "white", fontWeight: "bold", fontSize: 18 }}>Get Started</Text>
+              <Text style={{ color: colors.text, fontWeight: "bold", fontSize: 18 }}>Get Started</Text>
             </Pressable>
           </View>
         </SafeAreaView>
@@ -714,39 +716,39 @@ export default function LiveScreen({ navigation }: Props) {
     // Check camera permissions
     if (!permission) {
       return (
-        <View style={{ flex: 1, backgroundColor: "#1A1A1A", alignItems: "center", justifyContent: "center" }}>
-          <Text style={{ color: "white" }}>Loading camera...</Text>
+        <View style={{ flex: 1, backgroundColor: colors.backgroundSolid, alignItems: "center", justifyContent: "center" }}>
+          <Text style={{ color: colors.text }}>Loading camera...</Text>
         </View>
       );
     }
 
     if (!permission.granted) {
       return (
-        <View style={{ flex: 1, backgroundColor: "#1A1A1A", alignItems: "center", justifyContent: "center", paddingHorizontal: 32 }}>
-          <Video size={64} color="#FF6B35" style={{ marginBottom: 24 }} />
-          <Text style={{ color: "white", fontSize: 20, fontWeight: "bold", marginBottom: 12, textAlign: "center" }}>
+        <View style={{ flex: 1, backgroundColor: colors.backgroundSolid, alignItems: "center", justifyContent: "center", paddingHorizontal: 32 }}>
+          <Video size={64} color={colors.secondary} style={{ marginBottom: 24 }} />
+          <Text style={{ color: colors.text, fontSize: 20, fontWeight: "bold", marginBottom: 12, textAlign: "center" }}>
             Camera Permission Required
           </Text>
-          <Text style={{ color: "#999", fontSize: 16, textAlign: "center", marginBottom: 32 }}>
+          <Text style={{ color: colors.textSecondary, fontSize: 16, textAlign: "center", marginBottom: 32 }}>
             We need access to your camera to start the live stream
           </Text>
           <Pressable
             onPress={requestPermission}
             style={{
-              backgroundColor: "#FF6B35",
+              backgroundColor: colors.secondary,
               paddingHorizontal: 32,
               paddingVertical: 16,
               borderRadius: 999,
             }}
           >
-            <Text style={{ color: "white", fontWeight: "bold", fontSize: 16 }}>Grant Permission</Text>
+            <Text style={{ color: colors.text, fontWeight: "bold", fontSize: 16 }}>Grant Permission</Text>
           </Pressable>
         </View>
       );
     }
 
     return (
-      <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
+      <View style={{ flex: 1, backgroundColor: colors.backgroundSolid }}>
         {/* Camera View */}
         {!isVideoOff ? (
           <CameraView style={{ flex: 1 }} facing={facing} />
@@ -754,13 +756,13 @@ export default function LiveScreen({ navigation }: Props) {
           <View
             style={{
               flex: 1,
-              backgroundColor: "#1A1A1A",
+              backgroundColor: colors.card,
               alignItems: "center",
               justifyContent: "center",
             }}
           >
-            <VideoOff size={80} color="#555" />
-            <Text style={{ color: "#666", marginTop: 16, fontSize: 16 }}>
+            <VideoOff size={80} color={colors.textTertiary} />
+            <Text style={{ color: colors.textSecondary, marginTop: 16, fontSize: 16 }}>
               Camera is off
             </Text>
           </View>
@@ -774,14 +776,14 @@ export default function LiveScreen({ navigation }: Props) {
             left: 20,
             flexDirection: "row",
             alignItems: "center",
-            backgroundColor: "#FF0000",
+            backgroundColor: colors.error,
             paddingHorizontal: 12,
             paddingVertical: 6,
             borderRadius: 6,
           }}
         >
-          <Radio size={12} color="white" style={{ marginRight: 6 }} />
-          <Text style={{ color: "white", fontWeight: "bold", fontSize: 14 }}>LIVE</Text>
+          <Radio size={12} color={colors.text} style={{ marginRight: 6 }} />
+          <Text style={{ color: colors.text, fontWeight: "bold", fontSize: 14 }}>LIVE</Text>
         </View>
 
         {/* Close Button */}
@@ -1064,10 +1066,10 @@ export default function LiveScreen({ navigation }: Props) {
           transparent
           onRequestClose={() => setShowQuestSuggestions(false)}
         >
-          <View style={{ flex: 1, backgroundColor: "rgba(0, 0, 0, 0.8)", justifyContent: "flex-end" }}>
+          <View style={{ flex: 1, backgroundColor: colors.modalOverlay, justifyContent: "flex-end" }}>
             <View
               style={{
-                backgroundColor: "#1A1A1A",
+                backgroundColor: colors.backgroundSolid,
                 borderTopLeftRadius: 24,
                 borderTopRightRadius: 24,
                 paddingTop: 20,
@@ -1077,11 +1079,11 @@ export default function LiveScreen({ navigation }: Props) {
               }}
             >
               <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-                <Text style={{ color: "white", fontSize: 22, fontWeight: "bold" }}>
+                <Text style={{ color: colors.text, fontSize: 22, fontWeight: "bold" }}>
                   Quest Suggestions
                 </Text>
                 <Pressable onPress={() => setShowQuestSuggestions(false)}>
-                  <X size={28} color="white" />
+                  <X size={28} color={colors.text} />
                 </Pressable>
               </View>
 
@@ -1091,12 +1093,12 @@ export default function LiveScreen({ navigation }: Props) {
                     <View
                       key={suggestion.id}
                       style={{
-                        backgroundColor: "rgba(255, 255, 255, 0.05)",
+                        backgroundColor: colors.card,
                         borderRadius: 16,
                         padding: 16,
                         marginBottom: 12,
                         borderWidth: 1,
-                        borderColor: "rgba(255, 255, 255, 0.1)",
+                        borderColor: colors.cardBorder,
                       }}
                     >
                       {/* Boost Badge */}
@@ -1106,7 +1108,7 @@ export default function LiveScreen({ navigation }: Props) {
                             position: "absolute",
                             top: 12,
                             right: 12,
-                            backgroundColor: "#FFD700",
+                            backgroundColor: colors.warning,
                             paddingHorizontal: 10,
                             paddingVertical: 4,
                             borderRadius: 12,
@@ -1115,32 +1117,32 @@ export default function LiveScreen({ navigation }: Props) {
                             gap: 4,
                           }}
                         >
-                          <Crown size={12} color="#000" />
-                          <Text style={{ color: "#000", fontSize: 11, fontWeight: "bold" }}>
+                          <Crown size={12} color={colors.backgroundSolid} />
+                          <Text style={{ color: colors.backgroundSolid, fontSize: 11, fontWeight: "bold" }}>
                             {suggestion.boostAmount}💎
                           </Text>
                         </View>
                       )}
 
-                      <Text style={{ color: "#999", fontSize: 11, marginBottom: 4 }}>
+                      <Text style={{ color: colors.textTertiary, fontSize: 11, marginBottom: 4 }}>
                         From {suggestion.suggester.name || "Anonymous"}
                       </Text>
 
-                      <Text style={{ color: "#FF6B35", fontSize: 12, fontWeight: "600", marginBottom: 6 }}>
+                      <Text style={{ color: colors.secondary, fontSize: 12, fontWeight: "600", marginBottom: 6 }}>
                         {suggestion.quest.category} • {suggestion.quest.difficulty}
                       </Text>
 
-                      <Text style={{ color: "white", fontSize: 16, fontWeight: "bold", marginBottom: 8 }}>
+                      <Text style={{ color: colors.text, fontSize: 16, fontWeight: "bold", marginBottom: 8 }}>
                         {suggestion.quest.title}
                       </Text>
 
-                      <Text style={{ color: "rgba(255, 255, 255, 0.8)", fontSize: 14, marginBottom: 12 }} numberOfLines={2}>
+                      <Text style={{ color: colors.text, fontSize: 14, marginBottom: 12 }} numberOfLines={2}>
                         {suggestion.quest.description}
                       </Text>
 
                       {suggestion.message && (
-                        <View style={{ backgroundColor: "rgba(255, 215, 0, 0.1)", borderRadius: 8, padding: 10, marginBottom: 12 }}>
-                          <Text style={{ color: "#FFD700", fontSize: 13, fontStyle: "italic" }}>
+                        <View style={{ backgroundColor: colors.warning + "20", borderRadius: 8, padding: 10, marginBottom: 12 }}>
+                          <Text style={{ color: colors.warning, fontSize: 13, fontStyle: "italic" }}>
                             &quot;{suggestion.message}&quot;
                           </Text>
                         </View>
@@ -1157,7 +1159,7 @@ export default function LiveScreen({ navigation }: Props) {
                           }
                           style={{
                             flex: 1,
-                            backgroundColor: "#4CAF50",
+                            backgroundColor: colors.success,
                             paddingVertical: 12,
                             borderRadius: 10,
                             flexDirection: "row",
@@ -1166,8 +1168,8 @@ export default function LiveScreen({ navigation }: Props) {
                             gap: 6,
                           }}
                         >
-                          <CheckCircle size={18} color="white" />
-                          <Text style={{ color: "white", fontSize: 14, fontWeight: "bold" }}>Accept</Text>
+                          <CheckCircle size={18} color={colors.text} />
+                          <Text style={{ color: colors.text, fontSize: 14, fontWeight: "bold" }}>Accept</Text>
                         </Pressable>
 
                         <Pressable
@@ -1179,7 +1181,7 @@ export default function LiveScreen({ navigation }: Props) {
                           }
                           style={{
                             flex: 1,
-                            backgroundColor: "#F44336",
+                            backgroundColor: colors.error,
                             paddingVertical: 12,
                             borderRadius: 10,
                             flexDirection: "row",
@@ -1188,8 +1190,8 @@ export default function LiveScreen({ navigation }: Props) {
                             gap: 6,
                           }}
                         >
-                          <XCircle size={18} color="white" />
-                          <Text style={{ color: "white", fontSize: 14, fontWeight: "bold" }}>Decline</Text>
+                          <XCircle size={18} color={colors.text} />
+                          <Text style={{ color: colors.text, fontSize: 14, fontWeight: "bold" }}>Decline</Text>
                         </Pressable>
                       </View>
                     </View>
@@ -1197,11 +1199,11 @@ export default function LiveScreen({ navigation }: Props) {
                 </ScrollView>
               ) : (
                 <View style={{ alignItems: "center", paddingVertical: 40 }}>
-                  <Gift size={48} color="#666" />
-                  <Text style={{ color: "#999", fontSize: 16, marginTop: 16, textAlign: "center" }}>
+                  <Gift size={48} color={colors.textTertiary} />
+                  <Text style={{ color: colors.textSecondary, fontSize: 16, marginTop: 16, textAlign: "center" }}>
                     No quest suggestions yet
                   </Text>
-                  <Text style={{ color: "#666", fontSize: 14, marginTop: 8, textAlign: "center" }}>
+                  <Text style={{ color: colors.textTertiary, fontSize: 14, marginTop: 8, textAlign: "center" }}>
                     Viewers can send you quest challenges during your stream
                   </Text>
                 </View>
@@ -1215,14 +1217,14 @@ export default function LiveScreen({ navigation }: Props) {
 
   // Default view - show active streams or start streaming button
   return (
-    <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
+    <View style={{ flex: 1, backgroundColor: colors.backgroundSolid }}>
       <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
         {/* Header */}
         <View style={{ paddingTop: 16, paddingBottom: 20, paddingHorizontal: 24 }}>
-          <Text style={{ color: "white", fontSize: 32, fontWeight: "bold", letterSpacing: -1 }}>
+          <Text style={{ color: colors.text, fontSize: 32, fontWeight: "bold", letterSpacing: -1 }}>
             Live Now
           </Text>
-          <Text style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: 15, marginTop: 6 }}>
+          <Text style={{ color: colors.textSecondary, fontSize: 15, marginTop: 6 }}>
             Join warriors streaming their quest challenges
           </Text>
         </View>
@@ -1237,13 +1239,13 @@ export default function LiveScreen({ navigation }: Props) {
             <Pressable
               onPress={handleStartStream}
               style={{
-                backgroundColor: "#FF0000",
+                backgroundColor: colors.error,
                 borderRadius: 20,
                 padding: 24,
                 flexDirection: "row",
                 alignItems: "center",
                 gap: 16,
-                shadowColor: "#FF0000",
+                shadowColor: colors.error,
                 shadowOffset: { width: 0, height: 8 },
                 shadowOpacity: 0.5,
                 shadowRadius: 16,
@@ -1255,18 +1257,18 @@ export default function LiveScreen({ navigation }: Props) {
                   width: 56,
                   height: 56,
                   borderRadius: 28,
-                  backgroundColor: "rgba(255, 255, 255, 0.2)",
+                  backgroundColor: colors.text + "30",
                   alignItems: "center",
                   justifyContent: "center",
                 }}
               >
-                <Radio size={28} color="white" />
+                <Radio size={28} color={colors.text} />
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={{ color: "white", fontSize: 20, fontWeight: "bold", marginBottom: 4 }}>
+                <Text style={{ color: colors.text, fontSize: 20, fontWeight: "bold", marginBottom: 4 }}>
                   Start Streaming
                 </Text>
-                <Text style={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 14 }}>
+                <Text style={{ color: colors.text, fontSize: 14 }}>
                   Share your quest journey live
                 </Text>
               </View>
@@ -1277,12 +1279,12 @@ export default function LiveScreen({ navigation }: Props) {
           {streamsData?.streams && streamsData.streams.length > 0 && (
             <View style={{ marginBottom: 32 }}>
               <View style={{ paddingHorizontal: 24, marginBottom: 16, flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-                <Text style={{ color: "white", fontSize: 22, fontWeight: "bold" }}>
+                <Text style={{ color: colors.text, fontSize: 22, fontWeight: "bold" }}>
                   Featured Streams
                 </Text>
                 <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-                  <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: "#FF0000" }} />
-                  <Text style={{ color: "#FF0000", fontSize: 14, fontWeight: "600" }}>
+                  <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: colors.error }} />
+                  <Text style={{ color: colors.error, fontSize: 14, fontWeight: "600" }}>
                     {streamsData.streams.length} LIVE
                   </Text>
                 </View>
@@ -1299,24 +1301,24 @@ export default function LiveScreen({ navigation }: Props) {
                     onPress={() => setViewingStreamId(stream.id)}
                     style={{
                       width: 280,
-                      backgroundColor: "rgba(255, 255, 255, 0.08)",
+                      backgroundColor: colors.card,
                       borderRadius: 16,
                       overflow: "hidden",
                       borderWidth: 1.5,
-                      borderColor: "rgba(255, 0, 0, 0.3)",
+                      borderColor: colors.error + "30",
                     }}
                   >
                     {/* Thumbnail Area */}
                     <View
                       style={{
                         height: 160,
-                        backgroundColor: "#2A2A2A",
+                        backgroundColor: colors.surface,
                         alignItems: "center",
                         justifyContent: "center",
                         position: "relative",
                       }}
                     >
-                      <Video size={48} color="#555" />
+                      <Video size={48} color={colors.textTertiary} />
 
                       {/* LIVE Badge */}
                       <View
@@ -1326,14 +1328,14 @@ export default function LiveScreen({ navigation }: Props) {
                           left: 12,
                           flexDirection: "row",
                           alignItems: "center",
-                          backgroundColor: "#FF0000",
+                          backgroundColor: colors.error,
                           paddingHorizontal: 10,
                           paddingVertical: 6,
                           borderRadius: 6,
                         }}
                       >
-                        <Radio size={12} color="white" style={{ marginRight: 6 }} />
-                        <Text style={{ color: "white", fontWeight: "bold", fontSize: 11 }}>LIVE</Text>
+                        <Radio size={12} color={colors.text} style={{ marginRight: 6 }} />
+                        <Text style={{ color: colors.text, fontWeight: "bold", fontSize: 11 }}>LIVE</Text>
                       </View>
 
                       {/* Viewer Count */}
@@ -1351,8 +1353,8 @@ export default function LiveScreen({ navigation }: Props) {
                           gap: 6,
                         }}
                       >
-                        <Users size={14} color="white" />
-                        <Text style={{ color: "white", fontWeight: "bold", fontSize: 12 }}>
+                        <Users size={14} color={colors.text} />
+                        <Text style={{ color: colors.text, fontWeight: "bold", fontSize: 12 }}>
                           {stream.viewerCount}
                         </Text>
                       </View>
@@ -1366,21 +1368,21 @@ export default function LiveScreen({ navigation }: Props) {
                             width: 40,
                             height: 40,
                             borderRadius: 20,
-                            backgroundColor: "#FF6B35",
+                            backgroundColor: colors.secondary,
                             alignItems: "center",
                             justifyContent: "center",
                           }}
                         >
-                          <Text style={{ color: "white", fontWeight: "bold", fontSize: 16 }}>
+                          <Text style={{ color: colors.text, fontWeight: "bold", fontSize: 16 }}>
                             {stream.user.name?.[0] || "U"}
                           </Text>
                         </View>
                         <View style={{ flex: 1 }}>
-                          <Text style={{ color: "white", fontSize: 15, fontWeight: "700" }}>
+                          <Text style={{ color: colors.text, fontSize: 15, fontWeight: "700" }}>
                             {stream.user.name || "Anonymous"}
                           </Text>
                           {stream.userQuest && (
-                            <Text style={{ color: "#FF6B35", fontSize: 11, fontWeight: "600", marginTop: 2 }}>
+                            <Text style={{ color: colors.secondary, fontSize: 11, fontWeight: "600", marginTop: 2 }}>
                               {stream.userQuest.quest.category}
                             </Text>
                           )}
@@ -1390,7 +1392,7 @@ export default function LiveScreen({ navigation }: Props) {
                       {/* Quest Title */}
                       {stream.userQuest && (
                         <Text
-                          style={{ color: "rgba(255, 255, 255, 0.8)", fontSize: 13, lineHeight: 18 }}
+                          style={{ color: colors.text, fontSize: 13, lineHeight: 18 }}
                           numberOfLines={2}
                         >
                           {stream.userQuest.quest.title}
@@ -1406,7 +1408,7 @@ export default function LiveScreen({ navigation }: Props) {
           {/* All Live Streams Grid */}
           {streamsData?.streams && streamsData.streams.length > 0 ? (
             <View style={{ paddingHorizontal: 24 }}>
-              <Text style={{ color: "white", fontSize: 22, fontWeight: "bold", marginBottom: 16 }}>
+              <Text style={{ color: colors.text, fontSize: 22, fontWeight: "bold", marginBottom: 16 }}>
                 All Streams
               </Text>
 
@@ -1416,11 +1418,11 @@ export default function LiveScreen({ navigation }: Props) {
                     key={stream.id}
                     onPress={() => setViewingStreamId(stream.id)}
                     style={{
-                      backgroundColor: "rgba(255, 255, 255, 0.06)",
+                      backgroundColor: colors.card,
                       borderRadius: 16,
                       overflow: "hidden",
                       borderWidth: 1,
-                      borderColor: "rgba(255, 255, 255, 0.1)",
+                      borderColor: colors.cardBorder,
                     }}
                   >
                     <View style={{ flexDirection: "row", padding: 14, gap: 14 }}>
@@ -1430,13 +1432,13 @@ export default function LiveScreen({ navigation }: Props) {
                           width: 100,
                           height: 100,
                           borderRadius: 12,
-                          backgroundColor: "#2A2A2A",
+                          backgroundColor: colors.surface,
                           alignItems: "center",
                           justifyContent: "center",
                           position: "relative",
                         }}
                       >
-                        <Video size={32} color="#555" />
+                        <Video size={32} color={colors.textTertiary} />
 
                         {/* Mini LIVE Badge */}
                         <View
@@ -1446,14 +1448,14 @@ export default function LiveScreen({ navigation }: Props) {
                             left: 6,
                             flexDirection: "row",
                             alignItems: "center",
-                            backgroundColor: "#FF0000",
+                            backgroundColor: colors.error,
                             paddingHorizontal: 6,
                             paddingVertical: 3,
                             borderRadius: 4,
                           }}
                         >
-                          <Radio size={8} color="white" style={{ marginRight: 4 }} />
-                          <Text style={{ color: "white", fontWeight: "bold", fontSize: 9 }}>LIVE</Text>
+                          <Radio size={8} color={colors.text} style={{ marginRight: 4 }} />
+                          <Text style={{ color: colors.text, fontWeight: "bold", fontSize: 9 }}>LIVE</Text>
                         </View>
                       </View>
 
@@ -1465,22 +1467,22 @@ export default function LiveScreen({ navigation }: Props) {
                               width: 36,
                               height: 36,
                               borderRadius: 18,
-                              backgroundColor: "#FF6B35",
+                              backgroundColor: colors.secondary,
                               alignItems: "center",
                               justifyContent: "center",
                             }}
                           >
-                            <Text style={{ color: "white", fontWeight: "bold", fontSize: 14 }}>
+                            <Text style={{ color: colors.text, fontWeight: "bold", fontSize: 14 }}>
                               {stream.user.name?.[0] || "U"}
                             </Text>
                           </View>
                           <View style={{ flex: 1 }}>
-                            <Text style={{ color: "white", fontSize: 16, fontWeight: "700" }}>
+                            <Text style={{ color: colors.text, fontSize: 16, fontWeight: "700" }}>
                               {stream.user.name || "Anonymous"}
                             </Text>
                             <View style={{ flexDirection: "row", alignItems: "center", gap: 6, marginTop: 2 }}>
-                              <Users size={12} color="#999" />
-                              <Text style={{ color: "#999", fontSize: 12 }}>
+                              <Users size={12} color={colors.textTertiary} />
+                              <Text style={{ color: colors.textTertiary, fontSize: 12 }}>
                                 {stream.viewerCount} watching
                               </Text>
                             </View>
@@ -1491,18 +1493,18 @@ export default function LiveScreen({ navigation }: Props) {
                         {stream.userQuest && (
                           <View
                             style={{
-                              backgroundColor: "rgba(255, 107, 53, 0.15)",
+                              backgroundColor: colors.secondary + "20",
                               borderRadius: 8,
                               padding: 8,
                               borderLeftWidth: 2,
-                              borderLeftColor: "#FF6B35",
+                              borderLeftColor: colors.secondary,
                             }}
                           >
-                            <Text style={{ color: "#FF6B35", fontSize: 10, fontWeight: "700", marginBottom: 3 }}>
+                            <Text style={{ color: colors.secondary, fontSize: 10, fontWeight: "700", marginBottom: 3 }}>
                               {stream.userQuest.quest.category}
                             </Text>
                             <Text
-                              style={{ color: "white", fontSize: 13, fontWeight: "600" }}
+                              style={{ color: colors.text, fontSize: 13, fontWeight: "600" }}
                               numberOfLines={1}
                             >
                               {stream.userQuest.quest.title}
@@ -1519,12 +1521,12 @@ export default function LiveScreen({ navigation }: Props) {
             <View style={{ paddingHorizontal: 24 }}>
               <View
                 style={{
-                  backgroundColor: "rgba(255, 255, 255, 0.05)",
+                  backgroundColor: colors.card,
                   borderRadius: 20,
                   padding: 40,
                   alignItems: "center",
                   borderWidth: 1,
-                  borderColor: "rgba(255, 255, 255, 0.1)",
+                  borderColor: colors.cardBorder,
                 }}
               >
                 <View
@@ -1532,18 +1534,18 @@ export default function LiveScreen({ navigation }: Props) {
                     width: 80,
                     height: 80,
                     borderRadius: 40,
-                    backgroundColor: "rgba(255, 0, 0, 0.1)",
+                    backgroundColor: colors.error + "20",
                     alignItems: "center",
                     justifyContent: "center",
                     marginBottom: 20,
                   }}
                 >
-                  <Video size={40} color="#FF0000" />
+                  <Video size={40} color={colors.error} />
                 </View>
-                <Text style={{ color: "white", fontSize: 20, fontWeight: "700", marginBottom: 8 }}>
+                <Text style={{ color: colors.text, fontSize: 20, fontWeight: "700", marginBottom: 8 }}>
                   No Live Streams
                 </Text>
-                <Text style={{ color: "#999", fontSize: 15, textAlign: "center", lineHeight: 22 }}>
+                <Text style={{ color: colors.textSecondary, fontSize: 15, textAlign: "center", lineHeight: 22 }}>
                   Be the first warrior to go live and{"\n"}share your quest journey!
                 </Text>
               </View>
