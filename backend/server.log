@@ -1,20 +1,38 @@
 + exec gosu vibecode scripts/start --hot
 Installing dependencies and generating Prisma client...
-[0.03ms] ".env"
+[0.21ms] ".env"
 bun install v1.2.19 (aad3abea)
 
 $ prisma generate
 Environment variables loaded from .env
 Prisma schema loaded from prisma/schema.prisma
+┌─────────────────────────────────────────────────────────┐
+│  Update available 6.17.1 -> 6.19.0                      │
+│  Run the following to update                            │
+│    npm i --save-dev prisma@latest                       │
+│    npm i @prisma/client@latest                          │
+└─────────────────────────────────────────────────────────┘
 
-✔ Generated Prisma Client (v6.17.1) to ./generated/prisma in 267ms
+✔ Generated Prisma Client (v6.17.1) to ./generated/prisma in 360ms
 
 Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
 
-Tip: Interested in query caching in just a few lines of code? Try Accelerate today! https://pris.ly/tip-3-accelerate
+Tip: Want to turn off tips and other hints? https://pris.ly/tip-4-nohints
 
 
-Checked 760 installs across 702 packages (no changes) [1.74s]
++ @types/bun@1.2.23
++ prisma@6.17.1
++ @better-auth/expo@1.3.24
++ @hono/node-server@1.12.0
++ @hono/zod-validator@0.7.3
++ @prisma/adapter-better-sqlite3@6.17.1
++ @prisma/client@6.17.1
++ better-auth@1.3.24
++ hono@4.6.0
++ zod@4.1.11
++ typescript@5.8.3
+
+691 packages installed [19.52s]
 Starting server in dev mode with hot reload...
 $ NODE_ENV=development bun run --hot src/index.ts
 Failed to find Response internal state key
@@ -79,9 +97,6 @@ Failed to find Response internal state key
   💚 Health:       GET /health
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-<-- GET /api/live/active
-🔐 [Auth Middleware] GET /api/live/active - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
---> GET /api/live/active [32m200[0m 20ms
 Failed to find Response internal state key
 ✅ Environment variables validated successfully
 🔍 OPENAI_API_KEY from process.env: EXISTS
@@ -144,47 +159,164 @@ Failed to find Response internal state key
   💚 Health:       GET /health
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+<-- GET /api/auth/get-session
+--> GET /api/auth/get-session [32m200[0m 11ms
+<-- GET /api/quests
+🔐 [Auth Middleware] GET /api/quests - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+--> GET /api/quests [32m200[0m 9ms
+<-- GET /api/profile
+<-- GET /api/stats/weekly-forecast
+🔐 [Auth Middleware] GET /api/profile - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+👤 [Profile] GET request - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+🔍 [Profile] Fetching profile for user kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+<-- GET /api/stats
+<-- GET /api/stats/reflection-prompt
+🔐 [Auth Middleware] GET /api/stats/weekly-forecast - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+✅ [Profile] Successfully fetched profile for user kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+--> GET /api/profile [32m200[0m 11ms
+🔐 [Auth Middleware] GET /api/stats/reflection-prompt - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+--> GET /api/stats/reflection-prompt [32m200[0m 19ms
+🔐 [Auth Middleware] GET /api/stats - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+--> GET /api/stats [32m200[0m 21ms
+--> GET /api/stats/weekly-forecast [32m200[0m 29ms
+<-- GET /api/friends/requests
+<-- GET /api/posts/feed
+<-- GET /api/friends
+<-- GET /api/moments
+<-- GET /api/messages/conversations
+<-- GET /api/groups
+<-- GET /api/notifications/unread-count
+🔐 [Auth Middleware] GET /api/friends/requests - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+--> GET /api/friends/requests [32m200[0m 7ms
+🔐 [Auth Middleware] GET /api/posts/feed - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+🔐 [Auth Middleware] GET /api/friends - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+🔐 [Auth Middleware] GET /api/moments - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+🔐 [Auth Middleware] GET /api/messages/conversations - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+🔐 [Auth Middleware] GET /api/notifications/unread-count - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+--> GET /api/friends [32m200[0m 11ms
+🔐 [Auth Middleware] GET /api/groups - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+--> GET /api/posts/feed [32m200[0m 16ms
+--> GET /api/messages/conversations [32m200[0m 14ms
+--> GET /api/notifications/unread-count [32m200[0m 15ms
+--> GET /api/moments [32m200[0m 17ms
+--> GET /api/groups [32m200[0m 16ms
 <-- GET /api/notifications/unread-count
 🔐 [Auth Middleware] GET /api/notifications/unread-count - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
---> GET /api/notifications/unread-count [32m200[0m 10ms
-<-- GET /api/live/active
-🔐 [Auth Middleware] GET /api/live/active - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
---> GET /api/live/active [32m200[0m 6ms
-<-- GET /api/auth/get-session
---> GET /api/auth/get-session [32m200[0m 7ms
+--> GET /api/notifications/unread-count [32m200[0m 5ms
 <-- GET /api/quests
 🔐 [Auth Middleware] GET /api/quests - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
 --> GET /api/quests [32m200[0m 6ms
-<-- GET /api/profile
 <-- GET /api/stats
-<-- GET /api/stats/reflection-prompt
+🔐 [Auth Middleware] GET /api/stats - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+--> GET /api/stats [32m200[0m 2ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+--> GET /api/live/active [32m200[0m 3ms
+<-- GET /api/notifications/unread-count
+🔐 [Auth Middleware] GET /api/notifications/unread-count - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+--> GET /api/notifications/unread-count [32m200[0m 2ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+--> GET /api/live/active [32m200[0m 3ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+--> GET /api/live/active [32m200[0m 3ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/journal
+🔐 [Auth Middleware] GET /api/journal - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+--> GET /api/journal [32m200[0m 4ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+--> GET /api/live/active [32m200[0m 3ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+--> GET /api/live/active [32m200[0m 3ms
+<-- GET /api/notifications/unread-count
+🔐 [Auth Middleware] GET /api/notifications/unread-count - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+--> GET /api/notifications/unread-count [32m200[0m 2ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+--> GET /api/live/active [32m200[0m 3ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/stats
+🔐 [Auth Middleware] GET /api/stats - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+<-- GET /api/profile
+--> GET /api/stats [32m200[0m 4ms
 🔐 [Auth Middleware] GET /api/profile - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
 👤 [Profile] GET request - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
 🔍 [Profile] Fetching profile for user kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
 ✅ [Profile] Successfully fetched profile for user kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
---> GET /api/profile [32m200[0m 5ms
-🔐 [Auth Middleware] GET /api/stats/reflection-prompt - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
---> GET /api/stats/reflection-prompt [32m200[0m 7ms
-🔐 [Auth Middleware] GET /api/stats - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
-<-- GET /api/stats/weekly-forecast
---> GET /api/stats [32m200[0m 9ms
-🔐 [Auth Middleware] GET /api/stats/weekly-forecast - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
---> GET /api/stats/weekly-forecast [32m200[0m 5ms
-<-- GET /api/stats/weekly-forecast
-<-- GET /api/quests
-<-- GET /api/stats
-<-- GET /api/profile
-<-- GET /api/stats/reflection-prompt
-🔐 [Auth Middleware] GET /api/stats/weekly-forecast - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
-🔐 [Auth Middleware] GET /api/quests - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
-🔐 [Auth Middleware] GET /api/stats - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
-🔐 [Auth Middleware] GET /api/profile - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
-👤 [Profile] GET request - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
-🔍 [Profile] Fetching profile for user kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
-🔐 [Auth Middleware] GET /api/stats/reflection-prompt - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
---> GET /api/stats/reflection-prompt [32m200[0m 14ms
---> GET /api/quests [32m200[0m 35ms
---> GET /api/stats [32m200[0m 32ms
-✅ [Profile] Successfully fetched profile for user kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
---> GET /api/profile [32m200[0m 35ms
---> GET /api/stats/weekly-forecast [32m200[0m 40ms
+--> GET /api/profile [32m200[0m 4ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+--> GET /api/live/active [32m200[0m 3ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+--> GET /api/live/active [32m200[0m 3ms
+<-- GET /api/notifications/unread-count
+🔐 [Auth Middleware] GET /api/notifications/unread-count - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+--> GET /api/notifications/unread-count [32m200[0m 3ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+--> GET /api/live/active [32m200[0m 3ms
+<-- GET /api/notifications/unread-count
+🔐 [Auth Middleware] GET /api/notifications/unread-count - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+--> GET /api/notifications/unread-count [32m200[0m 2ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+--> GET /api/live/active [32m200[0m 3ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+--> GET /api/live/active [32m200[0m 8ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+--> GET /api/live/active [32m200[0m 5ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+--> GET /api/live/active [32m200[0m 3ms
+<-- GET /api/notifications/unread-count
+🔐 [Auth Middleware] GET /api/notifications/unread-count - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+--> GET /api/notifications/unread-count [32m200[0m 2ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+--> GET /api/live/active [32m200[0m 11ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+--> GET /api/live/active [32m200[0m 4ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+--> GET /api/live/active [32m200[0m 2ms

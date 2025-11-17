@@ -1,12 +1,12 @@
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer, DefaultTheme, DarkTheme } from "@react-navigation/native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { queryClient } from "@/lib/queryClient";
 import RootStackNavigator from "@/navigation/RootNavigator";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { ThemeProvider } from "@/contexts/ThemeContext";
+import { ThemeProvider, useTheme } from "@/contexts/ThemeContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 
 /*
@@ -30,6 +30,45 @@ const openai_api_key = Constants.expoConfig.extra.apikey;
 
 */
 
+// Create a wrapper component that has access to theme
+function AppContent() {
+  const { isDayMode, colors } = useTheme();
+
+  // Create custom navigation theme based on current app theme
+  const navigationTheme = isDayMode
+    ? {
+        ...DefaultTheme,
+        colors: {
+          ...DefaultTheme.colors,
+          primary: colors.primary,
+          background: colors.backgroundSolid,
+          card: colors.card,
+          text: colors.text,
+          border: colors.border,
+          notification: colors.primary,
+        },
+      }
+    : {
+        ...DarkTheme,
+        colors: {
+          ...DarkTheme.colors,
+          primary: colors.primary,
+          background: colors.backgroundSolid,
+          card: colors.card,
+          text: colors.text,
+          border: colors.border,
+          notification: colors.primary,
+        },
+      };
+
+  return (
+    <NavigationContainer theme={navigationTheme}>
+      <RootStackNavigator />
+      <StatusBar style={isDayMode ? "dark" : "light"} />
+    </NavigationContainer>
+  );
+}
+
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -38,10 +77,7 @@ export default function App() {
           <KeyboardProvider>
             <GestureHandlerRootView>
               <SafeAreaProvider>
-                <NavigationContainer>
-                  <RootStackNavigator />
-                  <StatusBar style="auto" />
-                </NavigationContainer>
+                <AppContent />
               </SafeAreaProvider>
             </GestureHandlerRootView>
           </KeyboardProvider>

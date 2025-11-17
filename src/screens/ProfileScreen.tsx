@@ -21,6 +21,8 @@ import {
   TrendingUp,
   Upload,
   Users,
+  Sun,
+  Moon,
 } from "lucide-react-native";
 import type { BottomTabScreenProps } from "@/navigation/types";
 import { api } from "@/lib/api";
@@ -34,7 +36,7 @@ type Props = BottomTabScreenProps<"ProfileTab">;
 
 export default function ProfileScreen({ navigation }: Props) {
   const { data: sessionData } = useSession();
-  const { colors } = useTheme();
+  const { colors, theme, setTheme, isDayMode } = useTheme();
   const { t } = useLanguage();
   const queryClient = useQueryClient();
   const [selectedTab, setSelectedTab] = useState<"quests" | "stats" | "about">("quests");
@@ -944,6 +946,110 @@ export default function ProfileScreen({ navigation }: Props) {
 
           {selectedTab === "about" && (
             <View style={{ marginTop: 20, paddingHorizontal: 20, gap: 16 }}>
+              {/* Theme Toggle Card */}
+              <View
+                style={{
+                  backgroundColor: colors.card,
+                  borderRadius: 16,
+                  padding: 20,
+                  borderWidth: 1,
+                  borderColor: colors.cardBorder,
+                }}
+              >
+                <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+                  <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+                    <View
+                      style={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: 20,
+                        backgroundColor: colors.primary + "20",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      {isDayMode ? <Sun size={20} color={colors.primary} /> : <Moon size={20} color={colors.primary} />}
+                    </View>
+                    <Text style={{ fontSize: 18, fontWeight: "bold", color: colors.text }}>
+                      App Theme
+                    </Text>
+                  </View>
+                </View>
+
+                <Text style={{ fontSize: 14, color: colors.textSecondary, marginBottom: 16, lineHeight: 20 }}>
+                  Switch between Day and Night mode to customize your experience
+                </Text>
+
+                {/* Theme Toggle Buttons */}
+                <View style={{ flexDirection: "row", gap: 12 }}>
+                  <Pressable
+                    onPress={() => setTheme("day")}
+                    style={{
+                      flex: 1,
+                      backgroundColor: theme === "day" ? colors.primary : colors.surface,
+                      paddingVertical: 16,
+                      borderRadius: 12,
+                      alignItems: "center",
+                      borderWidth: 2,
+                      borderColor: theme === "day" ? colors.primary : colors.cardBorder,
+                    }}
+                  >
+                    <Sun size={24} color={theme === "day" ? colors.text : colors.textSecondary} />
+                    <Text
+                      style={{
+                        color: theme === "day" ? colors.text : colors.textSecondary,
+                        fontSize: 14,
+                        fontWeight: "700",
+                        marginTop: 8,
+                      }}
+                    >
+                      Day
+                    </Text>
+                  </Pressable>
+
+                  <Pressable
+                    onPress={() => setTheme("night")}
+                    style={{
+                      flex: 1,
+                      backgroundColor: theme === "night" ? colors.primary : colors.surface,
+                      paddingVertical: 16,
+                      borderRadius: 12,
+                      alignItems: "center",
+                      borderWidth: 2,
+                      borderColor: theme === "night" ? colors.primary : colors.cardBorder,
+                    }}
+                  >
+                    <Moon size={24} color={theme === "night" ? colors.text : colors.textSecondary} />
+                    <Text
+                      style={{
+                        color: theme === "night" ? colors.text : colors.textSecondary,
+                        fontSize: 14,
+                        fontWeight: "700",
+                        marginTop: 8,
+                      }}
+                    >
+                      Night
+                    </Text>
+                  </Pressable>
+                </View>
+
+                {/* Current Theme Indicator */}
+                <View
+                  style={{
+                    marginTop: 16,
+                    paddingTop: 16,
+                    borderTopWidth: 1,
+                    borderTopColor: colors.cardBorder,
+                  }}
+                >
+                  <Text style={{ fontSize: 12, color: colors.textSecondary, textAlign: "center" }}>
+                    Current theme: <Text style={{ fontWeight: "700", color: colors.primary }}>
+                      {theme === "day" ? "Day Mode" : "Night Mode"}
+                    </Text>
+                  </Text>
+                </View>
+              </View>
+
               {/* User Context Card */}
               <View
                 style={{
