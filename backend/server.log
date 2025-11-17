@@ -764,3 +764,23 @@ Failed to find Response internal state key
 <-- GET /api/live/active
 🔐 [Auth Middleware] GET /api/live/active - User: sfisf1AD2qWCsQps13LuaD1c69Rextzd
 --> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/auth/get-session
+--> GET /api/auth/get-session [32m200[0m 5ms
+<-- GET /api/stats/reflection-prompt
+🔐 [Auth Middleware] GET /api/stats/reflection-prompt - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+--> GET /api/stats/reflection-prompt [32m200[0m 2ms
+<-- GET /api/quests
+<-- GET /api/stats/weekly-forecast
+<-- GET /api/stats
+<-- GET /api/profile
+🔐 [Auth Middleware] GET /api/quests - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+🔐 [Auth Middleware] GET /api/stats/weekly-forecast - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+--> GET /api/quests [32m200[0m 7ms
+🔐 [Auth Middleware] GET /api/profile - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+👤 [Profile] GET request - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+🔍 [Profile] Fetching profile for user kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+🔐 [Auth Middleware] GET /api/stats - User: kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+--> GET /api/stats/weekly-forecast [32m200[0m 8ms
+✅ [Profile] Successfully fetched profile for user kQLZbXvrT1aJpr0zdA5grO05cCPkyyOp
+--> GET /api/profile [32m200[0m 7ms
+--> GET /api/stats [32m200[0m 7ms

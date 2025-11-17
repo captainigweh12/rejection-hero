@@ -5,6 +5,7 @@ import { Calendar, ChevronLeft, ChevronRight, Target, TrendingUp, CheckCircle2 }
 import { useQuery } from "@tanstack/react-query";
 import type { RootStackScreenProps } from "@/navigation/types";
 import { api } from "@/lib/api";
+import { useTheme } from "@/contexts/ThemeContext";
 import { LinearGradient } from "expo-linear-gradient";
 
 type Props = RootStackScreenProps<"QuestCalendar">;
@@ -27,6 +28,7 @@ interface CompletedQuest {
 export default function QuestCalendarScreen({ navigation }: Props) {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const { colors } = useTheme();
 
   // Fetch completed quests
   const { data: questsData, isLoading } = useQuery({
@@ -194,19 +196,19 @@ export default function QuestCalendarScreen({ navigation }: Props) {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
+    <View style={{ flex: 1, backgroundColor: colors.backgroundSolid }}>
       <LinearGradient
-        colors={["#0A0A0F", "#1A1A24", "#2A1A34"]}
+        colors={colors.background as any}
         style={{ flex: 1 }}
       >
         <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
           {/* Header */}
           <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 20, paddingVertical: 16 }}>
             <Pressable onPress={() => navigation.goBack()} style={{ marginRight: 16 }}>
-              <ChevronLeft size={28} color="white" />
+              <ChevronLeft size={28} color={colors.text} />
             </Pressable>
             <Calendar size={24} color="#7E3FE4" />
-            <Text style={{ fontSize: 24, fontWeight: "bold", color: "white", marginLeft: 12 }}>
+            <Text style={{ fontSize: 24, fontWeight: "bold", color: colors.text, marginLeft: 12 }}>
               Quest Calendar
             </Text>
           </View>
@@ -217,11 +219,11 @@ export default function QuestCalendarScreen({ navigation }: Props) {
               style={{
                 marginHorizontal: 20,
                 marginBottom: 24,
-                backgroundColor: "rgba(255, 255, 255, 0.05)",
+                backgroundColor: colors.surface,
                 borderRadius: 16,
                 padding: 16,
                 borderWidth: 1,
-                borderColor: "rgba(126, 63, 228, 0.3)",
+                borderColor: colors.border,
               }}
             >
               {/* Month Navigation */}
@@ -239,14 +241,14 @@ export default function QuestCalendarScreen({ navigation }: Props) {
                     width: 40,
                     height: 40,
                     borderRadius: 20,
-                    backgroundColor: "rgba(126, 63, 228, 0.2)",
+                    backgroundColor: colors.primaryLight,
                     alignItems: "center",
                     justifyContent: "center",
                   }}
                 >
-                  <ChevronLeft size={20} color="white" />
+                  <ChevronLeft size={20} color={colors.text} />
                 </Pressable>
-                <Text style={{ fontSize: 18, fontWeight: "bold", color: "white" }}>
+                <Text style={{ fontSize: 18, fontWeight: "bold", color: colors.text }}>
                   {currentMonth.toLocaleString("default", { month: "long", year: "numeric" })}
                 </Text>
                 <Pressable
@@ -255,12 +257,12 @@ export default function QuestCalendarScreen({ navigation }: Props) {
                     width: 40,
                     height: 40,
                     borderRadius: 20,
-                    backgroundColor: "rgba(126, 63, 228, 0.2)",
+                    backgroundColor: colors.primaryLight,
                     alignItems: "center",
                     justifyContent: "center",
                   }}
                 >
-                  <ChevronRight size={20} color="white" />
+                  <ChevronRight size={20} color={colors.text} />
                 </Pressable>
               </View>
 
@@ -272,7 +274,7 @@ export default function QuestCalendarScreen({ navigation }: Props) {
             <View style={{ paddingHorizontal: 20 }}>
               <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 16 }}>
                 <Target size={20} color="#00D9FF" />
-                <Text style={{ fontSize: 18, fontWeight: "bold", color: "white", marginLeft: 8 }}>
+                <Text style={{ fontSize: 18, fontWeight: "bold", color: colors.text, marginLeft: 8 }}>
                   {selectedDate.toLocaleDateString("default", { month: "long", day: "numeric", year: "numeric" })}
                 </Text>
               </View>
@@ -282,19 +284,19 @@ export default function QuestCalendarScreen({ navigation }: Props) {
               ) : questsForDate.length === 0 ? (
                 <View
                   style={{
-                    backgroundColor: "rgba(255, 255, 255, 0.05)",
+                    backgroundColor: colors.surface,
                     borderRadius: 16,
                     padding: 32,
                     alignItems: "center",
                     borderWidth: 1,
-                    borderColor: "rgba(126, 63, 228, 0.3)",
+                    borderColor: colors.border,
                   }}
                 >
-                  <CheckCircle2 size={48} color="rgba(255, 255, 255, 0.3)" />
+                  <CheckCircle2 size={48} color={colors.textTertiary} />
                   <Text
                     style={{
                       fontSize: 16,
-                      color: "rgba(255, 255, 255, 0.6)",
+                      color: colors.textSecondary,
                       marginTop: 16,
                       textAlign: "center",
                     }}
@@ -355,7 +357,7 @@ export default function QuestCalendarScreen({ navigation }: Props) {
                       </View>
                     </View>
 
-                    <Text style={{ fontSize: 16, fontWeight: "700", color: "white", marginBottom: 8 }}>
+                    <Text style={{ fontSize: 16, fontWeight: "700", color: colors.text, marginBottom: 8 }}>
                       {quest.quest.title}
                     </Text>
 
@@ -393,16 +395,16 @@ export default function QuestCalendarScreen({ navigation }: Props) {
 
             {/* Summary Stats */}
             <View style={{ paddingHorizontal: 20, marginTop: 24 }}>
-              <Text style={{ fontSize: 18, fontWeight: "bold", color: "white", marginBottom: 16 }}>
+              <Text style={{ fontSize: 18, fontWeight: "bold", color: colors.text, marginBottom: 16 }}>
                 This Month&apos;s Progress
               </Text>
               <View
                 style={{
-                  backgroundColor: "rgba(255, 255, 255, 0.05)",
+                  backgroundColor: colors.surface,
                   borderRadius: 16,
                   padding: 20,
                   borderWidth: 1,
-                  borderColor: "rgba(126, 63, 228, 0.3)",
+                  borderColor: colors.border,
                 }}
               >
                 <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
@@ -410,11 +412,11 @@ export default function QuestCalendarScreen({ navigation }: Props) {
                     <Text style={{ fontSize: 28, fontWeight: "bold", color: "#7E3FE4" }}>
                       {datesWithQuests.size}
                     </Text>
-                    <Text style={{ fontSize: 14, color: "rgba(255, 255, 255, 0.6)", marginTop: 4 }}>
+                    <Text style={{ fontSize: 14, color: colors.textSecondary, marginTop: 4 }}>
                       Active Days
                     </Text>
                   </View>
-                  <View style={{ width: 1, backgroundColor: "rgba(255, 255, 255, 0.1)" }} />
+                  <View style={{ width: 1, backgroundColor: colors.border }} />
                   <View style={{ alignItems: "center" }}>
                     <Text style={{ fontSize: 28, fontWeight: "bold", color: "#00D9FF" }}>
                       {completedQuests.filter((q) => {
@@ -425,7 +427,7 @@ export default function QuestCalendarScreen({ navigation }: Props) {
                         );
                       }).length}
                     </Text>
-                    <Text style={{ fontSize: 14, color: "rgba(255, 255, 255, 0.6)", marginTop: 4 }}>
+                    <Text style={{ fontSize: 14, color: colors.textSecondary, marginTop: 4 }}>
                       Quests Done
                     </Text>
                   </View>

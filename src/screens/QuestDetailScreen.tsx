@@ -8,6 +8,7 @@ import * as Location from "expo-location";
 import * as Haptics from "expo-haptics";
 import type { RootStackScreenProps } from "@/navigation/types";
 import { api } from "@/lib/api";
+import { useTheme } from "@/contexts/ThemeContext";
 import type {
   GetUserQuestsResponse,
   RecordQuestActionRequest,
@@ -22,6 +23,7 @@ type Props = RootStackScreenProps<"QuestDetail">;
 
 export default function QuestDetailScreen({ route, navigation }: Props) {
   const { userQuestId: initialUserQuestId } = route.params;
+  const { colors } = useTheme();
   const [currentUserQuestId, setCurrentUserQuestId] = useState(initialUserQuestId);
   const queryClient = useQueryClient();
   const [showMore, setShowMore] = useState(false);
@@ -470,7 +472,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
 
   if (isLoading) {
     return (
-      <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
+      <View style={{ flex: 1, backgroundColor: colors.backgroundSolid }}>
         <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
           <ActivityIndicator size="large" color="#7E3FE4" />
         </View>
@@ -480,17 +482,17 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
 
   if (!userQuest && !showLoading && !showCompletion) {
     return (
-      <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
+      <View style={{ flex: 1, backgroundColor: colors.backgroundSolid }}>
         <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
           <View style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 32 }}>
-            <Text style={{ color: "white", fontSize: 20, fontWeight: "bold", marginBottom: 16 }}>
+            <Text style={{ color: colors.text, fontSize: 20, fontWeight: "bold", marginBottom: 16 }}>
               Quest not found
             </Text>
             <Pressable
               onPress={() => navigation.goBack()}
               style={{ backgroundColor: "#7E3FE4", paddingHorizontal: 32, paddingVertical: 16, borderRadius: 999 }}
             >
-              <Text style={{ color: "white", fontWeight: "bold", fontSize: 18 }}>Go Back</Text>
+              <Text style={{ color: colors.text, fontWeight: "bold", fontSize: 18 }}>Go Back</Text>
             </Pressable>
           </View>
         </SafeAreaView>
@@ -503,17 +505,17 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
 
   if (!displayQuest && !isLoading) {
     return (
-      <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
+      <View style={{ flex: 1, backgroundColor: colors.backgroundSolid }}>
         <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
           <View style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 32 }}>
-            <Text style={{ color: "white", fontSize: 20, fontWeight: "bold", marginBottom: 16 }}>
+            <Text style={{ color: colors.text, fontSize: 20, fontWeight: "bold", marginBottom: 16 }}>
               Quest not found
             </Text>
             <Pressable
               onPress={() => navigation.goBack()}
               style={{ backgroundColor: "#7E3FE4", paddingHorizontal: 32, paddingVertical: 16, borderRadius: 999 }}
             >
-              <Text style={{ color: "white", fontWeight: "bold", fontSize: 18 }}>Go Back</Text>
+              <Text style={{ color: colors.text, fontWeight: "bold", fontSize: 18 }}>Go Back</Text>
             </Pressable>
           </View>
         </SafeAreaView>
@@ -530,11 +532,11 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
       : (displayQuest.actionCount / quest.goalCount) * 100;
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
+    <View style={{ flex: 1, backgroundColor: colors.backgroundSolid }}>
       <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
         {/* Modern 3D Header with Stats */}
         <LinearGradient
-          colors={["#1A1A24", "#0A0A0F"]}
+          colors={[colors.background[1], colors.background[0]]}
           style={{
             paddingHorizontal: 20,
             paddingVertical: 16,
@@ -545,7 +547,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
             <Pressable
               onPress={() => navigation.goBack()}
               style={{
-                backgroundColor: "rgba(255, 255, 255, 0.05)",
+                backgroundColor: colors.surface,
                 paddingHorizontal: 16,
                 paddingVertical: 8,
                 borderRadius: 20,
@@ -553,11 +555,11 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                 alignItems: "center",
                 gap: 6,
                 borderWidth: 1,
-                borderColor: "rgba(126, 63, 228, 0.3)",
+                borderColor: colors.border,
               }}
             >
-              <ArrowLeft size={18} color="white" />
-              <Text style={{ color: "white", fontSize: 14, fontWeight: "600" }}>Back</Text>
+              <ArrowLeft size={18} color={colors.text} />
+              <Text style={{ color: colors.text, fontSize: 14, fontWeight: "600" }}>Back</Text>
             </Pressable>
 
             {/* Timer and Quit */}
@@ -568,18 +570,18 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                   flexDirection: "row",
                   alignItems: "center",
                   gap: 6,
-                  backgroundColor: timeRemaining < 60 ? "rgba(255, 59, 48, 0.1)" : "rgba(126, 63, 228, 0.1)",
+                  backgroundColor: timeRemaining < 60 ? "rgba(255, 59, 48, 0.1)" : colors.primaryLight,
                   paddingHorizontal: 12,
                   paddingVertical: 6,
                   borderRadius: 12,
                   borderWidth: 1,
-                  borderColor: timeRemaining < 60 ? "rgba(255, 59, 48, 0.3)" : "rgba(126, 63, 228, 0.3)",
+                  borderColor: timeRemaining < 60 ? "rgba(255, 59, 48, 0.3)" : colors.border,
                 }}
               >
-                <Clock size={16} color={timeRemaining < 60 ? "#FF3B30" : "#7E3FE4"} />
+                <Clock size={16} color={timeRemaining < 60 ? "#FF3B30" : colors.primary} />
                 <Text
                   style={{
-                    color: timeRemaining < 60 ? "#FF3B30" : "#7E3FE4",
+                    color: timeRemaining < 60 ? "#FF3B30" : colors.primary,
                     fontSize: 14,
                     fontWeight: "bold",
                   }}
@@ -617,7 +619,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
               onPress={() => navigation.navigate("GrowthAchievements")}
               style={{
                 flex: 1,
-                backgroundColor: "rgba(255, 255, 255, 0.05)",
+                backgroundColor: colors.surface,
                 borderRadius: 12,
                 padding: 12,
                 borderWidth: 1,
@@ -640,10 +642,10 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                 <Flame size={20} color="#FF6B35" />
               </View>
               <View>
-                <Text style={{ color: "white", fontSize: 18, fontWeight: "bold" }}>
+                <Text style={{ color: colors.text, fontSize: 18, fontWeight: "bold" }}>
                   {statsData?.currentStreak || 0}
                 </Text>
-                <Text style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: 11 }}>Streak</Text>
+                <Text style={{ color: colors.textSecondary, fontSize: 11 }}>Streak</Text>
               </View>
             </Pressable>
 
@@ -651,7 +653,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
             <View
               style={{
                 flex: 1,
-                backgroundColor: "rgba(255, 255, 255, 0.05)",
+                backgroundColor: colors.surface,
                 borderRadius: 12,
                 padding: 12,
                 borderWidth: 1,
@@ -674,10 +676,10 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                 <Trophy size={20} color="#FFD700" />
               </View>
               <View>
-                <Text style={{ color: "white", fontSize: 18, fontWeight: "bold" }}>
+                <Text style={{ color: colors.text, fontSize: 18, fontWeight: "bold" }}>
                   {statsData?.trophies || 0}
                 </Text>
-                <Text style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: 11 }}>Trophy</Text>
+                <Text style={{ color: colors.textSecondary, fontSize: 11 }}>Trophy</Text>
               </View>
             </View>
 
@@ -685,7 +687,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
             <View
               style={{
                 flex: 1,
-                backgroundColor: "rgba(255, 255, 255, 0.05)",
+                backgroundColor: colors.surface,
                 borderRadius: 12,
                 padding: 12,
                 borderWidth: 1,
@@ -708,10 +710,10 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                 <Diamond size={20} color="#00D9FF" />
               </View>
               <View>
-                <Text style={{ color: "white", fontSize: 18, fontWeight: "bold" }}>
+                <Text style={{ color: colors.text, fontSize: 18, fontWeight: "bold" }}>
                   {statsData?.diamonds || 0}
                 </Text>
-                <Text style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: 11 }}>Gems</Text>
+                <Text style={{ color: colors.textSecondary, fontSize: 11 }}>Gems</Text>
               </View>
             </View>
 
@@ -719,16 +721,16 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
             <Pressable
               onPress={() => navigation.navigate("Tabs", { screen: "LiveTab" })}
               style={{
-                backgroundColor: "rgba(126, 63, 228, 0.2)",
+                backgroundColor: colors.primaryLight,
                 borderRadius: 12,
                 padding: 12,
                 borderWidth: 1,
-                borderColor: "rgba(126, 63, 228, 0.5)",
+                borderColor: `${colors.primary}80`,
                 alignItems: "center",
                 justifyContent: "center",
               }}
             >
-              <Video size={24} color="#7E3FE4" />
+              <Video size={24} color={colors.primary} />
             </Pressable>
           </View>
         </LinearGradient>
@@ -825,7 +827,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
               {/* Title */}
               <Text
                 style={{
-                  color: "white",
+                  color: colors.text,
                   fontSize: 28,
                   fontWeight: "bold",
                   marginBottom: 12,
@@ -838,7 +840,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
               {/* Description */}
               <Text
                 style={{
-                  color: "rgba(255, 255, 255, 0.7)",
+                  color: colors.textSecondary,
                   fontSize: 16,
                   lineHeight: 24,
                   marginBottom: 20,

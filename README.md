@@ -1555,6 +1555,22 @@ See `ENV_SETUP.md` for complete environment variable setup guide.
 
 ## Recent Updates
 
+### 2025-11-17: Daytime Theme Support - Auto-Adjusted Text Colors 🌞
+- **Issue Fixed**: Text colors were hardcoded to white, making daytime theme unreadable
+- **Solution Implemented**: Updated quest screens to use theme context colors
+- **Screens Updated**:
+  - **QuestDetailScreen.tsx**: Header, stats cards, quest title/description now use `colors.text` and `colors.textSecondary`
+  - **QuestCalendarScreen.tsx**: Calendar navigation, quest titles, and summary stats now use theme colors
+- **Theme Color Mappings**:
+  - `colors.text`: Primary text (white in dark mode, dark gray #212529 in light mode)
+  - `colors.textSecondary`: Secondary text with 70% opacity for hierarchy
+  - `colors.textTertiary`: Tertiary text with 50% opacity for subtle content
+  - `colors.surface`: Surface backgrounds (glassmorphism effect, adapts to theme)
+  - `colors.background`: Gradient backgrounds (automatically adapts to theme)
+  - `colors.border`: Border colors (adapts to theme with appropriate opacity)
+- **Impact**: Quest cards now display correctly in both light and dark themes with proper text contrast
+- **Next Steps**: Remaining screens (CreateQuestScreen, MapScreen, SendQuestToFriendScreen) to be updated for full theme support
+
 ### 2025-11-17: Fixed Quest Card Color Themes 🎨
 - **Issue Fixed**: Inconsistent color themes across quest cards in different screens
 - **Changes Made**:
