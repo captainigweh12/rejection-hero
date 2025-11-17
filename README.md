@@ -102,14 +102,15 @@ A revolutionary mobile app that helps users overcome fear of rejection through A
 - **Custom Quest Creation** 🎯 FULLY FUNCTIONAL!:
   - Clean text input for quest description
   - **Create Button**: Appears when you start typing your quest
-  - **Voice Recording Button** 🎤 NOW ACTIVE!:
+  - **Voice Recording Button** 🎤 WORKING!:
     - Tap microphone button to start recording
     - Button turns red while recording with "Tap to Stop Recording" text
     - Tap again to stop and automatically transcribe
     - Shows "Transcribing..." with spinner while processing
     - AI transcribes your voice to text and fills the quest field
     - Uses expo-av for audio recording
-    - Backend transcription with OpenAI Whisper API
+    - Backend transcription with OpenAI Whisper API via `/api/audio/transcribe` endpoint
+    - Type-safe contract between frontend and backend using shared Zod schemas
   - Purple microphone button with glass styling
   - Uses AI to generate quest from your description
   - Orange gradient create button with enhanced loading state
@@ -1562,6 +1563,27 @@ See `ENV_SETUP.md` for complete environment variable setup guide.
 - **Database**: Prisma migrations required for schema changes
 
 ## Recent Updates
+
+### 2025-11-17: Fixed Audio Transcription API Error 🎤
+- **Issue Fixed**: POST /api/audio/transcribe endpoint returned 404 error
+- **Root Cause**: Audio transcription route was missing from backend
+- **Solution Implemented**:
+  - Created new `/backend/src/routes/audio.ts` route handler
+  - Integrated OpenAI Whisper API for audio transcription
+  - Added route to backend index.ts at `/api/audio`
+  - Added type-safe contract `AudioTranscribeResponse` in shared/contracts.ts
+  - Updated CreateQuestScreen.tsx to use proper typed response
+- **Files Modified**:
+  - `/backend/src/routes/audio.ts` (NEW) - Audio transcription endpoint
+  - `/backend/src/index.ts` - Mounted audio router
+  - `/shared/contracts.ts` - Added AudioTranscribeResponse contract
+  - `/src/screens/CreateQuestScreen.tsx` - Updated to use typed contract
+- **Technical Details**:
+  - Uses FormData to upload audio files (.m4a format)
+  - Requires authentication (user must be logged in)
+  - OpenAI API key must be configured in backend .env
+  - Returns `{ transcription: string }` with transcribed text
+- **User Experience**: Voice recording feature in Custom Quest creation now works properly
 
 ### 2025-11-17: Daytime Theme Support - Auto-Adjusted Text Colors 🌞
 - **Issue Fixed**: Text colors were hardcoded to white, making daytime theme unreadable

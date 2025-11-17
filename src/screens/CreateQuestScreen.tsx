@@ -8,7 +8,7 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "@/navigation/types";
 import { api } from "@/lib/api";
 import { useTheme } from "@/contexts/ThemeContext";
-import type { GenerateQuestRequest, GenerateQuestResponse } from "@/shared/contracts";
+import type { GenerateQuestRequest, GenerateQuestResponse, AudioTranscribeResponse } from "@/shared/contracts";
 import { Audio } from "expo-av";
 
 type Props = NativeStackScreenProps<RootStackParamList, "CreateQuest">;
@@ -140,7 +140,7 @@ export default function CreateQuestScreen({ navigation }: Props) {
         } as any);
 
         try {
-          const response = await api.post<{ transcription: string }>('/api/audio/transcribe', formData);
+          const response = await api.post<AudioTranscribeResponse>('/api/audio/transcribe', formData);
 
           setQuestAction(response.transcription);
           setIsTranscribing(false);

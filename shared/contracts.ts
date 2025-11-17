@@ -497,6 +497,12 @@ export type RespondToSuggestionResponse = z.infer<typeof respondToSuggestionResp
 // Journal Routes
 // ==========================================
 
+// POST /api/audio/transcribe - Transcribe audio file to text (used in CreateQuestScreen)
+export const audioTranscribeResponseSchema = z.object({
+  transcription: z.string(),
+});
+export type AudioTranscribeResponse = z.infer<typeof audioTranscribeResponseSchema>;
+
 // POST /api/journal/transcribe - Transcribe audio to text or process text
 export const transcribeAudioRequestSchema = z.object({
   audioBase64: z.string().optional(), // Base64 encoded audio (optional if text is provided)
