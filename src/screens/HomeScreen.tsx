@@ -1199,7 +1199,7 @@ export default function HomeScreen({ navigation }: Props) {
                     </View>
                   </View>
 
-                  {activeQuests.length < 2 && (
+                  {activeQuests.length < 2 ? (
                     <View
                       style={{
                         marginTop: 12,
@@ -1212,6 +1212,57 @@ export default function HomeScreen({ navigation }: Props) {
                         Tap to start this quest
                       </Text>
                     </View>
+                  ) : (
+                    <Pressable
+                      onPress={() => {
+                        // Show swap options
+                        Alert.alert(
+                          "Swap Quest",
+                          "Choose an active quest to swap with this queued quest:",
+                          activeQuests.map((aq) => ({
+                            text: aq.quest.title,
+                            onPress: () => {
+                              // Check if active quest has actions
+                              const hasActions = aq.noCount > 0 || aq.yesCount > 0 || aq.actionCount > 0;
+                              if (hasActions) {
+                                Alert.alert(
+                                  "Cannot Swap",
+                                  "This quest has already been started (you've recorded actions). Complete it first before swapping.",
+                                  [{ text: "OK" }]
+                                );
+                              } else {
+                                swapQuestMutation.mutate({
+                                  activeQuestId: aq.id,
+                                  queuedQuestId: userQuest.id,
+                                });
+                              }
+                            },
+                          })).concat([{ text: "Cancel", style: "cancel" }])
+                        );
+                      }}
+                      disabled={swapQuestMutation.isPending}
+                      style={{
+                        marginTop: 12,
+                        paddingTop: 12,
+                        borderTopWidth: 1,
+                        borderTopColor: colors.cardBorder,
+                        opacity: swapQuestMutation.isPending ? 0.5 : 1,
+                      }}
+                    >
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          gap: 8,
+                        }}
+                      >
+                        <RefreshCw size={16} color="#00D9FF" />
+                        <Text style={{ color: "#00D9FF", fontSize: 12, textAlign: "center", fontWeight: "600" }}>
+                          {swapQuestMutation.isPending ? "Swapping..." : "Swap with active quest"}
+                        </Text>
+                      </View>
+                    </Pressable>
                   )}
                 </Pressable>
               );
