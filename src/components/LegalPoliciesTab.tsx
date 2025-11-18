@@ -71,11 +71,11 @@ export function LegalPoliciesTab() {
       <View style={{ paddingHorizontal: 16, paddingTop: 16, paddingBottom: 12 }}>
         <View
           style={{
-            backgroundColor: "rgba(0, 217, 255, 0.1)",
+            backgroundColor: "rgba(126, 63, 228, 0.15)",
             borderRadius: 12,
             padding: 16,
             borderLeftWidth: 4,
-            borderLeftColor: colors.primary,
+            borderLeftColor: "#7E3FE4",
           }}
         >
           <Text style={{ fontSize: 14, color: colors.textSecondary, marginBottom: 4 }}>
@@ -204,14 +204,14 @@ export function LegalPoliciesTab() {
                   style={{
                     paddingHorizontal: 16,
                     paddingVertical: 12,
-                    backgroundColor: "rgba(0, 217, 255, 0.1)",
+                    backgroundColor: "rgba(126, 63, 228, 0.15)",
                     borderRadius: 8,
                     borderWidth: 1,
-                    borderColor: colors.primary,
+                    borderColor: "#7E3FE4",
                     alignItems: "center",
                   }}
                 >
-                  <Text style={{ fontSize: 14, fontWeight: "600", color: colors.primary }}>
+                  <Text style={{ fontSize: 14, fontWeight: "600", color: "#7E3FE4" }}>
                     Read Full Policy
                   </Text>
                 </Pressable>
@@ -237,16 +237,16 @@ export function LegalPoliciesTab() {
                     style={{
                       paddingHorizontal: 16,
                       paddingVertical: 12,
-                      backgroundColor: colors.primary,
+                      backgroundColor: "#7E3FE4",
                       borderRadius: 8,
                       alignItems: "center",
                       opacity: acceptPolicyMutation.isPending ? 0.6 : 1,
                     }}
                   >
                     {acceptPolicyMutation.isPending ? (
-                      <ActivityIndicator size="small" color={colors.text} />
+                      <ActivityIndicator size="small" color="white" />
                     ) : (
-                      <Text style={{ fontSize: 14, fontWeight: "600", color: colors.text }}>
+                      <Text style={{ fontSize: 14, fontWeight: "600", color: "white" }}>
                         Accept Policy
                       </Text>
                     )}

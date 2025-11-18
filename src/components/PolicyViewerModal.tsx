@@ -74,9 +74,16 @@ export default function PolicyViewerModal({
 
   const fetchPolicyContent = async () => {
     setIsLoading(true);
+    setContent(""); // Clear previous content
     try {
-      const response = await api.get(`/api/policies/${policyType}`) as { content?: string };
-      setContent(response.content || "");
+      const response = await api.get(`/api/policies/${policyType}`) as { content?: string; policyType?: string };
+      console.log("Policy response:", { hasContent: !!response.content, contentLength: response.content?.length });
+      if (response.content) {
+        setContent(response.content);
+      } else {
+        console.error("No content in response:", response);
+        Alert.alert("Error", "Policy content is empty. Please try again.");
+      }
     } catch (error) {
       console.error("Error fetching policy:", error);
       Alert.alert("Error", "Failed to load policy content. Please try again.");
@@ -130,7 +137,7 @@ export default function PolicyViewerModal({
       presentationStyle="pageSheet"
       onRequestClose={onClose}
     >
-      <LinearGradient colors={colors.background} className="flex-1">
+      <View style={{ flex: 1, backgroundColor: colors.backgroundSolid || "#0A0A0F" }}>
         <SafeAreaView edges={["top"]} className="flex-1">
           {/* Header */}
           <View
@@ -143,15 +150,13 @@ export default function PolicyViewerModal({
                 {POLICY_NAMES[policyType]}
               </Text>
             </View>
-            {!requireAcceptance && (
-              <Pressable
-                onPress={onClose}
-                className="w-10 h-10 items-center justify-center rounded-full"
-                style={{ backgroundColor: "rgba(255, 255, 255, 0.1)" }}
-              >
-                <X size={20} color={colors.text} />
-              </Pressable>
-            )}
+            <Pressable
+              onPress={onClose}
+              className="w-10 h-10 items-center justify-center rounded-full"
+              style={{ backgroundColor: "rgba(255, 255, 255, 0.1)" }}
+            >
+              <X size={20} color={colors.text} />
+            </Pressable>
           </View>
 
           {/* Content */}
@@ -168,11 +173,11 @@ export default function PolicyViewerModal({
                   Loading policy...
                 </Text>
               </View>
-            ) : (
+            ) : content ? (
               <View>
                 <Text
                   className="text-base leading-6 mb-4"
-                  style={textPrimary}
+                  style={[textPrimary, { color: colors.text || "#FFFFFF" }]}
                   selectable
                 >
                   {content}
@@ -187,6 +192,12 @@ export default function PolicyViewerModal({
                     </Text>
                   </View>
                 )}
+              </View>
+            ) : (
+              <View className="flex-1 items-center justify-center py-20">
+                <Text style={[textSecondary, { color: colors.textSecondary || "#999999" }]}>
+                  No content available
+                </Text>
               </View>
             )}
           </ScrollView>
@@ -225,7 +236,7 @@ export default function PolicyViewerModal({
             </View>
           )}
         </SafeAreaView>
-      </LinearGradient>
+      </View>
     </Modal>
   );
 }
