@@ -683,39 +683,6 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
               </View>
             </View>
 
-            {/* Diamonds */}
-            <View
-              style={{
-                flex: 1,
-                backgroundColor: colors.surface,
-                borderRadius: 12,
-                padding: 12,
-                borderWidth: 1,
-                borderColor: "rgba(0, 217, 255, 0.3)",
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 8,
-              }}
-            >
-              <View
-                style={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: 18,
-                  backgroundColor: "rgba(0, 217, 255, 0.2)",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Diamond size={20} color="#00D9FF" />
-              </View>
-              <View>
-                <Text style={{ color: colors.text, fontSize: 18, fontWeight: "bold" }}>
-                  {statsData?.diamonds || 0}
-                </Text>
-                <Text style={{ color: colors.textSecondary, fontSize: 11 }}>Gems</Text>
-              </View>
-            </View>
 
             {/* Go Live Button */}
             <Pressable
