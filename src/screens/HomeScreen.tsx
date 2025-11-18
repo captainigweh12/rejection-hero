@@ -1216,28 +1216,30 @@ export default function HomeScreen({ navigation }: Props) {
                     <Pressable
                       onPress={() => {
                         // Show swap options
+                        const swapOptions = activeQuests.map((aq) => ({
+                          text: aq.quest.title,
+                          onPress: () => {
+                            // Check if active quest has actions
+                            const hasActions = aq.noCount > 0 || aq.yesCount > 0 || aq.actionCount > 0;
+                            if (hasActions) {
+                              Alert.alert(
+                                "Cannot Swap",
+                                "This quest has already been started (you've recorded actions). Complete it first before swapping.",
+                                [{ text: "OK" }]
+                              );
+                            } else {
+                              swapQuestMutation.mutate({
+                                activeQuestId: aq.id,
+                                queuedQuestId: userQuest.id,
+                              });
+                            }
+                          },
+                        }));
+                        swapOptions.push({ text: "Cancel", style: "cancel" as const, onPress: () => {} });
                         Alert.alert(
                           "Swap Quest",
                           "Choose an active quest to swap with this queued quest:",
-                          activeQuests.map((aq) => ({
-                            text: aq.quest.title,
-                            onPress: () => {
-                              // Check if active quest has actions
-                              const hasActions = aq.noCount > 0 || aq.yesCount > 0 || aq.actionCount > 0;
-                              if (hasActions) {
-                                Alert.alert(
-                                  "Cannot Swap",
-                                  "This quest has already been started (you've recorded actions). Complete it first before swapping.",
-                                  [{ text: "OK" }]
-                                );
-                              } else {
-                                swapQuestMutation.mutate({
-                                  activeQuestId: aq.id,
-                                  queuedQuestId: userQuest.id,
-                                });
-                              }
-                            },
-                          })).concat([{ text: "Cancel", style: "cancel" }])
+                          swapOptions
                         );
                       }}
                       disabled={swapQuestMutation.isPending}
