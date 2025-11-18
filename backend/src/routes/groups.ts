@@ -713,7 +713,8 @@ groupsRouter.get("/:groupId/moments", async (c) => {
   });
 
   // Group by user
-  const momentsByUser = new Map<string, Array<typeof moments[0]>>();
+  type MomentWithUser = typeof moments[0];
+  const momentsByUser = new Map<string, MomentWithUser[]>();
   moments.forEach((moment) => {
     if (!momentsByUser.has(moment.userId)) {
       momentsByUser.set(moment.userId, []);

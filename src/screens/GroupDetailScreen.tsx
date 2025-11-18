@@ -883,10 +883,10 @@ export default function GroupDetailScreen({ navigation, route }: Props) {
             {/* Members Section */}
             {activeTab === "members" && (
               <View style={{ marginBottom: 24 }}>
-              <Text style={{ fontSize: 20, fontWeight: "bold", color: "white", marginBottom: 16 }}>
-                Members ({group.members.length})
-              </Text>
-              {group.members.map((member) => (
+                <Text style={{ fontSize: 20, fontWeight: "bold", color: "white", marginBottom: 16 }}>
+                  Members ({group.members.length})
+                </Text>
+                {group.members.map((member) => (
                 <View
                   key={member.id}
                   style={{
