@@ -450,6 +450,7 @@ export const getActiveLiveStreamsResponseSchema = z.object({
             description: z.string(),
             category: z.string(),
             goalCount: z.number(),
+            goalType: z.string(),
           }),
         })
         .nullable(),
