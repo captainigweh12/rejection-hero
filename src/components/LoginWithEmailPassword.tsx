@@ -26,13 +26,21 @@ export default function LoginWithEmailPassword() {
   // Close modal when user is logged in (AuthWrapper will handle navigation)
   useEffect(() => {
     if (session?.user && !isCheckingOnboarding) {
+      console.log("🔐 [Login] Session detected, closing login modal");
       setIsCheckingOnboarding(true);
-      setTimeout(() => {
+      
+      // Give a small delay to ensure session is fully established
+      const timer = setTimeout(() => {
         // Try to go back, but if we can't, AuthWrapper will handle navigation
         if (navigation.canGoBack()) {
+          console.log("🔐 [Login] Navigating back from login modal");
           navigation.goBack();
+        } else {
+          console.log("🔐 [Login] Cannot go back, AuthWrapper will handle navigation");
         }
-      }, 100);
+      }, 300); // Increased delay to ensure session is ready
+      
+      return () => clearTimeout(timer);
     }
   }, [session, navigation, isCheckingOnboarding]);
 
@@ -61,19 +69,65 @@ export default function LoginWithEmailPassword() {
         console.error("🔐 [Login] Sign in error:", result.error);
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
         Alert.alert("Sign In Failed", result.error.message || "Please check your credentials");
-      } else {
-        console.log("🔐 [Login] Sign in successful!");
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        setEmail("");
-        setPassword("");
-        console.log("🔐 [Login] Refetching session...");
-        await refetch();
-        console.log("🔐 [Login] Session refetched");
+        setIsLoading(false);
+        return;
+      }
+
+      console.log("🔐 [Login] Sign in successful!");
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      setEmail("");
+      setPassword("");
+
+      // Refetch session and wait for it to be available
+      console.log("🔐 [Login] Refetching session...");
+      try {
+        // Trigger refetch (it returns void, not a promise)
+        refetch();
+        
+        // Wait for session to be available (with retry logic)
+        // The session from the hook will update reactively
+        let retries = 0;
+        const maxRetries = 15; // 3 seconds total (15 * 200ms)
+        while (retries < maxRetries) {
+          // Small delay to allow session to update reactively
+          await new Promise((resolve) => setTimeout(resolve, 200));
+          
+          // Check if session is now available from the hook
+          // We need to check the current session state
+          // Since we can't directly access it here, we'll rely on the useEffect
+          // But we can trigger another refetch to help
+          if (retries % 3 === 0) {
+            // Refetch every 600ms to check for session
+            refetch();
+          }
+          
+          retries++;
+        }
+        
+        console.log("🔐 [Login] Session refetch completed");
+        // The useEffect will handle navigation when session becomes available
+      } catch (refetchError) {
+        console.error("🔐 [Login] Error during session refetch:", refetchError);
+        // Don't fail the login if refetch fails - session might still be valid
+        // The useEffect will handle navigation when session becomes available
       }
     } catch (error) {
       console.error("🔐 [Login] Unexpected error:", error);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert("Error", "An unexpected error occurred. Check logs for details.");
+      
+      // Provide more helpful error messages
+      let errorMessage = "An unexpected error occurred. Please try again.";
+      if (error instanceof Error) {
+        if (error.message.includes("Network") || error.message.includes("fetch failed")) {
+          errorMessage = "Network error: Please check your internet connection and try again.";
+        } else if (error.message.includes("timeout")) {
+          errorMessage = "Request timed out. Please try again.";
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
+      Alert.alert("Error", errorMessage);
       console.error(error);
     } finally {
       setIsLoading(false);
@@ -106,21 +160,67 @@ export default function LoginWithEmailPassword() {
         console.error("🔐 [SignUp] Sign up error:", result.error);
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
         Alert.alert("Sign Up Failed", result.error.message || "Please try again");
-      } else {
-        console.log("🔐 [SignUp] Sign up successful!");
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        setEmail("");
-        setPassword("");
-        setName("");
-        setIsSignUp(false);
-        console.log("🔐 [SignUp] Refetching session...");
-        await refetch();
-        console.log("🔐 [SignUp] Session refetched");
+        setIsLoading(false);
+        return;
+      }
+
+      console.log("🔐 [SignUp] Sign up successful!");
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      setEmail("");
+      setPassword("");
+      setName("");
+      setIsSignUp(false);
+
+      // Refetch session and wait for it to be available
+      console.log("🔐 [SignUp] Refetching session...");
+      try {
+        // Trigger refetch (it returns void, not a promise)
+        refetch();
+        
+        // Wait for session to be available (with retry logic)
+        // The session from the hook will update reactively
+        let retries = 0;
+        const maxRetries = 15; // 3 seconds total (15 * 200ms)
+        while (retries < maxRetries) {
+          // Small delay to allow session to update reactively
+          await new Promise((resolve) => setTimeout(resolve, 200));
+          
+          // Check if session is now available from the hook
+          // We need to check the current session state
+          // Since we can't directly access it here, we'll rely on the useEffect
+          // But we can trigger another refetch to help
+          if (retries % 3 === 0) {
+            // Refetch every 600ms to check for session
+            refetch();
+          }
+          
+          retries++;
+        }
+        
+        console.log("🔐 [SignUp] Session refetch completed");
+        // The useEffect will handle navigation when session becomes available
+      } catch (refetchError) {
+        console.error("🔐 [SignUp] Error during session refetch:", refetchError);
+        // Don't fail the signup if refetch fails - session might still be valid
+        // The useEffect will handle navigation when session becomes available
       }
     } catch (error) {
       console.error("🔐 [SignUp] Unexpected error:", error);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert("Error", "An unexpected error occurred. Check logs for details.");
+      
+      // Provide more helpful error messages
+      let errorMessage = "An unexpected error occurred. Please try again.";
+      if (error instanceof Error) {
+        if (error.message.includes("Network") || error.message.includes("fetch failed")) {
+          errorMessage = "Network error: Please check your internet connection and try again.";
+        } else if (error.message.includes("timeout")) {
+          errorMessage = "Request timed out. Please try again.";
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
+      Alert.alert("Error", errorMessage);
       console.error(error);
     } finally {
       setIsLoading(false);

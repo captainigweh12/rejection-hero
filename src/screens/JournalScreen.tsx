@@ -75,42 +75,70 @@ export default function JournalScreen({ navigation }: Props) {
   });
 
   // Fetch journal entries
-  const { data: entriesData, isLoading, refetch } = useQuery({
+  const { data: entriesData, isLoading, error: entriesError, refetch } = useQuery({
     queryKey: ["journal-entries"],
     queryFn: async () => {
       console.log("[JournalScreen] Fetching journal entries...");
-      const result = await api.get<GetJournalEntriesResponse>("/api/journal");
-      console.log("[JournalScreen] Fetched entries:", result?.entries?.length || 0);
-      return result;
+      try {
+        const result = await api.get<GetJournalEntriesResponse>("/api/journal");
+        console.log("[JournalScreen] Fetched entries:", result?.entries?.length || 0);
+        return result;
+      } catch (error) {
+        console.error("[JournalScreen] Error fetching entries:", error);
+        throw error;
+      }
     },
+    enabled: !!sessionData?.user,
+    retry: 2,
   });
 
   const entries = entriesData?.entries || [];
 
   // Get entries for selected date
   const entriesForSelectedDate = useMemo(() => {
+    if (!entries || entries.length === 0) return [];
+    
     return entries.filter((entry) => {
-      const entryDate = new Date(entry.createdAt);
-      return (
-        entryDate.getDate() === selectedDate.getDate() &&
-        entryDate.getMonth() === selectedDate.getMonth() &&
-        entryDate.getFullYear() === selectedDate.getFullYear()
-      );
+      try {
+        const entryDate = new Date(entry.createdAt);
+        // Normalize dates to compare only year, month, day (ignore time)
+        const entryDateOnly = new Date(entryDate.getFullYear(), entryDate.getMonth(), entryDate.getDate());
+        const selectedDateOnly = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
+        return entryDateOnly.getTime() === selectedDateOnly.getTime();
+      } catch (error) {
+        console.error("[JournalScreen] Error parsing entry date:", error, entry);
+        return false;
+      }
     });
   }, [entries, selectedDate]);
 
   // Get dates with entries for current month
   const datesWithEntries = useMemo(() => {
+    if (!entries || entries.length === 0) return new Set<number>();
+    
     return new Set(
       entries
         .filter((entry) => {
-          const entryDate = new Date(entry.createdAt);
-          return (
-            entryDate.getMonth() === currentMonth.getMonth() &&
-            entryDate.getFullYear() === currentMonth.getFullYear()
-          );
+          try {
+            const entryDate = new Date(entry.createdAt);
+            return (
+              entryDate.getMonth() === currentMonth.getMonth() &&
+              entryDate.getFullYear() === currentMonth.getFullYear()
+            );
+          } catch (error) {
+            console.error("[JournalScreen] Error parsing entry date for calendar:", error, entry);
+            return false;
+          }
         })
-        .map((entry) => new Date(entry.createdAt).getDate())
+        .map((entry) => {
+          try {
+            return new Date(entry.createdAt).getDate();
+          } catch (error) {
+            console.error("[JournalScreen] Error getting date from entry:", error, entry);
+            return 0;
+          }
+        })
+        .filter((day) => day > 0) // Filter out invalid dates
     );
   }, [entries, currentMonth]);
 
@@ -461,6 +489,39 @@ export default function JournalScreen({ navigation }: Props) {
             <View style={{ justifyContent: "center", alignItems: "center", paddingVertical: 60 }}>
               <ActivityIndicator size="large" color={colors.primary} />
             </View>
+          ) : entriesError ? (
+            <View style={{ paddingHorizontal: 24, paddingVertical: 40, alignItems: "center" }}>
+              <View
+                style={{
+                  width: 60,
+                  height: 60,
+                  borderRadius: 30,
+                  backgroundColor: "rgba(255, 59, 48, 0.2)",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  marginBottom: 12,
+                }}
+              >
+                <XCircle size={30} color="#FF3B30" />
+              </View>
+              <Text style={{ fontSize: 16, fontWeight: "600", color: colors.text, marginBottom: 4 }}>
+                Error loading entries
+              </Text>
+              <Text style={{ fontSize: 12, textAlign: "center", color: colors.textSecondary, marginBottom: 16 }}>
+                {entriesError instanceof Error ? entriesError.message : "Failed to load journal entries"}
+              </Text>
+              <TouchableOpacity
+                onPress={() => refetch()}
+                style={{
+                  backgroundColor: colors.primary,
+                  paddingHorizontal: 20,
+                  paddingVertical: 10,
+                  borderRadius: 8,
+                }}
+              >
+                <Text style={{ color: "white", fontWeight: "600" }}>Retry</Text>
+              </TouchableOpacity>
+            </View>
           ) : entriesForSelectedDate.length > 0 ? (
             <View style={{ paddingHorizontal: 24, marginBottom: 24 }}>
               {entriesForSelectedDate.map((entry) => (
@@ -560,18 +621,23 @@ export default function JournalScreen({ navigation }: Props) {
                         showsHorizontalScrollIndicator={false}
                         contentContainerStyle={{ gap: 8 }}
                       >
-                        {entry.imageUrls.map((imageUrl, index) => (
-                          <Image
-                            key={`${entry.id}-img-${index}`}
-                            source={{ uri: imageUrl }}
-                            style={{
-                              width: 120,
-                              height: 120,
-                              borderRadius: 12,
-                              backgroundColor: colors.surface,
-                            }}
-                          />
-                        ))}
+                        {entry.imageUrls
+                          .filter((url) => url && typeof url === "string") // Filter out invalid URLs
+                          .map((imageUrl, index) => (
+                            <Image
+                              key={`${entry.id}-img-${index}`}
+                              source={{ uri: imageUrl }}
+                              style={{
+                                width: 120,
+                                height: 120,
+                                borderRadius: 12,
+                                backgroundColor: colors.surface,
+                              }}
+                              onError={(error) => {
+                                console.error("[JournalScreen] Error loading image:", imageUrl, error);
+                              }}
+                            />
+                          ))}
                       </ScrollView>
                     </View>
                   )}

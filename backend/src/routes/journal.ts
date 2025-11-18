@@ -203,24 +203,39 @@ journalRouter.get("/", async (c) => {
     });
 
     return c.json({
-      entries: entries.map((entry) => ({
-        id: entry.id,
-        audioUrl: entry.audioUrl,
-        audioTranscript: entry.audioTranscript,
-        aiSummary: entry.aiSummary,
-        userEditedSummary: entry.userEditedSummary,
-        outcome: entry.outcome,
-        imageUrls: entry.imageUrls ? JSON.parse(entry.imageUrls) : [],
-        location: entry.location,
-        createdAt: entry.createdAt.toISOString(),
-        updatedAt: entry.updatedAt.toISOString(),
-        achievements: entry.achievements.map((ach) => ({
-          id: ach.id,
-          type: ach.type,
-          description: ach.description,
-          earnedAt: ach.earnedAt.toISOString(),
-        })),
-      })),
+      entries: entries.map((entry) => {
+        // Safely parse imageUrls JSON
+        let imageUrls: string[] = [];
+        if (entry.imageUrls) {
+          try {
+            const parsed = JSON.parse(entry.imageUrls);
+            // Ensure it's an array
+            imageUrls = Array.isArray(parsed) ? parsed.filter((url) => typeof url === "string") : [];
+          } catch (error) {
+            console.error("Error parsing imageUrls for entry:", entry.id, error);
+            imageUrls = [];
+          }
+        }
+
+        return {
+          id: entry.id,
+          audioUrl: entry.audioUrl,
+          audioTranscript: entry.audioTranscript,
+          aiSummary: entry.aiSummary,
+          userEditedSummary: entry.userEditedSummary,
+          outcome: entry.outcome,
+          imageUrls,
+          location: entry.location,
+          createdAt: entry.createdAt.toISOString(),
+          updatedAt: entry.updatedAt.toISOString(),
+          achievements: entry.achievements.map((ach) => ({
+            id: ach.id,
+            type: ach.type,
+            description: ach.description,
+            earnedAt: ach.earnedAt.toISOString(),
+          })),
+        };
+      }),
     });
   } catch (error) {
     console.error("Get journal entries error:", error);
@@ -276,10 +291,22 @@ journalRouter.put("/:id", zValidator("json", updateJournalEntryRequestSchema), a
       data: updateData,
     });
 
+    // Safely parse imageUrls JSON
+    let imageUrls: string[] = [];
+    if (updatedEntry.imageUrls) {
+      try {
+        const parsed = JSON.parse(updatedEntry.imageUrls);
+        imageUrls = Array.isArray(parsed) ? parsed.filter((url) => typeof url === "string") : [];
+      } catch (error) {
+        console.error("Error parsing imageUrls for updated entry:", updatedEntry.id, error);
+        imageUrls = [];
+      }
+    }
+
     return c.json({
       id: updatedEntry.id,
       userEditedSummary: updatedEntry.userEditedSummary,
-      imageUrls: updatedEntry.imageUrls ? JSON.parse(updatedEntry.imageUrls) : [],
+      imageUrls,
       location: updatedEntry.location,
     });
   } catch (error) {
