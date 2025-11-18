@@ -49,6 +49,7 @@ model User {
   Challenges          Challenge[]
   Subscription       Subscription?
   TokenTransactions  TokenTransaction[]
+  PolicyAcceptances PolicyAcceptance[]
 
   @@map("user")
 }
@@ -104,6 +105,8 @@ model Profile {
   displayName String
   bio         String?
   age         Int?
+  ageVerified  Boolean @default(false) // Whether age has been verified
+  parentalConsent Boolean @default(false) // For users 13-17
   photos      String?
   avatar      String?  // AI-generated or uploaded avatar URL
   interests   String?  // JSON array of interest tags
@@ -603,4 +606,20 @@ model TokenTransaction {
   user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("token_transaction")
+}
+
+model PolicyAcceptance {
+  id              String   @id @default(cuid())
+  userId          String
+  policyType      String   // terms-of-service, privacy-policy, content-guidelines, dmca, recording-consent, liability-waiver, age-policy, safety-policy, payment-policy
+  version         String   @default("1.0") // Policy version
+  acceptedAt      DateTime @default(now())
+  ipAddress       String?
+  userAgent       String?
+  emailSent       Boolean  @default(false) // Whether email confirmation was sent
+  emailSentAt     DateTime?
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, policyType]) // One acceptance per policy type per user
+  @@map("policy_acceptance")
 }
