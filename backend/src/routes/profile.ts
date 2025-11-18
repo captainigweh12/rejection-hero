@@ -176,6 +176,8 @@ profileRouter.post("/", zValidator("json", updateProfileRequestSchema), async (c
       userContext: profile.userContext,
       userGoals: profile.userGoals,
       onboardingCompleted: profile.onboardingCompleted,
+      ageVerified: profile.ageVerified,
+      parentalConsent: profile.parentalConsent,
     },
   } satisfies UpdateProfileResponse);
 });

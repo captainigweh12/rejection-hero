@@ -715,7 +715,7 @@ export default function HomeScreen({ navigation }: Props) {
                     }}
                   >
                     <Text style={{ color: colors.textSecondary, fontSize: 12, textAlign: "center" }}>
-                      Today's quest will be generated soon...
+                      Today&apos;s quest will be generated soon...
                     </Text>
                   </View>
                 )}

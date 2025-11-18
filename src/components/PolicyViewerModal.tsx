@@ -75,7 +75,7 @@ export default function PolicyViewerModal({
   const fetchPolicyContent = async () => {
     setIsLoading(true);
     try {
-      const response = await api.get(`/api/policies/${policyType}`);
+      const response = await api.get(`/api/policies/${policyType}`) as { content?: string };
       setContent(response.content || "");
     } catch (error) {
       console.error("Error fetching policy:", error);

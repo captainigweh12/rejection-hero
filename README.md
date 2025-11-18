@@ -1,5 +1,12 @@
 ## 🔧 Bug Fixes
 
+### Profile API Response Fixed (2025-11-18)
+- **Fixed**: Resolved 500 internal server error when fetching user profile
+- **Issue**: The POST /api/profile endpoint was missing `ageVerified` and `parentalConsent` fields in the response, causing type validation failures
+- **Error**: "Internal server error" when calling GET /api/profile
+- **Solution**: Added `ageVerified` and `parentalConsent` fields to the UpdateProfileResponse in the profile route
+- **Impact**: Users can now successfully load their profiles and the age verification flow works properly
+
 ### Database Schema Sync Fixed (2025-11-18)
 - **Fixed**: Resolved 500 internal server error on GET /api/moments endpoint
 - **Issue**: The database schema was out of sync with the Prisma schema - `groupId` column was missing from the `moment` table
