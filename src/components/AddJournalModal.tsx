@@ -218,7 +218,6 @@ export default function AddJournalModal({ visible, onClose, onSuccess }: AddJour
           audioUrl: recordingUri || undefined,
           audioTranscript: selectedMethod === "voice" ? transcript : textContent || undefined,
           aiSummary: aiSummary.trim(),
-          userEditedSummary: null,
           outcome: selectedOutcome,
         }
       );

@@ -6,6 +6,13 @@
 - **Solution**: Changed to `navigation.navigate()` and added proper null checks for navigation state
 - **Impact**: Users can now properly navigate to onboarding after signup/login without errors
 
+
+### Journal Save Error Fixed (2025-11-18)
+- **Fixed**: Resolved "Invalid input: expected string, received null" error when saving journal entries
+- **Issue**: The `userEditedSummary` field was being sent as `null`, but Zod's `.optional()` only accepts `undefined` or the expected type
+- **Solution**: Removed `userEditedSummary` from the request payload since it's optional and not being used during initial save
+- **Impact**: Users can now successfully save journal entries without validation errors
+
 # Go for No - Rejection Challenge App
 
 A revolutionary mobile app that helps users overcome fear of rejection through AI-powered "No Quests" - action-based challenges designed to build confidence and resilience. Complete quests, track progress, level up, and connect with a community of fellow challengers!
