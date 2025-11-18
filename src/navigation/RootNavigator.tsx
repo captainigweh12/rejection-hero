@@ -177,28 +177,60 @@ function AuthWrapper() {
   const [hasChecked, setHasChecked] = useState(false);
 
   // Fetch user profile to check onboarding status
-  const { data: profile } = useQuery({
+  const { data: profile, error: profileError, isLoading: profileLoading } = useQuery({
     queryKey: ["profile"],
     queryFn: async () => {
-      const response = await api.get("/api/profile");
-      return response as { onboardingCompleted?: boolean };
+      try {
+        const response = await api.get("/api/profile");
+        return response as { onboardingCompleted?: boolean };
+      } catch (error) {
+        console.error("🔐 [AuthWrapper] Error fetching profile:", error);
+        // Return default profile if fetch fails (assume onboarding not completed)
+        return { onboardingCompleted: false };
+      }
     },
     enabled: !!sessionData?.user,
+    retry: 2,
+    retryDelay: 1000,
   });
 
   useEffect(() => {
-    if (!isPending && !hasChecked) {
+    // Wait for session to be ready and profile to load (or fail)
+    if (!isPending && sessionData?.user && !hasChecked) {
+      // If profile is still loading, wait a bit more
+      if (profileLoading) {
+        console.log("🔐 [AuthWrapper] Profile still loading, waiting...");
+        return;
+      }
+
+      // Set hasChecked to prevent multiple triggers
       setHasChecked(true);
 
-      // Only handle onboarding redirect - HomeScreen handles login state
-      if (sessionData?.user && profile && !profile.onboardingCompleted) {
+      // Handle onboarding redirect
+      if (profile && !profile.onboardingCompleted) {
         // Replace with onboarding if user hasn't completed it
+        console.log("🔐 [AuthWrapper] Redirecting to onboarding");
+        setTimeout(() => {
+          navigation.replace("Onboarding");
+        }, 100);
+      } else if (profile && profile.onboardingCompleted) {
+        // User is logged in and has completed onboarding - ensure we're on Tabs
+        console.log("🔐 [AuthWrapper] User logged in with completed onboarding");
+        // Close login modal if it's open
+        setTimeout(() => {
+          if (navigation.canGoBack()) {
+            navigation.goBack();
+          }
+        }, 100);
+      } else if (profileError) {
+        // If profile fetch failed, assume onboarding not completed and redirect
+        console.log("🔐 [AuthWrapper] Profile fetch failed, redirecting to onboarding");
         setTimeout(() => {
           navigation.replace("Onboarding");
         }, 100);
       }
     }
-  }, [sessionData, isPending, hasChecked, navigation, profile]);
+  }, [sessionData, isPending, hasChecked, navigation, profile, profileLoading, profileError]);
 
   return null;
 }

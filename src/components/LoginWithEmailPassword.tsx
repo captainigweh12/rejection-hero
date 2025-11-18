@@ -37,11 +37,27 @@ export default function LoginWithEmailPassword() {
           console.log("🔐 [Login] Navigating back from login modal");
           navigation.goBack();
         } else {
-          console.log("🔐 [Login] Cannot go back, AuthWrapper will handle navigation");
+          console.log("🔐 [Login] Cannot go back, closing modal directly");
+          // If we can't go back, try to close the modal by navigating to Tabs
+          navigation.navigate("Tabs");
         }
-      }, 300); // Increased delay to ensure session is ready
+      }, 500); // Increased delay to ensure session is ready
       
-      return () => clearTimeout(timer);
+      // Fallback timeout - if navigation doesn't work after 3 seconds, force close
+      const fallbackTimer = setTimeout(() => {
+        console.log("🔐 [Login] Fallback: Force closing modal after timeout");
+        setIsCheckingOnboarding(false);
+        if (navigation.canGoBack()) {
+          navigation.goBack();
+        } else {
+          navigation.navigate("Tabs");
+        }
+      }, 3000);
+      
+      return () => {
+        clearTimeout(timer);
+        clearTimeout(fallbackTimer);
+      };
     }
   }, [session, navigation, isCheckingOnboarding]);
 
@@ -252,11 +268,12 @@ export default function LoginWithEmailPassword() {
   };
 
   // Show loading state while checking onboarding
-  if (session && isCheckingOnboarding) {
+  if (session?.user && isCheckingOnboarding) {
     return (
-      <LinearGradient colors={["#0A0A0F", "#1A1A24", "#2A1A34"]} className="flex-1 items-center justify-center">
+      <LinearGradient colors={["#0A0A0F", "#1A1A24", "#2A1A34"]} style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <ActivityIndicator size="large" color="#7E3FE4" />
-        <Text className="text-white mt-4 text-lg">Setting up your account...</Text>
+        <Text style={{ color: "white", marginTop: 16, fontSize: 18 }}>Setting up your account...</Text>
+        <Text style={{ color: "rgba(255, 255, 255, 0.5)", marginTop: 8, fontSize: 12 }}>This should only take a moment</Text>
       </LinearGradient>
     );
   }
