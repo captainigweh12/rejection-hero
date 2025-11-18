@@ -159,7 +159,7 @@ Only return valid JSON, no other text.`;
             descriptionText.includes(`${keyword} ${extractedNumber} `)
           );
           
-          if (hasActionContext) {
+          if (hasActionContext && extractedNumber !== undefined) {
             console.log(`[Quest Fine-tuning] Extracted number ${extractedNumber} from description, updating goalCount from ${finalGoalCount} to ${extractedNumber}`);
             finalGoalCount = extractedNumber;
           }
