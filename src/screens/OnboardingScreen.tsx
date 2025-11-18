@@ -4,6 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Haptics from "expo-haptics";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { api } from "@/lib/api";
 import { useSession } from "@/lib/useSession";
@@ -35,6 +36,7 @@ export default function OnboardingScreen() {
   const navigation = useNavigation();
   const { data: session } = useSession();
   const { colors } = useTheme();
+  const queryClient = useQueryClient();
   const [currentStep, setCurrentStep] = useState<OnboardingStep>(1);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -129,6 +131,7 @@ export default function OnboardingScreen() {
         .join(", ");
 
       // Update profile with onboarding data
+      console.log("🎯 [Onboarding] Saving profile with onboarding data...");
       await api.post("/api/profile", {
         username: username.trim().toLowerCase(),
         displayName: session?.user?.name || username.trim(),
@@ -138,14 +141,24 @@ export default function OnboardingScreen() {
         onboardingCompleted: true,
       });
 
+      console.log("✅ [Onboarding] Profile saved successfully, invalidating cache...");
+      
+      // Invalidate profile query cache so AuthWrapper re-checks onboarding status
+      await queryClient.invalidateQueries({ queryKey: ["profile"] });
+      
+      // Small delay to ensure cache is updated
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
       // Navigate to home (main menu)
+      console.log("🎯 [Onboarding] Navigating to main app...");
       Alert.alert("Welcome to Go for No! 🎉", "Your profile is set up. Let's start your rejection journey!", [
         {
           text: "Let's Go!",
           onPress: () => {
+            // Use replace to ensure onboarding can't be navigated back to
             navigation.reset({
               index: 0,
-              routes: [{ name: "MainTabs" as never }],
+              routes: [{ name: "Tabs" as never }],
             });
           },
         },

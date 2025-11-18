@@ -196,38 +196,64 @@ function AuthWrapper() {
 
   useEffect(() => {
     // Wait for session to be ready and profile to load (or fail)
-    if (!isPending && sessionData?.user && !hasChecked) {
+    if (!isPending && sessionData?.user) {
       // If profile is still loading, wait a bit more
       if (profileLoading) {
         console.log("🔐 [AuthWrapper] Profile still loading, waiting...");
         return;
       }
 
-      // Set hasChecked to prevent multiple triggers
-      setHasChecked(true);
+      // Get current route to avoid unnecessary navigation
+      const currentRoute = navigation.getState()?.routes[navigation.getState()?.index || 0];
+      const currentRouteName = currentRoute?.name;
 
-      // Handle onboarding redirect
+      // Handle onboarding redirect for users who haven't completed it
       if (profile && !profile.onboardingCompleted) {
-        // Replace with onboarding if user hasn't completed it
-        console.log("🔐 [AuthWrapper] Redirecting to onboarding");
-        setTimeout(() => {
-          navigation.replace("Onboarding");
-        }, 100);
+        // New users or existing users who haven't completed onboarding
+        if (currentRouteName !== "Onboarding") {
+          console.log("🔐 [AuthWrapper] User needs onboarding - redirecting");
+          console.log("🔐 [AuthWrapper] Profile onboardingCompleted:", profile.onboardingCompleted);
+          setHasChecked(true);
+          setTimeout(() => {
+            navigation.replace("Onboarding");
+          }, 100);
+        }
       } else if (profile && profile.onboardingCompleted) {
-        // User is logged in and has completed onboarding - ensure we're on Tabs
-        console.log("🔐 [AuthWrapper] User logged in with completed onboarding");
-        // Close login modal if it's open
-        setTimeout(() => {
-          if (navigation.canGoBack()) {
-            navigation.goBack();
-          }
-        }, 100);
+        // User has completed onboarding - ensure they're on the main app
+        if (currentRouteName === "LoginModalScreen") {
+          console.log("🔐 [AuthWrapper] User logged in with completed onboarding, closing login modal");
+          setTimeout(() => {
+            if (navigation.canGoBack()) {
+              navigation.goBack();
+            } else {
+              navigation.replace("Tabs");
+            }
+          }, 100);
+        } else if (currentRouteName === "Onboarding") {
+          // If somehow still on onboarding after completion, navigate away
+          console.log("🔐 [AuthWrapper] User completed onboarding, navigating to main app");
+          setTimeout(() => {
+            navigation.replace("Tabs");
+          }, 100);
+        }
+        // Reset hasChecked to allow future checks if needed
+        if (hasChecked) {
+          setHasChecked(false);
+        }
       } else if (profileError) {
         // If profile fetch failed, assume onboarding not completed and redirect
-        console.log("🔐 [AuthWrapper] Profile fetch failed, redirecting to onboarding");
-        setTimeout(() => {
-          navigation.replace("Onboarding");
-        }, 100);
+        if (currentRouteName !== "Onboarding") {
+          console.log("🔐 [AuthWrapper] Profile fetch failed, redirecting to onboarding");
+          setHasChecked(true);
+          setTimeout(() => {
+            navigation.replace("Onboarding");
+          }, 100);
+        }
+      } else if (!profile) {
+        // Profile doesn't exist yet - will be auto-created with onboardingCompleted: false
+        // Wait for profile to be created, then redirect will happen on next effect run
+        console.log("🔐 [AuthWrapper] Profile doesn't exist yet, waiting for auto-creation...");
+        // Profile will be auto-created on next profile fetch with onboardingCompleted: false
       }
     }
   }, [sessionData, isPending, hasChecked, navigation, profile, profileLoading, profileError]);
