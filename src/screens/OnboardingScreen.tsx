@@ -9,8 +9,11 @@ import { useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { useSession } from "@/lib/useSession";
 import { useTheme } from "@/contexts/ThemeContext";
+import PolicyViewerModal from "@/components/PolicyViewerModal";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { FileText, CheckCircle } from "lucide-react-native";
 
-type OnboardingStep = 1 | 2 | 3;
+type OnboardingStep = 0 | 1 | 2 | 3; // 0 = Policy Acceptance
 
 const CATEGORIES = [
   { id: "sales", label: "Sales", emoji: "💼", description: "Pitch, cold call, negotiate" },
@@ -37,8 +40,31 @@ export default function OnboardingScreen() {
   const { data: session } = useSession();
   const { colors } = useTheme();
   const queryClient = useQueryClient();
-  const [currentStep, setCurrentStep] = useState<OnboardingStep>(1);
+  const [currentStep, setCurrentStep] = useState<OnboardingStep>(0); // Start with policy acceptance
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedPolicy, setSelectedPolicy] = useState<string | null>(null);
+
+  // Required policies for onboarding
+  const REQUIRED_POLICIES: Array<{ type: string; name: string }> = [
+    { type: "terms-of-service", name: "Terms of Service" },
+    { type: "privacy-policy", name: "Privacy Policy" },
+    { type: "content-guidelines", name: "Content Guidelines" },
+    { type: "recording-consent", name: "Recording Consent" },
+    { type: "liability-waiver", name: "Liability Waiver" },
+  ];
+
+  // Check which policies user has accepted
+  const { data: policiesData } = useQuery({
+    queryKey: ["policies"],
+    queryFn: async () => {
+      const response = await api.get("/api/policies");
+      return response as { policies: Array<{ type: string; accepted: boolean }> };
+    },
+  });
+
+  const acceptedPolicies = new Set(
+    policiesData?.policies?.filter((p) => p.accepted).map((p) => p.type) || []
+  );
 
   // Step 1: About You & Username
   const [username, setUsername] = useState("");
@@ -75,6 +101,23 @@ export default function OnboardingScreen() {
 
   const handleNext = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    
+    // Step 0: Policy acceptance
+    if (currentStep === 0) {
+      const allAccepted = REQUIRED_POLICIES.every((policy) =>
+        acceptedPolicies.has(policy.type)
+      );
+      if (!allAccepted) {
+        Alert.alert(
+          "Accept All Policies",
+          "Please read and accept all required policies to continue."
+        );
+        return;
+      }
+      setCurrentStep(1);
+      return;
+    }
+    
     if (currentStep === 1) {
       if (!username.trim() || username.trim().length < 3) {
         Alert.alert("Username Required", "Please enter a username (at least 3 characters).");
@@ -102,7 +145,7 @@ export default function OnboardingScreen() {
 
   const handleBack = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    if (currentStep > 1) {
+    if (currentStep > 0) {
       setCurrentStep((currentStep - 1) as OnboardingStep);
     }
   };
@@ -173,7 +216,7 @@ export default function OnboardingScreen() {
 
   const renderProgressBar = () => (
     <View className="flex-row gap-2 mb-8">
-      {[1, 2, 3].map((step) => (
+      {[0, 1, 2, 3].map((step) => (
         <View
           key={step}
           className="flex-1 h-1.5 rounded-full overflow-hidden"
@@ -191,6 +234,75 @@ export default function OnboardingScreen() {
       ))}
     </View>
   );
+
+  const renderStep0 = () => {
+    const allAccepted = REQUIRED_POLICIES.every((policy) =>
+      acceptedPolicies.has(policy.type)
+    );
+
+    return (
+      <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+        <View className="mb-6">
+          <Text className="text-2xl font-bold mb-2" style={textPrimary}>
+            Legal Agreements
+          </Text>
+          <Text className="text-base" style={textSecondary}>
+            Please read and accept the following policies to continue:
+          </Text>
+        </View>
+
+        <View className="gap-3 mb-6">
+          {REQUIRED_POLICIES.map((policy) => {
+            const isAccepted = acceptedPolicies.has(policy.type);
+            return (
+              <Pressable
+                key={policy.type}
+                onPress={() => setSelectedPolicy(policy.type)}
+                className="flex-row items-center p-4 rounded-2xl"
+                style={{
+                  backgroundColor: isAccepted
+                    ? "rgba(126, 63, 228, 0.2)"
+                    : "rgba(255, 255, 255, 0.05)",
+                  borderWidth: 1,
+                  borderColor: isAccepted
+                    ? "rgba(126, 63, 228, 0.5)"
+                    : "rgba(255, 255, 255, 0.1)",
+                }}
+              >
+                <View className="flex-1 flex-row items-center">
+                  <FileText
+                    size={20}
+                    color={isAccepted ? "#7E3FE4" : colors.textSecondary}
+                    className="mr-3"
+                  />
+                  <Text
+                    className="flex-1 font-semibold"
+                    style={isAccepted ? { color: "#7E3FE4" } : textPrimary}
+                  >
+                    {policy.name}
+                  </Text>
+                </View>
+                {isAccepted && (
+                  <CheckCircle size={24} color="#7E3FE4" className="ml-2" />
+                )}
+              </Pressable>
+            );
+          })}
+        </View>
+
+        {!allAccepted && (
+          <View
+            className="p-4 rounded-2xl mb-4"
+            style={{ backgroundColor: "rgba(255, 107, 53, 0.1)" }}
+          >
+            <Text className="text-sm text-center" style={textPrimary}>
+              ⚠️ You must accept all policies to continue
+            </Text>
+          </View>
+        )}
+      </ScrollView>
+    );
+  };
 
   const renderStep1 = () => (
     <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
@@ -399,6 +511,7 @@ export default function OnboardingScreen() {
         <View className="flex-1 px-6 pt-6">
           {renderProgressBar()}
 
+          {currentStep === 0 && renderStep0()}
           {currentStep === 1 && renderStep1()}
           {currentStep === 2 && renderStep2()}
           {currentStep === 3 && renderStep3()}
@@ -406,7 +519,7 @@ export default function OnboardingScreen() {
           {/* Navigation Buttons */}
           <View className="pb-4 pt-6">
             <View className="flex-row gap-3">
-              {currentStep > 1 && (
+              {currentStep > 0 && (
                 <Pressable
                   onPress={handleBack}
                   disabled={isLoading}
@@ -435,13 +548,35 @@ export default function OnboardingScreen() {
                   className="absolute inset-0"
                 />
                 <Text className="font-bold text-base" style={textPrimary}>
-                  {isLoading ? "Saving..." : currentStep === 3 ? "Complete" : "Next"}
+                  {isLoading
+                    ? "Saving..."
+                    : currentStep === 0
+                    ? "Continue"
+                    : currentStep === 3
+                    ? "Complete"
+                    : "Next"}
                 </Text>
               </Pressable>
             </View>
           </View>
         </View>
       </SafeAreaView>
+
+      {/* Policy Viewer Modal */}
+      <PolicyViewerModal
+        visible={selectedPolicy !== null}
+        policyType={selectedPolicy as any}
+        onClose={() => {
+          setSelectedPolicy(null);
+          // Refetch policies after acceptance
+          queryClient.invalidateQueries({ queryKey: ["policies"] });
+        }}
+        onAccept={() => {
+          queryClient.invalidateQueries({ queryKey: ["policies"] });
+        }}
+        requireAcceptance={true}
+        showAcceptButton={true}
+      />
     </LinearGradient>
   );
 }

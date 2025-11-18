@@ -93,6 +93,8 @@ profileRouter.get("/", async (c) => {
       userContext: profile.userContext,
       userGoals: profile.userGoals,
       onboardingCompleted: profile.onboardingCompleted,
+      ageVerified: profile.ageVerified,
+      parentalConsent: profile.parentalConsent,
     } satisfies GetProfileResponse);
   } catch (error) {
     console.error("❌ [Profile] Error in GET /api/profile:", error);

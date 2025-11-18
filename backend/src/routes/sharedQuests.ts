@@ -201,7 +201,7 @@ Only return valid JSON, no other text.`;
 // ============================================
 // AI Safety Filtering Function
 // ============================================
-async function checkQuestSafety(description: string): Promise<{ isSafe: boolean; warning?: string; cleanDescription?: string }> {
+export async function checkQuestSafety(description: string): Promise<{ isSafe: boolean; warning?: string; cleanDescription?: string }> {
   const OPENAI_API_KEY = env.OPENAI_API_KEY || process.env.EXPO_PUBLIC_VIBECODE_OPENAI_API_KEY;
 
   if (!OPENAI_API_KEY) {

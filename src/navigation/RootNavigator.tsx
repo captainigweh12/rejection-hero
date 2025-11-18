@@ -18,6 +18,7 @@ import ProfileScreen from "@/screens/ProfileScreen";
 import JournalScreen from "@/screens/JournalScreen";
 import LoginModalScreen from "@/screens/LoginModalScreen";
 import OnboardingScreen from "@/screens/OnboardingScreen";
+import AgeVerificationScreen from "@/screens/AgeVerificationScreen";
 import EditProfileScreen from "@/screens/EditProfileScreen";
 import QuestDetailScreen from "@/screens/QuestDetailScreen";
 import CreateQuestScreen from "@/screens/CreateQuestScreen";
@@ -112,6 +113,11 @@ const RootNavigator = () => {
           options={{ headerShown: false }}
         />
         <RootStack.Screen
+          name="AgeVerification"
+          component={AgeVerificationScreen}
+          options={{ headerShown: false }}
+        />
+        <RootStack.Screen
           name="Onboarding"
           component={OnboardingScreen}
           options={{ headerShown: false }}
@@ -176,17 +182,17 @@ function AuthWrapper() {
   const { data: sessionData, isPending } = useSession();
   const [hasChecked, setHasChecked] = useState(false);
 
-  // Fetch user profile to check onboarding status
+  // Fetch user profile to check onboarding status and age verification
   const { data: profile, error: profileError, isLoading: profileLoading } = useQuery({
     queryKey: ["profile"],
     queryFn: async () => {
       try {
         const response = await api.get("/api/profile");
-        return response as { onboardingCompleted?: boolean };
+        return response as { onboardingCompleted?: boolean; ageVerified?: boolean; age?: number };
       } catch (error) {
         console.error("🔐 [AuthWrapper] Error fetching profile:", error);
         // Return default profile if fetch fails (assume onboarding not completed)
-        return { onboardingCompleted: false };
+        return { onboardingCompleted: false, ageVerified: false };
       }
     },
     enabled: !!sessionData?.user,
@@ -210,10 +216,19 @@ function AuthWrapper() {
       const currentRoute = state.routes[state.index || 0];
       const currentRouteName = currentRoute?.name;
 
-      // Handle onboarding redirect for users who haven't completed it
-      if (profile && !profile.onboardingCompleted) {
-        // New users or existing users who haven't completed onboarding
-        if (currentRouteName !== "Onboarding" && !hasChecked) {
+      // Check age verification first
+      if (profile && !profile.ageVerified) {
+        // User needs to verify age before onboarding
+        if (currentRouteName !== "AgeVerification" && !hasChecked) {
+          console.log("🔐 [AuthWrapper] User needs age verification - redirecting");
+          setHasChecked(true);
+          setTimeout(() => {
+            navigation.navigate("AgeVerification");
+          }, 100);
+        }
+      } else if (profile && profile.ageVerified && !profile.onboardingCompleted) {
+        // User has verified age but needs onboarding
+        if (currentRouteName !== "Onboarding" && currentRouteName !== "AgeVerification" && !hasChecked) {
           console.log("🔐 [AuthWrapper] User needs onboarding - redirecting");
           console.log("🔐 [AuthWrapper] Profile onboardingCompleted:", profile.onboardingCompleted);
           setHasChecked(true);
@@ -244,19 +259,19 @@ function AuthWrapper() {
           setHasChecked(false);
         }
       } else if (profileError) {
-        // If profile fetch failed, assume onboarding not completed and redirect
-        if (currentRouteName !== "Onboarding" && !hasChecked) {
-          console.log("🔐 [AuthWrapper] Profile fetch failed, redirecting to onboarding");
+        // If profile fetch failed, assume age not verified and redirect
+        if (currentRouteName !== "AgeVerification" && !hasChecked) {
+          console.log("🔐 [AuthWrapper] Profile fetch failed, redirecting to age verification");
           setHasChecked(true);
           setTimeout(() => {
-            navigation.navigate("Onboarding");
+            navigation.navigate("AgeVerification");
           }, 100);
         }
       } else if (!profile) {
-        // Profile doesn't exist yet - will be auto-created with onboardingCompleted: false
+        // Profile doesn't exist yet - will be auto-created with ageVerified: false
         // Wait for profile to be created, then redirect will happen on next effect run
         console.log("🔐 [AuthWrapper] Profile doesn't exist yet, waiting for auto-creation...");
-        // Profile will be auto-created on next profile fetch with onboardingCompleted: false
+        // Profile will be auto-created on next profile fetch with ageVerified: false
       }
     }
   }, [sessionData, isPending, hasChecked, navigation, profile, profileLoading, profileError]);

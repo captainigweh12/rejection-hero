@@ -13,6 +13,7 @@ export type RootStackParamList = {
   Tabs: NavigatorScreenParams<BottomTabParamList> | undefined;
   InsideScreen: undefined;
   LoginModalScreen: undefined;
+  AgeVerification: undefined;
   Onboarding: undefined;
   EditProfile: undefined;
   QuestDetail: { userQuestId: string };

@@ -84,6 +84,8 @@ export const getProfileResponseSchema = z.object({
   userContext: z.string().nullable().optional(), // About you - for AI
   userGoals: z.string().nullable().optional(), // User's goals - for AI
   onboardingCompleted: z.boolean().optional(), // Track onboarding completion
+  ageVerified: z.boolean().optional(), // Whether age has been verified
+  parentalConsent: z.boolean().optional(), // For users 13-17
 });
 export type GetProfileResponse = z.infer<typeof getProfileResponseSchema>;
 
@@ -92,7 +94,9 @@ export const updateProfileRequestSchema = z.object({
   username: z.string().min(3).max(30).regex(/^[a-zA-Z0-9_]+$/).optional(), // Username: alphanumeric + underscore only
   displayName: z.string().min(1).max(50),
   bio: z.string().max(500).optional(),
-  age: z.number().min(18).max(120).optional(),
+  age: z.number().min(1).max(120).optional(), // Allow ages 13+ (validation happens in backend)
+  ageVerified: z.boolean().optional(),
+  parentalConsent: z.boolean().optional(),
   photos: z.array(z.string()).optional(),
   avatar: z.string().optional(), // AI-generated or uploaded avatar URL
   interests: z.array(z.string()).optional(), // Interest tags

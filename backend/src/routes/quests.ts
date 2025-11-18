@@ -169,6 +169,23 @@ questsRouter.post("/generate", zValidator("json", generateQuestRequestSchema), a
 
   const { category, difficulty, customPrompt, userLocation, userLatitude, userLongitude, preferredQuestType } = c.req.valid("json");
 
+  // Safety check: If custom prompt provided, check for harmful content
+  if (customPrompt) {
+    const { checkQuestSafety } = await import("./sharedQuests");
+    const safetyCheck = await checkQuestSafety(customPrompt);
+    
+    if (!safetyCheck.isSafe) {
+      return c.json(
+        {
+          message: "Quest cannot be created",
+          isSafe: false,
+          safetyWarning: safetyCheck.warning || "This quest contains content that may be harmful or inappropriate.",
+        },
+        400
+      );
+    }
+  }
+
   // Generate quest using OpenAI with location context
   const questData = await generateQuestWithAI(
     category,
@@ -181,11 +198,30 @@ questsRouter.post("/generate", zValidator("json", generateQuestRequestSchema), a
     preferredQuestType
   );
 
+  // Safety check on generated quest description
+  const { checkQuestSafety } = await import("./sharedQuests");
+  const safetyCheck = await checkQuestSafety(questData.description);
+  
+  if (!safetyCheck.isSafe) {
+    console.warn("⚠️ Generated quest failed safety check:", safetyCheck.warning);
+    return c.json(
+      {
+        message: "Quest generation failed safety check",
+        isSafe: false,
+        safetyWarning: safetyCheck.warning || "The generated quest contains content that may be harmful.",
+      },
+      400
+    );
+  }
+
+  // Use cleaned description if available
+  const finalDescription = safetyCheck.cleanDescription || questData.description;
+
   // Create quest in database
   const quest = await db.quest.create({
     data: {
       title: questData.title,
-      description: questData.description,
+      description: finalDescription,
       category: questData.category,
       difficulty: questData.difficulty,
       goalType: questData.goalType,
