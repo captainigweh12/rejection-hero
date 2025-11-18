@@ -309,7 +309,7 @@ export default function AddJournalModal({ visible, onClose, onSuccess }: AddJour
           >
             {/* STEP 1: METHOD SELECTION */}
             {currentStep === 1 && (
-              <View>
+              <View style={{ minHeight: 400 }}>
                 <Text
                   style={{
                     fontSize: 18,
