@@ -63,7 +63,9 @@ async function runMigration() {
     }
 
     try {
-      await db.$executeRaw`ALTER TABLE "user_stats" ADD COLUMN "lastConfidenceDecayAt" DATETIME DEFAULT CURRENT_TIMESTAMP`;
+      await db.$executeRaw`ALTER TABLE "user_stats" ADD COLUMN "lastConfidenceDecayAt" DATETIME`;
+      // Update existing rows with current timestamp
+      await db.$executeRaw`UPDATE "user_stats" SET "lastConfidenceDecayAt" = datetime('now') WHERE "lastConfidenceDecayAt" IS NULL`;
       console.log("✅ Added lastConfidenceDecayAt column to user_stats table");
     } catch (error: any) {
       if (error.message?.includes("duplicate column") || error.message?.includes("already exists")) {
