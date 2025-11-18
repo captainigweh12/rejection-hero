@@ -1216,7 +1216,7 @@ export default function HomeScreen({ navigation }: Props) {
                     <Pressable
                       onPress={() => {
                         // Show swap options
-                        const swapOptions = activeQuests.map((aq) => ({
+                        const swapOptions: Array<{ text: string; onPress?: () => void; style?: "default" | "cancel" | "destructive" }> = activeQuests.map((aq) => ({
                           text: aq.quest.title,
                           onPress: () => {
                             // Check if active quest has actions
@@ -1235,7 +1235,7 @@ export default function HomeScreen({ navigation }: Props) {
                             }
                           },
                         }));
-                        swapOptions.push({ text: "Cancel", style: "cancel" as const, onPress: () => {} });
+                        swapOptions.push({ text: "Cancel", style: "cancel" });
                         Alert.alert(
                           "Swap Quest",
                           "Choose an active quest to swap with this queued quest:",
