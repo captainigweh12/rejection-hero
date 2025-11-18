@@ -265,6 +265,7 @@ live.get("/active", async (c) => {
                 description: true,
                 category: true,
                 goalCount: true,
+                goalType: true,
               },
             },
           },
@@ -298,6 +299,7 @@ live.get("/active", async (c) => {
                 description: stream.userQuest.quest.description,
                 category: stream.userQuest.quest.category,
                 goalCount: stream.userQuest.quest.goalCount,
+                goalType: stream.userQuest.quest.goalType,
               },
             }
           : null,
@@ -700,6 +702,100 @@ live.post("/:id/respond-to-suggestion", async (c) => {
   } catch (error) {
     console.error("Respond to suggestion error:", error);
     return c.json({ error: "Failed to respond to suggestion" }, 500);
+  }
+});
+
+// ============================================
+// POST /api/live/:id/record-quest-action - Record quest action for streamer's quest (viewers only)
+// ============================================
+live.post("/:id/record-quest-action", async (c) => {
+  const user = c.get("user");
+  if (!user) {
+    return c.json({ error: "Unauthorized" }, 401);
+  }
+
+  try {
+    const liveStreamId = c.req.param("id");
+    const body = await c.req.json();
+    const { action } = body; // "NO", "YES", or "ACTION"
+
+    if (!["NO", "YES", "ACTION"].includes(action)) {
+      return c.json({ error: "Invalid action. Must be NO, YES, or ACTION" }, 400);
+    }
+
+    // Get live stream with user quest
+    const liveStream = await db.liveStream.findUnique({
+      where: { id: liveStreamId },
+      include: {
+        userQuest: {
+          include: {
+            quest: true,
+          },
+        },
+      },
+    });
+
+    if (!liveStream || !liveStream.isActive) {
+      return c.json({ error: "Live stream not found or ended" }, 404);
+    }
+
+    if (!liveStream.userQuest) {
+      return c.json({ error: "Streamer has no active quest" }, 400);
+    }
+
+    // Can't record actions for your own quest via this endpoint
+    if (liveStream.userId === user.id) {
+      return c.json({ error: "Use the quest detail screen to record your own quest actions" }, 400);
+    }
+
+    const userQuest = liveStream.userQuest;
+
+    // Update counts based on action type
+    const newNoCount = action === "NO" ? userQuest.noCount + 1 : userQuest.noCount;
+    const newYesCount = action === "YES" ? userQuest.yesCount + 1 : userQuest.yesCount;
+    const newActionCount = action === "ACTION" ? userQuest.actionCount + 1 : userQuest.actionCount;
+
+    // Check if quest is completed
+    const isCompleted =
+      (userQuest.quest.goalType === "COLLECT_NOS" && newNoCount >= userQuest.quest.goalCount) ||
+      (userQuest.quest.goalType === "COLLECT_YES" && newYesCount >= userQuest.quest.goalCount) ||
+      (userQuest.quest.goalType === "TAKE_ACTION" && newActionCount >= userQuest.quest.goalCount);
+
+    // Update user quest
+    const updated = await db.userQuest.update({
+      where: { id: userQuest.id },
+      data: {
+        noCount: newNoCount,
+        yesCount: newYesCount,
+        actionCount: newActionCount,
+        ...(isCompleted && {
+          status: "COMPLETED",
+          completedAt: new Date(),
+        }),
+      },
+    });
+
+    // If completed, update streamer's stats
+    if (isCompleted) {
+      const { updateUserStats } = await import("./quests");
+      await updateUserStats(
+        liveStream.userId,
+        userQuest.quest.xpReward,
+        userQuest.quest.pointReward,
+        userQuest.quest.difficulty
+      );
+    }
+
+    return c.json({
+      success: true,
+      completed: isCompleted,
+      noCount: newNoCount,
+      yesCount: newYesCount,
+      actionCount: newActionCount,
+    });
+  } catch (error) {
+    console.error("Record quest action error:", error);
+    return c.json({ error: "Failed to record quest action" }, 500);
   }
 });
 

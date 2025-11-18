@@ -917,7 +917,7 @@ function getPredefinedQuest(category?: string, difficulty?: string) {
   return quests[Math.floor(Math.random() * quests.length)];
 }
 
-async function updateUserStats(userId: string, xpReward: number, pointReward: number, difficulty?: string) {
+export async function updateUserStats(userId: string, xpReward: number, pointReward: number, difficulty?: string) {
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 

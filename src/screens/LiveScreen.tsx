@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { View, Text, Pressable, TextInput, ScrollView, KeyboardAvoidingView, Platform, Alert, Modal, FlatList } from "react-native";
+import { View, Text, Pressable, TextInput, ScrollView, KeyboardAvoidingView, Platform, Alert, Modal, FlatList, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { CameraView, useCameraPermissions } from "expo-camera";
@@ -195,6 +195,21 @@ export default function LiveScreen({ navigation }: Props) {
     },
   });
 
+  // Record quest action mutation (for viewers)
+  const recordQuestActionMutation = useMutation({
+    mutationFn: async (data: { action: "YES" | "NO" | "ACTION" }) => {
+      if (!viewingStreamId) return;
+      return api.post(`/api/live/${viewingStreamId}/record-quest-action`, data);
+    },
+    onSuccess: () => {
+      refetchStreams();
+      queryClient.invalidateQueries({ queryKey: ["liveStreams"] });
+    },
+    onError: (error: any) => {
+      Alert.alert("Error", error.message || "Failed to record action");
+    },
+  });
+
   const handleStartStream = () => {
     if (!sessionData?.user) {
       Alert.alert("Sign In Required", "Please sign in to start a live stream");
@@ -366,14 +381,14 @@ export default function LiveScreen({ navigation }: Props) {
           <Gift size={24} color="#000" />
         </Pressable>
 
-        {/* Modern Quest Card Overlay */}
+        {/* Modern Quest Card Overlay with Yes/No Buttons */}
         {viewingStream.userQuest && (
           <View
             style={{
               position: "absolute",
               bottom: 240,
               left: 20,
-              right: 80,
+              right: 20,
               backgroundColor: "rgba(255, 107, 53, 0.95)",
               borderRadius: 16,
               padding: 16,
@@ -411,6 +426,50 @@ export default function LiveScreen({ navigation }: Props) {
             <Text style={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 13, lineHeight: 18 }} numberOfLines={2}>
               {viewingStream.userQuest.quest.description}
             </Text>
+
+            {/* Yes/No Buttons for Viewers */}
+            {(viewingStream.userQuest.quest.goalType === "COLLECT_NOS" || viewingStream.userQuest.quest.goalType === "COLLECT_YES") && (
+              <View style={{ flexDirection: "row", gap: 8, marginTop: 12 }}>
+                <Pressable
+                  onPress={() => recordQuestActionMutation.mutate({ action: "YES" })}
+                  disabled={recordQuestActionMutation.isPending}
+                  style={{
+                    flex: 1,
+                    backgroundColor: "#EF4444",
+                    paddingVertical: 10,
+                    borderRadius: 12,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    opacity: recordQuestActionMutation.isPending ? 0.6 : 1,
+                  }}
+                >
+                  {recordQuestActionMutation.isPending ? (
+                    <ActivityIndicator size="small" color="white" />
+                  ) : (
+                    <Text style={{ color: "white", fontSize: 16, fontWeight: "bold" }}>YES</Text>
+                  )}
+                </Pressable>
+                <Pressable
+                  onPress={() => recordQuestActionMutation.mutate({ action: "NO" })}
+                  disabled={recordQuestActionMutation.isPending}
+                  style={{
+                    flex: 1,
+                    backgroundColor: "#3B82F6",
+                    paddingVertical: 10,
+                    borderRadius: 12,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    opacity: recordQuestActionMutation.isPending ? 0.6 : 1,
+                  }}
+                >
+                  {recordQuestActionMutation.isPending ? (
+                    <ActivityIndicator size="small" color="white" />
+                  ) : (
+                    <Text style={{ color: "white", fontSize: 16, fontWeight: "bold" }}>NO</Text>
+                  )}
+                </Pressable>
+              </View>
+            )}
           </View>
         )}
 
