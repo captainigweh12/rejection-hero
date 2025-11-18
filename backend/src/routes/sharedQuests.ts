@@ -572,11 +572,17 @@ sharedQuestsRouter.post("/create-custom", zValidator("json", createCustomQuestSc
   const data = c.req.valid("json");
   const { friendId, audioTranscript, textDescription, category, difficulty, goalType, goalCount, locationType, customLocation, latitude, longitude, giftXP, giftPoints, message } = data;
 
+  // Check if user is admin - admins have full access
+  const userRecord = await db.user.findUnique({
+    where: { id: user.id },
+    select: { isAdmin: true },
+  });
+
   // Check subscription for AI features (custom quest uses AI fine-tuning)
   const subscription = await db.subscription.findUnique({
     where: { userId: user.id },
   });
-  const hasSubscription = subscription?.status === "active" || subscription?.status === "trialing";
+  const hasSubscription = userRecord?.isAdmin || subscription?.status === "active" || subscription?.status === "trialing";
 
   if (!hasSubscription) {
     return c.json(

@@ -160,4 +160,112 @@ notificationsRouter.delete("/:id", async (c) => {
   return c.json({ success: true });
 });
 
+// ============================================
+// GET /api/notifications/preferences - Get notification preferences
+// ============================================
+notificationsRouter.get("/preferences", async (c) => {
+  const user = c.get("user");
+
+  if (!user) {
+    return c.json({ message: "Unauthorized" }, 401);
+  }
+
+  const profile = await db.profile.findUnique({
+    where: { userId: user.id },
+    select: { notificationPreferences: true },
+  });
+
+  // Default preferences - all enabled
+  const defaultPreferences = {
+    questCompleted: true,
+    questShared: true,
+    friendRequest: true,
+    friendAccepted: true,
+    confidenceLow: true,
+    challengeReminder: true,
+    dailyMotivation: true,
+    achievementUnlocked: true,
+  };
+
+  if (!profile?.notificationPreferences) {
+    return c.json({ preferences: defaultPreferences });
+  }
+
+  try {
+    const preferences = JSON.parse(profile.notificationPreferences);
+    // Merge with defaults to ensure all keys exist
+    return c.json({ preferences: { ...defaultPreferences, ...preferences } });
+  } catch {
+    return c.json({ preferences: defaultPreferences });
+  }
+});
+
+// ============================================
+// POST /api/notifications/preferences - Update notification preferences
+// ============================================
+notificationsRouter.post(
+  "/preferences",
+  zValidator(
+    "json",
+    z.object({
+      questCompleted: z.boolean().optional(),
+      questShared: z.boolean().optional(),
+      friendRequest: z.boolean().optional(),
+      friendAccepted: z.boolean().optional(),
+      confidenceLow: z.boolean().optional(),
+      challengeReminder: z.boolean().optional(),
+      dailyMotivation: z.boolean().optional(),
+      achievementUnlocked: z.boolean().optional(),
+    })
+  ),
+  async (c) => {
+    const user = c.get("user");
+
+    if (!user) {
+      return c.json({ message: "Unauthorized" }, 401);
+    }
+
+    const updates = c.req.valid("json");
+
+    // Get current preferences
+    const profile = await db.profile.findUnique({
+      where: { userId: user.id },
+      select: { notificationPreferences: true },
+    });
+
+    const defaultPreferences = {
+      questCompleted: true,
+      questShared: true,
+      friendRequest: true,
+      friendAccepted: true,
+      confidenceLow: true,
+      challengeReminder: true,
+      dailyMotivation: true,
+      achievementUnlocked: true,
+    };
+
+    let currentPreferences = defaultPreferences;
+    if (profile?.notificationPreferences) {
+      try {
+        currentPreferences = { ...defaultPreferences, ...JSON.parse(profile.notificationPreferences) };
+      } catch {
+        // Use defaults
+      }
+    }
+
+    // Merge updates
+    const newPreferences = { ...currentPreferences, ...updates };
+
+    // Update profile
+    await db.profile.update({
+      where: { userId: user.id },
+      data: {
+        notificationPreferences: JSON.stringify(newPreferences),
+      },
+    });
+
+    return c.json({ success: true, preferences: newPreferences });
+  }
+);
+
 export { notificationsRouter };

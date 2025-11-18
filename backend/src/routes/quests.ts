@@ -139,6 +139,16 @@ questsRouter.get("/completed", async (c) => {
 
 // Helper function to check if user has active subscription
 async function hasActiveSubscription(userId: string): Promise<boolean> {
+  // Check if user is admin - admins have full access
+  const user = await db.user.findUnique({
+    where: { id: userId },
+    select: { isAdmin: true },
+  });
+
+  if (user?.isAdmin) {
+    return true; // Admins have full access
+  }
+
   const subscription = await db.subscription.findUnique({
     where: { userId },
   });
