@@ -14,6 +14,8 @@ import {
   type GenerateMapQuestsResponse,
   refreshAllQuestsRequestSchema,
   type RefreshAllQuestsResponse,
+  swapQuestRequestSchema,
+  type SwapQuestResponse,
 } from "@/shared/contracts";
 import { type AppType } from "../types";
 import { db } from "../db";
@@ -360,6 +362,86 @@ questsRouter.post("/:id/start", async (c) => {
     success: true,
     userQuestId: userQuest.id,
   } satisfies StartQuestResponse);
+});
+
+// ============================================
+// POST /api/quests/swap - Swap an active quest with a queued quest
+// ============================================
+questsRouter.post("/swap", zValidator("json", swapQuestRequestSchema), async (c) => {
+  const user = c.get("user");
+
+  if (!user) {
+    return c.json({ message: "Unauthorized" }, 401);
+  }
+
+  const { activeQuestId, queuedQuestId } = c.req.valid("json");
+
+  // Fetch both quests and verify they belong to the user
+  const activeQuest = await db.userQuest.findUnique({
+    where: { id: activeQuestId },
+    include: { quest: true },
+  });
+
+  const queuedQuest = await db.userQuest.findUnique({
+    where: { id: queuedQuestId },
+    include: { quest: true },
+  });
+
+  if (!activeQuest || !queuedQuest) {
+    return c.json({ message: "One or both quests not found" }, 404);
+  }
+
+  if (activeQuest.userId !== user.id || queuedQuest.userId !== user.id) {
+    return c.json({ message: "Unauthorized - quests don't belong to you" }, 403);
+  }
+
+  // Verify statuses
+  if (activeQuest.status !== "ACTIVE") {
+    return c.json({ message: "First quest must be active" }, 400);
+  }
+
+  if (queuedQuest.status !== "QUEUED") {
+    return c.json({ message: "Second quest must be queued" }, 400);
+  }
+
+  // 🚨 CRITICAL: Check if active quest has any actions recorded
+  // If user has gotten their first No, Yes, or Action, they can't swap
+  const hasActions = activeQuest.noCount > 0 || activeQuest.yesCount > 0 || activeQuest.actionCount > 0;
+
+  if (hasActions) {
+    return c.json(
+      {
+        success: false,
+        message: "Cannot swap quests once you've started recording actions (No, Yes, or Action). Complete this quest first.",
+      },
+      400
+    );
+  }
+
+  // Perform the swap: active -> queued, queued -> active
+  await db.$transaction([
+    // Move active quest to queue (reset startedAt)
+    db.userQuest.update({
+      where: { id: activeQuestId },
+      data: {
+        status: "QUEUED",
+        startedAt: null,
+      },
+    }),
+    // Move queued quest to active (set startedAt)
+    db.userQuest.update({
+      where: { id: queuedQuestId },
+      data: {
+        status: "ACTIVE",
+        startedAt: new Date(),
+      },
+    }),
+  ]);
+
+  return c.json({
+    success: true,
+    message: "Quests swapped successfully",
+  } satisfies SwapQuestResponse);
 });
 
 // ============================================

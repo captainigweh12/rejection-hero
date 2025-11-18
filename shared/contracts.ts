@@ -281,6 +281,18 @@ export const startQuestResponseSchema = z.object({
 });
 export type StartQuestResponse = z.infer<typeof startQuestResponseSchema>;
 
+// POST /api/quests/swap - Swap an active quest with a queued quest
+export const swapQuestRequestSchema = z.object({
+  activeQuestId: z.string(),
+  queuedQuestId: z.string(),
+});
+export type SwapQuestRequest = z.infer<typeof swapQuestRequestSchema>;
+export const swapQuestResponseSchema = z.object({
+  success: z.boolean(),
+  message: z.string(),
+});
+export type SwapQuestResponse = z.infer<typeof swapQuestResponseSchema>;
+
 // POST /api/quests/:id/record - Record NO or YES
 export const recordQuestActionRequestSchema = z.object({
   action: z.enum(["NO", "YES", "ACTION"]),

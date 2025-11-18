@@ -14,7 +14,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Flame,
   Trophy,
@@ -59,6 +59,8 @@ import type {
   GetWeeklyForecastResponse,
   GetProfileResponse,
   GetActiveChallengeResponse,
+  SwapQuestRequest,
+  SwapQuestResponse,
 } from "@/shared/contracts";
 
 type Props = BottomTabScreenProps<"HomeTab">;
@@ -131,6 +133,21 @@ export default function HomeScreen({ navigation }: Props) {
 
   const activeQuests = questsData?.activeQuests || [];
   const queuedQuests = questsData?.queuedQuests || [];
+
+  // Swap quest mutation
+  const swapQuestMutation = useMutation({
+    mutationFn: async (data: SwapQuestRequest) => {
+      return api.post<SwapQuestResponse>("/api/quests/swap", data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["quests"] });
+      Alert.alert("Success", "Quests swapped successfully!");
+    },
+    onError: (error: any) => {
+      const errorMessage = error?.message || error?.toString() || "Failed to swap quests";
+      Alert.alert("Error", errorMessage);
+    },
+  });
 
   const handleLogout = async () => {
     Alert.alert(
