@@ -1,11 +1,17 @@
 ## 🔧 Bug Fixes
 
+### Database Schema Sync Fixed (2025-11-18)
+- **Fixed**: Resolved 500 internal server error on GET /api/moments endpoint
+- **Issue**: The database schema was out of sync with the Prisma schema - `groupId` column was missing from the `moment` table
+- **Error**: "The column `main.moment.groupId` does not exist in the current database" (Prisma P2022)
+- **Solution**: Ran `bunx prisma db push` to sync the database schema with Prisma schema
+- **Impact**: Users can now successfully view moments/stories without API errors
+
 ### Navigation Error Fixed (2025-11-18)
 - **Fixed**: Resolved "undefined is not a function" error when navigating to onboarding
 - **Issue**: The `navigation.replace()` method was not available in the AuthWrapper context
 - **Solution**: Changed to `navigation.navigate()` and added proper null checks for navigation state
 - **Impact**: Users can now properly navigate to onboarding after signup/login without errors
-
 
 ### Journal Save Error Fixed (2025-11-18)
 - **Fixed**: Resolved "Invalid input: expected string, received null" error when saving journal entries
