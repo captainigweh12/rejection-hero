@@ -1597,6 +1597,20 @@ See `ENV_SETUP.md` for complete environment variable setup guide.
    - Backend environment variables: `GOHIGHLEVEL_API_KEY`, `GOHIGHLEVEL_LOCATION_ID`
    - **To enable email sending**: Add `conversations.message.write` and `conversations.write` scopes to your API key in GoHighLevel settings
 
+8. **Stripe Payment Processing** ✅ CONFIGURED!
+   - Secret Key: Added to backend `.env`
+   - Publishable Key: Added to backend `.env`
+   - **Features**:
+     - Monthly subscription: $4.99/month for AI features
+     - Token purchases: $0.10 per token (for sending quests to friends)
+     - Users can start for free (basic features)
+     - AI quest generation requires premium subscription
+     - Users earn tokens by completing quests (proportional to NOs collected)
+   - Backend environment variables: `STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`
+   - **Webhook Setup Required**: 
+     - Point Stripe webhook to: `https://your-backend-url.com/api/payments/webhook`
+     - Subscribe to: `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`
+
 ### Test the App
 
 1. Create an account with email/password OR sign in with Google

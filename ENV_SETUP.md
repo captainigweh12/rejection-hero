@@ -32,6 +32,22 @@ PERPLEXITY_API_KEY=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
 GOOGLE_MAPS_API_KEY=AIzaSyCHMHlOrPPSRULrUf-FqPWHz0Y6PJoPrRk
 ```
 
+### Stripe (Payment Processing)
+```
+STRIPE_SECRET_KEY=sk_test_51SUvVO1iXf3xZVpyDOBhx1wdrFSVoDigGLUW4lsPRgi6zi5zPMiI8y01VXOiLP2JCQ32VHWDiLKU8tozTvJQYBNZ00NRdKGYcw
+STRIPE_PUBLISHABLE_KEY=pk_test_51SUvVO1iXf3xZVpycT4b34CppKSMf6IIiEuJJKJBHPeMQiLeNt2zePQMOEDpkumkfubydR2lqdVIvqLtRbUACyKI00Xwwnp381
+STRIPE_WEBHOOK_SECRET=whsec_... (Get this from Stripe Dashboard after setting up webhook)
+```
+
+**Stripe Webhook Setup:**
+1. Go to Stripe Dashboard → Developers → Webhooks
+2. Add endpoint: `https://your-backend-url.com/api/payments/webhook`
+3. Subscribe to events:
+   - `checkout.session.completed`
+   - `customer.subscription.updated`
+   - `customer.subscription.deleted`
+4. Copy the webhook signing secret and add it to `STRIPE_WEBHOOK_SECRET`
+
 ### Supabase (Optional - for production database)
 ```
 DATABASE_URL=postgresql://user:password@host:port/database
