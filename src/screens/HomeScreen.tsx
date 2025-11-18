@@ -69,6 +69,7 @@ export default function HomeScreen({ navigation }: Props) {
   const { data: sessionData } = useSession();
   const { colors } = useTheme();
   const { t } = useLanguage();
+  const queryClient = useQueryClient();
   const [showMenu, setShowMenu] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [darkMode, setDarkMode] = useState(true);

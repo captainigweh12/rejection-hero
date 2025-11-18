@@ -2971,3 +2971,18 @@ Failed to find Response internal state key
 <-- GET /api/live/active
 🔐 [Auth Middleware] GET /api/live/active - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
 --> GET /api/live/active [32m200[0m 3ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+--> GET /api/live/active [32m200[0m 3ms
+<-- GET /api/challenges/active
+🔐 [Auth Middleware] GET /api/challenges/active - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+--> GET /api/challenges/active [32m200[0m 3ms
