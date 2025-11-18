@@ -290,6 +290,7 @@ paymentsRouter.post("/webhook", async (c) => {
         const userId = session.metadata?.userId || subscription.metadata?.userId;
 
         if (userId) {
+          const subData = subscription as any;
           await db.subscription.upsert({
             where: { userId },
             create: {
@@ -298,17 +299,17 @@ paymentsRouter.post("/webhook", async (c) => {
               stripeSubscriptionId: subscription.id,
               status: subscription.status,
               plan: "monthly",
-              currentPeriodStart: new Date(subscription.current_period_start * 1000),
-              currentPeriodEnd: new Date(subscription.current_period_end * 1000),
-              cancelAtPeriodEnd: subscription.cancel_at_period_end,
+              currentPeriodStart: subData.current_period_start ? new Date(subData.current_period_start * 1000) : null,
+              currentPeriodEnd: subData.current_period_end ? new Date(subData.current_period_end * 1000) : null,
+              cancelAtPeriodEnd: subData.cancel_at_period_end || false,
             },
             update: {
               stripeCustomerId: subscription.customer as string,
               stripeSubscriptionId: subscription.id,
               status: subscription.status,
-              currentPeriodStart: new Date(subscription.current_period_start * 1000),
-              currentPeriodEnd: new Date(subscription.current_period_end * 1000),
-              cancelAtPeriodEnd: subscription.cancel_at_period_end,
+              currentPeriodStart: subData.current_period_start ? new Date(subData.current_period_start * 1000) : null,
+              currentPeriodEnd: subData.current_period_end ? new Date(subData.current_period_end * 1000) : null,
+              cancelAtPeriodEnd: subData.cancel_at_period_end || false,
             },
           });
         }
