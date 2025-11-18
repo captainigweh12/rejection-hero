@@ -145,10 +145,12 @@ profileRouter.post("/", zValidator("json", updateProfileRequestSchema), async (c
       location: data.location,
       latitude: data.latitude,
       longitude: data.longitude,
-      userContext: data.userContext,
-      userGoals: data.userGoals,
-      onboardingCompleted: data.onboardingCompleted,
-    },
+          userContext: data.userContext,
+          userGoals: data.userGoals,
+          onboardingCompleted: data.onboardingCompleted,
+          ...(data.ageVerified !== undefined && { ageVerified: data.ageVerified }),
+          ...(data.parentalConsent !== undefined && { parentalConsent: data.parentalConsent }),
+        },
   });
 
   const photos = profile.photos ? JSON.parse(profile.photos) : [];
