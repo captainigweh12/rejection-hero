@@ -3,6 +3,7 @@ import { View, Text, Pressable, ActivityIndicator, ScrollView, Alert, TextInput,
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import * as ImagePicker from "expo-image-picker";
 import {
   Settings,
   Shield,
@@ -125,6 +126,73 @@ export default function ProfileScreen({ navigation }: Props) {
     });
   };
 
+  const handleUploadPhoto = async () => {
+    try {
+      // Request permissions
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert("Permission Required", "Please grant camera roll permissions to upload photos.");
+        return;
+      }
+
+      // Launch image picker
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
+
+      if (result.canceled || !result.assets[0]) {
+        return;
+      }
+
+      const imageUri = result.assets[0].uri;
+      setShowAvatarModal(false);
+
+      // Upload image to server
+      const formData = new FormData();
+      const filename = imageUri.split("/").pop() || "avatar.jpg";
+      const match = /\.(\w+)$/.exec(filename);
+      const type = match ? `image/${match[1]}` : "image/jpeg";
+
+      formData.append("image", {
+        uri: imageUri,
+        name: filename,
+        type,
+      } as any);
+
+      const uploadResponse = await fetch(`${process.env.EXPO_PUBLIC_VIBECODE_BACKEND_URL}/api/upload/image`, {
+        method: "POST",
+        body: formData,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      if (!uploadResponse.ok) {
+        throw new Error("Failed to upload image");
+      }
+
+      const uploadData = await uploadResponse.json();
+      const serverImageUrl = `${process.env.EXPO_PUBLIC_VIBECODE_BACKEND_URL}${uploadData.url}`;
+
+      // Save the avatar URL to the profile
+      await api.post("/api/profile", {
+        displayName: profileData?.displayName || sessionData?.user?.email?.split("@")[0] || "Warrior",
+        avatar: serverImageUrl,
+      });
+
+      // Refetch profile to show new avatar
+      queryClient.invalidateQueries({ queryKey: ["profile"] });
+
+      Alert.alert("Success!", "Your profile picture has been uploaded and saved!");
+    } catch (error) {
+      console.error("Error uploading photo:", error);
+      Alert.alert("Error", "Failed to upload photo. Please try again.");
+    }
+  };
+
   const handleGenerateAvatar = async (style: string) => {
     setShowStyleModal(false);
     setShowAvatarModal(false);
@@ -137,10 +205,15 @@ export default function ProfileScreen({ navigation }: Props) {
       );
 
       if (response.success && response.avatarUrl) {
+        // The avatar URL is already a server URL, so we can use it directly
+        const avatarUrl = response.avatarUrl.startsWith("http")
+          ? response.avatarUrl
+          : `${process.env.EXPO_PUBLIC_VIBECODE_BACKEND_URL}${response.avatarUrl}`;
+
         // Save the avatar to the profile
         await api.post("/api/profile", {
           displayName: profileData?.displayName || sessionData?.user?.email?.split("@")[0] || "Warrior",
-          avatar: response.avatarUrl,
+          avatar: avatarUrl,
         });
 
         // Refetch profile to show new avatar
@@ -1329,10 +1402,7 @@ export default function ProfileScreen({ navigation }: Props) {
 
             <View style={{ gap: 16 }}>
               <Pressable
-                onPress={() => {
-                  Alert.alert("Coming Soon", "Upload your own photo avatar!");
-                  setShowAvatarModal(false);
-                }}
+                onPress={handleUploadPhoto}
                 style={{
                   flexDirection: "row",
                   alignItems: "center",

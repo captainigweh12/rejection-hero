@@ -1,5 +1,8 @@
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
+import * as fs from "node:fs";
+import * as path from "node:path";
+import { randomUUID } from "node:crypto";
 import {
   type GetProfileResponse,
   updateProfileRequestSchema,
@@ -212,7 +215,7 @@ profileRouter.post("/generate-avatar", zValidator("json", generateAvatarRequestS
     const style = data.style || "gaming";
     const customDescription = data.description || "";
 
-    let prompt = "";
+    let prompt: string;
     if (customDescription) {
       prompt = `Create a profile avatar with this description: ${customDescription}. Style: ${style}. High quality, professional, suitable for a gaming profile picture.`;
     } else {
@@ -261,10 +264,10 @@ profileRouter.post("/generate-avatar", zValidator("json", generateAvatarRequestS
       } satisfies GenerateAvatarResponse, 500);
     }
 
-    const result = await response.json();
-    const avatarUrl = result.data[0]?.url;
+    const result = (await response.json()) as { data: Array<{ url: string }> };
+    const dallEUrl = result.data[0]?.url;
 
-    if (!avatarUrl) {
+    if (!dallEUrl) {
       return c.json({
         success: false,
         avatarUrl: "",
@@ -272,13 +275,52 @@ profileRouter.post("/generate-avatar", zValidator("json", generateAvatarRequestS
       } satisfies GenerateAvatarResponse, 500);
     }
 
-    console.log("✅ Avatar generated successfully:", avatarUrl);
+    console.log("✅ Avatar generated successfully from DALL-E:", dallEUrl);
 
-    return c.json({
-      success: true,
-      avatarUrl,
-      message: "Avatar generated successfully!",
-    } satisfies GenerateAvatarResponse);
+    // Download the image from DALL-E and save it to our server
+    try {
+      const imageResponse = await fetch(dallEUrl);
+      if (!imageResponse.ok) {
+        throw new Error("Failed to download avatar from DALL-E");
+      }
+
+      const imageBuffer = Buffer.from(await imageResponse.arrayBuffer());
+
+      // Get uploads directory
+      const UPLOADS_DIR = process.env.UPLOADS_DIR || path.join(process.cwd(), "uploads");
+      
+      // Ensure uploads directory exists
+      if (!fs.existsSync(UPLOADS_DIR)) {
+        fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+      }
+
+      // Generate unique filename
+      const uniqueFilename = `avatar-${randomUUID()}.png`;
+      const filePath = path.join(UPLOADS_DIR, uniqueFilename);
+
+      // Save file to disk
+      fs.writeFileSync(filePath, imageBuffer);
+      console.log("💾 Avatar saved to server:", filePath);
+
+      // Return server URL instead of DALL-E URL
+      const serverAvatarUrl = `/uploads/${uniqueFilename}`;
+      console.log("✅ Avatar URL saved:", serverAvatarUrl);
+
+      return c.json({
+        success: true,
+        avatarUrl: serverAvatarUrl,
+        message: "Avatar generated successfully!",
+      } satisfies GenerateAvatarResponse);
+    } catch (downloadError) {
+      console.error("Error downloading/saving avatar:", downloadError);
+      // Fallback: return DALL-E URL (will expire but better than nothing)
+      console.warn("⚠️ Using temporary DALL-E URL (will expire)");
+      return c.json({
+        success: true,
+        avatarUrl: dallEUrl,
+        message: "Avatar generated successfully!",
+      } satisfies GenerateAvatarResponse);
+    }
   } catch (error) {
     console.error("Error generating avatar:", error);
     return c.json({
