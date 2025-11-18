@@ -39,6 +39,7 @@ statsRouter.get("/", async (c) => {
         totalPoints: 0,
         trophies: 0,
         diamonds: 0,
+        tokens: 0,
       },
     });
 
@@ -49,6 +50,7 @@ statsRouter.get("/", async (c) => {
       totalPoints: newStats.totalPoints,
       trophies: newStats.trophies,
       diamonds: newStats.diamonds,
+      tokens: newStats.tokens || 0,
       confidenceLevel: newStats.confidenceLevel,
       previousConfidence: newStats.previousConfidence,
       confidenceChange: newStats.confidenceLevel - newStats.previousConfidence,
@@ -71,6 +73,7 @@ statsRouter.get("/", async (c) => {
     totalPoints: stats.totalPoints,
     trophies: stats.trophies,
     diamonds: stats.diamonds,
+    tokens: stats.tokens || 0,
     confidenceLevel: stats.confidenceLevel,
     previousConfidence: stats.previousConfidence,
     confidenceChange: stats.confidenceLevel - stats.previousConfidence,

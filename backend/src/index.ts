@@ -32,6 +32,7 @@ import { audioRouter } from "./routes/audio";
 import { authRouter } from "./routes/auth";
 import { webRedirectRouter } from "./routes/webRedirects";
 import challengesRouter from "./routes/challenges";
+import paymentsRouter from "./routes/payments";
 import { generateDailyChallengesForAllUsers, sendMotivationalNotifications } from "./services/challengeScheduler";
 import { type AppType } from "./types";
 
@@ -152,6 +153,9 @@ app.route("/api/categories", categoriesRouter);
 
 console.log("🎤 Mounting audio routes at /api/audio");
 app.route("/api/audio", audioRouter);
+
+console.log("💳 Mounting payments routes at /api/payments");
+app.route("/api/payments", paymentsRouter);
 
 console.log("🌐 Mounting web redirect routes");
 app.route("/", webRedirectRouter);

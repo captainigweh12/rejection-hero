@@ -36,6 +36,11 @@ const envSchema = z.object({
 
   // Perplexity AI Configuration
   PERPLEXITY_API_KEY: z.string().optional(),
+
+  // Stripe Configuration
+  STRIPE_SECRET_KEY: z.string().optional(),
+  STRIPE_PUBLISHABLE_KEY: z.string().optional(),
+  STRIPE_WEBHOOK_SECRET: z.string().optional(),
 });
 
 /**

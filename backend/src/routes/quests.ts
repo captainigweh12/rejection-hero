@@ -137,6 +137,14 @@ questsRouter.get("/completed", async (c) => {
   return c.json({ quests });
 });
 
+// Helper function to check if user has active subscription
+async function hasActiveSubscription(userId: string): Promise<boolean> {
+  const subscription = await db.subscription.findUnique({
+    where: { userId },
+  });
+  return subscription?.status === "active" || subscription?.status === "trialing";
+}
+
 // ============================================
 // POST /api/quests/generate - Generate AI quest
 // ============================================
@@ -145,6 +153,18 @@ questsRouter.post("/generate", zValidator("json", generateQuestRequestSchema), a
 
   if (!user) {
     return c.json({ message: "Unauthorized" }, 401);
+  }
+
+  // Check subscription for AI features
+  const hasSubscription = await hasActiveSubscription(user.id);
+  if (!hasSubscription) {
+    return c.json(
+      {
+        message: "AI quest generation requires a premium subscription. Subscribe to unlock AI-powered quests!",
+        requiresSubscription: true,
+      },
+      403
+    );
   }
 
   const { category, difficulty, customPrompt, userLocation, userLatitude, userLongitude, preferredQuestType } = c.req.valid("json");
@@ -220,6 +240,18 @@ questsRouter.post("/refresh-all", zValidator("json", refreshAllQuestsRequestSche
 
   if (!user) {
     return c.json({ message: "Unauthorized" }, 401);
+  }
+
+  // Check subscription for AI features
+  const hasSubscription = await hasActiveSubscription(user.id);
+  if (!hasSubscription) {
+    return c.json(
+      {
+        message: "AI quest generation requires a premium subscription. Subscribe to unlock AI-powered quests!",
+        requiresSubscription: true,
+      },
+      403
+    );
   }
 
   const { count = 3, userLocation, userLatitude, userLongitude } = c.req.valid("json");
@@ -491,9 +523,38 @@ questsRouter.post("/:id/record", zValidator("json", recordQuestActionRequestSche
     },
   });
 
-  // If completed, update user stats
+  // If completed, update user stats and award tokens
   if (isCompleted) {
     await updateUserStats(user.id, userQuest.quest.xpReward, userQuest.quest.pointReward, userQuest.quest.difficulty);
+
+    // Award tokens proportional to the number of "No"s collected
+    // Formula: 1 token per "No" collected (minimum 1 token if quest was completed)
+    const tokensEarned = userQuest.quest.goalType === "COLLECT_NOS" 
+      ? Math.max(1, newNoCount) // At least 1 token, or number of NOs collected
+      : userQuest.quest.goalType === "COLLECT_YES"
+      ? Math.max(1, newYesCount) // For YES quests, use YES count
+      : Math.max(1, newActionCount); // For ACTION quests, use action count
+
+    // Update user stats with tokens
+    await db.userStats.update({
+      where: { userId: user.id },
+      data: {
+        tokens: {
+          increment: tokensEarned,
+        },
+      },
+    });
+
+    // Create token transaction record
+    await db.tokenTransaction.create({
+      data: {
+        userId: user.id,
+        type: "earned",
+        amount: tokensEarned,
+        description: `Earned ${tokensEarned} token${tokensEarned > 1 ? "s" : ""} from completing quest: ${userQuest.quest.title}`,
+        questId: userQuest.quest.id,
+      },
+    });
 
     // Check if this is a challenge daily quest and mark it as completed
     const challengeDailyQuest = await db.challengeDailyQuest.findFirst({

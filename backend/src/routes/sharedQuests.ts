@@ -383,6 +383,42 @@ sharedQuestsRouter.post("/share", zValidator("json", shareQuestSchema), async (c
     return c.json({ message: "You can only share quests with friends" }, 403);
   }
 
+  // Check token balance (1 token required to send quest to friend)
+  const userStats = await db.userStats.findUnique({
+    where: { userId: user.id },
+  });
+
+  if (!userStats || (userStats.tokens || 0) < 1) {
+    return c.json(
+      {
+        message: "You need at least 1 token to send a quest to a friend. Complete quests to earn tokens!",
+        requiresTokens: true,
+      },
+      400
+    );
+  }
+
+  // Deduct token
+  await db.userStats.update({
+    where: { userId: user.id },
+    data: {
+      tokens: {
+        decrement: 1,
+      },
+    },
+  });
+
+  // Create token transaction record
+  await db.tokenTransaction.create({
+    data: {
+      userId: user.id,
+      type: "spent",
+      amount: -1,
+      description: `Spent 1 token to send quest "${quest.title}" to friend`,
+      questId: quest.id,
+    },
+  });
+
   // Create shared quest
   const sharedQuest = await db.sharedQuest.create({
     data: {
@@ -536,6 +572,24 @@ sharedQuestsRouter.post("/create-custom", zValidator("json", createCustomQuestSc
   const data = c.req.valid("json");
   const { friendId, audioTranscript, textDescription, category, difficulty, goalType, goalCount, locationType, customLocation, latitude, longitude, giftXP, giftPoints, message } = data;
 
+  // Check subscription for AI features (custom quest uses AI fine-tuning)
+  const subscription = await db.subscription.findUnique({
+    where: { userId: user.id },
+  });
+  const hasSubscription = subscription?.status === "active" || subscription?.status === "trialing";
+
+  if (!hasSubscription) {
+    return c.json(
+      {
+        success: false,
+        message: "AI-powered custom quest creation requires a premium subscription. Subscribe to unlock this feature!",
+        isSafe: false,
+        requiresSubscription: true,
+      },
+      403
+    );
+  }
+
   // Check if they are friends
   const friendship = await db.friendship.findFirst({
     where: {
@@ -548,6 +602,23 @@ sharedQuestsRouter.post("/create-custom", zValidator("json", createCustomQuestSc
 
   if (!friendship) {
     return c.json({ success: false, message: "You can only share quests with friends", isSafe: false }, 403);
+  }
+
+  // Check token balance (1 token required to send quest to friend)
+  const userStats = await db.userStats.findUnique({
+    where: { userId: user.id },
+  });
+
+  if (!userStats || (userStats.tokens || 0) < 1) {
+    return c.json(
+      {
+        success: false,
+        message: "You need at least 1 token to send a quest to a friend. Complete quests to earn tokens!",
+        isSafe: false,
+        requiresTokens: true,
+      },
+      400
+    );
   }
 
   // Check user's balance if gifting points/XP
@@ -667,6 +738,27 @@ sharedQuestsRouter.post("/create-custom", zValidator("json", createCustomQuestSc
       xpReward: baseXP + giftXP,
       pointReward: basePoints + giftPoints,
       isAIGenerated: true, // Mark as AI-generated since we fine-tuned it
+    },
+  });
+
+  // Deduct token for sending quest
+  await db.userStats.update({
+    where: { userId: user.id },
+    data: {
+      tokens: {
+        decrement: 1,
+      },
+    },
+  });
+
+  // Create token transaction record
+  await db.tokenTransaction.create({
+    data: {
+      userId: user.id,
+      type: "spent",
+      amount: -1,
+      description: `Spent 1 token to send custom quest to friend`,
+      questId: quest.id,
     },
   });
 

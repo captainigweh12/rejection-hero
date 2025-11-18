@@ -44,6 +44,8 @@ import {
   Send,
   Trash2,
   RefreshCw,
+  Coins,
+  Crown,
 } from "lucide-react-native";
 import type { BottomTabScreenProps } from "@/navigation/types";
 import { api } from "@/lib/api";
@@ -423,6 +425,26 @@ export default function HomeScreen({ navigation }: Props) {
                     <Flame size={16} color="#FF6B35" fill="#FF6B35" />
                     <Text style={{ color: "#FF6B35", fontSize: 14, fontWeight: "bold" }}>
                       {statsData?.currentStreak || 0}
+                    </Text>
+                  </View>
+
+                  {/* Tokens */}
+                  <View
+                    style={{
+                      backgroundColor: "rgba(0, 217, 255, 0.2)",
+                      borderRadius: 12,
+                      paddingHorizontal: 10,
+                      paddingVertical: 6,
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 4,
+                      borderWidth: 1,
+                      borderColor: "rgba(0, 217, 255, 0.4)",
+                    }}
+                  >
+                    <Coins size={16} color="#00D9FF" fill="#00D9FF" />
+                    <Text style={{ color: "#00D9FF", fontSize: 14, fontWeight: "bold" }}>
+                      {statsData?.tokens || 0}
                     </Text>
                   </View>
 

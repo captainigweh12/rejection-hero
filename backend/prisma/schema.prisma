@@ -47,6 +47,8 @@ model User {
   GroupQuestParticipations GroupQuestParticipant[]
   GroupQuestAssignments GroupQuestAssignment[]
   Challenges          Challenge[]
+  Subscription       Subscription?
+  TokenTransactions  TokenTransaction[]
 
   @@map("user")
 }
@@ -154,6 +156,7 @@ model UserStats {
   totalPoints   Int      @default(0)
   trophies      Int      @default(0)
   diamonds      Int      @default(0)
+  tokens        Int      @default(0) // Tokens for sending quests to friends
   lastActiveAt  DateTime @default(now())
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -568,4 +571,36 @@ model GroupQuestAssignment {
 
   @@unique([groupQuestId, userId])
   @@map("group_quest_assignment")
+}
+
+model Subscription {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  stripeCustomerId  String?  @unique
+  stripeSubscriptionId String? @unique
+  status            String   @default("inactive") // active, canceled, past_due, trialing, inactive
+  plan              String   @default("monthly") // monthly, annual
+  currentPeriodStart DateTime?
+  currentPeriodEnd   DateTime?
+  cancelAtPeriodEnd  Boolean  @default(false)
+  canceledAt         DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("subscription")
+}
+
+model TokenTransaction {
+  id                String   @id @default(cuid())
+  userId            String
+  type              String   // purchase, earned, spent
+  amount            Int      // Positive for purchase/earned, negative for spent
+  description       String?
+  stripePaymentIntentId String? // For purchases
+  questId           String?  // For earned tokens from quest completion
+  createdAt         DateTime @default(now())
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("token_transaction")
 }

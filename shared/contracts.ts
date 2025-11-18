@@ -365,6 +365,60 @@ export const generateMapQuestsResponseSchema = z.object({
 export type GenerateMapQuestsResponse = z.infer<typeof generateMapQuestsResponseSchema>;
 
 // GET /api/stats - Get user stats
+// ==========================================
+// Payments Routes
+// ==========================================
+
+// GET /api/payments/subscription - Get subscription status
+export const getSubscriptionResponseSchema = z.object({
+  hasActiveSubscription: z.boolean(),
+  subscription: z
+    .object({
+      id: z.string(),
+      status: z.string(),
+      plan: z.string(),
+      currentPeriodEnd: z.string().nullable(),
+      cancelAtPeriodEnd: z.boolean(),
+    })
+    .nullable(),
+});
+export type GetSubscriptionResponse = z.infer<typeof getSubscriptionResponseSchema>;
+
+// POST /api/payments/create-subscription - Create subscription checkout
+export const createSubscriptionResponseSchema = z.object({
+  sessionId: z.string(),
+  url: z.string().nullable(),
+});
+export type CreateSubscriptionResponse = z.infer<typeof createSubscriptionResponseSchema>;
+
+// POST /api/payments/cancel-subscription - Cancel subscription
+export const cancelSubscriptionResponseSchema = z.object({
+  success: z.boolean(),
+  message: z.string(),
+});
+export type CancelSubscriptionResponse = z.infer<typeof cancelSubscriptionResponseSchema>;
+
+// POST /api/payments/create-token-purchase - Create token purchase checkout
+export const createTokenPurchaseRequestSchema = z.object({
+  amount: z.number().int().min(1).max(1000),
+});
+export type CreateTokenPurchaseRequest = z.infer<typeof createTokenPurchaseRequestSchema>;
+export const createTokenPurchaseResponseSchema = z.object({
+  sessionId: z.string(),
+  url: z.string().nullable(),
+});
+export type CreateTokenPurchaseResponse = z.infer<typeof createTokenPurchaseResponseSchema>;
+
+// GET /api/payments/tokens - Get token balance
+export const getTokensResponseSchema = z.object({
+  tokens: z.number(),
+});
+export type GetTokensResponse = z.infer<typeof getTokensResponseSchema>;
+
+// ==========================================
+// Stats Routes
+// ==========================================
+
 export const getUserStatsResponseSchema = z.object({
   currentStreak: z.number(),
   longestStreak: z.number(),
@@ -372,6 +426,7 @@ export const getUserStatsResponseSchema = z.object({
   totalPoints: z.number(),
   trophies: z.number(),
   diamonds: z.number(),
+  tokens: z.number(),
 
   // Confidence & Fear Zone Tracking
   confidenceLevel: z.number(), // 0-100 confidence percentage
