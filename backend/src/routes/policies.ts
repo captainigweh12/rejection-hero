@@ -9,6 +9,12 @@ import { createOrUpdateContact, sendEmail as sendGoHighLevelEmail } from "../ser
 
 const policiesRouter = new Hono<AppType>();
 
+// Add __dirname for ES modules (Bun support)
+const __filename = new URL(import.meta.url).pathname;
+const __dirname = __filename.substring(0, __filename.lastIndexOf("/"));
+
+console.log(`📜 [Policies] Router initialized. __dirname: ${__dirname}`);
+
 // Policy types
 const POLICY_TYPES = [
   "terms-of-service",
@@ -36,20 +42,23 @@ policiesRouter.get("/:policyType", async (c) => {
 
   try {
     const filePath = path.join(__dirname, "../legal", `${policyType}.md`);
-    
+    console.log(`📄 [Policies] Loading policy: ${policyType}, path: ${filePath}`);
+
     if (!fs.existsSync(filePath)) {
+      console.log(`❌ [Policies] File not found at: ${filePath}`);
       return c.json({ message: "Policy not found" }, 404);
     }
 
     const content = fs.readFileSync(filePath, "utf-8");
-    
+    console.log(`✅ [Policies] Successfully read policy: ${policyType}`);
+
     return c.json({
       policyType,
       content,
       version: "1.0",
     });
   } catch (error) {
-    console.error("Error reading policy:", error);
+    console.error("❌ [Policies] Error reading policy:", error);
     return c.json({ message: "Failed to read policy" }, 500);
   }
 });

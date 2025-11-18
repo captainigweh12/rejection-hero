@@ -1,9 +1,24 @@
 ## 🔧 Bug Fixes
 
+### Legal Policy Files Created (2025-11-18)
+- **Added**: Created all 9 legal policy markdown files in `/backend/src/legal/` directory:
+  - `terms-of-service.md` - Complete Terms of Service
+  - `privacy-policy.md` - Privacy Policy with data handling details
+  - `age-policy.md` - Age Verification and Parental Consent Policy
+  - `payment-policy.md` - Payment and Subscription Policy
+  - `recording-consent.md` - Recording Consent and Release Agreement
+  - `dmca.md` - DMCA Policy and Copyright Notice
+  - `liability-waiver.md` - Liability Waiver and Risk Disclosure
+  - `safety-policy.md` - Safety and Misconduct Reporting Policy
+  - `content-guidelines.md` - Content and Community Guidelines
+- **Implementation**: Backend `/api/policies/:policyType` endpoint now successfully serves all policies
+- **User Access**: Policies are displayed in the Legal tab on the Profile screen with full content viewable in modal
+- **Features**: Users can read full policies and accept them with timestamp tracking
+
 ### Legal Policies Review Section Added (2025-11-18)
 - **Added**: New "Legal" tab in the Profile screen where users can review all accepted and pending policies
 - **Features**:
-  - View acceptance status for all 9 legal policy types (Terms of Service, Privacy Policy, Age Policy, etc.)
+  - View acceptance status for all 9 legal policy types
   - See when each policy was accepted
   - Read full policy content in a modal viewer
   - Accept pending policies with confirmation
@@ -12,7 +27,7 @@
   - Created `LegalPoliciesTab` component for displaying policies
   - Added policy contracts (`GetPoliciesResponse`, `AcceptPolicyResponse`) to shared contracts
   - Integrated with existing PolicyViewerModal for reading full policy text
-  - Backend already had GET /api/policies endpoint to fetch user's policy acceptance status
+  - Backend `/api/policies` endpoint fetches user's policy acceptance status
 - **User Flow**: Users can navigate to Profile → Legal tab to see all their accepted/pending policies and their acceptance timestamps
 
 ### Profile API Response Fixed (2025-11-18)
