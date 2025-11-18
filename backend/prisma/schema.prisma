@@ -46,6 +46,7 @@ model User {
   GroupQuestsCreated GroupQuest[]        @relation("GroupQuestCreator")
   GroupQuestParticipations GroupQuestParticipant[]
   GroupQuestAssignments GroupQuestAssignment[]
+  Challenges          Challenge[]
 
   @@map("user")
 }
@@ -204,6 +205,7 @@ model Quest {
   SharedQuests  SharedQuest[]
   QuestSuggestions QuestSuggestion[]
   GroupQuests   GroupQuest[]
+  ChallengeDailyQuests ChallengeDailyQuest[]
 
   @@map("quest")
 }
@@ -223,6 +225,7 @@ model UserQuest {
   isFromFriend Boolean     @default(false) // Track if quest came from a friend
   sharedById  String?      // ID of friend who shared this quest
   LiveStreams LiveStream[]
+  ChallengeDailyQuests ChallengeDailyQuest[]
   quest       Quest        @relation(fields: [questId], references: [id], onDelete: Cascade)
   user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -482,6 +485,42 @@ model Notification {
   sender      User?    @relation("NotificationSender", fields: [senderId], references: [id], onDelete: Cascade)
 
   @@map("notification")
+}
+
+model Challenge {
+  id          String   @id @default(cuid())
+  userId      String
+  category    String   // SALES, SOCIAL, ENTREPRENEURSHIP, etc.
+  startDate   DateTime @default(now())
+  endDate     DateTime // startDate + 100 days
+  currentDay  Int      @default(1) // Current day in the challenge (1-100)
+  isActive    Boolean  @default(true)
+  completedDays Int   @default(0) // Number of days with completed quests
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dailyQuests ChallengeDailyQuest[]
+
+  @@map("challenge")
+}
+
+model ChallengeDailyQuest {
+  id          String    @id @default(cuid())
+  challengeId String
+  day         Int       // Day number (1-100)
+  questId     String?   // Generated quest ID
+  userQuestId String?   // User's quest instance
+  status      String    @default("PENDING") // PENDING, ACTIVE, COMPLETED, SKIPPED
+  generatedAt DateTime? // When the quest was generated
+  completedAt DateTime? // When the quest was completed
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  challenge   Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  quest       Quest?    @relation(fields: [questId], references: [id], onDelete: SetNull)
+  userQuest   UserQuest? @relation(fields: [userQuestId], references: [id], onDelete: SetNull)
+
+  @@unique([challengeId, day])
+  @@map("challenge_daily_quest")
 }
 
 model GroupQuest {

@@ -412,6 +412,48 @@ questsRouter.post("/:id/record", zValidator("json", recordQuestActionRequestSche
   // If completed, update user stats
   if (isCompleted) {
     await updateUserStats(user.id, userQuest.quest.xpReward, userQuest.quest.pointReward, userQuest.quest.difficulty);
+
+    // Check if this is a challenge daily quest and mark it as completed
+    const challengeDailyQuest = await db.challengeDailyQuest.findFirst({
+      where: {
+        userQuestId: userQuestId,
+      },
+      include: {
+        challenge: true,
+      },
+    });
+
+    if (challengeDailyQuest && challengeDailyQuest.status !== "COMPLETED") {
+      // Mark daily quest as completed
+      await db.challengeDailyQuest.update({
+        where: { id: challengeDailyQuest.id },
+        data: {
+          status: "COMPLETED",
+          completedAt: new Date(),
+        },
+      });
+
+      // Update challenge completed days count
+      await db.challenge.update({
+        where: { id: challengeDailyQuest.challengeId },
+        data: {
+          completedDays: {
+            increment: 1,
+          },
+        },
+      });
+
+      // Send completion notification
+      await db.notification.create({
+        data: {
+          userId: user.id,
+          type: "CHALLENGE_DAY_COMPLETED",
+          title: `🎉 Day ${challengeDailyQuest.day} Complete!`,
+          message: `You completed Day ${challengeDailyQuest.day} of your 100 Day Challenge! Keep the momentum going! 🔥`,
+          data: JSON.stringify({ challengeId: challengeDailyQuest.challengeId, day: challengeDailyQuest.day }),
+        },
+      });
+    }
   }
 
   return c.json({
@@ -471,7 +513,7 @@ async function getNearbyPlaces(
   }
 }
 
-async function generateQuestWithAI(
+export async function generateQuestWithAI(
   category?: string,
   difficulty?: string,
   customPrompt?: string,

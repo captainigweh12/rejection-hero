@@ -8,7 +8,7 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "@/navigation/types";
 import { api } from "@/lib/api";
 import { useTheme } from "@/contexts/ThemeContext";
-import type { GenerateQuestRequest, GenerateQuestResponse, AudioTranscribeResponse } from "@/shared/contracts";
+import type { GenerateQuestRequest, GenerateQuestResponse, AudioTranscribeResponse, EnrollChallengeRequest, EnrollChallengeResponse } from "@/shared/contracts";
 import { Audio } from "expo-av";
 
 type Props = NativeStackScreenProps<RootStackParamList, "CreateQuest">;
@@ -38,6 +38,32 @@ export default function CreateQuestScreen({ navigation }: Props) {
   const [isTranscribing, setIsTranscribing] = useState(false);
 
   const queryClient = useQueryClient();
+
+  // Enroll in 100 Day Challenge mutation
+  const enrollChallengeMutation = useMutation({
+    mutationFn: async (data: EnrollChallengeRequest) => {
+      return api.post<EnrollChallengeResponse>("/api/challenges/enroll", data);
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["challenges"] });
+      Alert.alert(
+        "Challenge Started! 🎯",
+        `Your 100 Day ${data.challenge.category} Challenge has begun! You'll receive daily quest challenges and motivation to keep you going. Check your quests for Day 1!`,
+        [
+          {
+            text: "View Challenge",
+            onPress: () => {
+              navigation.navigate("Tabs", { screen: "HomeTab" });
+            },
+          },
+          { text: "OK" },
+        ]
+      );
+    },
+    onError: (error) => {
+      Alert.alert("Error", error instanceof Error ? error.message : "Failed to enroll in challenge");
+    },
+  });
 
   // Handle navigation to Friends screen when Send to Friends is selected
   React.useEffect(() => {
@@ -319,6 +345,58 @@ export default function CreateQuestScreen({ navigation }: Props) {
                       </Text>
                       <Text style={{ fontSize: 14, color: colors.textSecondary }}>
                         Design your own challenge
+                      </Text>
+                    </View>
+                  </View>
+                </Pressable>
+              </View>
+
+              {/* 100 Day Challenge Card - 3D Glassmorphism */}
+              <View style={{ paddingHorizontal: 24, marginBottom: 20 }}>
+                <Pressable
+                  onPress={() => {
+                    // Show category selection for challenge
+                    Alert.alert(
+                      "100 Day Challenge",
+                      "Choose a category for your 100 Day Challenge. AI will create daily NO quest challenges to build your confidence!",
+                      [
+                        ...CATEGORIES.map((cat) => ({
+                          text: cat,
+                          onPress: () => {
+                            enrollChallengeMutation.mutate({ category: cat as "SALES" | "SOCIAL" | "ENTREPRENEURSHIP" | "DATING" | "CONFIDENCE" | "CAREER" });
+                          },
+                        })),
+                        { text: "Cancel", style: "cancel" },
+                      ]
+                    );
+                  }}
+                  style={{
+                    backgroundColor: colors.card,
+                    borderRadius: 24,
+                    padding: 24,
+                    borderWidth: 1,
+                    borderColor: colors.cardBorder,
+                  }}
+                >
+                  <View style={{ flexDirection: "row", alignItems: "center", gap: 16 }}>
+                    <View
+                      style={{
+                        width: 60,
+                        height: 60,
+                        borderRadius: 30,
+                        backgroundColor: "#FFD700" + "30",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Star size={28} color="#FFD700" fill="#FFD700" />
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ fontSize: 22, fontWeight: "bold", color: colors.text, marginBottom: 4 }}>
+                        100 Day Challenge
+                      </Text>
+                      <Text style={{ fontSize: 14, color: colors.textSecondary }}>
+                        AI-powered daily NO quest challenges
                       </Text>
                     </View>
                   </View>

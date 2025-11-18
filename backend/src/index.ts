@@ -31,6 +31,7 @@ import { categoriesRouter } from "./routes/categories";
 import { audioRouter } from "./routes/audio";
 import { authRouter } from "./routes/auth";
 import { webRedirectRouter } from "./routes/webRedirects";
+import challengesRouter from "./routes/challenges";
 import { type AppType } from "./types";
 
 // AppType context adds user and session to the context, will be null if the user or session is null
@@ -99,6 +100,9 @@ app.route("/api/matches", matchesRouter);
 
 console.log("🎯 Mounting quests routes at /api/quests");
 app.route("/api/quests", questsRouter);
+
+console.log("🏆 Mounting challenges routes at /api/challenges");
+app.route("/api/challenges", challengesRouter);
 
 console.log("📊 Mounting stats routes at /api/stats");
 app.route("/api/stats", statsRouter);

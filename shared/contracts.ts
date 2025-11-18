@@ -1106,6 +1106,72 @@ export const leaveGroupLiveResponseSchema = z.object({
 export type LeaveGroupLiveResponse = z.infer<typeof leaveGroupLiveResponseSchema>;
 
 // ==========================================
+// Challenges Routes
+// ==========================================
+
+// POST /api/challenges/enroll - Enroll in 100 Day Challenge
+export const enrollChallengeRequestSchema = z.object({
+  category: z.enum(["SALES", "SOCIAL", "ENTREPRENEURSHIP", "DATING", "CONFIDENCE", "CAREER"]),
+});
+export type EnrollChallengeRequest = z.infer<typeof enrollChallengeRequestSchema>;
+
+export const enrollChallengeResponseSchema = z.object({
+  success: z.boolean(),
+  challenge: z.object({
+    id: z.string(),
+    category: z.string(),
+    startDate: z.string(),
+    endDate: z.string(),
+    currentDay: z.number(),
+    completedDays: z.number(),
+  }),
+});
+export type EnrollChallengeResponse = z.infer<typeof enrollChallengeResponseSchema>;
+
+// GET /api/challenges/active - Get active challenge
+export const getActiveChallengeResponseSchema = z.object({
+  challenge: z
+    .object({
+      id: z.string(),
+      category: z.string(),
+      startDate: z.string(),
+      endDate: z.string(),
+      currentDay: z.number(),
+      completedDays: z.number(),
+      todayQuest: z
+        .object({
+          id: z.string(),
+          day: z.number(),
+          status: z.string(),
+          quest: z
+            .object({
+              id: z.string(),
+              title: z.string(),
+              description: z.string(),
+              category: z.string(),
+              goalCount: z.number(),
+            })
+            .nullable(),
+          userQuestId: z.string().nullable(),
+        })
+        .nullable(),
+    })
+    .nullable(),
+});
+export type GetActiveChallengeResponse = z.infer<typeof getActiveChallengeResponseSchema>;
+
+// POST /api/challenges/generate-daily - Generate today's quest
+export const generateDailyChallengeResponseSchema = z.object({
+  success: z.boolean(),
+  dailyQuest: z.object({
+    id: z.string(),
+    day: z.number(),
+    questId: z.string().nullable(),
+  }),
+});
+export type GenerateDailyChallengeResponse = z.infer<typeof generateDailyChallengeResponseSchema>;
+
+// ==========================================
 // Messages Routes
 // ==========================================
 
