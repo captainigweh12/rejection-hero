@@ -289,7 +289,10 @@ export default function JournalScreen({ navigation }: Props) {
                 </Text>
               </View>
               <TouchableOpacity
-                onPress={() => setModalVisible(true)}
+                onPress={() => {
+                  console.log("[JournalScreen] Plus button pressed, opening modal");
+                  setModalVisible(true);
+                }}
                 style={{
                   width: 56,
                   height: 56,

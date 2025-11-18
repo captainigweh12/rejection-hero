@@ -53,6 +53,7 @@ export default function AddJournalModal({ visible, onClose, onSuccess }: AddJour
   useEffect(() => {
     if (visible) {
       console.log("[Journal] Modal opened - resetting all state");
+      console.log("[Journal] Current step:", currentStep);
       setCurrentStep(1);
       setSelectedMethod(null);
       setTextContent("");
@@ -235,6 +236,8 @@ export default function AddJournalModal({ visible, onClose, onSuccess }: AddJour
     onClose();
   };
 
+  console.log("[Journal] Rendering modal, visible:", visible, "currentStep:", currentStep);
+
   return (
     <Modal
       visible={visible}
@@ -242,6 +245,7 @@ export default function AddJournalModal({ visible, onClose, onSuccess }: AddJour
       transparent={true}
       onRequestClose={handleClose}
       statusBarTranslucent={true}
+      presentationStyle="overFullScreen"
     >
       <SafeAreaView style={{ flex: 1 }} edges={["top", "bottom"]}>
         <KeyboardAvoidingView
@@ -261,7 +265,8 @@ export default function AddJournalModal({ visible, onClose, onSuccess }: AddJour
               style={{
                 width: "100%",
                 maxWidth: 420,
-                maxHeight: "90%",
+                height: "90%",
+                maxHeight: 700,
                 backgroundColor: "#1A1A24",
                 borderRadius: 24,
                 borderWidth: 2,
@@ -295,8 +300,12 @@ export default function AddJournalModal({ visible, onClose, onSuccess }: AddJour
 
           <ScrollView
             style={{ flex: 1 }}
-            contentContainerStyle={{ padding: 20 }}
+            contentContainerStyle={{ 
+              padding: 20,
+              flexGrow: 1,
+            }}
             showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
           >
             {/* STEP 1: METHOD SELECTION */}
             {currentStep === 1 && (
