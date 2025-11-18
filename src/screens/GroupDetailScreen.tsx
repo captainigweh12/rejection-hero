@@ -958,7 +958,8 @@ export default function GroupDetailScreen({ navigation, route }: Props) {
                   </View>
                 </View>
               ))}
-            </View>
+              </View>
+            )}
 
             {/* Danger Zone */}
             <View style={{ marginTop: 24 }}>

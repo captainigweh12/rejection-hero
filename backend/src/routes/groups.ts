@@ -693,11 +693,12 @@ groupsRouter.get("/:groupId/moments", async (c) => {
   }
 
   // Get active group moments (not expired)
+  const now = new Date();
   const moments = await db.moment.findMany({
     where: {
       groupId: groupId,
       expiresAt: {
-        gt: new Date(),
+        gt: now,
       },
     },
     include: {
@@ -712,35 +713,48 @@ groupsRouter.get("/:groupId/moments", async (c) => {
     },
   });
 
-  // Group by user
-  type MomentWithUser = typeof moments[0];
-  const momentsByUser = new Map<string, MomentWithUser[]>();
-  moments.forEach((moment) => {
-    if (!momentsByUser.has(moment.userId)) {
-      momentsByUser.set(moment.userId, []);
-    }
-    momentsByUser.get(moment.userId)!.push(moment);
-  });
+  // Group moments by user (similar to moments.ts pattern)
+  const momentsByUser = moments.reduce(
+    (acc, moment) => {
+      const userId = moment.userId;
+      if (!acc[userId]) {
+        acc[userId] = {
+          userId: moment.user.id,
+          userName: moment.user.Profile?.displayName || moment.user.email?.split("@")[0] || "User",
+          userAvatar: moment.user.Profile?.avatar || moment.user.image || null,
+          moments: [],
+        };
+      }
+      acc[userId].moments.push({
+        id: moment.id,
+        imageUrl: moment.imageUrl,
+        videoUrl: moment.videoUrl,
+        content: moment.content,
+        createdAt: moment.createdAt.toISOString(),
+        expiresAt: moment.expiresAt.toISOString(),
+      });
+      return acc;
+    },
+    {} as Record<
+      string,
+      {
+        userId: string;
+        userName: string;
+        userAvatar: string | null;
+        moments: Array<{
+          id: string;
+          imageUrl: string | null;
+          videoUrl: string | null;
+          content: string | null;
+          createdAt: string;
+          expiresAt: string;
+        }>;
+      }
+    >
+  );
 
-  const formattedMoments = Array.from(momentsByUser.entries()).map(([userId, userMoments]) => {
-    const firstMoment = userMoments[0];
-    if (!firstMoment || !firstMoment.user) {
-      return null;
-    }
-    return {
-      userId,
-      userName: firstMoment.user.Profile?.displayName || firstMoment.user.email?.split("@")[0] || "User",
-      userAvatar: firstMoment.user.Profile?.avatar || firstMoment.user.image || null,
-      moments: userMoments.map((m) => ({
-        id: m.id,
-        imageUrl: m.imageUrl,
-        videoUrl: m.videoUrl,
-        content: m.content,
-        createdAt: m.createdAt.toISOString(),
-        expiresAt: m.expiresAt.toISOString(),
-      })),
-    };
-  }).filter((m): m is NonNullable<typeof m> => m !== null);
+  // Convert to array
+  const formattedMoments = Object.values(momentsByUser);
 
   return c.json({ moments: formattedMoments });
 });
