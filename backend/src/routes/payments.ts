@@ -9,7 +9,7 @@ const paymentsRouter = new Hono<AppType>();
 
 // Initialize Stripe
 const stripe = new Stripe(env.STRIPE_SECRET_KEY || "", {
-  apiVersion: "2024-12-18.acacia",
+  apiVersion: "2025-11-17.clover",
 });
 
 // ============================================
@@ -171,11 +171,11 @@ paymentsRouter.post("/cancel-subscription", async (c) => {
 // ============================================
 // POST /api/payments/create-token-purchase - Create token purchase checkout
 // ============================================
-paymentsRouter.post("/create-token-purchase", zValidator("json", (z) =>
-  z.object({
-    amount: z.number().int().min(1).max(1000), // Number of tokens to buy
-  })
-), async (c) => {
+const createTokenPurchaseRequestSchema = z.object({
+  amount: z.number().int().min(1).max(1000), // Number of tokens to buy
+});
+
+paymentsRouter.post("/create-token-purchase", zValidator("json", createTokenPurchaseRequestSchema), async (c) => {
   const user = c.get("user");
 
   if (!user) {
@@ -348,14 +348,15 @@ paymentsRouter.post("/webhook", async (c) => {
       const userId = subscription.metadata?.userId;
 
       if (userId) {
+        const subData = subscription as any;
         await db.subscription.update({
           where: { userId },
           data: {
             status: subscription.status === "active" ? "active" : subscription.status === "canceled" ? "canceled" : "inactive",
-            currentPeriodStart: new Date(subscription.current_period_start * 1000),
-            currentPeriodEnd: new Date(subscription.current_period_end * 1000),
-            cancelAtPeriodEnd: subscription.cancel_at_period_end,
-            canceledAt: subscription.canceled_at ? new Date(subscription.canceled_at * 1000) : null,
+            currentPeriodStart: subData.current_period_start ? new Date(subData.current_period_start * 1000) : null,
+            currentPeriodEnd: subData.current_period_end ? new Date(subData.current_period_end * 1000) : null,
+            cancelAtPeriodEnd: subData.cancel_at_period_end || false,
+            canceledAt: subData.canceled_at ? new Date(subData.canceled_at * 1000) : null,
           },
         });
       }
