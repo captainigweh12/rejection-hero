@@ -18,7 +18,6 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Flame,
   Trophy,
-  Diamond,
   Bell,
   Menu,
   Plus,
@@ -468,25 +467,6 @@ export default function HomeScreen({ navigation }: Props) {
                     </Text>
                   </View>
 
-                  {/* Diamonds */}
-                  <View
-                    style={{
-                      backgroundColor: "rgba(0, 217, 255, 0.2)",
-                      borderRadius: 12,
-                      paddingHorizontal: 10,
-                      paddingVertical: 6,
-                      flexDirection: "row",
-                      alignItems: "center",
-                      gap: 4,
-                      borderWidth: 1,
-                      borderColor: "rgba(0, 217, 255, 0.4)",
-                    }}
-                  >
-                    <Diamond size={16} color="#00D9FF" fill="#00D9FF" />
-                    <Text style={{ color: "#00D9FF", fontSize: 14, fontWeight: "bold" }}>
-                      {statsData?.diamonds || 0}
-                    </Text>
-                  </View>
                 </View>
 
                 {/* XP Progress Bar */}

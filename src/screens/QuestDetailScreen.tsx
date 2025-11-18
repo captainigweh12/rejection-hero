@@ -3,7 +3,7 @@ import { View, Text, Pressable, ActivityIndicator, ScrollView, Modal, Animated, 
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Bell, Menu as MenuIcon, Flame, Trophy, Diamond, Clock, Sparkles, Star, X, Video, Share2 } from "lucide-react-native";
+import { ArrowLeft, Bell, Menu as MenuIcon, Flame, Trophy, Clock, Sparkles, Star, X, Video, Share2 } from "lucide-react-native";
 import * as Location from "expo-location";
 import * as Haptics from "expo-haptics";
 import type { RootStackScreenProps } from "@/navigation/types";
