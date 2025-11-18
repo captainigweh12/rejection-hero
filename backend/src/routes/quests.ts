@@ -738,6 +738,12 @@ REQUIREMENTS:
 - Difficulty: EASY/MEDIUM/HARD/EXPERT
 - goalType: COLLECT_NOS (most common), COLLECT_YES, or TAKE_ACTION
 - goalCount: number of NOs, YESes, or actions to complete (based on difficulty)
+- 🚨 CRITICAL GOAL COUNT RULE: If your description mentions a specific number (e.g., "ask 5 local gyms", "visit 3 coffee shops", "request 8 managers"), the goalCount MUST match that exact number. For example:
+  * "Ask 5 local gyms for free trial" → goalCount: 5
+  * "Visit 3 coffee shops and request custom drinks" → goalCount: 3
+  * "Request 8 store managers for discounts" → goalCount: 8
+  * "Compliment 5 random people" → goalCount: 5
+  * "Apply to 10 jobs on LinkedIn" → goalCount: 10
 ${previousQuestsContext}${questTypeContext}
 
 GOOD EXAMPLES:
@@ -794,6 +800,7 @@ REQUIREMENTS:
     - MEDIUM: 3-5 actions
     - HARD: 5-8 actions
     - EXPERT: 8-12 actions
+  * 🚨 CRITICAL: If your description mentions a specific number (e.g., "ask 5 local gyms", "visit 3 coffee shops"), the goalCount MUST match that exact number, regardless of difficulty level. The number in the description takes priority.
 ${previousQuestsContext}${questTypeContext}${locationContext}${timeContext}
 
 GOOD EXAMPLES:
@@ -828,7 +835,10 @@ Return a JSON object with: title (exactly 3 words), description, category, diffi
           {
             role: "system",
             content:
-              "You are a creative motivational coach creating unique rejection challenges. Each title MUST be exactly 3 words. Each challenge must be completely unique and different from previous challenges. BE EXTREMELY SPECIFIC - include concrete locations, specific types of people, specific items/services. Avoid generic phrases like 'pitch your product' or 'ask strangers'. Instead say things like 'ask baristas for a custom drink not on the menu' or 'request bookstore managers to display your handmade bookmark'. Be actionable and specific.\n\n🚨 CRITICAL RULES:\n1. When writing the 'description' field, NEVER include GPS coordinates like '(GPS: 35.123, -80.456)' or '(Coordinates: 35.123, -80.456)' or raw numbers like '35.3088457, -80.7506283'. Write naturally like a human would speak: 'Visit Starbucks on Main Street' not 'Visit Starbucks (GPS: 35.123, -80.456)'. Coordinates belong ONLY in the separate latitude/longitude JSON fields, NEVER in the description text.\n\n2. GOAL COUNT RULE: If the quest requires visiting ONE SPECIFIC LOCATION and asking front desk/receptionist/manager, SET goalCount to 1. Examples: 'Visit Hilton Hotel and ask front desk for free upgrade' = goalCount: 1. 'Go to Planet Fitness and ask manager for free membership' = goalCount: 1. For quests visiting multiple locations, use normal counts.\n\n🛡️ SAFETY REQUIREMENTS (CRITICAL - READ CAREFULLY):\nYou MUST NEVER create quests that:\n- Involve physical harm, violence, or danger to self or others\n- Involve illegal activities (theft, vandalism, trespassing, drug use, etc.)\n- Involve sexual harassment, unwanted touching, or inappropriate behavior\n- Involve dangerous driving, drunk driving, or reckless behavior\n- Involve dangerous locations (highways, train tracks, cliffs, roofs)\n- Involve weapons, fire, or explosive materials\n- Could lead to arrest, injury, or death\n- Involve stalking, threatening, or intimidating behavior\n- Involve excessive alcohol consumption or substance abuse\n\nONLY create quests that are:\n- Safe and legal\n- Respectful and appropriate\n- About overcoming social fears (rejection, embarrassment)\n- Focused on asking for things, pitching ideas, or making requests\n- About building confidence through harmless social interactions\n- Positive actions that help personal growth\n\nIf the user's prompt contains unsafe content, CREATE A SAFE ALTERNATIVE instead that achieves a similar confidence-building goal.",
+              "You are a creative motivational coach creating unique rejection challenges. Each title MUST be exactly 3 words. Each challenge must be completely unique and different from previous challenges. BE EXTREMELY SPECIFIC - include concrete locations, specific types of people, specific items/services. Avoid generic phrases like 'pitch your product' or 'ask strangers'. Instead say things like 'ask baristas for a custom drink not on the menu' or 'request bookstore managers to display your handmade bookmark'. Be actionable and specific.\n\n🚨 CRITICAL RULES:\n1. When writing the 'description' field, NEVER include GPS coordinates like '(GPS: 35.123, -80.456)' or '(Coordinates: 35.123, -80.456)' or raw numbers like '35.3088457, -80.7506283'. Write naturally like a human would speak: 'Visit Starbucks on Main Street' not 'Visit Starbucks (GPS: 35.123, -80.456)'. Coordinates belong ONLY in the separate latitude/longitude JSON fields, NEVER in the description text.\n\n2. GOAL COUNT RULE: 
+   a) If the quest requires visiting ONE SPECIFIC LOCATION and asking front desk/receptionist/manager, SET goalCount to 1. Examples: 'Visit Hilton Hotel and ask front desk for free upgrade' = goalCount: 1. 'Go to Planet Fitness and ask manager for free membership' = goalCount: 1.
+   b) 🚨 CRITICAL: If the description mentions a specific number (e.g., "ask 5 local gyms", "visit 3 coffee shops", "request 8 managers"), the goalCount MUST match that exact number. The number in the description ALWAYS takes priority over difficulty-based ranges.
+   c) For quests visiting multiple locations without a specific number mentioned, use normal difficulty-based counts.\n\n🛡️ SAFETY REQUIREMENTS (CRITICAL - READ CAREFULLY):\nYou MUST NEVER create quests that:\n- Involve physical harm, violence, or danger to self or others\n- Involve illegal activities (theft, vandalism, trespassing, drug use, etc.)\n- Involve sexual harassment, unwanted touching, or inappropriate behavior\n- Involve dangerous driving, drunk driving, or reckless behavior\n- Involve dangerous locations (highways, train tracks, cliffs, roofs)\n- Involve weapons, fire, or explosive materials\n- Could lead to arrest, injury, or death\n- Involve stalking, threatening, or intimidating behavior\n- Involve excessive alcohol consumption or substance abuse\n\nONLY create quests that are:\n- Safe and legal\n- Respectful and appropriate\n- About overcoming social fears (rejection, embarrassment)\n- Focused on asking for things, pitching ideas, or making requests\n- About building confidence through harmless social interactions\n- Positive actions that help personal growth\n\nIf the user's prompt contains unsafe content, CREATE A SAFE ALTERNATIVE instead that achieves a similar confidence-building goal.",
           },
           { role: "user", content: prompt },
         ],
@@ -854,6 +864,32 @@ Return a JSON object with: title (exactly 3 words), description, category, diffi
     }
 
     const questData = JSON.parse(data.choices[0].message.content);
+
+    // 🚨 CRITICAL: Extract number from description and match goalCount
+    // If description says "ask 5 local gyms", goalCount MUST be 5
+    const descriptionText = `${questData.title} ${questData.description}`.toLowerCase();
+    const numberPattern = /\b(\d+)\b/g;
+    const numbers = descriptionText.match(numberPattern)?.map(Number) || [];
+    
+    // Find the most relevant number (usually the first one mentioned)
+    if (numbers.length > 0) {
+      const extractedNumber = numbers[0];
+      // Only override if the extracted number is reasonable (1-50)
+      if (extractedNumber >= 1 && extractedNumber <= 50) {
+        // Check if description mentions this number in context of the action
+        const actionKeywords = ['ask', 'request', 'visit', 'pitch', 'tell', 'compliment', 'apply', 'send', 'contact', 'reach out'];
+        const hasActionContext = actionKeywords.some(keyword => 
+          descriptionText.includes(`${keyword} ${extractedNumber}`) || 
+          descriptionText.includes(`${extractedNumber} ${keyword}`) ||
+          descriptionText.includes(`${keyword} ${extractedNumber} `)
+        );
+        
+        if (hasActionContext) {
+          console.log(`[Quest Generation] Extracted number ${extractedNumber} from description, updating goalCount from ${questData.goalCount} to ${extractedNumber}`);
+          questData.goalCount = extractedNumber;
+        }
+      }
+    }
 
     // SAFETY CHECK: Verify quest content is safe
     const safetyCheck = checkFullQuestSafety(

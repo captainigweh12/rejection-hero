@@ -63,12 +63,21 @@ Your task: Fine-tune and optimize this quest to help the user meet their desired
 4. Location-appropriate if location is specified
 5. Achievable and motivating
 
+🚨 CRITICAL GOAL COUNT RULE: If your description mentions a specific number (e.g., "ask 5 local gyms", "visit 3 coffee shops", "request 8 managers"), the goalCount MUST match that exact number. For example:
+- "Ask 5 local gyms for free trial" → goalCount: 5
+- "Visit 3 coffee shops and request custom drinks" → goalCount: 3
+- "Request 8 store managers for discounts" → goalCount: 8
+- "Compliment 5 random people" → goalCount: 5
+- "Apply to 10 jobs on LinkedIn" → goalCount: 10
+
+The number in the description ALWAYS takes priority over difficulty-based ranges or user-specified goalCount.
+
 Return a JSON object with:
 {
   "description": "Optimized quest description (2-3 sentences, clear and actionable)",
   "category": "One of: SOCIAL, SALES, ENTREPRENEURSHIP, DATING, CONFIDENCE, CAREER",
   "goalType": "COLLECT_NOS, COLLECT_YES, or TAKE_ACTION",
-  "goalCount": number (1-50, appropriate for difficulty),
+  "goalCount": number (1-50, MUST match number in description if mentioned, otherwise appropriate for difficulty),
   "difficulty": "EASY, MEDIUM, HARD, or EXPERT",
   "location": "Location name if applicable, or null"
 }
@@ -128,11 +137,40 @@ Only return valid JSON, no other text.`;
     try {
       const parsed = JSON.parse(content);
       console.log("✅ AI fine-tuning completed:", parsed);
+      
+      // 🚨 CRITICAL: Extract number from description and match goalCount
+      // If description says "ask 5 local gyms", goalCount MUST be 5
+      const descriptionText = `${parsed.description || params.description}`.toLowerCase();
+      const numberPattern = /\b(\d+)\b/g;
+      const numbers = descriptionText.match(numberPattern)?.map(Number) || [];
+      
+      let finalGoalCount = parsed.goalCount || params.goalCount || 5;
+      
+      // Find the most relevant number (usually the first one mentioned)
+      if (numbers.length > 0) {
+        const extractedNumber = numbers[0];
+        // Only override if the extracted number is reasonable (1-50)
+        if (extractedNumber >= 1 && extractedNumber <= 50) {
+          // Check if description mentions this number in context of the action
+          const actionKeywords = ['ask', 'request', 'visit', 'pitch', 'tell', 'compliment', 'apply', 'send', 'contact', 'reach out'];
+          const hasActionContext = actionKeywords.some(keyword => 
+            descriptionText.includes(`${keyword} ${extractedNumber}`) || 
+            descriptionText.includes(`${extractedNumber} ${keyword}`) ||
+            descriptionText.includes(`${keyword} ${extractedNumber} `)
+          );
+          
+          if (hasActionContext) {
+            console.log(`[Quest Fine-tuning] Extracted number ${extractedNumber} from description, updating goalCount from ${finalGoalCount} to ${extractedNumber}`);
+            finalGoalCount = extractedNumber;
+          }
+        }
+      }
+      
       return {
         description: parsed.description || params.description,
         category: parsed.category || params.category,
         goalType: parsed.goalType || params.goalType,
-        goalCount: parsed.goalCount || params.goalCount || 5,
+        goalCount: finalGoalCount,
         difficulty: parsed.difficulty || params.difficulty || "MEDIUM",
         location: parsed.location || params.customLocation,
       };
