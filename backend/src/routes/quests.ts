@@ -1218,6 +1218,20 @@ export async function updateUserStats(userId: string, xpReward: number, pointRew
     newLongestStreak = Math.max(newCurrentStreak, currentStats.longestStreak);
   }
 
+  // Calculate confidence meter increase based on quest difficulty
+  // Harder quests give more confidence boost
+  const difficultyMultiplier: Record<string, number> = {
+    easy: 5,
+    medium: 10,
+    hard: 15,
+    expert: 20,
+  };
+  const confidenceBoost = difficultyMultiplier[difficulty?.toLowerCase() || "medium"] || 10;
+  
+  // Get current confidence meter
+  const currentConfidence = currentStats?.dailyConfidenceMeter || 0;
+  const newConfidenceMeter = Math.min(100, currentConfidence + confidenceBoost);
+
   // Determine which difficulty zone to increment
   const updateData: any = {
     totalXP: { increment: xpReward },
@@ -1226,6 +1240,8 @@ export async function updateUserStats(userId: string, xpReward: number, pointRew
     longestStreak: newLongestStreak,
     lastActiveAt: now,
     lastQuestCompletedAt: now,
+    dailyConfidenceMeter: newConfidenceMeter,
+    lastConfidenceDecayAt: now,
   };
 
   // Track difficulty zones
@@ -1240,6 +1256,15 @@ export async function updateUserStats(userId: string, xpReward: number, pointRew
     }
   }
 
+  // Calculate confidence meter for create case
+  const difficultyMultiplier: Record<string, number> = {
+    easy: 5,
+    medium: 10,
+    hard: 15,
+    expert: 20,
+  };
+  const initialConfidence = difficultyMultiplier[difficulty?.toLowerCase() || "medium"] || 10;
+
   await db.userStats.upsert({
     where: { userId },
     create: {
@@ -1252,6 +1277,8 @@ export async function updateUserStats(userId: string, xpReward: number, pointRew
       diamonds: 0,
       lastActiveAt: now,
       lastQuestCompletedAt: now,
+      dailyConfidenceMeter: initialConfidence,
+      lastConfidenceDecayAt: now,
       easyZoneCount: difficulty?.toLowerCase() === "easy" ? 1 : 0,
       growthZoneCount: difficulty?.toLowerCase() === "medium" ? 1 : 0,
       fearZoneCount: (difficulty?.toLowerCase() === "hard" || difficulty?.toLowerCase() === "expert") ? 1 : 0,
