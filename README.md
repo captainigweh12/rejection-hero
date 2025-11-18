@@ -1,4 +1,31 @@
-## 🔧 Bug Fixes
+## 🔧 Bug Fixes & Features
+
+### Stripe Payment Integration & Token System (2025-11-18)
+- **Added**: Complete Stripe payment integration for token purchases with beautiful UI
+- **Components Created**:
+  - `TokenPurchaseModal` - Modal for browsing and purchasing token packages
+  - `OutOfTokensModal` - Out-of-tokens notification with options to buy or earn tokens
+  - `UpgradeCard` - Premium/tokens upgrade card in Profile About tab
+- **Token Packages Available**:
+  - 10 tokens - $0.99
+  - 50 tokens - $4.99 (20% off)
+  - 100 tokens - $8.99 (35% off)
+  - 250 tokens - $19.99 (50% off)
+- **Features**:
+  - Stripe Checkout integration via web browser
+  - Real-time token balance display
+  - Automatic query invalidation after purchase
+  - Beautiful gradient UI with savings badges
+  - Two-option out-of-tokens modal (Buy or Earn via quests)
+- **Backend Integration**:
+  - `GET /api/payments/tokens` - Fetch user's current token balance
+  - `POST /api/payments/create-token-purchase` - Initiate Stripe checkout for tokens
+  - Existing subscription management via Stripe
+- **User Flow**:
+  - Profile → About tab → View "Tokens & Premium" card
+  - Click "View Token Packages" to see purchase options
+  - When out of tokens, get automatic popup with buy/earn options
+  - Tokens used to send quests to friends
 
 ### Legal Policy Files Created (2025-11-18)
 - **Added**: Created all 9 legal policy markdown files in `/backend/src/legal/` directory:

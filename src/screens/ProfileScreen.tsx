@@ -33,6 +33,9 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import type { GetProfileResponse, GetUserStatsResponse } from "@/shared/contracts";
 import { LegalPoliciesTab } from "@/components/LegalPoliciesTab";
+import { TokenPurchaseModal } from "@/components/TokenPurchaseModal";
+import { OutOfTokensModal } from "@/components/OutOfTokensModal";
+import { UpgradeCard } from "@/components/UpgradeCard";
 
 type Props = BottomTabScreenProps<"ProfileTab">;
 
@@ -49,6 +52,8 @@ export default function ProfileScreen({ navigation }: Props) {
   const [userContext, setUserContext] = useState("");
   const [goals, setGoals] = useState("");
   const [interests, setInterests] = useState("");
+  const [showTokenPurchaseModal, setShowTokenPurchaseModal] = useState(false);
+  const [showOutOfTokensModal, setShowOutOfTokensModal] = useState(false);
 
   const { data: profileData, isLoading: profileLoading } = useQuery<GetProfileResponse>({
     queryKey: ["profile"],
@@ -1075,6 +1080,9 @@ export default function ProfileScreen({ navigation }: Props) {
 
           {selectedTab === "about" && (
             <View style={{ marginTop: 20, paddingHorizontal: 20, gap: 16 }}>
+              {/* Upgrade Card */}
+              <UpgradeCard onViewTokens={() => setShowTokenPurchaseModal(true)} />
+
               {/* Theme Toggle Card */}
               <View
                 style={{
@@ -1621,6 +1629,30 @@ export default function ProfileScreen({ navigation }: Props) {
           </View>
         </Modal>
       )}
+
+      {/* Token Purchase Modal */}
+      <TokenPurchaseModal
+        visible={showTokenPurchaseModal}
+        onClose={() => setShowTokenPurchaseModal(false)}
+        onSuccess={() => {
+          queryClient.invalidateQueries({ queryKey: ["tokens"] });
+          queryClient.invalidateQueries({ queryKey: ["stats"] });
+        }}
+      />
+
+      {/* Out of Tokens Modal */}
+      <OutOfTokensModal
+        visible={showOutOfTokensModal}
+        onClose={() => setShowOutOfTokensModal(false)}
+        onBuyTokens={() => {
+          setShowOutOfTokensModal(false);
+          setShowTokenPurchaseModal(true);
+        }}
+        onEarnTokens={() => {
+          setShowOutOfTokensModal(false);
+          navigation.navigate("HomeTab");
+        }}
+      />
     </View>
   );
 }
