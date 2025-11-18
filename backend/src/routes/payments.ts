@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
+import { z } from "zod";
 import Stripe from "stripe";
 import { type AppType } from "../types";
 import { db } from "../db";
