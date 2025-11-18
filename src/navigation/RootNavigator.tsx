@@ -190,12 +190,8 @@ function AuthWrapper() {
     if (!isPending && !hasChecked) {
       setHasChecked(true);
 
-      if (!sessionData?.user) {
-        // Open login modal on first launch if not authenticated
-        setTimeout(() => {
-          navigation.navigate("LoginModalScreen");
-        }, 100);
-      } else if (profile && !profile.onboardingCompleted) {
+      // Only handle onboarding redirect - HomeScreen handles login state
+      if (sessionData?.user && profile && !profile.onboardingCompleted) {
         // Replace with onboarding if user hasn't completed it
         setTimeout(() => {
           navigation.replace("Onboarding");

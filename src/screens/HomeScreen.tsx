@@ -75,7 +75,8 @@ export default function HomeScreen({ navigation }: Props) {
   const [showFriendsQuests, setShowFriendsQuests] = useState(true);
   const [isRefreshingQuests, setIsRefreshingQuests] = useState(false);
 
-  console.log("[HomeScreen] Rendering - User logged in:", !!sessionData?.user);
+  // Debug log - can be removed in production
+  // console.log("[HomeScreen] Rendering - User logged in:", !!sessionData?.user);
 
   const { data: questsData, isLoading: questsLoading, error: questsError, refetch: refetchQuests } = useQuery<GetUserQuestsResponse>({
     queryKey: ["quests"],
