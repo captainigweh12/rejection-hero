@@ -23,6 +23,8 @@ import EditProfileScreen from "@/screens/EditProfileScreen";
 import QuestDetailScreen from "@/screens/QuestDetailScreen";
 import CreateQuestScreen from "@/screens/CreateQuestScreen";
 import SettingsScreen from "@/screens/SettingsScreen";
+import NotificationSettingsScreen from "@/screens/NotificationSettingsScreen";
+import AdminScreen from "@/screens/AdminScreen";
 import LanguageSelectionScreen from "@/screens/LanguageSelectionScreen";
 import SearchUsersScreen from "@/screens/SearchUsersScreen";
 import GrowthAchievementsScreen from "@/screens/GrowthAchievementsScreen";
@@ -81,6 +83,16 @@ const RootNavigator = () => {
           name="Settings"
           component={SettingsScreen}
           options={{ title: "Settings", headerShown: true }}
+        />
+        <RootStack.Screen
+          name="NotificationSettings"
+          component={NotificationSettingsScreen}
+          options={{ headerShown: false }}
+        />
+        <RootStack.Screen
+          name="Admin"
+          component={AdminScreen}
+          options={{ headerShown: false }}
         />
         <RootStack.Screen
           name="LanguageSelection"

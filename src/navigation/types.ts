@@ -19,6 +19,8 @@ export type RootStackParamList = {
   QuestDetail: { userQuestId: string };
   CreateQuest: undefined;
   Settings: undefined;
+  NotificationSettings: undefined;
+  Admin: undefined;
   LanguageSelection: undefined;
   SearchUsers: undefined;
   GrowthAchievements: undefined;

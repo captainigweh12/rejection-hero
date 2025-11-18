@@ -31,6 +31,13 @@ profileRouter.get("/", async (c) => {
     }
 
     console.log(`🔍 [Profile] Fetching profile for user ${user.id}`);
+    
+    // Get user's admin status
+    const userRecord = await db.user.findUnique({
+      where: { id: user.id },
+      select: { isAdmin: true },
+    });
+    
     let profile = await db.profile.findUnique({
       where: { userId: user.id },
     });
@@ -95,6 +102,7 @@ profileRouter.get("/", async (c) => {
       onboardingCompleted: profile.onboardingCompleted,
       ageVerified: profile.ageVerified,
       parentalConsent: profile.parentalConsent,
+      isAdmin: userRecord?.isAdmin || false,
     } satisfies GetProfileResponse);
   } catch (error) {
     console.error("❌ [Profile] Error in GET /api/profile:", error);

@@ -8,6 +8,9 @@ import { authClient } from "@/lib/authClient";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { languages } from "@/lib/translations";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/lib/api";
+import type { GetProfileResponse } from "@/shared/contracts";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Settings">;
 
@@ -15,6 +18,15 @@ export default function SettingsScreen({ navigation }: Props) {
   const { theme, setTheme, colors } = useTheme();
   const { language, t } = useLanguage();
   const [questReminders, setQuestReminders] = useState(false);
+
+  const { data: profileData } = useQuery<GetProfileResponse>({
+    queryKey: ["profile"],
+    queryFn: async () => {
+      return api.get<GetProfileResponse>("/api/profile");
+    },
+  });
+
+  const isAdmin = profileData?.isAdmin || false;
 
   const handleLogout = async () => {
     Alert.alert(
@@ -232,6 +244,49 @@ export default function SettingsScreen({ navigation }: Props) {
             <Text style={{ fontSize: 20, fontWeight: "bold", marginBottom: 12, color: colors.text }}>
               {t("settings.notifications")}
             </Text>
+            <Pressable
+              onPress={() => navigation.navigate("NotificationSettings")}
+              style={{
+                backgroundColor: colors.card,
+                borderRadius: 16,
+                padding: 20,
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+                borderWidth: 1,
+                borderColor: colors.cardBorder,
+                shadowColor: colors.shadow,
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.1,
+                shadowRadius: 4,
+                elevation: 2,
+                marginBottom: 12,
+              }}
+            >
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 16, flex: 1 }}>
+                <View
+                  style={{
+                    width: 48,
+                    height: 48,
+                    borderRadius: 24,
+                    backgroundColor: colors.surface,
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Bell size={24} color="#FF6B35" />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontWeight: "600", fontSize: 16, color: colors.text, marginBottom: 4 }}>
+                    Manage Notifications
+                  </Text>
+                  <Text style={{ color: colors.textSecondary, fontSize: 14 }}>
+                    Choose which notifications to receive
+                  </Text>
+                </View>
+              </View>
+              <ChevronRight size={20} color={colors.textSecondary} />
+            </Pressable>
             <View
               style={{
                 backgroundColor: colors.card,

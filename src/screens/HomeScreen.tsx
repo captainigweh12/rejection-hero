@@ -494,29 +494,27 @@ export default function HomeScreen({ navigation }: Props) {
                   </Text>
                 </View>
 
-                {/* Confidence Meter - NEW */}
+                {/* Daily Confidence Meter */}
                 <View style={{ marginTop: 12 }}>
                   <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
                     <Text style={{ color: colors.textSecondary, fontSize: 12, fontWeight: "600" }}>
-                      Confidence Meter
+                      Daily Confidence Meter
                     </Text>
                     <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
                       <Text style={{ color: "#00D9FF", fontSize: 14, fontWeight: "bold" }}>
-                        {statsData?.confidenceLevel || 50}%
+                        {Math.round(statsData?.dailyConfidenceMeter || 0)}%
                       </Text>
-                      {statsData?.confidenceChange !== 0 && (
+                      {(statsData?.dailyConfidenceMeter || 0) < 20 && (
                         <View style={{ flexDirection: "row", alignItems: "center" }}>
-                          <TrendingUp size={12} color={statsData?.confidenceChange && statsData.confidenceChange > 0 ? "#4CAF50" : "#FF6B35"} />
                           <Text
                             style={{
-                              color: statsData?.confidenceChange && statsData.confidenceChange > 0 ? "#4CAF50" : "#FF6B35",
+                              color: "#FF6B35",
                               fontSize: 11,
                               fontWeight: "600",
                               marginLeft: 2,
                             }}
                           >
-                            {statsData?.confidenceChange && statsData.confidenceChange > 0 ? "+" : ""}
-                            {statsData?.confidenceChange || 0}% this week
+                            Low! Complete a quest
                           </Text>
                         </View>
                       )}
@@ -536,7 +534,7 @@ export default function HomeScreen({ navigation }: Props) {
                       end={{ x: 1, y: 0 }}
                       style={{
                         height: "100%",
-                        width: `${statsData?.confidenceLevel || 50}%`,
+                        width: `${Math.min(100, Math.max(0, statsData?.dailyConfidenceMeter || 0))}%`,
                       }}
                     />
                   </View>
