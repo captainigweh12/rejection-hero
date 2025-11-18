@@ -32,6 +32,7 @@ import { authClient } from "@/lib/authClient";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import type { GetProfileResponse, GetUserStatsResponse } from "@/shared/contracts";
+import { LegalPoliciesTab } from "@/components/LegalPoliciesTab";
 
 type Props = BottomTabScreenProps<"ProfileTab">;
 
@@ -40,7 +41,7 @@ export default function ProfileScreen({ navigation }: Props) {
   const { colors, theme, setTheme, isDayMode } = useTheme();
   const { t } = useLanguage();
   const queryClient = useQueryClient();
-  const [selectedTab, setSelectedTab] = useState<"quests" | "stats" | "about">("quests");
+  const [selectedTab, setSelectedTab] = useState<"quests" | "stats" | "about" | "legal">("quests");
   const [isEditingAbout, setIsEditingAbout] = useState(false);
   const [showAvatarModal, setShowAvatarModal] = useState(false);
   const [showStyleModal, setShowStyleModal] = useState(false);
@@ -619,6 +620,26 @@ export default function ProfileScreen({ navigation }: Props) {
                 }}
               >
                 About
+              </Text>
+            </Pressable>
+            <Pressable
+              onPress={() => setSelectedTab("legal")}
+              style={{
+                flex: 1,
+                paddingVertical: 12,
+                borderRadius: 12,
+                backgroundColor: selectedTab === "legal" ? colors.primary : "transparent",
+              }}
+            >
+              <Text
+                style={{
+                  textAlign: "center",
+                  fontWeight: "700",
+                  color: selectedTab === "legal" ? colors.text : colors.textSecondary,
+                  fontSize: 14,
+                }}
+              >
+                Legal
               </Text>
             </Pressable>
           </View>
@@ -1490,7 +1511,13 @@ export default function ProfileScreen({ navigation }: Props) {
         </View>
       </Modal>
 
-      {/* Style Selection Modal */}
+          {selectedTab === "legal" && (
+            <View style={{ marginTop: 20, paddingHorizontal: 20, flex: 1 }}>
+              <LegalPoliciesTab />
+            </View>
+          )}
+
+      {/* Avatar Selection Modal */}
       <Modal visible={showStyleModal} transparent animationType="slide">
         <View style={{ flex: 1, backgroundColor: colors.modalOverlay, justifyContent: "flex-end" }}>
           <View

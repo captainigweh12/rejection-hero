@@ -1352,3 +1352,44 @@ export const createCustomQuestResponseSchema = z.object({
   safetyWarning: z.string().optional(),
 });
 export type CreateCustomQuestResponse = z.infer<typeof createCustomQuestResponseSchema>;
+
+// ==========================================
+// Policy Routes
+// ==========================================
+
+// GET /api/policies - Get all policies and user's acceptance status
+export const getPoliciesResponseSchema = z.object({
+  policies: z.array(
+    z.object({
+      type: z.string(),
+      name: z.string(),
+      accepted: z.boolean(),
+      acceptedAt: z.string().nullable(),
+      version: z.string(),
+    })
+  ),
+});
+export type GetPoliciesResponse = z.infer<typeof getPoliciesResponseSchema>;
+
+// POST /api/policies/:policyType/accept - Accept a specific policy
+export const acceptPolicyRequestSchema = z.object({});
+export type AcceptPolicyRequest = z.infer<typeof acceptPolicyRequestSchema>;
+export const acceptPolicyResponseSchema = z.object({
+  success: z.boolean(),
+  message: z.string(),
+  acceptance: z.object({
+    policyType: z.string(),
+    acceptedAt: z.string(),
+    emailSent: z.boolean(),
+  }),
+});
+export type AcceptPolicyResponse = z.infer<typeof acceptPolicyResponseSchema>;
+
+// GET /api/policies/check-required - Check which policies user needs to accept
+export const checkRequiredPoliciesResponseSchema = z.object({
+  required: z.array(z.string()),
+  allAccepted: z.boolean(),
+  acceptedCount: z.number(),
+  totalCount: z.number(),
+});
+export type CheckRequiredPoliciesResponse = z.infer<typeof checkRequiredPoliciesResponseSchema>;

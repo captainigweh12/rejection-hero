@@ -1,5 +1,20 @@
 ## 🔧 Bug Fixes
 
+### Legal Policies Review Section Added (2025-11-18)
+- **Added**: New "Legal" tab in the Profile screen where users can review all accepted and pending policies
+- **Features**:
+  - View acceptance status for all 9 legal policy types (Terms of Service, Privacy Policy, Age Policy, etc.)
+  - See when each policy was accepted
+  - Read full policy content in a modal viewer
+  - Accept pending policies with confirmation
+  - Summary card showing acceptance progress (e.g., "8 of 9 Policies Accepted")
+- **Implementation**:
+  - Created `LegalPoliciesTab` component for displaying policies
+  - Added policy contracts (`GetPoliciesResponse`, `AcceptPolicyResponse`) to shared contracts
+  - Integrated with existing PolicyViewerModal for reading full policy text
+  - Backend already had GET /api/policies endpoint to fetch user's policy acceptance status
+- **User Flow**: Users can navigate to Profile → Legal tab to see all their accepted/pending policies and their acceptance timestamps
+
 ### Profile API Response Fixed (2025-11-18)
 - **Fixed**: Resolved 500 internal server error when fetching user profile
 - **Issue**: The POST /api/profile endpoint was missing `ageVerified` and `parentalConsent` fields in the response, causing type validation failures
