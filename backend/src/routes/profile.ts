@@ -231,8 +231,7 @@ profileRouter.post("/generate-avatar", zValidator("json", generateAvatarRequestS
         cyborg: "Futuristic tech character with cybernetic elements, neon lights and digital effects, advanced technology aesthetic, sci-fi style",
       };
 
-      prompt = stylePrompts[style] || stylePrompts.gaming;
-      prompt += ". Square composition, centered, suitable for profile picture. No text or watermarks.";
+      prompt = (stylePrompts[style] ?? stylePrompts.gaming) + ". Square composition, centered, suitable for profile picture. No text or watermarks.";
     }
 
     console.log("🎨 Generating AI avatar with prompt:", prompt);
