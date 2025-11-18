@@ -249,19 +249,84 @@ export default function LoginWithEmailPassword() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
     try {
+      console.log("🔐 [Google OAuth] Starting Google sign-in...");
+      console.log("🔐 [Google OAuth] Backend URL:", process.env.EXPO_PUBLIC_VIBECODE_BACKEND_URL);
+      console.log("🔐 [Google OAuth] Callback URL: vibecode://auth/callback");
+
       const result = await authClient.signIn.social({
         provider: "google",
         callbackURL: "vibecode://auth/callback",
       });
 
+      console.log("🔐 [Google OAuth] Sign-in result:", JSON.stringify(result, null, 2));
+
       if (result.error) {
+        console.error("🔐 [Google OAuth] Sign-in error:", result.error);
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-        Alert.alert("Error", result.error.message || "Failed to sign in with Google");
+        
+        // Provide more specific error messages
+        let errorMessage = result.error.message || "Failed to sign in with Google";
+        if (result.error.message?.includes("network") || result.error.message?.includes("fetch")) {
+          errorMessage = "Network error: Please check your internet connection and try again.";
+        } else if (result.error.message?.includes("cancelled") || result.error.message?.includes("canceled")) {
+          errorMessage = "Sign-in was cancelled. Please try again.";
+        }
+        
+        Alert.alert("Sign In Failed", errorMessage);
+        setIsLoading(false);
+        return;
+      }
+
+      console.log("🔐 [Google OAuth] Sign-in successful!");
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+
+      // Refetch session and wait for it to be available (similar to email login)
+      console.log("🔐 [Google OAuth] Refetching session...");
+      try {
+        // Trigger refetch
+        refetch();
+
+        // Wait for session to be available (with retry logic)
+        let retries = 0;
+        const maxRetries = 15; // 3 seconds total (15 * 200ms)
+        while (retries < maxRetries) {
+          await new Promise((resolve) => setTimeout(resolve, 200));
+
+          // Check if session is now available
+          if (retries % 3 === 0) {
+            // Refetch every 600ms to check for session
+            refetch();
+          }
+
+          retries++;
+        }
+
+        console.log("🔐 [Google OAuth] Session refetch completed");
+        // The useEffect will handle navigation when session becomes available
+      } catch (refetchError) {
+        console.error("🔐 [Google OAuth] Error during session refetch:", refetchError);
+        // Don't fail the login if refetch fails - session might still be valid
+        // The useEffect will handle navigation when session becomes available
       }
     } catch (error: any) {
+      console.error("🔐 [Google OAuth] Unexpected error:", error);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert("Error", error?.message || "Failed to sign in with Google");
-      console.error("Google Sign-In Error:", error);
+
+      // Provide more helpful error messages
+      let errorMessage = "An unexpected error occurred. Please try again.";
+      if (error instanceof Error) {
+        if (error.message.includes("Network") || error.message.includes("fetch failed")) {
+          errorMessage = "Network error: Please check your internet connection and try again.";
+        } else if (error.message.includes("timeout")) {
+          errorMessage = "Request timed out. Please try again.";
+        } else if (error.message.includes("cancelled") || error.message.includes("canceled")) {
+          errorMessage = "Sign-in was cancelled. Please try again.";
+        } else {
+          errorMessage = error.message;
+        }
+      }
+
+      Alert.alert("Error", errorMessage);
     } finally {
       setIsLoading(false);
     }

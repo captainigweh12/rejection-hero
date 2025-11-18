@@ -25,6 +25,16 @@ import { db } from "./db";
 //   - Google OAuth authentication
 //   - Trusted origins for CORS
 console.log("🔐 [Auth] Initializing Better Auth...");
+
+// Validate Google OAuth configuration
+if (!env.GOOGLE_CLIENT_ID || !env.GOOGLE_CLIENT_SECRET) {
+  console.warn("⚠️ [Auth] Google OAuth credentials not configured. Google sign-in will not work.");
+  console.warn("⚠️ [Auth] Please set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET environment variables.");
+} else {
+  console.log("✅ [Auth] Google OAuth credentials configured");
+  console.log(`🔑 [Auth] Google Client ID: ${env.GOOGLE_CLIENT_ID.substring(0, 20)}...`);
+}
+
 export const auth = betterAuth({
   database: prismaAdapter(db, {
     provider: env.DATABASE_PROVIDER || "sqlite",
@@ -41,15 +51,25 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
-  socialProviders: {
+  socialProviders: env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET ? {
     google: {
       clientId: env.GOOGLE_CLIENT_ID,
       clientSecret: env.GOOGLE_CLIENT_SECRET,
       redirectURI: `${env.BACKEND_URL}/api/auth/callback/google`,
+      scope: ["openid", "profile", "email"], // Explicitly request these scopes for better compatibility
+    },
+  } : undefined,
+  session: {
+    expiresIn: 60 * 60 * 24 * 7, // 7 days
+    updateAge: 60 * 60 * 24, // Update session every 24 hours
+    cookieCache: {
+      enabled: true,
+      maxAge: 60 * 60 * 24 * 7, // 7 days
     },
   },
 });
 console.log("✅ [Auth] Better Auth initialized");
 console.log(`🔗 [Auth] Base URL: ${env.BACKEND_URL}`);
 console.log(`🌐 [Auth] Trusted origins: ${auth.options.trustedOrigins?.join(", ")}`);
-console.log(`🔑 [Auth] Google OAuth: ${env.GOOGLE_CLIENT_ID ? "Enabled" : "Disabled"}`);
+console.log(`🔑 [Auth] Google OAuth: ${env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET ? "Enabled ✅" : "Disabled ⚠️"}`);
+console.log(`🔐 [Auth] Session expires in: 7 days`);
