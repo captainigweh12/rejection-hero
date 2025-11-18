@@ -204,18 +204,21 @@ function AuthWrapper() {
       }
 
       // Get current route to avoid unnecessary navigation
-      const currentRoute = navigation.getState()?.routes[navigation.getState()?.index || 0];
+      const state = navigation.getState();
+      if (!state) return;
+
+      const currentRoute = state.routes[state.index || 0];
       const currentRouteName = currentRoute?.name;
 
       // Handle onboarding redirect for users who haven't completed it
       if (profile && !profile.onboardingCompleted) {
         // New users or existing users who haven't completed onboarding
-        if (currentRouteName !== "Onboarding") {
+        if (currentRouteName !== "Onboarding" && !hasChecked) {
           console.log("🔐 [AuthWrapper] User needs onboarding - redirecting");
           console.log("🔐 [AuthWrapper] Profile onboardingCompleted:", profile.onboardingCompleted);
           setHasChecked(true);
           setTimeout(() => {
-            navigation.replace("Onboarding");
+            navigation.navigate("Onboarding");
           }, 100);
         }
       } else if (profile && profile.onboardingCompleted) {
@@ -226,14 +229,14 @@ function AuthWrapper() {
             if (navigation.canGoBack()) {
               navigation.goBack();
             } else {
-              navigation.replace("Tabs");
+              navigation.navigate("Tabs");
             }
           }, 100);
         } else if (currentRouteName === "Onboarding") {
           // If somehow still on onboarding after completion, navigate away
           console.log("🔐 [AuthWrapper] User completed onboarding, navigating to main app");
           setTimeout(() => {
-            navigation.replace("Tabs");
+            navigation.navigate("Tabs");
           }, 100);
         }
         // Reset hasChecked to allow future checks if needed
@@ -242,11 +245,11 @@ function AuthWrapper() {
         }
       } else if (profileError) {
         // If profile fetch failed, assume onboarding not completed and redirect
-        if (currentRouteName !== "Onboarding") {
+        if (currentRouteName !== "Onboarding" && !hasChecked) {
           console.log("🔐 [AuthWrapper] Profile fetch failed, redirecting to onboarding");
           setHasChecked(true);
           setTimeout(() => {
-            navigation.replace("Onboarding");
+            navigation.navigate("Onboarding");
           }, 100);
         }
       } else if (!profile) {

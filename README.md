@@ -1,3 +1,11 @@
+## 🔧 Bug Fixes
+
+### Navigation Error Fixed (2025-11-18)
+- **Fixed**: Resolved "undefined is not a function" error when navigating to onboarding
+- **Issue**: The `navigation.replace()` method was not available in the AuthWrapper context
+- **Solution**: Changed to `navigation.navigate()` and added proper null checks for navigation state
+- **Impact**: Users can now properly navigate to onboarding after signup/login without errors
+
 # Go for No - Rejection Challenge App
 
 A revolutionary mobile app that helps users overcome fear of rejection through AI-powered "No Quests" - action-based challenges designed to build confidence and resilience. Complete quests, track progress, level up, and connect with a community of fellow challengers!
