@@ -643,6 +643,38 @@ questsRouter.post("/:id/record", zValidator("json", recordQuestActionRequestSche
         },
       });
     }
+
+    // Check if user is in AI_SERIES mode and handle series generation
+    const profile = await db.profile.findUnique({
+      where: { userId: user.id },
+      select: { questMode: true },
+    });
+
+    if (profile?.questMode === "AI_SERIES") {
+      // Check if this quest is part of a series
+      if (userQuest.isSeriesQuest && userQuest.seriesId) {
+        // Find all quests in this series
+        const seriesQuests = await db.userQuest.findMany({
+          where: {
+            userId: user.id,
+            seriesId: userQuest.seriesId,
+            status: { not: "COMPLETED" },
+          },
+          orderBy: { seriesIndex: "asc" },
+        });
+
+        // If there are more quests in the series, do nothing (user can continue)
+        // If this was the last quest in the series, generate a new series
+        if (seriesQuests.length === 0) {
+          // All quests in series completed, generate new series
+          await generateAISeries(user.id, userQuest.seriesId);
+        }
+      } else {
+        // This is not part of a series, but user is in AI_SERIES mode
+        // Generate a new series (first time or after completing a non-series quest)
+        await generateAISeries(user.id);
+      }
+    }
   }
 
   return c.json({
@@ -1179,6 +1211,118 @@ function getPredefinedQuest(category?: string, difficulty?: string) {
   ];
 
   return quests[Math.floor(Math.random() * quests.length)];
+}
+
+/**
+ * Generate an AI quest series (3-8 quests) for a user
+ */
+async function generateAISeries(userId: string, previousSeriesId?: string) {
+  try {
+    // Get user profile for context
+    const profile = await db.profile.findUnique({
+      where: { userId },
+      include: { user: true },
+    });
+
+    if (!profile) {
+      console.error("❌ [AI Series] Profile not found for user:", userId);
+      return;
+    }
+
+    // Generate series ID
+    const seriesId = `series_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+    
+    // Determine number of quests in series (3-8)
+    const seriesSize = Math.floor(Math.random() * 6) + 3; // 3-8 quests
+
+    // Get user's location if available
+    const userLocation = profile.location || null;
+    const userLatitude = profile.latitude || null;
+    const userLongitude = profile.longitude || null;
+
+    // Generate quests for the series
+    const generatedQuests = [];
+    
+    for (let i = 0; i < seriesSize; i++) {
+      try {
+        // Generate quest using existing AI generation function
+        const questData = await generateQuestWithAI(
+          null, // category - let AI choose based on user context
+          null, // difficulty - let AI choose
+          null, // customPrompt
+          userId,
+          userLocation,
+          userLatitude,
+          userLongitude,
+          "REJECTION" // preferredQuestType
+        );
+
+        // Safety check
+        const { checkQuestSafety } = await import("./sharedQuests");
+        const safetyCheck = await checkQuestSafety(questData.description);
+
+        if (!safetyCheck.isSafe) {
+          console.warn(`⚠️ [AI Series] Quest ${i + 1} failed safety check, skipping`);
+          continue;
+        }
+
+        const finalDescription = safetyCheck.cleanDescription || questData.description;
+
+        // Create quest in database
+        const quest = await db.quest.create({
+          data: {
+            title: questData.title,
+            description: finalDescription,
+            category: questData.category,
+            difficulty: questData.difficulty,
+            goalType: questData.goalType,
+            goalCount: questData.goalCount,
+            xpReward: questData.xpReward,
+            pointReward: questData.pointReward,
+            isAIGenerated: true,
+            location: questData.location || null,
+            latitude: questData.latitude || null,
+            longitude: questData.longitude || null,
+          },
+        });
+
+        // Create user quest (only the first one is active, others are queued)
+        const userQuest = await db.userQuest.create({
+          data: {
+            userId,
+            questId: quest.id,
+            status: i === 0 ? "ACTIVE" : "QUEUED", // First quest is active, others queued
+            seriesId,
+            seriesIndex: i,
+            isSeriesQuest: true,
+            startedAt: i === 0 ? new Date() : null,
+          },
+        });
+
+        generatedQuests.push(userQuest);
+      } catch (error) {
+        console.error(`❌ [AI Series] Error generating quest ${i + 1}:`, error);
+        // Continue with other quests even if one fails
+      }
+    }
+
+    if (generatedQuests.length > 0) {
+      // Send notification about new series
+      await db.notification.create({
+        data: {
+          userId,
+          type: "AI_SERIES_GENERATED",
+          title: "🎯 New Quest Series Ready!",
+          message: `Your AI has created a series of ${generatedQuests.length} quests! Complete them one by one to unlock the next.`,
+          data: JSON.stringify({ seriesId, questCount: generatedQuests.length }),
+        },
+      });
+
+      console.log(`✅ [AI Series] Generated ${generatedQuests.length} quests for user ${userId}`);
+    }
+  } catch (error) {
+    console.error("❌ [AI Series] Error generating series:", error);
+  }
 }
 
 export async function updateUserStats(userId: string, xpReward: number, pointReward: number, difficulty?: string) {

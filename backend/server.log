@@ -682,3 +682,21 @@ error: "difficultyMultiplier" has already been declared
                ^
 note: "difficultyMultiplier" was originally declared here
    at /home/user/workspace/backend/src/routes/quests.ts:1223:9
+1292 |   const difficultyMultiplier: Record<string, number> = {
+               ^
+error: "difficultyMultiplier" has already been declared
+    at /home/user/workspace/backend/src/routes/quests.ts:1292:9
+
+1255 |   const difficultyMultiplier: Record<string, number> = {
+               ^
+note: "difficultyMultiplier" was originally declared here
+   at /home/user/workspace/backend/src/routes/quests.ts:1255:9
+1404 |   const difficultyMultiplier: Record<string, number> = {
+               ^
+error: "difficultyMultiplier" has already been declared
+    at /home/user/workspace/backend/src/routes/quests.ts:1404:9
+
+1367 |   const difficultyMultiplier: Record<string, number> = {
+               ^
+note: "difficultyMultiplier" was originally declared here
+   at /home/user/workspace/backend/src/routes/quests.ts:1367:9
