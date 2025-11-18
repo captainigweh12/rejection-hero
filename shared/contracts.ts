@@ -107,6 +107,8 @@ export const updateProfileRequestSchema = z.object({
   userContext: z.string().optional(), // About you - for AI quest generation
   userGoals: z.string().optional(), // User's goals - for AI quest generation
   onboardingCompleted: z.boolean().optional(), // Mark onboarding as completed
+  challengeDuration: z.number().optional(), // 14, 30, or 100 days
+  questMode: z.enum(["QUEST_BY_QUEST", "AI_SERIES"]).optional(), // Quest mode selection
 });
 export type UpdateProfileRequest = z.infer<typeof updateProfileRequestSchema>;
 export const updateProfileResponseSchema = z.object({

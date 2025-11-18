@@ -141,6 +141,8 @@ profileRouter.post("/", zValidator("json", updateProfileRequestSchema), async (c
       userContext: data.userContext,
       userGoals: data.userGoals,
       onboardingCompleted: data.onboardingCompleted ?? false,
+      challengeDuration: data.challengeDuration,
+      questMode: data.questMode,
     },
     update: {
       username: data.username,
@@ -153,12 +155,14 @@ profileRouter.post("/", zValidator("json", updateProfileRequestSchema), async (c
       location: data.location,
       latitude: data.latitude,
       longitude: data.longitude,
-          userContext: data.userContext,
-          userGoals: data.userGoals,
-          onboardingCompleted: data.onboardingCompleted,
-          ...(data.ageVerified !== undefined && { ageVerified: data.ageVerified }),
-          ...(data.parentalConsent !== undefined && { parentalConsent: data.parentalConsent }),
-        },
+      userContext: data.userContext,
+      userGoals: data.userGoals,
+      onboardingCompleted: data.onboardingCompleted,
+      ...(data.ageVerified !== undefined && { ageVerified: data.ageVerified }),
+      ...(data.parentalConsent !== undefined && { parentalConsent: data.parentalConsent }),
+      ...(data.challengeDuration !== undefined && { challengeDuration: data.challengeDuration }),
+      ...(data.questMode !== undefined && { questMode: data.questMode }),
+    },
   });
 
   const photos = profile.photos ? JSON.parse(profile.photos) : [];

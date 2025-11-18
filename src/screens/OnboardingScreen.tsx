@@ -13,7 +13,7 @@ import PolicyViewerModal from "@/components/PolicyViewerModal";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { FileText, CheckCircle } from "lucide-react-native";
 
-type OnboardingStep = 0 | 1 | 2 | 3; // 0 = Policy Acceptance
+type OnboardingStep = 0 | 1 | 2 | 3 | 4 | 5; // 0 = Policy Acceptance, 1 = Challenge Duration, 2 = Quest Mode, 3 = About You, 4 = Categories, 5 = Goals
 
 const CATEGORIES = [
   { id: "sales", label: "Sales", emoji: "💼", description: "Pitch, cold call, negotiate" },
@@ -43,6 +43,12 @@ export default function OnboardingScreen() {
   const [currentStep, setCurrentStep] = useState<OnboardingStep>(0); // Start with policy acceptance
   const [isLoading, setIsLoading] = useState(false);
   const [selectedPolicy, setSelectedPolicy] = useState<string | null>(null);
+  
+  // Challenge Duration Selection (Step 1)
+  const [challengeDuration, setChallengeDuration] = useState<14 | 30 | 100 | null>(null);
+  
+  // Quest Mode Selection (Step 2)
+  const [questMode, setQuestMode] = useState<"QUEST_BY_QUEST" | "AI_SERIES" | null>(null);
 
   // Required policies for onboarding
   const REQUIRED_POLICIES: Array<{ type: string; name: string }> = [
@@ -114,11 +120,26 @@ export default function OnboardingScreen() {
         );
         return;
       }
-      setCurrentStep(1);
-      return;
     }
     
+    // Step 1: Challenge Duration Selection
     if (currentStep === 1) {
+      if (!challengeDuration) {
+        Alert.alert("Select Challenge Duration", "Please select a challenge duration to continue.");
+        return;
+      }
+    }
+    
+    // Step 2: Quest Mode Selection
+    if (currentStep === 2) {
+      if (!questMode) {
+        Alert.alert("Select Quest Mode", "Please select a quest mode to continue.");
+        return;
+      }
+    }
+    
+    // Step 3: About You & Username
+    if (currentStep === 3) {
       if (!username.trim() || username.trim().length < 3) {
         Alert.alert("Username Required", "Please enter a username (at least 3 characters).");
         return;
@@ -132,11 +153,14 @@ export default function OnboardingScreen() {
         return;
       }
     }
-    if (currentStep === 2 && selectedCategories.length === 0) {
+    
+    // Step 4: Categories
+    if (currentStep === 4 && selectedCategories.length === 0) {
       Alert.alert("Select Categories", "Please select at least one category you're interested in.");
       return;
     }
-    if (currentStep < 3) {
+    
+    if (currentStep < 5) {
       setCurrentStep((currentStep + 1) as OnboardingStep);
     } else {
       handleComplete();
@@ -149,6 +173,121 @@ export default function OnboardingScreen() {
       setCurrentStep((currentStep - 1) as OnboardingStep);
     }
   };
+  
+  // Render Step 1: Challenge Duration Selection
+  const renderChallengeDurationStep = () => (
+    <View className="flex-1 px-6 py-8">
+      <Text className="text-3xl font-bold mb-2" style={textPrimary}>
+        Choose Your Challenge Duration 🎯
+      </Text>
+      <Text className="text-base mb-8" style={textSecondary}>
+        Select how long you want to commit to your growth journey
+      </Text>
+      
+      <View className="gap-4">
+        {[
+          { days: 14, label: "14 Day Challenge", description: "Perfect for a quick start", emoji: "⚡" },
+          { days: 30, label: "30 Day Challenge", description: "Build a solid habit", emoji: "🔥" },
+          { days: 100, label: "100 Day Challenge", description: "Transform your life", emoji: "🚀" },
+        ].map((option) => (
+          <Pressable
+            key={option.days}
+            onPress={() => {
+              setChallengeDuration(option.days as 14 | 30 | 100);
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            }}
+            className="p-6 rounded-2xl"
+            style={{
+              backgroundColor: challengeDuration === option.days ? "rgba(126, 63, 228, 0.2)" : colors.card,
+              borderWidth: 2,
+              borderColor: challengeDuration === option.days ? "#7E3FE4" : colors.cardBorder,
+            }}
+          >
+            <View className="flex-row items-center justify-between">
+              <View className="flex-1">
+                <View className="flex-row items-center gap-3 mb-2">
+                  <Text className="text-2xl">{option.emoji}</Text>
+                  <Text className="text-xl font-bold" style={textPrimary}>
+                    {option.label}
+                  </Text>
+                </View>
+                <Text className="text-sm" style={textSecondary}>
+                  {option.description}
+                </Text>
+              </View>
+              {challengeDuration === option.days && (
+                <View className="w-6 h-6 rounded-full items-center justify-center" style={{ backgroundColor: "#7E3FE4" }}>
+                  <CheckCircle size={16} color="white" />
+                </View>
+              )}
+            </View>
+          </Pressable>
+        ))}
+      </View>
+    </View>
+  );
+  
+  // Render Step 2: Quest Mode Selection
+  const renderQuestModeStep = () => (
+    <View className="flex-1 px-6 py-8">
+      <Text className="text-3xl font-bold mb-2" style={textPrimary}>
+        Choose Your Quest Mode 🎮
+      </Text>
+      <Text className="text-base mb-8" style={textSecondary}>
+        How would you like to receive your quests?
+      </Text>
+      
+      <View className="gap-4">
+        {[
+          {
+            mode: "QUEST_BY_QUEST" as const,
+            label: "Quest by Quest",
+            description: "Generate one quest at a time. You control the pace.",
+            emoji: "🎯",
+          },
+          {
+            mode: "AI_SERIES" as const,
+            label: "AI Quest Series",
+            description: "AI creates 3-8 quests at once. Complete one to unlock the next.",
+            emoji: "🤖",
+          },
+        ].map((option) => (
+          <Pressable
+            key={option.mode}
+            onPress={() => {
+              setQuestMode(option.mode);
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            }}
+            className="p-6 rounded-2xl"
+            style={{
+              backgroundColor: questMode === option.mode ? "rgba(126, 63, 228, 0.2)" : colors.card,
+              borderWidth: 2,
+              borderColor: questMode === option.mode ? "#7E3FE4" : colors.cardBorder,
+            }}
+          >
+            <View className="flex-row items-center justify-between">
+              <View className="flex-1">
+                <View className="flex-row items-center gap-3 mb-2">
+                  <Text className="text-2xl">{option.emoji}</Text>
+                  <Text className="text-xl font-bold" style={textPrimary}>
+                    {option.label}
+                  </Text>
+                </View>
+                <Text className="text-sm" style={textSecondary}>
+                  {option.description}
+                </Text>
+              </View>
+              {questMode === option.mode && (
+                <View className="w-6 h-6 rounded-full items-center justify-center" style={{ backgroundColor: "#7E3FE4" }}>
+                  <CheckCircle size={16} color="white" />
+                </View>
+              )}
+            </View>
+          </Pressable>
+        ))}
+      </View>
+    </View>
+  );
 
   const handleComplete = async () => {
     if (selectedGoals.length === 0 && !customGoal.trim()) {
@@ -386,7 +525,7 @@ export default function OnboardingScreen() {
     </ScrollView>
   );
 
-  const renderStep2 = () => (
+  const renderStep4 = () => (
     <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
       <View className="items-center mb-6">
         <Text className="text-6xl mb-4">🎯</Text>
@@ -435,7 +574,7 @@ export default function OnboardingScreen() {
     </ScrollView>
   );
 
-  const renderStep3 = () => (
+  const renderStep5 = () => (
     <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
       <View className="items-center mb-6">
         <Text className="text-6xl mb-4">🚀</Text>
@@ -512,9 +651,11 @@ export default function OnboardingScreen() {
           {renderProgressBar()}
 
           {currentStep === 0 && renderStep0()}
-          {currentStep === 1 && renderStep1()}
-          {currentStep === 2 && renderStep2()}
+          {currentStep === 1 && renderChallengeDurationStep()}
+          {currentStep === 2 && renderQuestModeStep()}
           {currentStep === 3 && renderStep3()}
+          {currentStep === 4 && renderStep4()}
+          {currentStep === 5 && renderStep5()}
 
           {/* Navigation Buttons */}
           <View className="pb-4 pt-6">
