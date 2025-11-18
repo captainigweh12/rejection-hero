@@ -247,7 +247,25 @@ questsRouter.post("/generate", zValidator("json", generateQuestRequestSchema), a
     },
   });
 
-  // Create user quest
+  // Check if user is in AI_SERIES mode
+  const profile = await db.profile.findUnique({
+    where: { userId: user.id },
+    select: { questMode: true },
+  });
+
+  // If user is in AI_SERIES mode, generate a series instead of a single quest
+  if (profile?.questMode === "AI_SERIES") {
+    // Generate a series of 3-8 quests
+    await generateAISeries(user.id);
+    
+    return c.json({
+      success: true,
+      message: "AI Quest Series generated! Check your quests.",
+      isSeries: true,
+    } satisfies GenerateQuestResponse);
+  }
+
+  // Create user quest (normal quest-by-quest mode)
   const userQuest = await db.userQuest.create({
     data: {
       userId: user.id,
