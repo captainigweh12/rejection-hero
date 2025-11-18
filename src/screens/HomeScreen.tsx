@@ -58,6 +58,7 @@ import type {
   GetCourageBoostResponse,
   GetWeeklyForecastResponse,
   GetProfileResponse,
+  GetActiveChallengeResponse,
 } from "@/shared/contracts";
 
 type Props = BottomTabScreenProps<"HomeTab">;
@@ -100,6 +101,16 @@ export default function HomeScreen({ navigation }: Props) {
       return api.get<GetProfileResponse>("/api/profile");
     },
     enabled: !!sessionData?.user,
+  });
+
+  // Fetch active challenge
+  const { data: challengeData } = useQuery<GetActiveChallengeResponse>({
+    queryKey: ["active-challenge"],
+    queryFn: async () => {
+      return api.get<GetActiveChallengeResponse>("/api/challenges/active");
+    },
+    enabled: !!sessionData?.user,
+    refetchInterval: 60000, // Refetch every minute to update current day
   });
 
   const { data: reflectionPrompt } = useQuery<GetReflectionPromptResponse>({
@@ -513,6 +524,164 @@ export default function HomeScreen({ navigation }: Props) {
               </View>
             </View>
           </Pressable>
+
+          {/* 100 Day Challenge Card */}
+          {challengeData?.challenge && (
+            <View style={{ paddingHorizontal: 24, paddingVertical: 8, marginTop: 20 }}>
+              <Pressable
+                onPress={() => {
+                  // Navigate to quest if today's quest is available
+                  if (challengeData.challenge?.todayQuest?.userQuestId) {
+                    // Find the userQuest in activeQuests
+                    const challengeUserQuest = activeQuests.find(
+                      (uq) => uq.id === challengeData.challenge?.todayQuest?.userQuestId
+                    );
+                    if (challengeUserQuest) {
+                      navigation.navigate("QuestDetail", { userQuestId: challengeUserQuest.id });
+                    }
+                  }
+                }}
+                style={{
+                  backgroundColor: colors.card,
+                  borderRadius: 20,
+                  padding: 20,
+                  borderWidth: 2,
+                  borderColor: colors.cardBorder,
+                  shadowColor: "#7E3FE4",
+                  shadowOffset: { width: 0, height: 4 },
+                  shadowOpacity: 0.3,
+                  shadowRadius: 8,
+                  elevation: 6,
+                }}
+              >
+                <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+                  <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+                    <LinearGradient
+                      colors={["#7E3FE4", "#00D9FF", "#FFD700"]}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 1 }}
+                      style={{
+                        width: 56,
+                        height: 56,
+                        borderRadius: 28,
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Trophy size={28} color="#FFF" fill="#FFF" />
+                    </LinearGradient>
+                    <View>
+                      <Text style={{ color: colors.text, fontSize: 18, fontWeight: "bold" }}>
+                        100 Day Challenge
+                      </Text>
+                      <Text style={{ color: colors.textSecondary, fontSize: 12 }}>
+                        {challengeData.challenge.category} • Day {challengeData.challenge.currentDay} of 100
+                      </Text>
+                    </View>
+                  </View>
+                  <ChevronRight size={20} color={colors.textSecondary} />
+                </View>
+
+                {/* Progress Bar */}
+                <View style={{ marginBottom: 12 }}>
+                  <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 4 }}>
+                    <Text style={{ color: colors.textSecondary, fontSize: 11, fontWeight: "600" }}>
+                      Progress
+                    </Text>
+                    <Text style={{ color: colors.textSecondary, fontSize: 11, fontWeight: "600" }}>
+                      {challengeData.challenge.completedDays} / 100 days
+                    </Text>
+                  </View>
+                  <View
+                    style={{
+                      height: 8,
+                      backgroundColor: colors.cardBorder,
+                      borderRadius: 4,
+                      overflow: "hidden",
+                    }}
+                  >
+                    <LinearGradient
+                      colors={["#7E3FE4", "#00D9FF"]}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 0 }}
+                      style={{
+                        height: "100%",
+                        width: `${(challengeData.challenge.completedDays / 100) * 100}%`,
+                      }}
+                    />
+                  </View>
+                </View>
+
+                {/* Today's Quest Status */}
+                {challengeData.challenge.todayQuest ? (
+                  <View
+                    style={{
+                      backgroundColor: challengeData.challenge.todayQuest.status === "COMPLETED" 
+                        ? "rgba(76, 175, 80, 0.1)" 
+                        : challengeData.challenge.todayQuest.status === "ACTIVE"
+                        ? "rgba(126, 63, 228, 0.1)"
+                        : "rgba(255, 107, 53, 0.1)",
+                      borderRadius: 12,
+                      padding: 12,
+                      borderWidth: 1,
+                      borderColor: challengeData.challenge.todayQuest.status === "COMPLETED" 
+                        ? "rgba(76, 175, 80, 0.3)" 
+                        : challengeData.challenge.todayQuest.status === "ACTIVE"
+                        ? "rgba(126, 63, 228, 0.3)"
+                        : "rgba(255, 107, 53, 0.3)",
+                    }}
+                  >
+                    <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+                      <View style={{ flex: 1 }}>
+                        <Text style={{ color: colors.text, fontSize: 13, fontWeight: "600", marginBottom: 4 }}>
+                          Day {challengeData.challenge.currentDay} Quest
+                        </Text>
+                        {challengeData.challenge.todayQuest.quest && (
+                          <Text style={{ color: colors.textSecondary, fontSize: 11 }} numberOfLines={2}>
+                            {challengeData.challenge.todayQuest.quest.title}
+                          </Text>
+                        )}
+                      </View>
+                      <View
+                        style={{
+                          backgroundColor: challengeData.challenge.todayQuest.status === "COMPLETED" 
+                            ? "#4CAF50" 
+                            : challengeData.challenge.todayQuest.status === "ACTIVE"
+                            ? "#7E3FE4"
+                            : "#FF6B35",
+                          borderRadius: 16,
+                          paddingHorizontal: 10,
+                          paddingVertical: 4,
+                        }}
+                      >
+                        <Text style={{ color: "#FFF", fontSize: 10, fontWeight: "bold", textTransform: "uppercase" }}>
+                          {challengeData.challenge.todayQuest.status === "COMPLETED" 
+                            ? "✓ Done" 
+                            : challengeData.challenge.todayQuest.status === "ACTIVE"
+                            ? "Active"
+                            : "Pending"}
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                ) : (
+                  <View
+                    style={{
+                      backgroundColor: "rgba(255, 107, 53, 0.1)",
+                      borderRadius: 12,
+                      padding: 12,
+                      borderWidth: 1,
+                      borderColor: "rgba(255, 107, 53, 0.3)",
+                    }}
+                  >
+                    <Text style={{ color: colors.textSecondary, fontSize: 12, textAlign: "center" }}>
+                      Today's quest will be generated soon...
+                    </Text>
+                  </View>
+                )}
+              </Pressable>
+            </View>
+          )}
 
           {/* Active Quests */}
           <View style={{ paddingHorizontal: 24, paddingVertical: 8, marginTop: 20 }}>

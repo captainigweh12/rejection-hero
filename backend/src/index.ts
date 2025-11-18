@@ -32,6 +32,7 @@ import { audioRouter } from "./routes/audio";
 import { authRouter } from "./routes/auth";
 import { webRedirectRouter } from "./routes/webRedirects";
 import challengesRouter from "./routes/challenges";
+import { generateDailyChallengesForAllUsers, sendMotivationalNotifications } from "./services/challengeScheduler";
 import { type AppType } from "./types";
 
 // AppType context adds user and session to the context, will be null if the user or session is null
@@ -164,6 +165,44 @@ app.get("/health", (c) => {
 
 // Start the server
 console.log("⚙️  Starting server...");
+
+// Set up challenge scheduler (runs daily at 9 AM and 2 PM UTC)
+let lastDailyGeneration = new Date();
+let lastMotivationSend = new Date();
+
+// Check every 5 minutes for scheduled tasks
+setInterval(() => {
+  const now = new Date();
+  const utcHour = now.getUTCHours();
+  const utcMinute = now.getUTCMinutes();
+
+  // Generate daily challenges at 9:00 AM UTC (check at 9:00-9:05)
+  if (utcHour === 9 && utcMinute >= 0 && utcMinute < 5) {
+    const hoursSinceLastRun = (now.getTime() - lastDailyGeneration.getTime()) / (1000 * 60 * 60);
+    if (hoursSinceLastRun >= 23) {
+      // Only run if at least 23 hours have passed (once per day)
+      console.log("⏰ [Challenge Scheduler] Running daily quest generation...");
+      generateDailyChallengesForAllUsers().catch((error) => {
+        console.error("❌ [Challenge Scheduler] Error generating daily challenges:", error);
+      });
+      lastDailyGeneration = now;
+    }
+  }
+
+  // Send motivational notifications at 2:00 PM UTC (check at 14:00-14:05)
+  if (utcHour === 14 && utcMinute >= 0 && utcMinute < 5) {
+    const hoursSinceLastRun = (now.getTime() - lastMotivationSend.getTime()) / (1000 * 60 * 60);
+    if (hoursSinceLastRun >= 23) {
+      // Only run if at least 23 hours have passed (once per day)
+      console.log("💪 [Challenge Scheduler] Sending motivational notifications...");
+      sendMotivationalNotifications().catch((error) => {
+        console.error("❌ [Challenge Scheduler] Error sending motivation:", error);
+      });
+      lastMotivationSend = now;
+    }
+  }
+}, 5 * 60 * 1000); // Check every 5 minutes
+
 serve({ fetch: app.fetch, port: Number(env.PORT) }, () => {
   console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
   console.log(`📍 Environment: ${env.NODE_ENV}`);
@@ -179,8 +218,9 @@ serve({ fetch: app.fetch, port: Number(env.PORT) }, () => {
   console.log("  👆 Swipe:        POST /api/swipe");
   console.log("  💕 Matches:      GET /api/matches");
   console.log("  🎯 Quests:       GET/POST /api/quests");
+  console.log("  🏆 Challenges:   GET/POST /api/challenges");
   console.log("  📊 Stats:        GET /api/stats");
-  console.log("  📹 Live:         GET/POST /api/live");
+  console.log("  📹 Live:        GET/POST /api/live");
   console.log("  👥 Friends:      GET/POST /api/friends");
   console.log("  💬 Messages:     GET/POST /api/messages");
   console.log("  🏘️  Groups:       GET/POST /api/groups");
@@ -188,5 +228,6 @@ serve({ fetch: app.fetch, port: Number(env.PORT) }, () => {
   console.log("  📓 Journal:      GET/POST /api/journal");
   console.log("  🔔 Notifications: GET /api/notifications");
   console.log("  💚 Health:       GET /health");
+  console.log("\n⏰ Challenge Scheduler: Active (Daily at 9 AM & 2 PM UTC)");
   console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
 });
