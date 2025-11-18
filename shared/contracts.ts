@@ -436,6 +436,7 @@ export const getUserStatsResponseSchema = z.object({
   confidenceLevel: z.number(), // 0-100 confidence percentage
   previousConfidence: z.number(), // For calculating weekly change
   confidenceChange: z.number(), // Calculated: confidenceLevel - previousConfidence
+  dailyConfidenceMeter: z.number(), // 0-100, grows with quests, decays over time
 
   // Fear Zone Stats
   easyZoneCount: z.number(), // Count of easy difficulty quests
