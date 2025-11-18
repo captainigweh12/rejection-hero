@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, ScrollView, Pressable, TextInput, ActivityIndicator, Image, Alert, Modal, KeyboardAvoidingView, Platform, TouchableOpacity } from "react-native";
+import { View, Text, ScrollView, Pressable, TextInput, ActivityIndicator, Image, Alert, Modal, KeyboardAvoidingView, Platform, TouchableOpacity, PanResponder } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -17,14 +17,18 @@ import {
   Home,
   Plus,
   Globe,
-  Lock
+  Lock,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react-native";
+import * as ImagePicker from "expo-image-picker";
 import type { BottomTabScreenProps } from "@/navigation/types";
 import { api } from "@/lib/api";
 import { useSession } from "@/lib/useSession";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import FeedScreen from "./FeedScreen";
+import CreateStoryModal from "@/components/CreateStoryModal";
 
 type Props = BottomTabScreenProps<"SwipeTab">;
 
@@ -62,6 +66,24 @@ interface GroupType {
   role?: string;
 }
 
+interface MomentsUser {
+  userId: string;
+  userName: string | null;
+  userAvatar: string | null;
+  moments: Array<{
+    id: string;
+    imageUrl: string | null;
+    videoUrl: string | null;
+    content: string | null;
+    expiresAt: string;
+    createdAt: string;
+  }>;
+}
+
+interface GetMomentsResponse {
+  moments: MomentsUser[];
+}
+
 export default function CommunityScreen({ navigation }: Props) {
   const { data: sessionData } = useSession();
   const { colors } = useTheme();
@@ -69,6 +91,11 @@ export default function CommunityScreen({ navigation }: Props) {
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState<"feed" | "friends" | "messages" | "groups">("feed");
+  
+  // Story/Moments state
+  const [showCreateMoment, setShowCreateMoment] = useState(false);
+  const [selectedMoment, setSelectedMoment] = useState<MomentsUser | null>(null);
+  const [momentIndex, setMomentIndex] = useState(0);
 
   // Ref to store FeedScreen's setShowCreatePost function
   const [feedCreatePostHandler, setFeedCreatePostHandler] = useState<(() => void) | null>(null);
@@ -96,6 +123,68 @@ export default function CommunityScreen({ navigation }: Props) {
     },
     enabled: !!sessionData?.user,
   });
+
+  // Fetch moments/stories
+  const { data: momentsData, refetch: refetchMoments } = useQuery({
+    queryKey: ["moments"],
+    queryFn: () => api.get<GetMomentsResponse>("/api/moments"),
+    enabled: !!sessionData?.user && activeTab === "friends",
+  });
+
+  // Create moment mutation
+  const createMomentMutation = useMutation({
+    mutationFn: (data: { imageUrl?: string; content?: string }) =>
+      api.post("/api/moments", data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["moments"] });
+      setShowCreateMoment(false);
+      Alert.alert("Success", "Story created! It will expire in 24 hours.");
+    },
+    onError: () => {
+      Alert.alert("Error", "Failed to create story. Please try again.");
+    },
+  });
+
+  const handleCreateMoment = async (imageUrl: string, text?: string) => {
+    try {
+      // Upload image to server first
+      const formData = new FormData();
+      const filename = imageUrl.split("/").pop() || "moment.jpg";
+      const match = /\.(\w+)$/.exec(filename);
+      const type = match ? `image/${match[1]}` : "image/jpeg";
+
+      formData.append("image", {
+        uri: imageUrl,
+        name: filename,
+        type,
+      } as any);
+
+      const uploadResponse = await fetch(`${process.env.EXPO_PUBLIC_VIBECODE_BACKEND_URL}/api/upload/image`, {
+        method: "POST",
+        body: formData,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      if (!uploadResponse.ok) {
+        throw new Error("Failed to upload image");
+      }
+
+      const uploadData = await uploadResponse.json();
+      const serverImageUrl = `${process.env.EXPO_PUBLIC_VIBECODE_BACKEND_URL}${uploadData.url}`;
+
+      // Now create moment with server URL
+      createMomentMutation.mutate({
+        imageUrl: serverImageUrl,
+        content: text,
+      });
+    } catch (error) {
+      console.error("Upload error:", error);
+      Alert.alert("Error", "Failed to upload image. Please try again.");
+      throw error;
+    }
+  };
 
   // Fetch unread notification count
   const { data: notificationsCount } = useQuery({
@@ -442,10 +531,98 @@ export default function CommunityScreen({ navigation }: Props) {
                 }}
                 contentContainerStyle={{ paddingHorizontal: 12, paddingVertical: 12, gap: 10, paddingBottom: 16 }}
               >
-                {/* Stories will be populated from FeedScreen data */}
-                <Text style={{ color: colors.textSecondary, fontSize: 14, padding: 20 }}>
-                  Stories coming soon...
-                </Text>
+                {/* Your Story Button */}
+                <TouchableOpacity
+                  onPress={() => setShowCreateMoment(true)}
+                  style={{
+                    alignItems: "center",
+                    marginRight: 8,
+                  }}
+                >
+                  <View
+                    style={{
+                      width: 70,
+                      height: 70,
+                      borderRadius: 35,
+                      borderWidth: 2,
+                      borderStyle: "dashed",
+                      borderColor: colors.primary,
+                      backgroundColor: colors.surface,
+                      justifyContent: "center",
+                      alignItems: "center",
+                      marginBottom: 6,
+                    }}
+                  >
+                    <Plus size={24} color={colors.primary} />
+                  </View>
+                  <Text style={{ color: colors.text, fontSize: 12, fontWeight: "600" }}>
+                    Your Story
+                  </Text>
+                </TouchableOpacity>
+
+                {/* Friends' Stories */}
+                {momentsData?.moments?.map((momentUser) => (
+                  <TouchableOpacity
+                    key={momentUser.userId}
+                    onPress={() => {
+                      setSelectedMoment(momentUser);
+                      setMomentIndex(0);
+                    }}
+                    style={{
+                      alignItems: "center",
+                      marginRight: 8,
+                    }}
+                  >
+                    <View
+                      style={{
+                        width: 70,
+                        height: 70,
+                        borderRadius: 35,
+                        borderWidth: 2,
+                        borderColor: colors.primary,
+                        padding: 2,
+                        marginBottom: 6,
+                      }}
+                    >
+                      {momentUser.userAvatar ? (
+                        <Image
+                          source={{ uri: momentUser.userAvatar }}
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            borderRadius: 33,
+                          }}
+                        />
+                      ) : (
+                        <View
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            borderRadius: 33,
+                            backgroundColor: colors.primary,
+                            justifyContent: "center",
+                            alignItems: "center",
+                          }}
+                        >
+                          <Text style={{ color: colors.text, fontSize: 20, fontWeight: "bold" }}>
+                            {momentUser.userName?.charAt(0).toUpperCase() || "?"}
+                          </Text>
+                        </View>
+                      )}
+                    </View>
+                    <Text
+                      style={{
+                        color: colors.text,
+                        fontSize: 12,
+                        maxWidth: 70,
+                        textAlign: "center",
+                      }}
+                      numberOfLines={1}
+                    >
+                      {momentUser.userName || "Friend"}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
               </ScrollView>
 
               <View style={{ paddingHorizontal: 20 }}>
@@ -1124,6 +1301,207 @@ export default function CommunityScreen({ navigation }: Props) {
           </View>
         </KeyboardAvoidingView>
       </Modal>
+
+      {/* Create Story Modal */}
+      <CreateStoryModal
+        visible={showCreateMoment}
+        onClose={() => setShowCreateMoment(false)}
+        onCreateStory={handleCreateMoment}
+        isLoading={createMomentMutation.isPending}
+      />
+
+      {/* Story Viewer Modal - Instagram Style */}
+      {selectedMoment && (
+        <Modal
+          visible={!!selectedMoment}
+          animationType="fade"
+          onRequestClose={() => setSelectedMoment(null)}
+        >
+          <View style={{ flex: 1, backgroundColor: "black" }}>
+            <SafeAreaView style={{ flex: 1 }} edges={["top", "bottom"]}>
+              {/* Progress Bars */}
+              <View
+                style={{
+                  flexDirection: "row",
+                  gap: 4,
+                  paddingHorizontal: 12,
+                  paddingTop: 12,
+                }}
+              >
+                {selectedMoment.moments.map((_, index) => (
+                  <View
+                    key={index}
+                    style={{
+                      flex: 1,
+                      height: 3,
+                      backgroundColor: "rgba(255, 255, 255, 0.3)",
+                      borderRadius: 2,
+                      overflow: "hidden",
+                    }}
+                  >
+                    <View
+                      style={{
+                        height: "100%",
+                        backgroundColor: index <= momentIndex ? "white" : "transparent",
+                        borderRadius: 2,
+                      }}
+                    />
+                  </View>
+                ))}
+              </View>
+
+              {/* Header */}
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  paddingHorizontal: 16,
+                  paddingVertical: 12,
+                }}
+              >
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+                  <View
+                    style={{
+                      width: 36,
+                      height: 36,
+                      borderRadius: 18,
+                      borderWidth: 2,
+                      borderColor: colors.primary,
+                      overflow: "hidden",
+                    }}
+                  >
+                    {selectedMoment.userAvatar ? (
+                      <Image
+                        source={{ uri: selectedMoment.userAvatar }}
+                        style={{ width: "100%", height: "100%" }}
+                      />
+                    ) : (
+                      <View
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          backgroundColor: colors.primary,
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <Text style={{ color: colors.text, fontSize: 16, fontWeight: "700" }}>
+                          {selectedMoment.userName?.charAt(0).toUpperCase() || "?"}
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+                  <View>
+                    <Text style={{ color: colors.text, fontSize: 16, fontWeight: "700" }}>
+                      {selectedMoment.userName || "Anonymous"}
+                    </Text>
+                    <Text style={{ color: colors.textSecondary, fontSize: 13 }}>
+                      {new Date(selectedMoment.moments[momentIndex].createdAt).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </Text>
+                  </View>
+                </View>
+                <TouchableOpacity
+                  onPress={() => setSelectedMoment(null)}
+                  style={{ padding: 8 }}
+                >
+                  <X size={28} color={colors.text} strokeWidth={2.5} />
+                </TouchableOpacity>
+              </View>
+
+              {/* Story Content with Swipe Navigation */}
+              <View style={{ flex: 1, position: "relative" }}>
+                <TouchableOpacity
+                  activeOpacity={1}
+                  onPress={(e) => {
+                    const { locationX } = e.nativeEvent;
+                    const screenWidth = 400; // approximate
+                    if (locationX < screenWidth / 2) {
+                      // Tap left side - previous
+                      if (momentIndex > 0) {
+                        setMomentIndex(momentIndex - 1);
+                      }
+                    } else {
+                      // Tap right side - next
+                      if (momentIndex < selectedMoment.moments.length - 1) {
+                        setMomentIndex(momentIndex + 1);
+                      } else {
+                        setSelectedMoment(null);
+                      }
+                    }
+                  }}
+                  style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+                >
+                  {selectedMoment.moments[momentIndex]?.imageUrl && (
+                    <Image
+                      source={{ uri: selectedMoment.moments[momentIndex].imageUrl }}
+                      style={{ width: "100%", height: "100%" }}
+                      resizeMode="contain"
+                    />
+                  )}
+                </TouchableOpacity>
+
+                {/* Navigation Arrows */}
+                {momentIndex > 0 && (
+                  <TouchableOpacity
+                    onPress={() => setMomentIndex(momentIndex - 1)}
+                    style={{
+                      position: "absolute",
+                      left: 10,
+                      top: "50%",
+                      transform: [{ translateY: -20 }],
+                      padding: 12,
+                      backgroundColor: "rgba(0, 0, 0, 0.5)",
+                      borderRadius: 20,
+                    }}
+                  >
+                    <ChevronLeft size={24} color="white" />
+                  </TouchableOpacity>
+                )}
+                {momentIndex < selectedMoment.moments.length - 1 && (
+                  <TouchableOpacity
+                    onPress={() => setMomentIndex(momentIndex + 1)}
+                    style={{
+                      position: "absolute",
+                      right: 10,
+                      top: "50%",
+                      transform: [{ translateY: -20 }],
+                      padding: 12,
+                      backgroundColor: "rgba(0, 0, 0, 0.5)",
+                      borderRadius: 20,
+                    }}
+                  >
+                    <ChevronRight size={24} color="white" />
+                  </TouchableOpacity>
+                )}
+
+                {/* Bottom Info */}
+                {selectedMoment.moments[momentIndex]?.content && (
+                  <View
+                    style={{
+                      position: "absolute",
+                      bottom: 40,
+                      left: 20,
+                      right: 20,
+                      backgroundColor: "rgba(0, 0, 0, 0.6)",
+                      paddingHorizontal: 16,
+                      paddingVertical: 12,
+                      borderRadius: 12,
+                    }}
+                  >
+                    <Text style={{ color: colors.text, fontSize: 15 }}>
+                      {selectedMoment.moments[momentIndex].content}
+                    </Text>
+                  </View>
+                )}
+              </View>
+            </SafeAreaView>
+          </View>
+        </Modal>
+      )}
     </View>
   );
 }

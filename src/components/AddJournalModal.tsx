@@ -8,7 +8,10 @@ import {
   ActivityIndicator,
   Alert,
   Modal,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Mic, Square, CheckCircle, XCircle, Activity, X, Type } from "lucide-react-native";
 import { Audio } from "expo-av";
 import * as FileSystem from "expo-file-system";
@@ -235,31 +238,42 @@ export default function AddJournalModal({ visible, onClose, onSuccess }: AddJour
   return (
     <Modal
       visible={visible}
-      animationType="fade"
+      animationType="slide"
       transparent={true}
       onRequestClose={handleClose}
+      statusBarTranslucent={true}
     >
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: "rgba(0, 0, 0, 0.9)",
-          justifyContent: "center",
-          alignItems: "center",
-          padding: 20,
-        }}
-      >
-        <View
-          style={{
-            width: "100%",
-            maxWidth: 420,
-            maxHeight: "85%",
-            backgroundColor: "#1A1A24",
-            borderRadius: 24,
-            borderWidth: 2,
-            borderColor: "#7E3FE4",
-            overflow: "hidden",
-          }}
+      <SafeAreaView style={{ flex: 1 }} edges={["top", "bottom"]}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={{ flex: 1 }}
         >
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: "rgba(0, 0, 0, 0.95)",
+              justifyContent: "center",
+              alignItems: "center",
+              padding: 20,
+            }}
+          >
+            <View
+              style={{
+                width: "100%",
+                maxWidth: 420,
+                maxHeight: "90%",
+                backgroundColor: "#1A1A24",
+                borderRadius: 24,
+                borderWidth: 2,
+                borderColor: "#7E3FE4",
+                overflow: "hidden",
+                shadowColor: "#7E3FE4",
+                shadowOffset: { width: 0, height: 8 },
+                shadowOpacity: 0.5,
+                shadowRadius: 16,
+                elevation: 20,
+              }}
+            >
           {/* Header */}
           <View
             style={{
@@ -649,6 +663,8 @@ export default function AddJournalModal({ visible, onClose, onSuccess }: AddJour
           </ScrollView>
         </View>
       </View>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
     </Modal>
   );
 }
