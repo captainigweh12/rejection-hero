@@ -137,12 +137,19 @@ export default function AddJournalModal({ visible, onClose, onSuccess }: AddJour
         { audioBase64 }
       );
 
-      setTranscript(response.transcript);
+      console.log("[Journal] Audio processing response:", response);
+
+      if (!response.summary || response.summary.trim() === "") {
+        throw new Error("Failed to generate summary. Please try again.");
+      }
+
+      setTranscript(response.transcript || "");
       setAiSummary(response.summary);
       setCurrentStep(3);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Transcription error:", err);
-      Alert.alert("Error", "Failed to transcribe audio");
+      const errorMessage = err?.response?.data?.message || err?.message || "Failed to transcribe audio";
+      Alert.alert("Error", errorMessage);
     } finally {
       setIsProcessing(false);
     }
@@ -157,16 +164,23 @@ export default function AddJournalModal({ visible, onClose, onSuccess }: AddJour
 
     setIsProcessing(true);
     try {
-      const response = await api.post<{ summary: string }>(
+      const response = await api.post<{ transcript?: string; summary: string }>(
         "/api/journal/transcribe",
         { text: textContent.trim() }
       );
 
+      console.log("[Journal] Text processing response:", response);
+      
+      if (!response.summary || response.summary.trim() === "") {
+        throw new Error("Failed to generate summary. Please try again.");
+      }
+
       setAiSummary(response.summary);
       setCurrentStep(3);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Text processing error:", err);
-      Alert.alert("Error", "Failed to process text");
+      const errorMessage = err?.response?.data?.message || err?.message || "Failed to process text";
+      Alert.alert("Error", errorMessage);
     } finally {
       setIsProcessing(false);
     }
@@ -179,6 +193,17 @@ export default function AddJournalModal({ visible, onClose, onSuccess }: AddJour
         throw new Error("Please select an outcome");
       }
 
+      if (!aiSummary || aiSummary.trim() === "") {
+        throw new Error("AI summary is required. Please try processing again.");
+      }
+
+      console.log("[Journal] Saving entry with data:", {
+        audioUrl: recordingUri || undefined,
+        audioTranscript: selectedMethod === "voice" ? transcript : textContent,
+        aiSummary,
+        outcome: selectedOutcome,
+      });
+
       return api.post<{
         id: string;
         achievement: {
@@ -190,9 +215,9 @@ export default function AddJournalModal({ visible, onClose, onSuccess }: AddJour
       }>(
         "/api/journal",
         {
-          audioUrl: recordingUri,
-          audioTranscript: selectedMethod === "voice" ? transcript : textContent,
-          aiSummary,
+          audioUrl: recordingUri || undefined,
+          audioTranscript: selectedMethod === "voice" ? transcript : textContent || undefined,
+          aiSummary: aiSummary.trim(),
           userEditedSummary: null,
           outcome: selectedOutcome,
         }
@@ -214,9 +239,19 @@ export default function AddJournalModal({ visible, onClose, onSuccess }: AddJour
 
       onSuccess?.();
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error("Save error:", error);
-      Alert.alert("Error", "Failed to save journal entry");
+      console.error("Error details:", JSON.stringify(error, null, 2));
+      
+      // Provide more helpful error messages
+      let errorMessage = "Failed to save journal entry";
+      if (error?.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error?.message) {
+        errorMessage = error.message;
+      }
+      
+      Alert.alert("Error", errorMessage);
     },
   });
 
