@@ -10,6 +10,7 @@ import {
   TextInput,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
 } from "react-native";
 import { X, Camera, Image as ImageIcon } from "lucide-react-native";
 import * as ImagePicker from "expo-image-picker";
@@ -93,6 +94,7 @@ export default function CreateStoryModal({
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
       >
         <View
           style={{
@@ -105,7 +107,7 @@ export default function CreateStoryModal({
           <View
             style={{
               width: "90%",
-              maxHeight: "80%",
+              maxHeight: "85%",
               backgroundColor: "#0A0A0F",
               borderRadius: 20,
               borderWidth: 1,
@@ -130,7 +132,11 @@ export default function CreateStoryModal({
               </TouchableOpacity>
             </View>
 
-            <View style={{ padding: 20 }}>
+            <ScrollView 
+              style={{ flex: 1 }}
+              contentContainerStyle={{ padding: 20 }}
+              keyboardShouldPersistTaps="handled"
+            >
               {/* Image Preview or Upload Options */}
               {selectedImage ? (
                 <View>
@@ -299,7 +305,7 @@ export default function CreateStoryModal({
                   </Text>
                 </View>
               )}
-            </View>
+            </ScrollView>
           </View>
         </View>
       </KeyboardAvoidingView>

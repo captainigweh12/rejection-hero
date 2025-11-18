@@ -52,10 +52,8 @@ postsRouter.post("/", zValidator("json", createPostRequestSchema), async (c) => 
       },
       include: {
         user: {
-          select: {
-            id: true,
-            name: true,
-            image: true,
+          include: {
+            Profile: true,
           },
         },
       },
@@ -65,10 +63,12 @@ postsRouter.post("/", zValidator("json", createPostRequestSchema), async (c) => 
     const images = [];
     if (imageUrls && imageUrls.length > 0) {
       for (let i = 0; i < imageUrls.length; i++) {
+        const imageUrl = imageUrls[i];
+        if (!imageUrl) continue;
         const image = await db.postImage.create({
           data: {
             postId: post.id,
-            imageUrl: imageUrls[i],
+            imageUrl: imageUrl,
             order: i,
           },
         });
@@ -89,7 +89,7 @@ postsRouter.post("/", zValidator("json", createPostRequestSchema), async (c) => 
       user: {
         id: post.user.id,
         name: post.user.name,
-        avatar: post.user.image,
+        avatar: post.user.Profile?.avatar || post.user.image || null,
       },
       images,
     });
@@ -154,11 +154,8 @@ postsRouter.get("/feed", async (c) => {
       },
       include: {
         user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            image: true,
+          include: {
+            Profile: true,
           },
         },
         group: {
@@ -182,10 +179,8 @@ postsRouter.get("/feed", async (c) => {
         comments: {
           include: {
             user: {
-              select: {
-                id: true,
-                name: true,
-                image: true,
+              include: {
+                Profile: true,
               },
             },
           },
@@ -212,7 +207,7 @@ postsRouter.get("/feed", async (c) => {
         id: post.user.id,
         name: post.user.name,
         email: post.user.email,
-        avatar: post.user.image,
+        avatar: post.user.Profile?.avatar || post.user.image || null,
       },
       group: post.group,
       images: post.images.map((img) => ({
@@ -232,7 +227,7 @@ postsRouter.get("/feed", async (c) => {
         user: {
           id: comment.user.id,
           name: comment.user.name,
-          avatar: comment.user.image,
+          avatar: comment.user.Profile?.avatar || comment.user.image || null,
         },
       })),
       likeCount: post.likes.length,
@@ -369,10 +364,8 @@ postsRouter.post("/:id/comment", zValidator("json", addCommentRequestSchema), as
       },
       include: {
         user: {
-          select: {
-            id: true,
-            name: true,
-            image: true,
+          include: {
+            Profile: true,
           },
         },
       },
@@ -385,7 +378,7 @@ postsRouter.post("/:id/comment", zValidator("json", addCommentRequestSchema), as
       user: {
         id: comment.user.id,
         name: comment.user.name,
-        avatar: comment.user.image,
+        avatar: comment.user.Profile?.avatar || comment.user.image || null,
       },
     });
   } catch (error) {
@@ -434,10 +427,8 @@ postsRouter.put("/:id", async (c) => {
       },
       include: {
         user: {
-          select: {
-            id: true,
-            name: true,
-            image: true,
+          include: {
+            Profile: true,
           },
         },
       },
@@ -451,7 +442,7 @@ postsRouter.put("/:id", async (c) => {
       user: {
         id: updatedPost.user.id,
         name: updatedPost.user.name,
-        avatar: updatedPost.user.image,
+        avatar: updatedPost.user.Profile?.avatar || updatedPost.user.image || null,
       },
     });
   } catch (error) {

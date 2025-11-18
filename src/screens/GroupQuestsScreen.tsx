@@ -175,36 +175,36 @@ function CreateGroupQuestModal({ visible, onClose, groupId, onSuccess }: CreateG
 
   return (
     <Modal visible={visible} animationType="slide" transparent={false} onRequestClose={resetAndClose}>
-      <View style={{ flex: 1, backgroundColor: colors.backgroundSolid }}>
-        <SafeAreaView edges={["top"]} style={{ flex: 1 }}>
-          <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
-            {/* Header */}
-            <View
+      <SafeAreaView edges={["top", "bottom"]} style={{ flex: 1, backgroundColor: colors.backgroundSolid }}>
+        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
+          {/* Header */}
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+              paddingHorizontal: 20,
+              paddingTop: 16,
+              paddingBottom: 16,
+              borderBottomWidth: 1,
+              borderBottomColor: colors.cardBorder,
+            }}
+          >
+            <Text style={{ fontSize: 20, fontWeight: "700", color: colors.text }}>Create Group Quest</Text>
+            <Pressable
+              onPress={resetAndClose}
               style={{
-                flexDirection: "row",
+                width: 36,
+                height: 36,
+                borderRadius: 18,
+                backgroundColor: colors.surface,
                 alignItems: "center",
-                justifyContent: "space-between",
-                paddingHorizontal: 20,
-                paddingVertical: 16,
-                borderBottomWidth: 1,
-                borderBottomColor: colors.cardBorder,
+                justifyContent: "center",
               }}
             >
-              <Text style={{ fontSize: 20, fontWeight: "700", color: colors.text }}>Create Group Quest</Text>
-              <Pressable
-                onPress={resetAndClose}
-                style={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: 18,
-                  backgroundColor: colors.surface,
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <X size={20} color={colors.text} />
-              </Pressable>
-            </View>
+              <X size={20} color={colors.text} />
+            </Pressable>
+          </View>
 
             {/* Step Indicators */}
             <View style={{ flexDirection: "row", paddingHorizontal: 20, paddingVertical: 16, gap: 8 }}>
@@ -592,12 +592,15 @@ function CreateGroupQuestModal({ visible, onClose, groupId, onSuccess }: CreateG
                 onPress={handleNext}
                 disabled={
                   createMutation.isPending ||
-                  (step === 1 && !selectedQuestId) ||
+                  (step === 1 && creationType === "existing" && !selectedQuestId) ||
+                  (step === 1 && creationType === "custom" && !customQuestText.trim()) ||
                   (step === 3 && selectedMemberIds.length === 0)
                 }
                 style={{
                   backgroundColor:
-                    (step === 1 && !selectedQuestId) || (step === 3 && selectedMemberIds.length === 0)
+                    (step === 1 && creationType === "existing" && !selectedQuestId) ||
+                    (step === 1 && creationType === "custom" && !customQuestText.trim()) ||
+                    (step === 3 && selectedMemberIds.length === 0)
                       ? colors.primaryLight
                       : colors.primary,
                   paddingVertical: 16,
@@ -617,7 +620,6 @@ function CreateGroupQuestModal({ visible, onClose, groupId, onSuccess }: CreateG
             </View>
           </KeyboardAvoidingView>
         </SafeAreaView>
-      </View>
     </Modal>
   );
 }
