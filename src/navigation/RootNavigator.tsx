@@ -59,7 +59,7 @@ const RootNavigator = () => {
         <RootStack.Screen
           name="LoginModalScreen"
           component={LoginModalScreen}
-          options={{ presentation: "modal", title: "Login" }}
+          options={{ presentation: "modal", headerShown: false }}
         />
         <RootStack.Screen
           name="EditProfile"

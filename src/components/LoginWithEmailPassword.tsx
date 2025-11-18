@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Alert, Pressable, Text, TextInput, View, ActivityIndicator, Image } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation } from "@react-navigation/native";
@@ -262,21 +263,25 @@ export default function LoginWithEmailPassword() {
 
   // Show forgot password screen
   if (showForgotPassword) {
-    return <ForgotPasswordScreen
-      onBack={() => setShowForgotPassword(false)}
-      onSuccess={() => setShowForgotPassword(false)}
-    />;
+    return (
+      <LinearGradient colors={["#0A0A0F", "#1A1A24", "#2A1A34"]} style={{ flex: 1 }}>
+        <ForgotPasswordScreen
+          onBack={() => setShowForgotPassword(false)}
+          onSuccess={() => setShowForgotPassword(false)}
+        />
+      </LinearGradient>
+    );
   }
 
   return (
-    <LinearGradient colors={["#0A0A0F", "#1A1A24", "#2A1A34"]} className="flex-1">
-      <View className="flex-1">
+    <LinearGradient colors={["#0A0A0F", "#1A1A24", "#2A1A34"]} style={{ flex: 1 }}>
+      <SafeAreaView edges={["bottom"]} style={{ flex: 1 }}>
         <KeyboardAwareScrollView
-          contentContainerStyle={{ flexGrow: 1 }}
+          contentContainerStyle={{ flexGrow: 1, paddingTop: 20 }}
           showsVerticalScrollIndicator={false}
-          className="flex-1"
+          style={{ flex: 1 }}
         >
-          <View className="flex-1 px-6 pt-12 pb-8">
+          <View style={{ flex: 1, paddingHorizontal: 24, paddingTop: 12, paddingBottom: 32 }}>
             {/* Logo */}
             <View className="items-center mb-8">
               <Image
@@ -455,7 +460,7 @@ export default function LoginWithEmailPassword() {
             </Text>
           </View>
         </KeyboardAwareScrollView>
-      </View>
+      </SafeAreaView>
     </LinearGradient>
   );
 }
