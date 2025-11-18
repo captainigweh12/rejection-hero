@@ -262,14 +262,10 @@ export default function LoginWithEmailPassword() {
 
   // Show forgot password screen
   if (showForgotPassword) {
-    return (
-      <LinearGradient colors={["#0A0A0F", "#1A1A24", "#2A1A34"]} className="flex-1">
-        <ForgotPasswordScreen
-          onBack={() => setShowForgotPassword(false)}
-          onSuccess={() => setShowForgotPassword(false)}
-        />
-      </LinearGradient>
-    );
+    return <ForgotPasswordScreen
+      onBack={() => setShowForgotPassword(false)}
+      onSuccess={() => setShowForgotPassword(false)}
+    />;
   }
 
   return (
