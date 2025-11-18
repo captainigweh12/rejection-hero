@@ -203,9 +203,9 @@ app.post(
         );
       }
 
-      // Generate reset link
+      // Generate reset link (web URL that redirects to app)
       const backendUrl = process.env.BACKEND_URL || "https://preview-cgmxpdeghzpq.share.sandbox.dev";
-      const resetLink = `vibecode://reset-password?token=${resetToken}&email=${encodeURIComponent(email)}`;
+      const resetLink = `${backendUrl}/reset-password?token=${resetToken}&email=${encodeURIComponent(email)}`;
 
       // Send password reset email via GoHighLevel
       const emailHTML = getPasswordResetEmailHTML(user.name || "User", resetLink);

@@ -320,7 +320,8 @@ export function getWelcomeEmailHTML(userName: string): string {
  * Get invite email HTML template
  */
 export function getInviteEmailHTML(inviteeName: string, inviterName: string): string {
-  const appUrl = "com.vibecode.goforno://home"; // Deep link to app
+  const backendUrl = process.env.BACKEND_URL || "https://preview-cgmxpdeghzpq.share.sandbox.dev";
+  const appUrl = `${backendUrl}/invite`; // Web URL that redirects to app
 
   return `
     <!DOCTYPE html>

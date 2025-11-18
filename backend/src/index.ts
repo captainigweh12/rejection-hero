@@ -30,6 +30,7 @@ import { supportRouter } from "./routes/support";
 import { categoriesRouter } from "./routes/categories";
 import { audioRouter } from "./routes/audio";
 import { authRouter } from "./routes/auth";
+import { webRedirectRouter } from "./routes/webRedirects";
 import { type AppType } from "./types";
 
 // AppType context adds user and session to the context, will be null if the user or session is null
@@ -146,6 +147,9 @@ app.route("/api/categories", categoriesRouter);
 
 console.log("🎤 Mounting audio routes at /api/audio");
 app.route("/api/audio", audioRouter);
+
+console.log("🌐 Mounting web redirect routes");
+app.route("/", webRedirectRouter);
 
 // Health check endpoint
 // Used by load balancers and monitoring tools to verify service is running

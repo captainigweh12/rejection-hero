@@ -869,11 +869,11 @@ export default function ProfileScreen({ navigation }: Props) {
                   Growth Zone Progress
                 </Text>
 
-                {/* Confidence Level */}
+                {/* Confidence Meter */}
                 <View style={{ marginBottom: 24 }}>
                   <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
                     <Text style={{ fontSize: 14, color: colors.textSecondary, fontWeight: "600" }}>
-                      Confidence Level
+                      Confidence Meter
                     </Text>
                       <Text style={{ fontSize: 20, fontWeight: "bold", color: colors.warning }}>
                         {statsData?.confidenceLevel || 50}%

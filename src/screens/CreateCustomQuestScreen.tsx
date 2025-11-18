@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -13,6 +13,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Audio } from "expo-av";
+import * as Location from "expo-location";
 import {
   Mic,
   MicOff,
@@ -22,6 +23,8 @@ import {
   Gift,
   ChevronDown,
   ChevronUp,
+  MapPin,
+  Navigation2,
 } from "lucide-react-native";
 import type { RootStackScreenProps } from "@/navigation/types";
 import { api } from "@/lib/api";
@@ -49,11 +52,15 @@ export default function CreateCustomQuestScreen({ route, navigation }: Props) {
   const [isTranscribing, setIsTranscribing] = useState(false);
 
   // Quest customization
-  const [showAdvanced, setShowAdvanced] = useState(false);
   const [category, setCategory] = useState("SOCIAL");
   const [difficulty, setDifficulty] = useState<"EASY" | "MEDIUM" | "HARD" | "EXPERT">("MEDIUM");
   const [goalType, setGoalType] = useState<"COLLECT_NOS" | "COLLECT_YES" | "TAKE_ACTION">("COLLECT_NOS");
   const [goalCount, setGoalCount] = useState(5);
+  
+  // Location options
+  const [locationType, setLocationType] = useState<"CURRENT" | "CUSTOM" | "NONE">("NONE");
+  const [customLocation, setCustomLocation] = useState("");
+  const [currentLocation, setCurrentLocation] = useState<{ latitude: number; longitude: number } | null>(null);
 
   // Gifting
   const [giftXP, setGiftXP] = useState(0);
@@ -180,11 +187,42 @@ export default function CreateCustomQuestScreen({ route, navigation }: Props) {
     }
   };
 
+  // Get current location when locationType is CURRENT
+  useEffect(() => {
+    if (locationType === "CURRENT") {
+      (async () => {
+        try {
+          const { status } = await Location.requestForegroundPermissionsAsync();
+          if (status !== "granted") {
+            Alert.alert("Permission Required", "Location permission is needed to use your current location.");
+            setLocationType("NONE");
+            return;
+          }
+
+          const location = await Location.getCurrentPositionAsync({});
+          setCurrentLocation({
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+          });
+        } catch (error) {
+          console.error("Error getting location:", error);
+          Alert.alert("Error", "Failed to get your location. Please try again or use a custom location.");
+          setLocationType("NONE");
+        }
+      })();
+    }
+  }, [locationType]);
+
   const handleCreateQuest = () => {
     const description = inputMode === "voice" ? audioTranscript : textDescription;
 
     if (!description.trim()) {
       Alert.alert("Missing Description", "Please provide a quest description via voice or text");
+      return;
+    }
+
+    if (locationType === "CUSTOM" && !customLocation.trim()) {
+      Alert.alert("Missing Location", "Please enter a location name or select 'No Specific Location'");
       return;
     }
 
@@ -200,10 +238,14 @@ export default function CreateCustomQuestScreen({ route, navigation }: Props) {
       friendId,
       audioTranscript: inputMode === "voice" ? audioTranscript : undefined,
       textDescription: inputMode === "text" ? textDescription : undefined,
-      category: showAdvanced ? category : undefined,
-      difficulty: showAdvanced ? difficulty : undefined,
-      goalType: showAdvanced ? goalType : undefined,
-      goalCount: showAdvanced ? goalCount : undefined,
+      category,
+      difficulty,
+      goalType,
+      goalCount,
+      locationType,
+      customLocation: locationType === "CUSTOM" ? customLocation : undefined,
+      latitude: locationType === "CURRENT" && currentLocation ? currentLocation.latitude : undefined,
+      longitude: locationType === "CURRENT" && currentLocation ? currentLocation.longitude : undefined,
       giftXP,
       giftPoints,
       message: message.trim() || undefined,
@@ -571,34 +613,16 @@ export default function CreateCustomQuestScreen({ route, navigation }: Props) {
               </View>
             )}
 
-            {/* Advanced Options */}
+            {/* Quest Customization - Always Visible */}
             <View style={{ marginHorizontal: 20, marginBottom: 20 }}>
-              <Pressable
-                onPress={() => setShowAdvanced(!showAdvanced)}
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  backgroundColor: colors.surface,
-                  borderRadius: 12,
-                  padding: 16,
-                }}
-              >
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <Sparkles size={20} color={colors.primary} />
-                  <Text style={{ fontSize: 16, fontWeight: "700", color: colors.text, marginLeft: 8 }}>
-                    Advanced Options
-                  </Text>
-                </View>
-                {showAdvanced ? (
-                  <ChevronUp size={20} color={colors.textSecondary} />
-                ) : (
-                  <ChevronDown size={20} color={colors.textSecondary} />
-                )}
-              </Pressable>
+              <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 16 }}>
+                <Sparkles size={20} color={colors.primary} />
+                <Text style={{ fontSize: 18, fontWeight: "700", color: colors.text, marginLeft: 8 }}>
+                  Quest Settings
+                </Text>
+              </View>
 
-              {showAdvanced && (
-                <View style={{ marginTop: 16, gap: 12 }}>
+              <View style={{ gap: 12 }}>
                   {/* Category */}
                   <Pressable
                     onPress={() => setShowCategoryModal(true)}
@@ -694,8 +718,95 @@ export default function CreateCustomQuestScreen({ route, navigation }: Props) {
                       thumbTintColor={colors.primary}
                     />
                   </View>
+
+                  {/* Location Options */}
+                  <View
+                    style={{
+                      backgroundColor: colors.inputBackground,
+                      borderRadius: 12,
+                      padding: 16,
+                    }}
+                  >
+                    <Text style={{ fontSize: 14, color: colors.textSecondary, marginBottom: 12 }}>
+                      Location
+                    </Text>
+                    <View style={{ gap: 8 }}>
+                      <Pressable
+                        onPress={() => setLocationType("CURRENT")}
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                          padding: 12,
+                          borderRadius: 8,
+                          backgroundColor: locationType === "CURRENT" ? colors.primary + "20" : "transparent",
+                          borderWidth: 1,
+                          borderColor: locationType === "CURRENT" ? colors.primary : colors.inputBorder,
+                        }}
+                      >
+                        <Navigation2 size={20} color={locationType === "CURRENT" ? colors.primary : colors.textSecondary} />
+                        <Text style={{ fontSize: 14, fontWeight: "600", color: colors.text, marginLeft: 12 }}>
+                          Use My Current Location
+                        </Text>
+                      </Pressable>
+                      <Pressable
+                        onPress={() => setLocationType("CUSTOM")}
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                          padding: 12,
+                          borderRadius: 8,
+                          backgroundColor: locationType === "CUSTOM" ? colors.primary + "20" : "transparent",
+                          borderWidth: 1,
+                          borderColor: locationType === "CUSTOM" ? colors.primary : colors.inputBorder,
+                        }}
+                      >
+                        <MapPin size={20} color={locationType === "CUSTOM" ? colors.primary : colors.textSecondary} />
+                        <Text style={{ fontSize: 14, fontWeight: "600", color: colors.text, marginLeft: 12 }}>
+                          Specify Location
+                        </Text>
+                      </Pressable>
+                      <Pressable
+                        onPress={() => setLocationType("NONE")}
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                          padding: 12,
+                          borderRadius: 8,
+                          backgroundColor: locationType === "NONE" ? colors.primary + "20" : "transparent",
+                          borderWidth: 1,
+                          borderColor: locationType === "NONE" ? colors.primary : colors.inputBorder,
+                        }}
+                      >
+                        <Text style={{ fontSize: 14, fontWeight: "600", color: colors.text }}>
+                          No Specific Location
+                        </Text>
+                      </Pressable>
+                    </View>
+                    {locationType === "CUSTOM" && (
+                      <TextInput
+                        value={customLocation}
+                        onChangeText={setCustomLocation}
+                        placeholder="Enter location (e.g., Central Park, Times Square, Airport)"
+                        placeholderTextColor={colors.textTertiary}
+                        style={{
+                          marginTop: 12,
+                          backgroundColor: colors.surface,
+                          borderRadius: 8,
+                          padding: 12,
+                          fontSize: 14,
+                          color: colors.text,
+                          borderWidth: 1,
+                          borderColor: colors.inputBorder,
+                        }}
+                      />
+                    )}
+                    {locationType === "CURRENT" && currentLocation && (
+                      <Text style={{ fontSize: 12, color: colors.success, marginTop: 8 }}>
+                        ✓ Location captured
+                      </Text>
+                    )}
+                  </View>
                 </View>
-              )}
             </View>
 
             {/* Optional Message */}

@@ -8,10 +8,163 @@ import { env } from "../env";
 const sharedQuestsRouter = new Hono<AppType>();
 
 // ============================================
+// AI Fine-tuning Function - Optimizes quest based on user preferences
+// ============================================
+async function fineTuneQuestWithAI(params: {
+  description: string;
+  category: string;
+  goalType: string;
+  goalCount?: number;
+  locationType?: string;
+  customLocation?: string;
+  difficulty?: string;
+}): Promise<{
+  description: string;
+  category: string;
+  goalType: string;
+  goalCount: number;
+  difficulty: string;
+  location?: string;
+}> {
+  const OPENAI_API_KEY = env.OPENAI_API_KEY || process.env.EXPO_PUBLIC_VIBECODE_OPENAI_API_KEY;
+
+  if (!OPENAI_API_KEY) {
+    console.warn("⚠️ No OpenAI API key - skipping AI fine-tuning");
+    return {
+      description: params.description,
+      category: params.category,
+      goalType: params.goalType,
+      goalCount: params.goalCount || 5,
+      difficulty: params.difficulty || "MEDIUM",
+      location: params.customLocation,
+    };
+  }
+
+  try {
+    const locationContext = params.locationType === "CURRENT"
+      ? "Use the user's current location"
+      : params.locationType === "CUSTOM" && params.customLocation
+      ? `Location: ${params.customLocation}`
+      : "No specific location required";
+
+    const prompt = `You are an expert quest designer for a personal growth app called "Go for No" that helps people overcome fear of rejection.
+
+User's quest idea: "${params.description}"
+Category: ${params.category}
+Goal Type: ${params.goalType} (COLLECT_NOS = track rejections, COLLECT_YES = track approvals, TAKE_ACTION = complete actions)
+Desired Goal Count: ${params.goalCount || "not specified"}
+${locationContext}
+Difficulty: ${params.difficulty || "MEDIUM"}
+
+Your task: Fine-tune and optimize this quest to help the user meet their desired goal. Make it:
+1. Clear and actionable
+2. Appropriate for the specified difficulty level
+3. Optimized for the goal type (if COLLECT_NOS, make it rejection-focused; if TAKE_ACTION, make it action-focused)
+4. Location-appropriate if location is specified
+5. Achievable and motivating
+
+Return a JSON object with:
+{
+  "description": "Optimized quest description (2-3 sentences, clear and actionable)",
+  "category": "One of: SOCIAL, SALES, ENTREPRENEURSHIP, DATING, CONFIDENCE, CAREER",
+  "goalType": "COLLECT_NOS, COLLECT_YES, or TAKE_ACTION",
+  "goalCount": number (1-50, appropriate for difficulty),
+  "difficulty": "EASY, MEDIUM, HARD, or EXPERT",
+  "location": "Location name if applicable, or null"
+}
+
+Only return valid JSON, no other text.`;
+
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${OPENAI_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: "gpt-4o-mini",
+        messages: [
+          {
+            role: "system",
+            content: "You are an expert quest designer. Always return valid JSON only.",
+          },
+          {
+            role: "user",
+            content: prompt,
+          },
+        ],
+        temperature: 0.7,
+        max_tokens: 500,
+      }),
+    });
+
+    if (!response.ok) {
+      console.error("OpenAI API error:", response.statusText);
+      return {
+        description: params.description,
+        category: params.category,
+        goalType: params.goalType,
+        goalCount: params.goalCount || 5,
+        difficulty: params.difficulty || "MEDIUM",
+        location: params.customLocation,
+      };
+    }
+
+    const result = (await response.json()) as { choices: Array<{ message?: { content?: string } }> };
+    const content = result.choices[0]?.message?.content;
+
+    if (!content) {
+      return {
+        description: params.description,
+        category: params.category,
+        goalType: params.goalType,
+        goalCount: params.goalCount || 5,
+        difficulty: params.difficulty || "MEDIUM",
+        location: params.customLocation,
+      };
+    }
+
+    // Parse JSON response
+    try {
+      const parsed = JSON.parse(content);
+      console.log("✅ AI fine-tuning completed:", parsed);
+      return {
+        description: parsed.description || params.description,
+        category: parsed.category || params.category,
+        goalType: parsed.goalType || params.goalType,
+        goalCount: parsed.goalCount || params.goalCount || 5,
+        difficulty: parsed.difficulty || params.difficulty || "MEDIUM",
+        location: parsed.location || params.customLocation,
+      };
+    } catch (parseError) {
+      console.error("Error parsing AI response:", parseError);
+      return {
+        description: params.description,
+        category: params.category,
+        goalType: params.goalType,
+        goalCount: params.goalCount || 5,
+        difficulty: params.difficulty || "MEDIUM",
+        location: params.customLocation,
+      };
+    }
+  } catch (error) {
+    console.error("Error in AI fine-tuning:", error);
+    return {
+      description: params.description,
+      category: params.category,
+      goalType: params.goalType,
+      goalCount: params.goalCount || 5,
+      difficulty: params.difficulty || "MEDIUM",
+      location: params.customLocation,
+    };
+  }
+}
+
+// ============================================
 // AI Safety Filtering Function
 // ============================================
 async function checkQuestSafety(description: string): Promise<{ isSafe: boolean; warning?: string; cleanDescription?: string }> {
-  const OPENAI_API_KEY = env.OPENAI_API_KEY || env.EXPO_PUBLIC_VIBECODE_OPENAI_API_KEY;
+  const OPENAI_API_KEY = env.OPENAI_API_KEY || process.env.EXPO_PUBLIC_VIBECODE_OPENAI_API_KEY;
 
   if (!OPENAI_API_KEY) {
     console.warn("⚠️ No OpenAI API key - skipping AI safety check");
@@ -74,7 +227,7 @@ Important: Be permissive with rejection challenges - the app is about overcoming
       return { isSafe: true, cleanDescription: description }; // Fail open
     }
 
-    const result = await response.json();
+    const result = (await response.json()) as { choices: Array<{ message?: { content?: string } }> };
     const content = result.choices[0]?.message?.content;
 
     if (!content) {
@@ -326,6 +479,10 @@ const createCustomQuestSchema = z.object({
   difficulty: z.enum(["EASY", "MEDIUM", "HARD", "EXPERT"]).optional(),
   goalType: z.enum(["COLLECT_NOS", "COLLECT_YES", "TAKE_ACTION"]).optional(),
   goalCount: z.number().min(1).max(50).optional(),
+  locationType: z.enum(["CURRENT", "CUSTOM", "NONE"]).optional(),
+  customLocation: z.string().optional(),
+  latitude: z.number().optional(),
+  longitude: z.number().optional(),
   giftXP: z.number().min(0).max(10000).default(0),
   giftPoints: z.number().min(0).max(10000).default(0),
   message: z.string().max(500).optional(),
@@ -339,7 +496,7 @@ sharedQuestsRouter.post("/create-custom", zValidator("json", createCustomQuestSc
   }
 
   const data = c.req.valid("json");
-  const { friendId, audioTranscript, textDescription, category, difficulty, goalType, goalCount, giftXP, giftPoints, message } = data;
+  const { friendId, audioTranscript, textDescription, category, difficulty, goalType, goalCount, locationType, customLocation, latitude, longitude, giftXP, giftPoints, message } = data;
 
   // Check if they are friends
   const friendship = await db.friendship.findFirst({
@@ -396,9 +553,9 @@ sharedQuestsRouter.post("/create-custom", zValidator("json", createCustomQuestSc
   }
 
   // Get description from voice or text
-  const description = audioTranscript || textDescription;
+  const rawDescription = audioTranscript || textDescription;
 
-  if (!description) {
+  if (!rawDescription) {
     return c.json({
       success: false,
       message: "Please provide a quest description via voice or text",
@@ -408,7 +565,7 @@ sharedQuestsRouter.post("/create-custom", zValidator("json", createCustomQuestSc
 
   // AI Safety Check
   console.log("🛡️ Running AI safety check on quest description...");
-  const safetyCheck = await checkQuestSafety(description);
+  const safetyCheck = await checkQuestSafety(rawDescription);
 
   if (!safetyCheck.isSafe) {
     // Refund XP/Points if quest was unsafe
@@ -432,11 +589,25 @@ sharedQuestsRouter.post("/create-custom", zValidator("json", createCustomQuestSc
 
   console.log("✅ Quest passed safety check");
 
-  // Determine quest parameters
-  const finalCategory = category || "SOCIAL";
-  const finalDifficulty = difficulty || "MEDIUM";
-  const finalGoalType = goalType || "COLLECT_NOS";
-  const finalGoalCount = goalCount || (finalDifficulty === "EASY" ? 3 : finalDifficulty === "MEDIUM" ? 5 : 8);
+  // AI Fine-tuning: Use smart algorithm to optimize quest based on user preferences
+  console.log("🤖 Running AI fine-tuning to optimize quest...");
+  const fineTunedQuest = await fineTuneQuestWithAI({
+    description: safetyCheck.cleanDescription || rawDescription,
+    category: category || "SOCIAL",
+    goalType: goalType || "COLLECT_NOS",
+    goalCount: goalCount,
+    locationType: locationType || "NONE",
+    customLocation: customLocation,
+    difficulty: difficulty || "MEDIUM",
+  });
+
+  // Determine quest parameters (use AI-optimized values or defaults)
+  const finalCategory = fineTunedQuest.category || category || "SOCIAL";
+  const finalDifficulty = fineTunedQuest.difficulty || difficulty || "MEDIUM";
+  const finalGoalType = fineTunedQuest.goalType || goalType || "COLLECT_NOS";
+  const finalGoalCount = fineTunedQuest.goalCount || goalCount || (finalDifficulty === "EASY" ? 3 : finalDifficulty === "MEDIUM" ? 5 : 8);
+  const finalDescription = fineTunedQuest.description || safetyCheck.cleanDescription || rawDescription;
+  const finalLocation = fineTunedQuest.location || customLocation;
 
   // Calculate rewards
   const difficultyMultiplier = { EASY: 1, MEDIUM: 1.5, HARD: 2, EXPERT: 3 }[finalDifficulty] || 1;
@@ -446,15 +617,18 @@ sharedQuestsRouter.post("/create-custom", zValidator("json", createCustomQuestSc
   // Create the quest in the database
   const quest = await db.quest.create({
     data: {
-      title: safetyCheck.cleanDescription?.substring(0, 50) || description.substring(0, 50),
-      description: safetyCheck.cleanDescription || description,
+      title: finalDescription.substring(0, 50),
+      description: finalDescription,
       category: finalCategory,
       difficulty: finalDifficulty,
       goalType: finalGoalType,
       goalCount: finalGoalCount,
+      location: finalLocation || null,
+      latitude: locationType === "CURRENT" && latitude ? latitude : null,
+      longitude: locationType === "CURRENT" && longitude ? longitude : null,
       xpReward: baseXP + giftXP,
       pointReward: basePoints + giftPoints,
-      isAIGenerated: false,
+      isAIGenerated: true, // Mark as AI-generated since we fine-tuned it
     },
   });
 

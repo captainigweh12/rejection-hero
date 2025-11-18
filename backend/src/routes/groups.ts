@@ -401,9 +401,9 @@ groupsRouter.post(
 
     console.log(`✅ [Groups] Contact created/updated with ID: ${contactResult.contactId}`);
 
-    // Generate join link (when user signs up or logs in, they'll be prompted to join the group)
+    // Generate join link (web URL that redirects to app)
     const backendUrl = process.env.BACKEND_URL || "http://localhost:3000";
-    const joinLink = `${backendUrl}/api/groups/${groupId}/accept-invite?email=${encodeURIComponent(email)}`;
+    const joinLink = `${backendUrl}/accept-invite?groupId=${encodeURIComponent(groupId)}&email=${encodeURIComponent(email)}`;
 
     // Generate email HTML
     const emailHTML = getGroupInviteEmailHTML(

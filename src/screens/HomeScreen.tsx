@@ -467,7 +467,7 @@ export default function HomeScreen({ navigation }: Props) {
                 <View style={{ marginTop: 12 }}>
                   <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
                     <Text style={{ color: colors.textSecondary, fontSize: 12, fontWeight: "600" }}>
-                      Confidence Level
+                      Confidence Meter
                     </Text>
                     <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
                       <Text style={{ color: "#00D9FF", fontSize: 14, fontWeight: "bold" }}>

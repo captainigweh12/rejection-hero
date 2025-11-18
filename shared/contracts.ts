@@ -1174,6 +1174,12 @@ export const createCustomQuestRequestSchema = z.object({
   goalType: z.enum(["COLLECT_NOS", "COLLECT_YES", "TAKE_ACTION"]).optional(),
   goalCount: z.number().min(1).max(50).optional(),
 
+  // Location options
+  locationType: z.enum(["CURRENT", "CUSTOM", "NONE"]).optional(),
+  customLocation: z.string().optional(), // Location name when locationType is CUSTOM
+  latitude: z.number().optional(), // Current location latitude
+  longitude: z.number().optional(), // Current location longitude
+
   // Gifting (from sender's balance)
   giftXP: z.number().min(0).max(10000).default(0),
   giftPoints: z.number().min(0).max(10000).default(0),
