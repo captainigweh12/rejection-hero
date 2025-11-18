@@ -16,11 +16,27 @@ momentsRouter.post("/", zValidator("json", createMomentRequestSchema), async (c)
     return c.json({ message: "Unauthorized" }, 401);
   }
 
-  const { imageUrl, videoUrl, content } = c.req.valid("json");
+  const { imageUrl, videoUrl, content, groupId } = c.req.valid("json");
 
   // Validate that at least one content type is provided
   if (!imageUrl && !videoUrl && !content) {
     return c.json({ message: "Moment must have either an image, video, or text content" }, 400);
+  }
+
+  // If groupId provided, verify user is a member
+  if (groupId) {
+    const membership = await db.groupMember.findUnique({
+      where: {
+        groupId_userId: {
+          groupId,
+          userId: user.id,
+        },
+      },
+    });
+
+    if (!membership) {
+      return c.json({ message: "You must be a member of this group to post stories" }, 403);
+    }
   }
 
   try {
@@ -31,6 +47,7 @@ momentsRouter.post("/", zValidator("json", createMomentRequestSchema), async (c)
     const moment = await db.moment.create({
       data: {
         userId: user.id,
+        groupId: groupId || null,
         imageUrl: imageUrl || null,
         videoUrl: videoUrl || null,
         content: content || null,
@@ -80,11 +97,12 @@ momentsRouter.get("/", async (c) => {
     // Include user's own ID to show their moments too
     const userIds = [user.id, ...friendIds];
 
-    // Get active moments (not expired) from friends and self
+    // Get active moments (not expired) from friends and self (exclude group moments)
     const now = new Date();
     const moments = await db.moment.findMany({
       where: {
         userId: { in: userIds },
+        groupId: null, // Only personal moments, not group moments
         expiresAt: { gt: now },
       },
       include: {

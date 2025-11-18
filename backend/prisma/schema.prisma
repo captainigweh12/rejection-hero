@@ -312,7 +312,7 @@ model Group {
   id          String        @id @default(cuid())
   name        String
   description String?
-  coverImage  String?
+  coverImage  String?       // Group avatar/picture
   creatorId   String
   isPrivate   Boolean       @default(false)
   createdAt   DateTime      @default(now())
@@ -322,6 +322,7 @@ model Group {
   posts       Post[]
   groupQuests GroupQuest[]
   liveStreams LiveStream[]
+  moments     Moment[]      // Group stories
 
   @@map("group")
 }
@@ -455,12 +456,14 @@ model PostComment {
 model Moment {
   id        String   @id @default(cuid())
   userId    String
+  groupId   String?  // If posted to a specific group
   imageUrl  String?
   videoUrl  String?
   content   String?
   expiresAt DateTime // Stories expire after 24 hours
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group     Group?   @relation(fields: [groupId], references: [id], onDelete: Cascade)
 
   @@map("moment")
 }

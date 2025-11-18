@@ -795,6 +795,7 @@ export const createMomentRequestSchema = z.object({
   imageUrl: z.string().optional(),
   videoUrl: z.string().optional(),
   content: z.string().optional(),
+  groupId: z.string().optional(), // If posting to a group
 });
 export type CreateMomentRequest = z.infer<typeof createMomentRequestSchema>;
 export const createMomentResponseSchema = z.object({

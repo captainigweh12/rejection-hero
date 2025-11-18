@@ -441,4 +441,431 @@ groupsRouter.post(
   }
 );
 
+// ============================================
+// PATCH /api/groups/:groupId/avatar - Update group avatar/picture (admin only)
+// ============================================
+const updateGroupAvatarSchema = z.object({
+  coverImage: z.string(),
+});
+
+groupsRouter.patch("/:groupId/avatar", zValidator("json", updateGroupAvatarSchema), async (c) => {
+  const user = c.get("user");
+
+  if (!user) {
+    return c.json({ message: "Unauthorized" }, 401);
+  }
+
+  const groupId = c.req.param("groupId");
+  const { coverImage } = c.req.valid("json");
+
+  // Check if user is admin
+  const membership = await db.groupMember.findUnique({
+    where: {
+      groupId_userId: {
+        groupId,
+        userId: user.id,
+      },
+    },
+  });
+
+  if (!membership || membership.role !== "admin") {
+    return c.json({ message: "Only admins can update group avatar" }, 403);
+  }
+
+  // Update group avatar
+  const group = await db.group.update({
+    where: { id: groupId },
+    data: { coverImage },
+  });
+
+  return c.json({ success: true, coverImage: group.coverImage });
+});
+
+// ============================================
+// POST /api/groups/:groupId/invite-user - Invite in-app user to group (admin/moderator only)
+// ============================================
+const inviteUserSchema = z.object({
+  userId: z.string(),
+  message: z.string().optional(),
+});
+
+groupsRouter.post("/:groupId/invite-user", zValidator("json", inviteUserSchema), async (c) => {
+  const user = c.get("user");
+
+  if (!user) {
+    return c.json({ message: "Unauthorized" }, 401);
+  }
+
+  const groupId = c.req.param("groupId");
+  const { userId, message } = c.req.valid("json");
+
+  // Check if user is admin or moderator
+  const membership = await db.groupMember.findUnique({
+    where: {
+      groupId_userId: {
+        groupId,
+        userId: user.id,
+      },
+    },
+  });
+
+  if (!membership || (membership.role !== "admin" && membership.role !== "moderator")) {
+    return c.json({ message: "Only admins and moderators can invite users" }, 403);
+  }
+
+  // Check if user to invite exists
+  const userToInvite = await db.user.findUnique({
+    where: { id: userId },
+    include: { Profile: true },
+  });
+
+  if (!userToInvite) {
+    return c.json({ message: "User not found" }, 404);
+  }
+
+  // Check if user is already a member
+  const existingMember = await db.groupMember.findUnique({
+    where: {
+      groupId_userId: {
+        groupId,
+        userId,
+      },
+    },
+  });
+
+  if (existingMember) {
+    return c.json({ message: "User is already a member of this group" }, 400);
+  }
+
+  // Add user as member
+  await db.groupMember.create({
+    data: {
+      groupId,
+      userId,
+      role: "member",
+    },
+  });
+
+  // Create notification
+  await db.notification.create({
+    data: {
+      userId,
+      senderId: user.id,
+      type: "GROUP_INVITE",
+      title: "Group Invitation",
+      message: message || `${user.name || "Someone"} invited you to join a group`,
+      read: false,
+    },
+  });
+
+  return c.json({ success: true, message: "User invited successfully" });
+});
+
+// ============================================
+// GET /api/groups/:groupId/posts - Get group posts (members only)
+// ============================================
+groupsRouter.get("/:groupId/posts", async (c) => {
+  const user = c.get("user");
+
+  if (!user) {
+    return c.json({ message: "Unauthorized" }, 401);
+  }
+
+  const groupId = c.req.param("groupId");
+
+  // Check if user is a member
+  const membership = await db.groupMember.findUnique({
+    where: {
+      groupId_userId: {
+        groupId,
+        userId: user.id,
+      },
+    },
+  });
+
+  if (!membership) {
+    return c.json({ message: "You must be a member to view group posts" }, 403);
+  }
+
+  // Get group posts
+  const posts = await db.post.findMany({
+    where: {
+      groupId,
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          image: true,
+        },
+      },
+      images: true,
+      likes: true,
+      comments: {
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+            },
+          },
+        },
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+    take: 50,
+  });
+
+  const formattedPosts = posts.map((post) => ({
+    id: post.id,
+    content: post.content,
+    privacy: post.privacy,
+    groupId: post.groupId,
+    createdAt: post.createdAt.toISOString(),
+    updatedAt: post.updatedAt.toISOString(),
+    user: {
+      id: post.user.id,
+      name: post.user.name,
+      email: post.user.email,
+      avatar: post.user.image,
+    },
+    group: {
+      id: groupId,
+      name: "", // Will be filled by frontend
+    },
+    images: post.images.map((img) => ({
+      id: img.id,
+      imageUrl: img.imageUrl,
+      order: img.order,
+    })),
+    likes: post.likes.map((like) => ({
+      id: like.id,
+      userId: like.userId,
+      createdAt: like.createdAt.toISOString(),
+    })),
+    comments: post.comments.map((comment) => ({
+      id: comment.id,
+      content: comment.content,
+      createdAt: comment.createdAt.toISOString(),
+      user: {
+        id: comment.user.id,
+        name: comment.user.name,
+        avatar: comment.user.image,
+      },
+    })),
+    likeCount: post.likes.length,
+    commentCount: post.comments.length,
+    isLikedByCurrentUser: post.likes.some((like) => like.userId === user.id),
+  }));
+
+  return c.json({ posts: formattedPosts });
+});
+
+// ============================================
+// GET /api/groups/:groupId/moments - Get group stories (members only)
+// ============================================
+groupsRouter.get("/:groupId/moments", async (c) => {
+  const user = c.get("user");
+
+  if (!user) {
+    return c.json({ message: "Unauthorized" }, 401);
+  }
+
+  const groupId = c.req.param("groupId");
+
+  // Check if user is a member
+  const membership = await db.groupMember.findUnique({
+    where: {
+      groupId_userId: {
+        groupId,
+        userId: user.id,
+      },
+    },
+  });
+
+  if (!membership) {
+    return c.json({ message: "You must be a member to view group stories" }, 403);
+  }
+
+  // Get active group moments (not expired)
+  const moments = await db.moment.findMany({
+    where: {
+      groupId: groupId,
+      expiresAt: {
+        gt: new Date(),
+      },
+    },
+    include: {
+      user: {
+        include: {
+          Profile: true,
+        },
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  // Group by user
+  const momentsByUser = new Map<string, Array<typeof moments[0]>>();
+  moments.forEach((moment) => {
+    if (!momentsByUser.has(moment.userId)) {
+      momentsByUser.set(moment.userId, []);
+    }
+    momentsByUser.get(moment.userId)!.push(moment);
+  });
+
+  const formattedMoments = Array.from(momentsByUser.entries()).map(([userId, userMoments]) => {
+    const firstMoment = userMoments[0];
+    if (!firstMoment || !firstMoment.user) {
+      return null;
+    }
+    return {
+      userId,
+      userName: firstMoment.user.Profile?.displayName || firstMoment.user.email?.split("@")[0] || "User",
+      userAvatar: firstMoment.user.Profile?.avatar || firstMoment.user.image || null,
+      moments: userMoments.map((m) => ({
+        id: m.id,
+        imageUrl: m.imageUrl,
+        videoUrl: m.videoUrl,
+        content: m.content,
+        createdAt: m.createdAt.toISOString(),
+        expiresAt: m.expiresAt.toISOString(),
+      })),
+    };
+  }).filter((m): m is NonNullable<typeof m> => m !== null);
+
+  return c.json({ moments: formattedMoments });
+});
+
+// ============================================
+// POST /api/groups/generate-avatar - Generate AI avatar for group
+// ============================================
+const generateGroupAvatarSchema = z.object({
+  groupName: z.string().min(1),
+  style: z.string().optional().default("gaming"),
+  description: z.string().optional(),
+});
+
+groupsRouter.post("/generate-avatar", zValidator("json", generateGroupAvatarSchema), async (c) => {
+  const user = c.get("user");
+
+  if (!user) {
+    return c.json({ message: "Unauthorized" }, 401);
+  }
+
+  const data = c.req.valid("json");
+  const OPENAI_API_KEY = process.env.OPENAI_API_KEY || process.env.EXPO_PUBLIC_VIBECODE_OPENAI_API_KEY;
+
+  if (!OPENAI_API_KEY) {
+    return c.json({
+      success: false,
+      avatarUrl: "",
+      message: "AI avatar generation is not configured.",
+    }, 503);
+  }
+
+  try {
+    const style = data.style || "gaming";
+    const customDescription = data.description || "";
+
+    let prompt: string;
+    if (customDescription) {
+      prompt = `Create a group logo/avatar for "${data.groupName}" with this description: ${customDescription}. Style: ${style}. High quality, professional, suitable for a group profile picture.`;
+    } else {
+      const stylePrompts: Record<string, string> = {
+        gaming: "Epic gaming group logo, futuristic design, neon colors, purple and orange glow, cyberpunk style, professional group emblem",
+        anime: "Anime style group logo, bold colors, dynamic design, professional anime art style",
+        realistic: "Professional group logo, modern design, high quality, clean and professional",
+        fantasy: "Fantasy RPG group emblem, magical aura, heroic design, detailed fantasy art style, glowing effects",
+        warrior: "Powerful warrior group logo, battle-ready design, strong presence, epic fantasy style, glowing armor",
+        ninja: "Stealth ninja group emblem, mysterious design, dark background, professional game art",
+        mage: "Magical wizard group logo, mystical energy, fantasy RPG style, glowing magic effects",
+        cyborg: "Futuristic tech group emblem with cybernetic elements, neon lights and digital effects, advanced technology aesthetic, sci-fi style",
+      };
+
+      prompt = (stylePrompts[style] ?? stylePrompts.gaming) + `. Group name: "${data.groupName}". Square composition, centered, suitable for group profile picture. No text or watermarks.`;
+    }
+
+    // Call OpenAI DALL-E API
+    const response = await fetch("https://api.openai.com/v1/images/generations", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${OPENAI_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: "dall-e-3",
+        prompt: prompt,
+        n: 1,
+        size: "1024x1024",
+        quality: "standard",
+        style: "vivid",
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("OpenAI API error:", errorData);
+      return c.json({
+        success: false,
+        avatarUrl: "",
+        message: "Failed to generate avatar. Please try again.",
+      }, 500);
+    }
+
+    const result = (await response.json()) as { data: Array<{ url: string }> };
+    const dallEUrl = result.data[0]?.url;
+
+    if (!dallEUrl) {
+      return c.json({
+        success: false,
+        avatarUrl: "",
+        message: "No avatar was generated. Please try again.",
+      }, 500);
+    }
+
+    // Download and save the image
+    const imageResponse = await fetch(dallEUrl);
+    if (!imageResponse.ok) {
+      throw new Error("Failed to download avatar from DALL-E");
+    }
+
+    const imageBuffer = Buffer.from(await imageResponse.arrayBuffer());
+    const fs = await import("node:fs");
+    const path = await import("node:path");
+    const { randomUUID } = await import("node:crypto");
+
+    const UPLOADS_DIR = process.env.UPLOADS_DIR || path.join(process.cwd(), "uploads");
+    if (!fs.existsSync(UPLOADS_DIR)) {
+      fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+    }
+
+    const uniqueFilename = `group-avatar-${randomUUID()}.png`;
+    const filePath = path.join(UPLOADS_DIR, uniqueFilename);
+    fs.writeFileSync(filePath, imageBuffer);
+
+    const serverAvatarUrl = `/uploads/${uniqueFilename}`;
+
+    return c.json({
+      success: true,
+      avatarUrl: serverAvatarUrl,
+      message: "Avatar generated successfully!",
+    });
+  } catch (error) {
+    console.error("Error generating group avatar:", error);
+    return c.json({
+      success: false,
+      avatarUrl: "",
+      message: "An error occurred while generating the avatar. Please try again.",
+    }, 500);
+  }
+});
+
 export { groupsRouter };
