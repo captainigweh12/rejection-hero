@@ -241,11 +241,6 @@ export default function CreateCustomQuestScreen({ route, navigation }: Props) {
       return;
     }
 
-    if (selectedFriendIds.length === 0) {
-      Alert.alert("No Friends Selected", "Please select at least one friend to share the quest with");
-      return;
-    }
-
     if (locationType === "CUSTOM" && !customLocation.trim()) {
       Alert.alert("Missing Location", "Please enter a location name or select 'No Specific Location'");
       return;
@@ -275,8 +270,8 @@ export default function CreateCustomQuestScreen({ route, navigation }: Props) {
       giftPoints,
       message: message.trim() || undefined,
     };
-    
-    // Add friendId or friendIds based on selection
+
+    // Add friendId or friendIds based on selection (optional)
     if (selectedFriendIds.length === 1) {
       mutationData.friendId = selectedFriendIds[0];
     } else if (selectedFriendIds.length > 1) {

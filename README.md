@@ -10,6 +10,7 @@
 | **Backend URLs** | ✅ **SYNCHRONIZED** | Both frontend & backend now use same URL |
 | **Tokens System** | ✅ **UPDATED** | Changed from diamonds to tokens throughout |
 | **Onboarding Flow** | ✅ **FIXED** | New users now see age verification → onboarding |
+| **Custom Quests** | ✅ **FIXED** | Users can create custom quests without selecting friends |
 | Database | ⚠️ Dev-Only | SQLite (needs PostgreSQL for production) |
 | SSL/TLS | ⚠️ Required | Not set up (needs Let's Encrypt for rejectionhero.com) |
 
@@ -21,6 +22,20 @@
 ---
 
 ## 🔧 Bug Fixes & Features
+
+### 🎁 Custom Quest Creation Now Optional for Friends (2025-11-19)
+- **✅ FIXED**: Users can now create custom quests without selecting friends to invite
+- **Changes**:
+  - **CreateCustomQuestScreen.tsx**:
+    - Removed mandatory friend selection requirement
+    - Users can create personal custom quests
+    - Friend selection is now optional (users can invite friends or create for themselves)
+    - Validation now only checks for: description, location (if custom), and sufficient balance
+  - **Behavior**:
+    - If no friends selected → Quest created as personal quest
+    - If friends selected → Quest shared with selected friends
+    - Users still have the option to invite friends if they want to
+- **Impact**: More flexibility for users to create solo challenges or personal tracking quests
 
 ### 💰 Diamonds → Tokens Rebranding (2025-11-19)
 - **✅ COMPLETED**: All references to "diamonds" changed to "tokens"
