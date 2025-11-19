@@ -43,6 +43,7 @@ import CreateCustomQuestScreen from "@/screens/CreateCustomQuestScreen";
 import LeaderboardScreen from "@/screens/LeaderboardScreen";
 import LegalPoliciesScreen from "@/screens/LegalPoliciesScreen";
 import ParentalGuidanceSettingsScreen from "@/screens/ParentalGuidanceSettingsScreen";
+import ReportBugScreen from "@/screens/ReportBugScreen";
 import FriendQuestViewScreen from "@/screens/FriendQuestViewScreen";
 import { useSession } from "@/lib/useSession";
 import { api } from "@/lib/api";
@@ -127,6 +128,11 @@ const RootNavigator = () => {
         <RootStack.Screen
           name="ParentalGuidanceSettings"
           component={ParentalGuidanceSettingsScreen}
+          options={{ headerShown: false }}
+        />
+        <RootStack.Screen
+          name="ReportBug"
+          component={ReportBugScreen}
           options={{ headerShown: false }}
         />
         <RootStack.Screen

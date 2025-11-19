@@ -40,6 +40,7 @@ export type RootStackParamList = {
   Journal: undefined;
   LegalPolicies: undefined;
   ParentalGuidanceSettings: undefined;
+  ReportBug: undefined;
   FriendQuestView: { userQuestId: string; userId: string };
 };
 

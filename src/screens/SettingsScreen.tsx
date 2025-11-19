@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-import { View, Text, Pressable, ScrollView, Switch, Alert, Modal, TextInput, Platform } from "react-native";
+import { View, Text, Pressable, ScrollView, Switch, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Video, Bell, Globe, Sun, Moon, ChevronRight, Shield, Smartphone, X, Send, Bug } from "lucide-react-native";
-import * as Device from "expo-device";
+import { Video, Bell, Globe, Sun, Moon, ChevronRight, Shield, Smartphone, Bug } from "lucide-react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "@/navigation/types";
 import { authClient } from "@/lib/authClient";
@@ -19,11 +18,6 @@ export default function SettingsScreen({ navigation }: Props) {
   const { theme, setTheme, colors } = useTheme();
   const { language, t } = useLanguage();
   const [questReminders, setQuestReminders] = useState(false);
-  const [showBugReportModal, setShowBugReportModal] = useState(false);
-  const [bugSubject, setBugSubject] = useState("");
-  const [bugDescription, setBugDescription] = useState("");
-  const [bugCategory, setBugCategory] = useState<"BUG" | "FEATURE_REQUEST" | "UI_ISSUE" | "PERFORMANCE" | "OTHER">("BUG");
-  const [bugSteps, setBugSteps] = useState("");
 
   const { data: profileData } = useQuery<GetProfileResponse>({
     queryKey: ["profile"],
@@ -33,51 +27,6 @@ export default function SettingsScreen({ navigation }: Props) {
   });
 
   const isAdmin = profileData?.isAdmin || false;
-
-  const bugReportMutation = useMutation({
-    mutationFn: async (data: {
-      subject: string;
-      description: string;
-      category: string;
-      stepsToReproduce?: string;
-      deviceInfo?: string;
-    }) => {
-      return api.post("/api/bug-reports", data);
-    },
-    onSuccess: () => {
-      Alert.alert("Success", "Bug report submitted successfully! We'll look into it.");
-      setShowBugReportModal(false);
-      setBugSubject("");
-      setBugDescription("");
-      setBugSteps("");
-      setBugCategory("BUG");
-    },
-    onError: (error: any) => {
-      Alert.alert("Error", error?.message || "Failed to submit bug report. Please try again.");
-    },
-  });
-
-  const handleSubmitBugReport = async () => {
-    if (!bugSubject.trim() || bugSubject.length < 5) {
-      Alert.alert("Invalid Subject", "Please enter a subject with at least 5 characters");
-      return;
-    }
-    if (!bugDescription.trim() || bugDescription.length < 10) {
-      Alert.alert("Invalid Description", "Please enter a description with at least 10 characters");
-      return;
-    }
-
-    // Get device info
-    const deviceInfo = `${Platform.OS} ${Platform.Version}${Device.modelName ? ` - ${Device.modelName}` : ""}`;
-
-    bugReportMutation.mutate({
-      subject: bugSubject.trim(),
-      description: bugDescription.trim(),
-      category: bugCategory,
-      stepsToReproduce: bugSteps.trim() || undefined,
-      deviceInfo,
-    });
-  };
 
   const handleLogout = async () => {
     Alert.alert(
@@ -479,8 +428,7 @@ export default function SettingsScreen({ navigation }: Props) {
             </Pressable>
             <Pressable
               onPress={() => {
-                // Show bug report modal
-                setShowBugReportModal(true);
+                navigation.navigate("ReportBug");
               }}
               style={{
                 backgroundColor: colors.card,
@@ -546,211 +494,6 @@ export default function SettingsScreen({ navigation }: Props) {
           </View>
         </ScrollView>
       </SafeAreaView>
-
-      {/* Bug Report Modal */}
-      <Modal
-        visible={showBugReportModal}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setShowBugReportModal(false)}
-      >
-        <View
-          style={{
-            flex: 1,
-            backgroundColor: "rgba(0, 0, 0, 0.8)",
-            justifyContent: "flex-end",
-          }}
-        >
-          <Pressable
-            style={{ flex: 1 }}
-            onPress={() => setShowBugReportModal(false)}
-          />
-          <View
-            style={{
-              backgroundColor: colors.backgroundSolid,
-              borderTopLeftRadius: 24,
-              borderTopRightRadius: 24,
-              paddingTop: 20,
-              paddingBottom: 40,
-              maxHeight: "90%",
-            }}
-          >
-            <ScrollView
-              style={{ flex: 1 }}
-              contentContainerStyle={{ paddingHorizontal: 20 }}
-            >
-              {/* Header */}
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  marginBottom: 24,
-                }}
-              >
-                <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
-                  <View
-                    style={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: 20,
-                      backgroundColor: "#FF6B35" + "20",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <Bug size={20} color="#FF6B35" />
-                  </View>
-                  <Text style={{ fontSize: 24, fontWeight: "bold", color: colors.text }}>
-                    Report a Bug
-                  </Text>
-                </View>
-                <Pressable
-                  onPress={() => setShowBugReportModal(false)}
-                  style={{
-                    width: 36,
-                    height: 36,
-                    borderRadius: 18,
-                    backgroundColor: colors.surface,
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <X size={20} color={colors.text} />
-                </Pressable>
-              </View>
-
-              {/* Category Selection */}
-              <Text style={{ fontSize: 16, fontWeight: "600", color: colors.text, marginBottom: 12 }}>
-                Category
-              </Text>
-              <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, marginBottom: 20 }}>
-                {(["BUG", "FEATURE_REQUEST", "UI_ISSUE", "PERFORMANCE", "OTHER"] as const).map((cat) => (
-                  <Pressable
-                    key={cat}
-                    onPress={() => setBugCategory(cat)}
-                    style={{
-                      paddingHorizontal: 16,
-                      paddingVertical: 8,
-                      borderRadius: 20,
-                      backgroundColor: bugCategory === cat ? colors.primary : colors.surface,
-                      borderWidth: 1,
-                      borderColor: bugCategory === cat ? colors.primary : colors.border,
-                    }}
-                  >
-                    <Text
-                      style={{
-                        fontSize: 14,
-                        fontWeight: "600",
-                        color: bugCategory === cat ? "white" : colors.text,
-                      }}
-                    >
-                      {cat.replace("_", " ")}
-                    </Text>
-                  </Pressable>
-                ))}
-              </View>
-
-              {/* Subject */}
-              <Text style={{ fontSize: 16, fontWeight: "600", color: colors.text, marginBottom: 8 }}>
-                Subject *
-              </Text>
-              <TextInput
-                value={bugSubject}
-                onChangeText={setBugSubject}
-                placeholder="Brief description of the issue"
-                placeholderTextColor={colors.textTertiary}
-                style={{
-                  backgroundColor: colors.inputBackground,
-                  borderRadius: 12,
-                  padding: 16,
-                  color: colors.text,
-                  borderWidth: 1,
-                  borderColor: colors.inputBorder,
-                  marginBottom: 20,
-                }}
-              />
-
-              {/* Description */}
-              <Text style={{ fontSize: 16, fontWeight: "600", color: colors.text, marginBottom: 8 }}>
-                Description *
-              </Text>
-              <TextInput
-                value={bugDescription}
-                onChangeText={setBugDescription}
-                placeholder="Describe the issue in detail..."
-                placeholderTextColor={colors.textTertiary}
-                multiline
-                numberOfLines={6}
-                textAlignVertical="top"
-                style={{
-                  backgroundColor: colors.inputBackground,
-                  borderRadius: 12,
-                  padding: 16,
-                  color: colors.text,
-                  borderWidth: 1,
-                  borderColor: colors.inputBorder,
-                  minHeight: 120,
-                  marginBottom: 20,
-                }}
-              />
-
-              {/* Steps to Reproduce */}
-              <Text style={{ fontSize: 16, fontWeight: "600", color: colors.text, marginBottom: 8 }}>
-                Steps to Reproduce (Optional)
-              </Text>
-              <TextInput
-                value={bugSteps}
-                onChangeText={setBugSteps}
-                placeholder="1. Step one...\n2. Step two...\n3. Step three..."
-                placeholderTextColor={colors.textTertiary}
-                multiline
-                numberOfLines={4}
-                textAlignVertical="top"
-                style={{
-                  backgroundColor: colors.inputBackground,
-                  borderRadius: 12,
-                  padding: 16,
-                  color: colors.text,
-                  borderWidth: 1,
-                  borderColor: colors.inputBorder,
-                  minHeight: 100,
-                  marginBottom: 24,
-                }}
-              />
-
-              {/* Submit Button */}
-              <Pressable
-                onPress={handleSubmitBugReport}
-                disabled={bugReportMutation.isPending || !bugSubject.trim() || !bugDescription.trim()}
-                style={{
-                  backgroundColor: bugReportMutation.isPending || !bugSubject.trim() || !bugDescription.trim()
-                    ? colors.textTertiary
-                    : "#FF6B35",
-                  borderRadius: 16,
-                  padding: 18,
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: 8,
-                  opacity: bugReportMutation.isPending || !bugSubject.trim() || !bugDescription.trim() ? 0.5 : 1,
-                }}
-              >
-                {bugReportMutation.isPending ? (
-                  <>
-                    <Text style={{ color: "white", fontSize: 16, fontWeight: "bold" }}>Submitting...</Text>
-                  </>
-                ) : (
-                  <>
-                    <Send size={20} color="white" />
-                    <Text style={{ color: "white", fontSize: 16, fontWeight: "bold" }}>Submit Report</Text>
-                  </>
-                )}
-              </Pressable>
-            </ScrollView>
-          </View>
-        </View>
-      </Modal>
     </View>
   );
 }
