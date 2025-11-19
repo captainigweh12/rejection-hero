@@ -1005,6 +1005,25 @@ export const getSmartQuestSuggestionsResponseSchema = z.object({
 });
 export type GetSmartQuestSuggestionsResponse = z.infer<typeof getSmartQuestSuggestionsResponseSchema>;
 
+// GET /api/quests/:questId/friends - Get friends doing a specific quest
+export const getQuestFriendsResponseSchema = z.object({
+  friends: z.array(
+    z.object({
+      userId: z.string(),
+      userQuestId: z.string(),
+      displayName: z.string(),
+      avatar: z.string().nullable(),
+      noCount: z.number(),
+      yesCount: z.number(),
+      actionCount: z.number(),
+      status: z.string(),
+      startedAt: z.string().nullable(),
+    })
+  ),
+  count: z.number(),
+});
+export type GetQuestFriendsResponse = z.infer<typeof getQuestFriendsResponseSchema>;
+
 // ==========================================
 // Group Quests Routes
 // ==========================================

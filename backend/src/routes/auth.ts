@@ -192,7 +192,10 @@ app.post(
         tags: ["password-reset", "rejection-hero"],
       });
 
-      if (!contactResult.success || !contactResult.contactId) {
+      // Extract contact ID from result (can be in different fields)
+      const contactId = contactResult.id || contactResult.contact?.id;
+
+      if (!contactResult.success || !contactId) {
         console.error("❌ [Auth] Failed to create GoHighLevel contact:", contactResult.error);
         return c.json(
           {
@@ -210,7 +213,7 @@ app.post(
       // Send password reset email via GoHighLevel
       const emailHTML = getPasswordResetEmailHTML(user.name || "User", resetLink);
       const emailResult = await sendEmail(
-        contactResult.contactId,
+        contactId,
         "Reset Your Rejection Hero Password",
         emailHTML,
         "noreply@rejectionhero.com"
@@ -354,7 +357,10 @@ app.post(
         tags: ["password-reset-complete", "rejection-hero"],
       });
 
-      if (contactResult.success && contactResult.contactId) {
+      // Extract contact ID from result (can be in different fields)
+      const confirmationContactId = contactResult.id || contactResult.contact?.id;
+
+      if (contactResult.success && confirmationContactId) {
         const confirmationHTML = `
           <!DOCTYPE html>
           <html>
@@ -388,7 +394,7 @@ app.post(
         `;
 
         await sendEmail(
-          contactResult.contactId,
+          confirmationContactId,
           "Your Rejection Hero Password Has Been Reset",
           confirmationHTML,
           "noreply@rejectionhero.com"

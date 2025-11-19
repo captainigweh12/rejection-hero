@@ -16,6 +16,7 @@ import {
   type RefreshAllQuestsResponse,
   swapQuestRequestSchema,
   type SwapQuestResponse,
+  type GetQuestFriendsResponse,
 } from "@/shared/contracts";
 import { type AppType } from "../types";
 import { db } from "../db";
@@ -2012,6 +2013,78 @@ questsRouter.post("/generate-map-quests", zValidator("json", generateMapQuestsRe
       quests: [],
     }, 500);
   }
+});
+
+// ============================================
+// GET /api/quests/:questId/friends - Get friends doing a specific quest
+// ============================================
+questsRouter.get("/:questId/friends", async (c) => {
+  const user = c.get("user");
+
+  if (!user) {
+    return c.json({ message: "Unauthorized" }, 401);
+  }
+
+  const questId = c.req.param("questId");
+
+  // Get user's friends
+  const friendships = await db.friendship.findMany({
+    where: {
+      OR: [
+        { initiatorId: user.id, status: "ACCEPTED" },
+        { receiverId: user.id, status: "ACCEPTED" },
+      ],
+    },
+  });
+
+  const friendIds = friendships.map((f) =>
+    f.initiatorId === user.id ? f.receiverId : f.initiatorId
+  );
+
+  if (friendIds.length === 0) {
+    return c.json({
+      friends: [],
+      count: 0,
+    } satisfies GetQuestFriendsResponse);
+  }
+
+  // Get friends' active quests for this quest
+  const friendsQuests = await db.userQuest.findMany({
+    where: {
+      questId: questId,
+      userId: { in: friendIds },
+      status: { in: ["ACTIVE", "COMPLETED"] }, // Include completed to show recent activity
+    },
+    include: {
+      user: {
+        include: {
+          Profile: true,
+        },
+      },
+    },
+    orderBy: {
+      startedAt: "desc",
+    },
+  });
+
+  const friends = friendsQuests
+    .map((uq) => ({
+      userId: uq.userId,
+      userQuestId: uq.id,
+      displayName: uq.user.Profile?.displayName || uq.user.name || uq.user.email?.split("@")[0] || "Friend",
+      avatar: uq.user.Profile?.avatar || null,
+      noCount: uq.noCount,
+      yesCount: uq.yesCount,
+      actionCount: uq.actionCount,
+      status: uq.status,
+      startedAt: uq.startedAt?.toISOString() || null,
+    }))
+    .filter((f) => f.status === "ACTIVE"); // Only show active friends for now
+
+  return c.json({
+    friends,
+    count: friends.length,
+  } satisfies GetQuestFriendsResponse);
 });
 
 export { questsRouter };

@@ -62,7 +62,7 @@ export default function ForgotPasswordScreen({ onBack, onSuccess }: ForgotPasswo
         throw new Error("Unexpected response from server");
       }
     } catch (error) {
-      console.error("🔐 [ForgotPassword] Error:", error);
+      console.log("🔐 [ForgotPassword] Error:", error);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
 
       let errorMessage = "An unexpected error occurred. Please try again.";
