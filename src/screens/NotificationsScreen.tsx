@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, ScrollView, Pressable, ActivityIndicator, Image, RefreshControl } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
-import { ChevronLeft, Bell, Check, UserPlus, Users, X, TrendingUp, Trophy } from "lucide-react-native";
+import { ChevronLeft, Bell, Check, UserPlus, Users, X, TrendingUp, Trophy, Target } from "lucide-react-native";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "@/navigation/types";
@@ -125,6 +125,12 @@ export default function NotificationsScreen({ navigation }: Props) {
     } else if (notification.type === "LEADERBOARD_FALL_BEHIND") {
       // Navigate to leaderboard
       navigation.navigate("Leaderboard");
+    } else if (notification.type === "QUEST_STARTED" && notification.data?.userQuestId && notification.data?.userId) {
+      // Navigate to friend quest view
+      navigation.navigate("FriendQuestView", {
+        userQuestId: notification.data.userQuestId,
+        userId: notification.data.userId,
+      });
     }
   };
 
@@ -138,6 +144,8 @@ export default function NotificationsScreen({ navigation }: Props) {
         return <TrendingUp size={24} color="#FF6B35" />;
       case "LEADERBOARD_FALL_BEHIND":
         return <Trophy size={24} color="#FFD700" />;
+      case "QUEST_STARTED":
+        return <Target size={24} color="#7E3FE4" />;
       default:
         return <Bell size={24} color="#A78BFA" />;
     }

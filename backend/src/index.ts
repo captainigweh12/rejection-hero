@@ -32,7 +32,7 @@ import { audioRouter } from "./routes/audio";
 import { authRouter } from "./routes/auth";
 import { webRedirectRouter } from "./routes/webRedirects";
 import challengesRouter from "./routes/challenges";
-import paymentsRouter from "./routes/payments";
+import paymentsRouter, { paymentRedirectRouter } from "./routes/payments";
 import policiesRouter from "./routes/policies";
 import { adminRouter } from "./routes/admin";
 import { generateDailyChallengesForAllUsers, sendMotivationalNotifications } from "./services/challengeScheduler";
@@ -158,6 +158,9 @@ app.route("/api/audio", audioRouter);
 
 console.log("💳 Mounting payments routes at /api/payments");
 app.route("/api/payments", paymentsRouter);
+
+console.log("💳 Mounting payment redirect routes at root level");
+app.route("/", paymentRedirectRouter);
 
 console.log("📜 Mounting policies routes at /api/policies");
 app.route("/api/policies", policiesRouter);

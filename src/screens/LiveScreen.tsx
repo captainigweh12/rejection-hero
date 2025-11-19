@@ -20,6 +20,8 @@ import {
   Crown,
   MessageCircle,
   Sparkles,
+  Plus,
+  Share2,
 } from "lucide-react-native";
 import type { BottomTabScreenProps } from "@/navigation/types";
 import { api } from "@/lib/api";
@@ -278,7 +280,12 @@ export default function LiveScreen({ navigation }: Props) {
     });
   };
 
-  const activeQuest = questsData?.activeQuests.find((uq) => uq.id === selectedQuestId);
+  // Get active quest from stream or selected quest
+  const currentStream = streamsData?.streams.find((s) => s.id === currentStreamId);
+  const streamQuestId = currentStream?.userQuest?.id;
+  const activeQuest = questsData?.activeQuests.find((uq) => {
+    return streamQuestId === uq.id || uq.id === selectedQuestId;
+  });
 
   // Find the stream being viewed
   const viewingStream = streamsData?.streams.find((s) => s.id === viewingStreamId);
@@ -953,9 +960,10 @@ export default function LiveScreen({ navigation }: Props) {
           </Pressable>
         </View>
 
-        {/* Modern Quest Card Overlay */}
+        {/* Modern Quest Card Overlay - Interactive */}
         {activeQuest && (
-          <View
+          <Pressable
+            onPress={() => navigation.navigate("QuestDetail", { userQuestId: activeQuest.id })}
             style={{
               position: "absolute",
               bottom: 240,
@@ -1002,7 +1010,10 @@ export default function LiveScreen({ navigation }: Props) {
             {/* Interactive Quest Buttons */}
             <View style={{ flexDirection: "row", gap: 8, marginTop: 12 }}>
               <Pressable
-                onPress={() => navigation.navigate("QuestDetail", { userQuestId: activeQuest.id })}
+                onPress={(e) => {
+                  e.stopPropagation();
+                  navigation.navigate("QuestDetail", { userQuestId: activeQuest.id });
+                }}
                 style={{
                   flex: 1,
                   backgroundColor: "rgba(255, 255, 255, 0.2)",
@@ -1013,8 +1024,49 @@ export default function LiveScreen({ navigation }: Props) {
               >
                 <Text style={{ color: "white", fontSize: 12, fontWeight: "600" }}>Track Progress</Text>
               </Pressable>
+              <Pressable
+                onPress={(e) => {
+                  e.stopPropagation();
+                  // Share quest on live - quest is already linked to stream
+                  Alert.alert("Quest Shared", "Your quest is visible to all viewers!");
+                }}
+                style={{
+                  backgroundColor: "rgba(126, 63, 228, 0.3)",
+                  paddingVertical: 8,
+                  paddingHorizontal: 12,
+                  borderRadius: 8,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Share2 size={16} color="white" />
+              </Pressable>
             </View>
-          </View>
+          </Pressable>
+        )}
+
+        {/* Create Quest Button - Show when streaming without active quest */}
+        {!activeQuest && (
+          <Pressable
+            onPress={() => navigation.navigate("CreateQuest")}
+            style={{
+              position: "absolute",
+              bottom: 240,
+              left: 20,
+              width: 56,
+              height: 56,
+              borderRadius: 28,
+              backgroundColor: "#7E3FE4",
+              alignItems: "center",
+              justifyContent: "center",
+              shadowColor: "#7E3FE4",
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.5,
+              shadowRadius: 8,
+            }}
+          >
+            <Plus size={24} color="white" />
+          </Pressable>
         )}
 
         {/* Chat Section - Modern Design */}

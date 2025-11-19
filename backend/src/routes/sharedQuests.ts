@@ -546,7 +546,8 @@ export { sharedQuestsRouter };
 // POST /api/shared-quests/create-custom - Create custom quest and share with friend
 // ============================================
 const createCustomQuestSchema = z.object({
-  friendId: z.string(),
+  friendId: z.string().optional(), // For backward compatibility
+  friendIds: z.array(z.string()).optional(), // For multiple friends
   audioTranscript: z.string().optional(),
   textDescription: z.string().optional(),
   category: z.string().optional(),
@@ -560,6 +561,8 @@ const createCustomQuestSchema = z.object({
   giftXP: z.number().min(0).max(10000).default(0),
   giftPoints: z.number().min(0).max(10000).default(0),
   message: z.string().max(500).optional(),
+}).refine((data) => data.friendId || (data.friendIds && data.friendIds.length > 0), {
+  message: "Either friendId or friendIds must be provided",
 });
 
 sharedQuestsRouter.post("/create-custom", zValidator("json", createCustomQuestSchema), async (c) => {
@@ -570,7 +573,14 @@ sharedQuestsRouter.post("/create-custom", zValidator("json", createCustomQuestSc
   }
 
   const data = c.req.valid("json");
-  const { friendId, audioTranscript, textDescription, category, difficulty, goalType, goalCount, locationType, customLocation, latitude, longitude, giftXP, giftPoints, message } = data;
+  const { friendId, friendIds, audioTranscript, textDescription, category, difficulty, goalType, goalCount, locationType, customLocation, latitude, longitude, giftXP, giftPoints, message } = data;
+  
+  // Normalize to array of friend IDs
+  const targetFriendIds = friendIds || (friendId ? [friendId] : []);
+  
+  if (targetFriendIds.length === 0) {
+    return c.json({ success: false, message: "Please select at least one friend", isSafe: false }, 400);
+  }
 
   // Check if user is admin - admins have full access
   const userRecord = await db.user.findUnique({
@@ -596,30 +606,40 @@ sharedQuestsRouter.post("/create-custom", zValidator("json", createCustomQuestSc
     );
   }
 
-  // Check if they are friends
-  const friendship = await db.friendship.findFirst({
+  // Verify all friends exist and are actually friends
+  const friendships = await db.friendship.findMany({
     where: {
-      OR: [
-        { initiatorId: user.id, receiverId: friendId, status: "ACCEPTED" },
-        { initiatorId: friendId, receiverId: user.id, status: "ACCEPTED" },
-      ],
+      OR: targetFriendIds.flatMap((fId) => [
+        { initiatorId: user.id, receiverId: fId, status: "ACCEPTED" },
+        { initiatorId: fId, receiverId: user.id, status: "ACCEPTED" },
+      ]),
     },
   });
 
-  if (!friendship) {
-    return c.json({ success: false, message: "You can only share quests with friends", isSafe: false }, 403);
+  const validFriendIds = friendships.map((f) =>
+    f.initiatorId === user.id ? f.receiverId : f.initiatorId
+  );
+
+  if (validFriendIds.length !== targetFriendIds.length) {
+    const invalidIds = targetFriendIds.filter((id) => !validFriendIds.includes(id));
+    return c.json({
+      success: false,
+      message: `Some selected users are not your friends. Please only select friends.`,
+      isSafe: false,
+    }, 403);
   }
 
-  // Check token balance (1 token required to send quest to friend)
+  // Check token balance (1 token per friend required)
+  const requiredTokens = targetFriendIds.length;
   const userStats = await db.userStats.findUnique({
     where: { userId: user.id },
   });
 
-  if (!userStats || (userStats.tokens || 0) < 1) {
+  if (!userStats || (userStats.tokens || 0) < requiredTokens) {
     return c.json(
       {
         success: false,
-        message: "You need at least 1 token to send a quest to a friend. Complete quests to earn tokens!",
+        message: `You need at least ${requiredTokens} token${requiredTokens > 1 ? 's' : ''} to send a quest to ${requiredTokens} friend${requiredTokens > 1 ? 's' : ''}. Complete quests to earn tokens!`,
         isSafe: false,
         requiresTokens: true,
       },
@@ -747,12 +767,12 @@ sharedQuestsRouter.post("/create-custom", zValidator("json", createCustomQuestSc
     },
   });
 
-  // Deduct token for sending quest
+  // Deduct tokens for sending quest (1 per friend)
   await db.userStats.update({
     where: { userId: user.id },
     data: {
       tokens: {
-        decrement: 1,
+        decrement: validFriendIds.length,
       },
     },
   });
@@ -762,55 +782,60 @@ sharedQuestsRouter.post("/create-custom", zValidator("json", createCustomQuestSc
     data: {
       userId: user.id,
       type: "spent",
-      amount: -1,
-      description: `Spent 1 token to send custom quest to friend`,
+      amount: -validFriendIds.length,
+      description: `Spent ${validFriendIds.length} token${validFriendIds.length > 1 ? 's' : ''} to send custom quest to ${validFriendIds.length} friend${validFriendIds.length > 1 ? 's' : ''}`,
       questId: quest.id,
     },
   });
 
-  // Create shared quest with custom fields
-  const sharedQuest = await db.sharedQuest.create({
-    data: {
-      senderId: user.id,
-      receiverId: friendId,
-      questId: quest.id,
-      message,
-      status: "pending",
-      isCustomQuest: true,
-      customTitle: quest.title,
-      customDescription: quest.description,
-      customCategory: finalCategory,
-      customDifficulty: finalDifficulty,
-      customGoalType: finalGoalType,
-      customGoalCount: finalGoalCount,
-      audioTranscript: audioTranscript || null,
-      giftedXP: giftXP,
-      giftedPoints: giftPoints,
-    },
-  });
+  // Create shared quests for all friends
+  const sharedQuests = await Promise.all(
+    validFriendIds.map((fId) =>
+      db.sharedQuest.create({
+        data: {
+          senderId: user.id,
+          receiverId: fId,
+          questId: quest.id,
+          message,
+          status: "pending",
+          isCustomQuest: true,
+          customTitle: quest.title,
+          customDescription: quest.description,
+          customCategory: finalCategory,
+          customDifficulty: finalDifficulty,
+          customGoalType: finalGoalType,
+          customGoalCount: finalGoalCount,
+          audioTranscript: audioTranscript || null,
+          giftedXP: giftXP,
+          giftedPoints: giftPoints,
+        },
+      })
+    )
+  );
 
   const userName = user.name || user.email || "A friend";
   const giftMessage = giftXP > 0 || giftPoints > 0 ? ` with ${giftXP} XP and ${giftPoints} Points!` : "!";
 
-  // Create notification for friend
-  await db.notification.create({
-    data: {
-      userId: friendId,
+  // Create notifications for all friends
+  await db.notification.createMany({
+    data: validFriendIds.map((fId) => ({
+      userId: fId,
       senderId: user.id,
       type: "QUEST_SHARED",
       title: "Custom Quest Received!",
       message: `${userName} created a custom quest for you${giftMessage}`,
       read: false,
-    },
+    })),
   });
 
-  console.log(`✅ Custom quest created and shared with friend ${friendId}`);
+  console.log(`✅ Custom quest created and shared with ${validFriendIds.length} friend${validFriendIds.length > 1 ? 's' : ''}`);
   console.log(`💎 Gifted: ${giftXP} XP, ${giftPoints} Points`);
 
   return c.json({
     success: true,
-    sharedQuestId: sharedQuest.id,
-    message: "Custom quest created and shared successfully!",
+    sharedQuestIds: sharedQuests.map((sq) => sq.id),
+    sharedQuestId: sharedQuests[0]?.id, // For backward compatibility
+    message: `Custom quest created and shared with ${validFriendIds.length} friend${validFriendIds.length > 1 ? 's' : ''} successfully!`,
     quest: {
       title: quest.title,
       description: quest.description,

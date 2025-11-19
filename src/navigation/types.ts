@@ -26,7 +26,7 @@ export type RootStackParamList = {
   GrowthAchievements: undefined;
   Friends: undefined;
   SendQuestToFriend: { friendId: string; friendName: string };
-  CreateCustomQuest: { friendId: string; friendName: string };
+  CreateCustomQuest: { friendId?: string; friendName?: string };
   Notifications: undefined;
   QuestCalendar: undefined;
   InviteWarriors: undefined;
@@ -40,6 +40,7 @@ export type RootStackParamList = {
   Journal: undefined;
   LegalPolicies: undefined;
   ParentalGuidanceSettings: undefined;
+  FriendQuestView: { userQuestId: string; userId: string };
 };
 
 export type BottomTabParamList = {

@@ -1312,7 +1312,8 @@ export type GetConversationsResponse = z.infer<typeof getConversationsResponseSc
 
 // POST /api/shared-quests/create-custom - Create and share custom quest with AI safety filtering
 export const createCustomQuestRequestSchema = z.object({
-  friendId: z.string(),
+  friendId: z.string().optional(), // For backward compatibility
+  friendIds: z.array(z.string()).optional(), // For multiple friends
 
   // Quest creation method
   audioTranscript: z.string().optional(), // Voice-to-text transcript

@@ -29,7 +29,20 @@ export default function NotificationSettingsScreen({ navigation }: Props) {
   const queryClient = useQueryClient();
   const [preferences, setPreferences] = useState<NotificationPreferences | null>(null);
 
-  const { data: prefsData, isLoading } = useQuery<{ preferences: NotificationPreferences }>({
+  // Default preferences
+  const defaultPreferences: NotificationPreferences = {
+    questCompleted: true,
+    questShared: true,
+    friendRequest: true,
+    friendAccepted: true,
+    confidenceLow: true,
+    leaderboardFallBehind: true,
+    challengeReminder: true,
+    dailyMotivation: true,
+    achievementUnlocked: true,
+  };
+
+  const { data: prefsData, isLoading, error } = useQuery<{ preferences: NotificationPreferences }>({
     queryKey: ["notification-preferences"],
     queryFn: async () => {
       return api.get<{ preferences: NotificationPreferences }>("/api/notifications/preferences");
@@ -56,16 +69,18 @@ export default function NotificationSettingsScreen({ navigation }: Props) {
   React.useEffect(() => {
     if (prefsData?.preferences) {
       setPreferences(prefsData.preferences);
+    } else if (!isLoading && !prefsData) {
+      // If query completed but no data, use defaults
+      setPreferences(defaultPreferences);
     }
-  }, [prefsData]);
+  }, [prefsData, isLoading]);
 
   const togglePreference = (key: keyof NotificationPreferences) => {
-    if (!preferences) return;
-    
-    const newValue = !preferences[key];
+    const currentPrefs = preferences || defaultPreferences;
+    const newValue = !currentPrefs[key];
     const updates = { [key]: newValue };
     
-    setPreferences({ ...preferences, ...updates });
+    setPreferences({ ...currentPrefs, ...updates });
     updateMutation.mutate(updates);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   };
@@ -82,7 +97,10 @@ export default function NotificationSettingsScreen({ navigation }: Props) {
     { key: "achievementUnlocked" as const, label: "Achievements", description: "Get notified when you unlock achievements" },
   ];
 
-  if (isLoading || !preferences) {
+  // Use default preferences if loading fails or data is not available
+  const currentPreferences = preferences || defaultPreferences;
+
+  if (isLoading && !preferences) {
     return (
       <LinearGradient colors={colors.background} className="flex-1">
         <SafeAreaView edges={["top"]} className="flex-1">
@@ -142,10 +160,10 @@ export default function NotificationSettingsScreen({ navigation }: Props) {
                   </Text>
                 </View>
                 <Switch
-                  value={preferences[type.key]}
+                  value={currentPreferences[type.key]}
                   onValueChange={() => togglePreference(type.key)}
                   trackColor={{ false: "rgba(255, 255, 255, 0.2)", true: "#7E3FE4" }}
-                  thumbColor={preferences[type.key] ? "#FFFFFF" : "#f4f3f4"}
+                  thumbColor={currentPreferences[type.key] ? "#FFFFFF" : "#f4f3f4"}
                 />
               </View>
             ))}

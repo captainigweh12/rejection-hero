@@ -1,4 +1,6 @@
 import { Hono } from "hono";
+import { zValidator } from "@hono/zod-validator";
+import { z } from "zod";
 import type { AppType } from "../index";
 import { db } from "../db";
 import {
@@ -796,6 +798,64 @@ live.post("/:id/record-quest-action", async (c) => {
   } catch (error) {
     console.error("Record quest action error:", error);
     return c.json({ error: "Failed to record quest action" }, 500);
+  }
+});
+
+// ============================================
+// POST /api/live/:id/link-quest - Link a quest to a live stream
+// ============================================
+const linkQuestSchema = z.object({
+  userQuestId: z.string(),
+});
+
+live.post("/:id/link-quest", zValidator("json", linkQuestSchema), async (c) => {
+  const user = c.get("user");
+  if (!user) {
+    return c.json({ error: "Unauthorized" }, 401);
+  }
+
+  const liveStreamId = c.req.param("id");
+  const { userQuestId } = c.req.valid("json");
+
+  try {
+    // Verify the stream belongs to the user
+    const liveStream = await db.liveStream.findUnique({
+      where: { id: liveStreamId },
+    });
+
+    if (!liveStream) {
+      return c.json({ error: "Live stream not found" }, 404);
+    }
+
+    if (liveStream.userId !== user.id) {
+      return c.json({ error: "You can only link quests to your own stream" }, 403);
+    }
+
+    // Verify the quest belongs to the user
+    const userQuest = await db.userQuest.findUnique({
+      where: { id: userQuestId },
+    });
+
+    if (!userQuest) {
+      return c.json({ error: "Quest not found" }, 404);
+    }
+
+    if (userQuest.userId !== user.id) {
+      return c.json({ error: "You can only link your own quests" }, 403);
+    }
+
+    // Update the stream to link the quest
+    await db.liveStream.update({
+      where: { id: liveStreamId },
+      data: {
+        userQuestId: userQuestId,
+      },
+    });
+
+    return c.json({ success: true, message: "Quest linked to stream" });
+  } catch (error) {
+    console.error("Link quest error:", error);
+    return c.json({ error: "Failed to link quest" }, 500);
   }
 });
 

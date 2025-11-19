@@ -452,12 +452,137 @@ questsRouter.post("/:id/start", async (c) => {
       status: "ACTIVE",
       startedAt: new Date(),
     },
+    include: {
+      quest: true,
+      user: {
+        include: {
+          Profile: true,
+        },
+      },
+    },
   });
+
+  // Only send notifications for non-friend quests (user's own quests)
+  if (!userQuest.isFromFriend) {
+    // Get user's friends
+    const friendships = await db.friendship.findMany({
+      where: {
+        OR: [
+          { initiatorId: user.id, status: "ACCEPTED" },
+          { receiverId: user.id, status: "ACCEPTED" },
+        ],
+      },
+    });
+
+    const friendIds = friendships.map((f) =>
+      f.initiatorId === user.id ? f.receiverId : f.initiatorId
+    );
+
+    // Get user's profile for display name
+    const userProfile = userQuest.user.Profile;
+    const userName = userProfile?.displayName || userQuest.user.name || user.email?.split("@")[0] || "A friend";
+
+    // Create notifications for all friends
+    if (friendIds.length > 0) {
+      await db.notification.createMany({
+        data: friendIds.map((friendId) => ({
+          userId: friendId,
+          senderId: user.id,
+          type: "QUEST_STARTED",
+          title: "Friend Started a Quest!",
+          message: `${userName} started a quest: ${userQuest.quest.title}`,
+          data: JSON.stringify({
+            userQuestId: userQuest.id,
+            questId: userQuest.questId,
+            userId: user.id,
+          }),
+        })),
+      });
+    }
+  }
 
   return c.json({
     success: true,
     userQuestId: userQuest.id,
   } satisfies StartQuestResponse);
+});
+
+// ============================================
+// GET /api/quests/friend/:userQuestId - Get friend's quest (read-only view)
+// ============================================
+questsRouter.get("/friend/:userQuestId", async (c) => {
+  const user = c.get("user");
+
+  if (!user) {
+    return c.json({ message: "Unauthorized" }, 401);
+  }
+
+  const userQuestId = c.req.param("userQuestId");
+
+  // Get the user quest
+  const userQuest = await db.userQuest.findUnique({
+    where: { id: userQuestId },
+    include: {
+      quest: true,
+      user: {
+        include: {
+          Profile: true,
+        },
+      },
+    },
+  });
+
+  if (!userQuest) {
+    return c.json({ message: "Quest not found" }, 404);
+  }
+
+  // Verify that the current user is a friend of the quest owner
+  const friendship = await db.friendship.findFirst({
+    where: {
+      OR: [
+        { initiatorId: user.id, receiverId: userQuest.userId, status: "ACCEPTED" },
+        { initiatorId: userQuest.userId, receiverId: user.id, status: "ACCEPTED" },
+      ],
+    },
+  });
+
+  if (!friendship) {
+    return c.json({ message: "You can only view quests from your friends" }, 403);
+  }
+
+  return c.json({
+    userQuest: {
+      id: userQuest.id,
+      status: userQuest.status,
+      noCount: userQuest.noCount,
+      yesCount: userQuest.yesCount,
+      actionCount: userQuest.actionCount,
+      startedAt: userQuest.startedAt?.toISOString() || null,
+      completedAt: userQuest.completedAt?.toISOString() || null,
+    },
+    quest: {
+      id: userQuest.quest.id,
+      title: userQuest.quest.title,
+      description: userQuest.quest.description,
+      category: userQuest.quest.category,
+      difficulty: userQuest.quest.difficulty,
+      goalType: userQuest.quest.goalType,
+      goalCount: userQuest.quest.goalCount,
+      xpReward: userQuest.quest.xpReward,
+      pointReward: userQuest.quest.pointReward,
+    },
+    user: {
+      id: userQuest.user.id,
+      name: userQuest.user.name,
+      email: userQuest.user.email,
+      Profile: userQuest.user.Profile
+        ? {
+            displayName: userQuest.user.Profile.displayName,
+            avatar: userQuest.user.Profile.avatar,
+          }
+        : null,
+    },
+  });
 });
 
 // ============================================

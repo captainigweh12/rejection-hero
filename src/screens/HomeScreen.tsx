@@ -1699,6 +1699,50 @@ export default function HomeScreen({ navigation }: Props) {
                       </Text>
                       <ChevronRight size={20} color={colors.textSecondary} />
                     </Pressable>
+
+                    {/* Admin Panel - Only visible to admins */}
+                    {profileData?.isAdmin && (
+                      <Pressable
+                        onPress={() => {
+                          setShowMenu(false);
+                          navigation.navigate("Admin");
+                        }}
+                        style={{
+                          backgroundColor: colors.card,
+                          borderRadius: 16,
+                          padding: 16,
+                          flexDirection: "row",
+                          alignItems: "center",
+                          borderWidth: 1,
+                          borderColor: "rgba(126, 63, 228, 0.3)",
+                          shadowColor: "#7E3FE4",
+                          shadowOffset: { width: 0, height: 2 },
+                          shadowOpacity: 0.2,
+                          shadowRadius: 4,
+                          elevation: 3,
+                        }}
+                      >
+                        <View
+                          style={{
+                            width: 48,
+                            height: 48,
+                            borderRadius: 24,
+                            backgroundColor: "rgba(126, 63, 228, 0.2)",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            marginRight: 16,
+                            borderWidth: 2,
+                            borderColor: "rgba(126, 63, 228, 0.4)",
+                          }}
+                        >
+                          <Shield size={24} color="#7E3FE4" />
+                        </View>
+                        <Text style={{ fontSize: 16, color: colors.text, fontWeight: "600", flex: 1 }}>
+                          Admin Panel
+                        </Text>
+                        <ChevronRight size={20} color={colors.textSecondary} />
+                      </Pressable>
+                    )}
                   </View>
 
                   {/* ADVENTURE Section */}

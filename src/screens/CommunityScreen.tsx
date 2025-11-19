@@ -23,7 +23,7 @@ import {
 } from "lucide-react-native";
 import * as ImagePicker from "expo-image-picker";
 import type { BottomTabScreenProps } from "@/navigation/types";
-import { api } from "@/lib/api";
+import { api, uploadImage } from "@/lib/api";
 import { useSession } from "@/lib/useSession";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -137,51 +137,29 @@ export default function CommunityScreen({ navigation }: Props) {
       api.post("/api/moments", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["moments"] });
+      refetchMoments(); // Immediately refetch to show the new story
       setShowCreateMoment(false);
       Alert.alert("Success", "Story created! It will expire in 24 hours.");
     },
-    onError: () => {
-      Alert.alert("Error", "Failed to create story. Please try again.");
+    onError: (error: any) => {
+      const errorMessage = error?.message || "Failed to create story. Please try again.";
+      Alert.alert("Error", errorMessage);
     },
   });
 
   const handleCreateMoment = async (imageUrl: string, text?: string) => {
     try {
-      // Upload image to server first
-      const formData = new FormData();
-      const filename = imageUrl.split("/").pop() || "moment.jpg";
-      const match = /\.(\w+)$/.exec(filename);
-      const type = match ? `image/${match[1]}` : "image/jpeg";
-
-      formData.append("image", {
-        uri: imageUrl,
-        name: filename,
-        type,
-      } as any);
-
-      const uploadResponse = await fetch(`${process.env.EXPO_PUBLIC_VIBECODE_BACKEND_URL}/api/upload/image`, {
-        method: "POST",
-        body: formData,
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-
-      if (!uploadResponse.ok) {
-        throw new Error("Failed to upload image");
-      }
-
-      const uploadData = await uploadResponse.json();
-      const serverImageUrl = `${process.env.EXPO_PUBLIC_VIBECODE_BACKEND_URL}${uploadData.url}`;
+      // Upload image to server first using authenticated upload helper
+      const serverImageUrl = await uploadImage(imageUrl);
 
       // Now create moment with server URL
       createMomentMutation.mutate({
         imageUrl: serverImageUrl,
         content: text,
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Upload error:", error);
-      Alert.alert("Error", "Failed to upload image. Please try again.");
+      Alert.alert("Error", error?.message || "Failed to upload image. Please try again.");
       throw error;
     }
   };

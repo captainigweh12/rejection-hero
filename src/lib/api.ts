@@ -197,5 +197,50 @@ const api = {
   delete: <T>(path: string) => fetchFn<T>(path, { method: "DELETE" }),
 };
 
-// Export the API client and backend URL to be used in other modules
-export { api, BACKEND_URL };
+/**
+ * Upload image with authentication
+ * Helper function for uploading images with FormData while maintaining authentication
+ */
+const uploadImage = async (imageUri: string, filename?: string): Promise<string> => {
+  const formData = new FormData();
+  const fileExtension = imageUri.split(".").pop() || "jpg";
+  const finalFilename = filename || `image.${fileExtension}`;
+  const match = /\.(\w+)$/.exec(finalFilename);
+  const type = match ? `image/${match[1]}` : "image/jpeg";
+
+  formData.append("image", {
+    uri: imageUri,
+    name: finalFilename,
+    type,
+  } as any);
+
+  const cookies = authClient.getCookie();
+  
+  const response = await fetch(`${BACKEND_URL}/api/upload/image`, {
+    method: "POST",
+    body: formData,
+    headers: {
+      // Don't set Content-Type for FormData - let the browser set it with boundary
+      ...(cookies ? { Cookie: cookies } : {}),
+    },
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    let errorData;
+    try {
+      errorData = await response.json();
+    } catch {
+      errorData = { message: response.statusText };
+    }
+    throw new Error(
+      `Upload Error: ${response.status} ${response.statusText} - ${JSON.stringify(errorData)}`,
+    );
+  }
+
+  const uploadData = await response.json();
+  return `${BACKEND_URL}${uploadData.url}`;
+};
+
+// Export the API client, upload helper, and backend URL to be used in other modules
+export { api, uploadImage, BACKEND_URL };

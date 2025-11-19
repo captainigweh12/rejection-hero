@@ -76,10 +76,14 @@ export default function AdminScreen({ navigation }: Props) {
     enabled: !!sessionData?.user,
   });
 
+  // Check if user is admin
+  const isAdmin = profileData?.isAdmin || false;
+
   // Fetch users
   const {
     data: usersData,
     isLoading,
+    error: usersError,
     refetch,
   } = useQuery<{ users: User[]; total: number; page: number; limit: number; totalPages: number }>({
     queryKey: ["admin-users", page, searchQuery],
@@ -93,7 +97,8 @@ export default function AdminScreen({ navigation }: Props) {
         `/api/admin/users?${params.toString()}`
       );
     },
-    enabled: !!sessionData?.user,
+    enabled: !!sessionData?.user && isAdmin,
+    retry: false,
   });
 
   const deleteUserMutation = useMutation({
@@ -179,8 +184,22 @@ export default function AdminScreen({ navigation }: Props) {
     ]);
   };
 
-  // Check if user is admin (you'd need to add this to the profile response)
-  const isAdmin = profileData?.isAdmin || false;
+  const isLoadingProfile = !profileData && !!sessionData?.user;
+
+  if (isLoadingProfile) {
+    return (
+      <LinearGradient colors={colors.background} className="flex-1">
+        <SafeAreaView edges={["top"]} className="flex-1">
+          <View className="flex-1 items-center justify-center">
+            <ActivityIndicator size="large" color="#7E3FE4" />
+            <Text className="text-base mt-4" style={{ color: colors.textSecondary }}>
+              Loading...
+            </Text>
+          </View>
+        </SafeAreaView>
+      </LinearGradient>
+    );
+  }
 
   if (!isAdmin) {
     return (
@@ -303,18 +322,61 @@ export default function AdminScreen({ navigation }: Props) {
             </View>
           </View>
 
+          {/* Error Message */}
+          {usersError && (
+            <View
+              className="p-4 rounded-2xl mb-4"
+              style={{ backgroundColor: "rgba(239, 68, 68, 0.15)", borderWidth: 1, borderColor: "#ef4444" }}
+            >
+              <Text className="text-base font-semibold mb-1" style={{ color: "#ef4444" }}>
+                Error Loading Users
+              </Text>
+              <Text className="text-sm mb-2" style={{ color: colors.textSecondary }}>
+                {(() => {
+                  const error = usersError as any;
+                  if (error?.message) {
+                    // Extract a cleaner error message
+                    const msg = error.message;
+                    if (msg.includes("403") || msg.includes("Forbidden")) {
+                      return "Access denied. Please ensure you have admin privileges.";
+                    }
+                    if (msg.includes("401") || msg.includes("Unauthorized")) {
+                      return "Please log in again to access the admin panel.";
+                    }
+                    if (msg.includes("Network") || msg.includes("Connection")) {
+                      return "Network error. Please check your connection and try again.";
+                    }
+                    return msg;
+                  }
+                  return "Failed to load users. Please try again.";
+                })()}
+              </Text>
+              <Pressable
+                onPress={() => refetch()}
+                className="mt-3 py-2 px-4 rounded-xl items-center"
+                style={{ backgroundColor: "#ef4444" }}
+              >
+                <Text className="text-white font-semibold">Retry</Text>
+              </Pressable>
+            </View>
+          )}
+
           {/* Users List */}
           {isLoading ? (
             <View className="py-20 items-center">
               <ActivityIndicator size="large" color="#7E3FE4" />
+              <Text className="text-sm mt-4" style={{ color: colors.textSecondary }}>
+                Loading users...
+              </Text>
             </View>
-          ) : (
+          ) : usersError ? null : (
             <>
               <Text className="text-sm mb-4" style={{ color: colors.textSecondary }}>
                 {usersData?.total || 0} total users
               </Text>
-              <View className="gap-3">
-                {usersData?.users.map((user) => (
+              {usersData?.users && usersData.users.length > 0 ? (
+                <View className="gap-3">
+                  {usersData.users.map((user) => (
                   <View
                     key={user.id}
                     className="p-4 rounded-2xl"
@@ -424,8 +486,15 @@ export default function AdminScreen({ navigation }: Props) {
                       </Pressable>
                     </View>
                   </View>
-                ))}
-              </View>
+                  ))}
+                </View>
+              ) : (
+                <View className="py-20 items-center">
+                  <Text className="text-base" style={{ color: colors.textSecondary }}>
+                    No users found
+                  </Text>
+                </View>
+              )}
 
               {/* Pagination */}
               {usersData && usersData.totalPages > 1 && (

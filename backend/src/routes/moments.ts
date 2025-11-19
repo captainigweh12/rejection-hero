@@ -111,6 +111,12 @@ momentsRouter.get("/", async (c) => {
             id: true,
             name: true,
             image: true,
+            Profile: {
+              select: {
+                displayName: true,
+                avatar: true,
+              },
+            },
           },
         },
       },
@@ -126,8 +132,8 @@ momentsRouter.get("/", async (c) => {
         if (!acc[userId]) {
           acc[userId] = {
             userId: moment.user.id,
-            userName: moment.user.name,
-            userAvatar: moment.user.image,
+            userName: moment.user.Profile?.displayName || moment.user.name,
+            userAvatar: moment.user.Profile?.avatar || moment.user.image,
             moments: [],
           };
         }

@@ -383,7 +383,7 @@ export default function SettingsScreen({ navigation }: Props) {
               </View>
               <ChevronRight size={20} color={colors.textSecondary} />
             </Pressable>
-            {profileData?.age && profileData.age < 18 && (
+            {profileData?.age != null && profileData.age < 18 && (
               <Pressable
                 onPress={() => navigation.navigate("ParentalGuidanceSettings")}
                 style={{
