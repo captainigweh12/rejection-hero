@@ -598,7 +598,8 @@ export default function AdminScreen({ navigation }: Props) {
               )}
             </>
           )}
-        </ScrollView>
+          </ScrollView>
+        )}
 
         {/* Subscription Management Modal */}
         {selectedUser && (
