@@ -1,5 +1,22 @@
 ## 🔧 Bug Fixes & Features
 
+### Journal Screen Navigation & UI Cleanup (2025-11-19)
+- **Added**: Back button to Journal screen for easy navigation
+- **Removed**: Unnecessary calendar picker section to simplify UI
+- **Changes**:
+  - Added back arrow button in top-left of header
+  - Button uses navigation.goBack() to return to previous screen
+  - Removed calendar month/year selector and calendar grid
+  - Calendar section was redundant as date selection is not actively used
+  - Cleaner, more focused UI that highlights insights and journal entries
+- **UI Benefits**:
+  - Users can now easily navigate back from the Journal screen
+  - Reduced screen clutter improves focus on actual journal content
+  - More space for journal entries and insights panel
+- **Implementation**:
+  - File: `/src/screens/JournalScreen.tsx`
+  - Back button styled with surface color, matches app design
+
 ### Group Quest Type Selection & Rejection Nos (2025-11-19)
 - **Added**: Quest type selection for group quests (Action vs Rejection)
 - **Features**:

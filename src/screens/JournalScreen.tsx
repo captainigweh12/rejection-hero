@@ -284,7 +284,21 @@ export default function JournalScreen({ navigation }: Props) {
           {/* Header */}
           <View style={{ paddingHorizontal: 24, paddingTop: 20, paddingBottom: 16 }}>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-              <View>
+              <Pressable
+                onPress={() => navigation.goBack()}
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 8,
+                  backgroundColor: colors.surface,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  marginRight: 12,
+                }}
+              >
+                <ArrowLeft size={24} color={colors.text} />
+              </Pressable>
+              <View style={{ flex: 1 }}>
                 <Text style={{ fontSize: 28, fontWeight: "bold", color: colors.text }}>
                   Journal
                 </Text>
@@ -432,57 +446,6 @@ export default function JournalScreen({ navigation }: Props) {
               </LinearGradient>
             </View>
           )}
-
-          {/* Calendar Section */}
-          <View style={{ paddingHorizontal: 24, marginBottom: 24 }}>
-            <View
-              style={{
-                backgroundColor: colors.card,
-                borderWidth: 1,
-                borderColor: colors.cardBorder,
-                borderRadius: 16,
-                padding: 16,
-              }}
-            >
-              {/* Month Navigation */}
-              <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-                <Text style={{ fontSize: 16, fontWeight: "bold", color: colors.text }}>
-                  {currentMonth.toLocaleDateString("en-US", { month: "long", year: "numeric" })}
-                </Text>
-                <View style={{ flexDirection: "row", gap: 8 }}>
-                  <Pressable
-                    onPress={goToPreviousMonth}
-                    style={{
-                      width: 32,
-                      height: 32,
-                      borderRadius: 8,
-                      backgroundColor: colors.surface,
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
-                  >
-                    <ChevronLeft size={20} color={colors.text} />
-                  </Pressable>
-                  <Pressable
-                    onPress={goToNextMonth}
-                    style={{
-                      width: 32,
-                      height: 32,
-                      borderRadius: 8,
-                      backgroundColor: colors.surface,
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
-                  >
-                    <ChevronRight size={20} color={colors.text} />
-                  </Pressable>
-                </View>
-              </View>
-
-              {/* Calendar Grid */}
-              {renderCalendar()}
-            </View>
-          </View>
 
           {/* Date Header */}
           <View style={{ paddingHorizontal: 24, marginBottom: 12 }}>
