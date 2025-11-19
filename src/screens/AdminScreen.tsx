@@ -71,11 +71,6 @@ export default function AdminScreen({ navigation }: Props) {
   const [emailBody, setEmailBody] = useState("");
   const [emailRecipient, setEmailRecipient] = useState<User | null>(null);
 
-  // Debug logging - moved to top level to comply with React hooks rules
-  React.useEffect(() => {
-    console.log("[AdminScreen] Rendering - sessionData:", !!sessionData?.user);
-  }, [sessionData]);
-
   // Check if current user is admin
   const { data: profileData } = useQuery<GetProfileResponse>({
     queryKey: ["profile"],
@@ -109,6 +104,12 @@ export default function AdminScreen({ navigation }: Props) {
     enabled: !!sessionData?.user && isAdmin,
     retry: false,
   });
+
+  // Debug logging - after all queries are defined
+  React.useEffect(() => {
+    console.log("[AdminScreen] Rendering - sessionData:", !!sessionData?.user, "profileData:", !!profileData, "isAdmin:", isAdmin);
+    console.log("[AdminScreen] usersData:", !!usersData, "isLoading:", isLoading, "usersError:", !!usersError);
+  }, [sessionData, profileData, isAdmin, usersData, isLoading, usersError]);
 
   const deleteUserMutation = useMutation({
     mutationFn: async (userId: string) => {
@@ -396,11 +397,26 @@ export default function AdminScreen({ navigation }: Props) {
           {isLoading ? (
             <View className="py-20 items-center">
               <ActivityIndicator size="large" color="#7E3FE4" />
-              <Text className="text-sm mt-4" style={{ color: colors.textSecondary }}>
+              <Text className="text-sm mt-4" style={{ color: colors.textSecondary || "#999" }}>
                 Loading users...
               </Text>
             </View>
-          ) : usersError ? null : (
+          ) : usersError ? (
+            <View className="py-10 items-center">
+              <Text className="text-sm" style={{ color: colors.textSecondary || "#999" }}>
+                Error loading users. Please try again.
+              </Text>
+            </View>
+          ) : !usersData || usersData.users.length === 0 ? (
+            <View className="py-20 items-center">
+              <Text className="text-base mb-2" style={{ color: colors.text || "#fff" }}>
+                No users found
+              </Text>
+              <Text className="text-sm" style={{ color: colors.textSecondary || "#999" }}>
+                {searchQuery ? "Try a different search term" : "No users in the system"}
+              </Text>
+            </View>
+          ) : (
             <>
               <Text className="text-sm mb-4" style={{ color: colors.textSecondary }}>
                 {usersData?.total || 0} total users

@@ -7,7 +7,7 @@
 
 // Import fetch from expo/fetch for React Native compatibility
 // This ensures fetch works correctly across different platforms (iOS, Android, Web)
-import { fetch } from "expo/fetch";
+import { fetch as expoFetch } from "expo/fetch";
 
 // Import the authentication client to access user session cookies
 import { authClient } from "./authClient";
@@ -68,7 +68,7 @@ const fetchFn = async <T>(path: string, options: FetchOptions): Promise<T> => {
   // Step 2: Make the HTTP request
   try {
     // Construct the full URL by combining the base backend URL with the endpoint path
-    const response = await fetch(`${BACKEND_URL}${path}`, {
+    const response = await expoFetch(`${BACKEND_URL}${path}`, {
       method,
       headers: {
         // Only set Content-Type for JSON, let browser set it for FormData
@@ -216,7 +216,7 @@ const uploadImage = async (imageUri: string, filename?: string): Promise<string>
 
   const cookies = authClient.getCookie();
   
-  const response = await fetch(`${BACKEND_URL}/api/upload/image`, {
+  const response = await expoFetch(`${BACKEND_URL}/api/upload/image`, {
     method: "POST",
     body: formData,
     headers: {
