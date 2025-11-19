@@ -9,6 +9,7 @@ import * as Haptics from "expo-haptics";
 import type { RootStackScreenProps } from "@/navigation/types";
 import { api } from "@/lib/api";
 import { useTheme } from "@/contexts/ThemeContext";
+import { playSound } from "@/services/soundService";
 import type {
   GetUserQuestsResponse,
   RecordQuestActionRequest,

@@ -17,6 +17,7 @@ import type { RootStackScreenProps } from "@/navigation/types";
 import { api } from "@/lib/api";
 import { useSession } from "@/lib/useSession";
 import type { GetMessagesResponse, SendMessageRequest } from "@/shared/contracts";
+import { playSound } from "@/services/soundService";
 
 type Props = RootStackScreenProps<"Chat">;
 
@@ -50,10 +51,12 @@ export default function ChatScreen({ navigation, route }: Props) {
       };
       return api.post("/api/messages/send", requestData);
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       setMessageText("");
       queryClient.invalidateQueries({ queryKey: ["messages", userId] });
       queryClient.invalidateQueries({ queryKey: ["conversations"] });
+      // Play message sent sound
+      await playSound("messageSent");
       // Scroll to bottom after sending
       setTimeout(() => {
         scrollViewRef.current?.scrollToEnd({ animated: true });
@@ -66,14 +69,20 @@ export default function ChatScreen({ navigation, route }: Props) {
     sendMessageMutation.mutate(messageText.trim());
   };
 
-  // Scroll to bottom when messages change
+  // Scroll to bottom when messages change and play sound for received messages
   useEffect(() => {
     if (messages.length > 0) {
+      // Check if last message is from other user (not current user)
+      const lastMessage = messages[messages.length - 1];
+      if (lastMessage && lastMessage.senderId !== currentUserId) {
+        // Play message received sound
+        playSound("messageReceived").catch(console.error);
+      }
       setTimeout(() => {
         scrollViewRef.current?.scrollToEnd({ animated: false });
       }, 100);
     }
-  }, [messages.length]);
+  }, [messages.length, currentUserId]);
 
   if (isLoading) {
     return (

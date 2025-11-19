@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -12,6 +12,7 @@ import {
   Image,
   TextInput,
 } from "react-native";
+import { playSound, initializeSounds } from "@/services/soundService";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -305,7 +306,10 @@ export default function HomeScreen({ navigation }: Props) {
             </LinearGradient>
 
             {/* Right: Notifications */}
-            <Pressable style={{ width: 40, alignItems: "flex-end" }}>
+            <Pressable 
+              style={{ width: 40, alignItems: "flex-end" }}
+              onPress={() => navigation.navigate("Notifications")}
+            >
               <Bell size={24} color={colors.text} />
             </Pressable>
           </View>
@@ -500,25 +504,9 @@ export default function HomeScreen({ navigation }: Props) {
                     <Text style={{ color: colors.textSecondary, fontSize: 12, fontWeight: "600" }}>
                       Daily Confidence Meter
                     </Text>
-                    <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-                      <Text style={{ color: "#00D9FF", fontSize: 14, fontWeight: "bold" }}>
-                        {Math.round(statsData?.dailyConfidenceMeter || 0)}%
-                      </Text>
-                      {(statsData?.dailyConfidenceMeter || 0) < 20 && (
-                        <View style={{ flexDirection: "row", alignItems: "center" }}>
-                          <Text
-                            style={{
-                              color: "#FF6B35",
-                              fontSize: 11,
-                              fontWeight: "600",
-                              marginLeft: 2,
-                            }}
-                          >
-                            Low! Complete a quest
-                          </Text>
-                        </View>
-                      )}
-                    </View>
+                    <Text style={{ color: "#00D9FF", fontSize: 14, fontWeight: "bold" }}>
+                      {Math.round(statsData?.dailyConfidenceMeter || 0)}%
+                    </Text>
                   </View>
                   <View
                     style={{
@@ -632,7 +620,18 @@ export default function HomeScreen({ navigation }: Props) {
 
                 {/* Today's Quest Status */}
                 {challengeData.challenge.todayQuest ? (
-                  <View
+                  <Pressable
+                    onPress={() => {
+                      // Navigate to quest if available
+                      if (challengeData.challenge?.todayQuest?.userQuestId) {
+                        const challengeUserQuest = activeQuests.find(
+                          (uq) => uq.id === challengeData.challenge?.todayQuest?.userQuestId
+                        );
+                        if (challengeUserQuest) {
+                          navigation.navigate("QuestDetail", { userQuestId: challengeUserQuest.id });
+                        }
+                      }
+                    }}
                     style={{
                       backgroundColor: challengeData.challenge.todayQuest.status === "COMPLETED" 
                         ? "rgba(76, 175, 80, 0.1)" 
@@ -659,6 +658,36 @@ export default function HomeScreen({ navigation }: Props) {
                             {challengeData.challenge.todayQuest.quest.title}
                           </Text>
                         )}
+                        {/* Quest Progress - Show if we can find the active quest */}
+                        {challengeData.challenge?.todayQuest?.status === "ACTIVE" && challengeData.challenge?.todayQuest?.userQuestId && (() => {
+                          const challengeUserQuest = activeQuests.find(
+                            (uq) => uq.id === challengeData.challenge?.todayQuest?.userQuestId
+                          );
+                          if (challengeUserQuest && challengeUserQuest.quest) {
+                            const quest = challengeUserQuest.quest;
+                            const userQuest = challengeUserQuest;
+                            return (
+                              <View style={{ marginTop: 6, flexDirection: "row", gap: 8 }}>
+                                {quest.goalType === "COLLECT_NOS" && (
+                                  <Text style={{ color: colors.textSecondary, fontSize: 10 }}>
+                                    NOs: {userQuest.noCount || 0}/{quest.goalCount}
+                                  </Text>
+                                )}
+                                {quest.goalType === "COLLECT_YES" && (
+                                  <Text style={{ color: colors.textSecondary, fontSize: 10 }}>
+                                    YESes: {userQuest.yesCount || 0}/{quest.goalCount}
+                                  </Text>
+                                )}
+                                {quest.goalType === "TAKE_ACTION" && (
+                                  <Text style={{ color: colors.textSecondary, fontSize: 10 }}>
+                                    Actions: {userQuest.actionCount || 0}/{quest.goalCount}
+                                  </Text>
+                                )}
+                              </View>
+                            );
+                          }
+                          return null;
+                        })()}
                       </View>
                       <View
                         style={{
@@ -681,7 +710,7 @@ export default function HomeScreen({ navigation }: Props) {
                         </Text>
                       </View>
                     </View>
-                  </View>
+                  </Pressable>
                 ) : (
                   <View
                     style={{
@@ -1010,12 +1039,14 @@ export default function HomeScreen({ navigation }: Props) {
             </Pressable>
           )}
 
-          {/* Weekly NO Forecast - NEW */}
+          {/* Weekly NO Forecast - Dynamic with AI */}
           {weeklyForecast && (
             <View style={{ paddingHorizontal: 24, marginTop: 20 }}>
-              <View
+              <LinearGradient
+                colors={["rgba(0, 217, 255, 0.15)", "rgba(126, 63, 228, 0.1)"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
                 style={{
-                  backgroundColor: "rgba(0, 217, 255, 0.1)",
                   borderRadius: 16,
                   padding: 16,
                   borderWidth: 1,
@@ -1031,6 +1062,57 @@ export default function HomeScreen({ navigation }: Props) {
                 <Text style={{ color: colors.text, fontSize: 14, lineHeight: 20, marginBottom: 12 }}>
                   {weeklyForecast.forecast}
                 </Text>
+
+                {/* Motivations */}
+                {weeklyForecast.motivations && weeklyForecast.motivations.length > 0 && (
+                  <View style={{ marginBottom: 12 }}>
+                    <Text style={{ color: colors.primary, fontSize: 12, fontWeight: "600", marginBottom: 8 }}>
+                      💪 This Week's Challenges
+                    </Text>
+                    {weeklyForecast.motivations.map((motivation, index) => (
+                      <View
+                        key={index}
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "flex-start",
+                          marginBottom: 6,
+                          paddingLeft: 8,
+                        }}
+                      >
+                        <Text style={{ color: colors.textSecondary, fontSize: 12, marginRight: 8 }}>•</Text>
+                        <Text style={{ color: colors.text, fontSize: 12, flex: 1, lineHeight: 18 }}>
+                          {motivation}
+                        </Text>
+                      </View>
+                    ))}
+                  </View>
+                )}
+
+                {/* Accomplishments */}
+                {weeklyForecast.accomplishments && weeklyForecast.accomplishments.length > 0 && (
+                  <View style={{ marginBottom: 12 }}>
+                    <Text style={{ color: "#FFD700", fontSize: 12, fontWeight: "600", marginBottom: 8 }}>
+                      🎯 Potential Achievements
+                    </Text>
+                    {weeklyForecast.accomplishments.map((accomplishment, index) => (
+                      <View
+                        key={index}
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "flex-start",
+                          marginBottom: 6,
+                          paddingLeft: 8,
+                        }}
+                      >
+                        <Text style={{ color: "#FFD700", fontSize: 12, marginRight: 8 }}>⭐</Text>
+                        <Text style={{ color: colors.text, fontSize: 12, flex: 1, lineHeight: 18 }}>
+                          {accomplishment}
+                        </Text>
+                      </View>
+                    ))}
+                  </View>
+                )}
+
                 <View
                   style={{
                     flexDirection: "row",
@@ -1057,7 +1139,7 @@ export default function HomeScreen({ navigation }: Props) {
                     </Text>
                   </View>
                 </View>
-              </View>
+              </LinearGradient>
             </View>
           )}
         </View>
@@ -1673,7 +1755,7 @@ export default function HomeScreen({ navigation }: Props) {
                     <Pressable
                       onPress={() => {
                         setShowMenu(false);
-                        navigation.navigate("GrowthAchievements");
+                        navigation.navigate("Leaderboard");
                       }}
                       style={{
                         backgroundColor: colors.card,
@@ -1707,6 +1789,48 @@ export default function HomeScreen({ navigation }: Props) {
                       </View>
                       <Text style={{ fontSize: 16, color: colors.text, fontWeight: "600", flex: 1 }}>
                         Leaderboard
+                      </Text>
+                      <ChevronRight size={20} color={colors.textSecondary} />
+                    </Pressable>
+
+                    {/* Journal */}
+                    <Pressable
+                      onPress={() => {
+                        setShowMenu(false);
+                        navigation.navigate("Journal");
+                      }}
+                      style={{
+                        backgroundColor: colors.card,
+                        borderRadius: 16,
+                        padding: 16,
+                        flexDirection: "row",
+                        alignItems: "center",
+                        borderWidth: 1,
+                        borderColor: "rgba(126, 63, 228, 0.3)",
+                        shadowColor: "#7E3FE4",
+                        shadowOffset: { width: 0, height: 2 },
+                        shadowOpacity: 0.2,
+                        shadowRadius: 4,
+                        elevation: 3,
+                      }}
+                    >
+                      <View
+                        style={{
+                          width: 48,
+                          height: 48,
+                          borderRadius: 24,
+                          backgroundColor: "rgba(126, 63, 228, 0.2)",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          marginRight: 16,
+                          borderWidth: 2,
+                          borderColor: "rgba(126, 63, 228, 0.4)",
+                        }}
+                      >
+                        <FileText size={24} color="#7E3FE4" />
+                      </View>
+                      <Text style={{ fontSize: 16, color: colors.text, fontWeight: "600", flex: 1 }}>
+                        Journal
                       </Text>
                       <ChevronRight size={20} color={colors.textSecondary} />
                     </Pressable>

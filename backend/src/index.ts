@@ -216,12 +216,24 @@ setInterval(() => {
 }, 5 * 60 * 1000); // Check every 5 minutes
 
 // Decay confidence meters every hour
-setInterval(() => {
-  console.log("📉 [Confidence Decay] Running confidence meter decay...");
-  decayConfidenceMeters().catch((error) => {
-    console.error("❌ [Confidence Decay] Error decaying confidence meters:", error);
-  });
+setInterval(async () => {
+  try {
+    const { decayConfidenceMeters } = await import("./services/confidenceDecay");
+    await decayConfidenceMeters();
+  } catch (error) {
+    console.error("❌ [Confidence Decay] Error:", error);
+  }
 }, 60 * 60 * 1000); // Every hour
+
+// Check leaderboard fall-behind every 6 hours
+setInterval(async () => {
+  try {
+    const { checkLeaderboardFallBehind } = await import("./services/leaderboardNotifications");
+    await checkLeaderboardFallBehind();
+  } catch (error) {
+    console.error("❌ [Leaderboard Notifications] Error:", error);
+  }
+}, 6 * 60 * 60 * 1000); // Every 6 hours
 
 serve({ fetch: app.fetch, port: Number(env.PORT) }, () => {
   console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");

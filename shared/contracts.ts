@@ -468,11 +468,13 @@ export const getLeaderboardResponseSchema = z.object({
       totalXP: z.number(),
       totalPoints: z.number(),
       currentStreak: z.number(),
+      questsCompleted: z.number().optional(), // Quest completions in the period
       isCurrentUser: z.boolean(),
     })
   ),
   currentUserRank: z.number(),
   totalUsers: z.number(),
+  period: z.enum(["day", "week", "month", "all"]).optional(),
 });
 export type GetLeaderboardResponse = z.infer<typeof getLeaderboardResponseSchema>;
 
@@ -932,6 +934,8 @@ export const getWeeklyForecastResponseSchema = z.object({
   recommendedWeeklyTarget: z.number(),
   trendingCategory: z.string(),
   previousWeekNOs: z.number(),
+  motivations: z.array(z.string()).optional(),
+  accomplishments: z.array(z.string()).optional(),
 });
 export type GetWeeklyForecastResponse = z.infer<typeof getWeeklyForecastResponseSchema>;
 

@@ -3,7 +3,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { BlurView } from "expo-blur";
 import * as Haptics from "expo-haptics";
-import { Home, Heart, Users, Video, Map, User, BookOpen } from "lucide-react-native";
+import { Home, Heart, Users, Video, Map, User } from "lucide-react-native";
 import { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -40,9 +40,12 @@ import GroupQuestsScreen from "@/screens/GroupQuestsScreen";
 import GroupLiveScreen from "@/screens/GroupLiveScreen";
 import ChatScreen from "@/screens/ChatScreen";
 import CreateCustomQuestScreen from "@/screens/CreateCustomQuestScreen";
+import LeaderboardScreen from "@/screens/LeaderboardScreen";
+import LegalPoliciesScreen from "@/screens/LegalPoliciesScreen";
 import { useSession } from "@/lib/useSession";
 import { api } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
+import { setupNotificationListeners, requestNotificationPermissions } from "@/services/notificationService";
 
 /**
  * RootStackNavigator
@@ -50,6 +53,31 @@ import { useQuery } from "@tanstack/react-query";
  */
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 const RootNavigator = () => {
+  // Set up notification listeners on mount
+  useEffect(() => {
+    // Request notification permissions
+    requestNotificationPermissions();
+
+    // Set up notification listeners
+    const listeners = setupNotificationListeners(
+      (notification) => {
+        console.log("📬 Notification received in foreground:", notification);
+      },
+      (response) => {
+        console.log("👆 Notification tapped:", response);
+        // Handle navigation based on notification data
+        const data = response.notification.request.content.data;
+        if (data?.type === "confidence_low") {
+          // Navigation will be handled by the notification screen
+        }
+      }
+    );
+
+    return () => {
+      listeners.remove();
+    };
+  }, []);
+
   return (
     <>
       <AuthWrapper />
@@ -87,6 +115,11 @@ const RootNavigator = () => {
         <RootStack.Screen
           name="NotificationSettings"
           component={NotificationSettingsScreen}
+          options={{ headerShown: false }}
+        />
+        <RootStack.Screen
+          name="LegalPolicies"
+          component={LegalPoliciesScreen}
           options={{ headerShown: false }}
         />
         <RootStack.Screen
@@ -177,6 +210,16 @@ const RootNavigator = () => {
         <RootStack.Screen
           name="Chat"
           component={ChatScreen}
+          options={{ headerShown: false }}
+        />
+        <RootStack.Screen
+          name="Leaderboard"
+          component={LeaderboardScreen}
+          options={{ headerShown: false }}
+        />
+        <RootStack.Screen
+          name="Journal"
+          component={JournalScreen}
           options={{ headerShown: false }}
         />
       </RootStack.Navigator>
@@ -342,14 +385,6 @@ const BottomTabNavigator = () => {
         options={{
           title: "Live",
           tabBarIcon: ({ color, size }) => <Video size={size} color={color} />,
-        }}
-      />
-      <BottomTab.Screen
-        name="JournalTab"
-        component={JournalScreen}
-        options={{
-          title: "Journal",
-          tabBarIcon: ({ color, size }) => <BookOpen size={size} color={color} />,
         }}
       />
       <BottomTab.Screen

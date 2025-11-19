@@ -587,9 +587,19 @@ questsRouter.post("/:id/record", zValidator("json", recordQuestActionRequestSche
     },
   });
 
-  // If completed, update user stats and award tokens
-  if (isCompleted) {
-    await updateUserStats(user.id, userQuest.quest.xpReward, userQuest.quest.pointReward, userQuest.quest.difficulty);
+    // If completed, update user stats and award tokens
+    if (isCompleted) {
+      await updateUserStats(user.id, userQuest.quest.xpReward, userQuest.quest.pointReward, userQuest.quest.difficulty);
+
+      // Check leaderboard fall-behind after quest completion (async, don't block)
+      try {
+        const { checkLeaderboardFallBehind } = await import("../services/leaderboardNotifications");
+        checkLeaderboardFallBehind().catch((error) => {
+          console.error("Error checking leaderboard fall-behind:", error);
+        });
+      } catch (error) {
+        // Ignore errors - this is non-critical
+      }
 
     // Award tokens proportional to the number of "No"s collected
     // Formula: 1 token per "No" collected (minimum 1 token if quest was completed)
@@ -1042,17 +1052,20 @@ REQUIREMENTS:
   * 🚨 CRITICAL: If your description mentions a specific number (e.g., "ask 5 local gyms", "visit 3 coffee shops"), the goalCount MUST match that exact number, regardless of difficulty level. The number in the description takes priority.
 ${previousQuestsContext}${questTypeContext}${locationContext}${timeContext}
 
-GOOD EXAMPLES:
-- SALES: "Request grocery stores for expired produce samples to take home"
+GOOD EXAMPLES (Covering Social, Business, Financial):
 - SOCIAL: "Ask 5 dog owners at the park if you can walk their dog for 5 minutes"
 - SOCIAL (ACTION): "Compliment 5 random people on their outfit" (TAKE_ACTION)
-- SOCIAL (ACTION): "Tell 5 people they have nice shoes" (TAKE_ACTION)
-- ENTREPRENEURSHIP: "Pitch restaurant managers to let you place your flyers on their tables"
-- DATING: "Ask 5 people at the bookstore for their book recommendation and phone number"
-- CONFIDENCE (ACTION): "Give 3 strangers genuine compliments" (TAKE_ACTION)
-- CONFIDENCE: "Request clothing stores for a private fashion show of their most expensive items"
-- CAREER: "Ask 6 professionals on LinkedIn to mentor you for free for 3 months"
-- CAREER (ACTION): "Apply to 5 jobs on LinkedIn" (TAKE_ACTION)
+- SOCIAL: "Ask 5 people at the bookstore for their book recommendation and phone number"
+- BUSINESS/SALES: "Request grocery stores for expired produce samples to take home"
+- BUSINESS/ENTREPRENEURSHIP: "Pitch restaurant managers to let you place your flyers on their tables"
+- BUSINESS/CAREER: "Ask 6 professionals on LinkedIn to mentor you for free for 3 months"
+- BUSINESS/CAREER (ACTION): "Apply to 5 jobs on LinkedIn" (TAKE_ACTION)
+- FINANCIAL: "Ask 3 store managers for a discount on items you want to buy"
+- FINANCIAL: "Request a free consultation from a financial advisor"
+- FINANCIAL: "Ask your bank for a lower interest rate on your credit card"
+- FINANCIAL/BUSINESS: "Negotiate a better price for a service (car repair, home improvement, etc.)"
+- SOCIAL/FINANCIAL: "Ask 5 local businesses for a student/senior discount you don't qualify for"
+- BUSINESS/FINANCIAL: "Request a raise or negotiate your salary at work"
 
 BAD EXAMPLES (too generic):
 - "Pitch your product to 10 people"

@@ -335,12 +335,13 @@ export default function SettingsScreen({ navigation }: Props) {
             </View>
           </View>
 
-          {/* Legal */}
+          {/* Legal & Safety */}
           <View style={{ paddingHorizontal: 20, paddingTop: 24 }}>
             <Text style={{ fontSize: 20, fontWeight: "bold", marginBottom: 12, color: colors.text }}>
-              {t("settings.legal")}
+              Legal & Safety
             </Text>
             <Pressable
+              onPress={() => navigation.navigate("LegalPolicies")}
               style={{
                 backgroundColor: colors.card,
                 borderRadius: 16,
@@ -370,12 +371,12 @@ export default function SettingsScreen({ navigation }: Props) {
                 >
                   <Shield size={24} color="#4CAF50" />
                 </View>
-                <View>
+                <View style={{ flex: 1 }}>
                   <Text style={{ fontWeight: "600", fontSize: 16, color: colors.text, marginBottom: 4 }}>
-                    {t("settings.safetyGuidelines")}
+                    Legal Disclaimers & Policies
                   </Text>
                   <Text style={{ color: colors.textSecondary, fontSize: 14 }}>
-                    Learn about safe challenges
+                    View and accept legal policies, safety guidelines, and terms
                   </Text>
                 </View>
               </View>

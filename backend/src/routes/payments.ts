@@ -93,27 +93,37 @@ paymentsRouter.post("/create-subscription", async (c) => {
       });
     }
 
+    // Use stored price ID if available, otherwise create inline price
+    const subscriptionPriceId = env.STRIPE_SUBSCRIPTION_PRICE_ID;
+
     // Create checkout session
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       payment_method_types: ["card"],
       mode: "subscription",
-      line_items: [
-        {
-          price_data: {
-            currency: "usd",
-            product_data: {
-              name: "Rejection Hero Premium",
-              description: "Monthly subscription for AI-powered quest generation",
+      line_items: subscriptionPriceId
+        ? [
+            {
+              price: subscriptionPriceId,
+              quantity: 1,
             },
-            recurring: {
-              interval: "month",
+          ]
+        : [
+            {
+              price_data: {
+                currency: "usd",
+                product_data: {
+                  name: "Rejection Hero Premium",
+                  description: "Monthly subscription for AI-powered quest generation",
+                },
+                recurring: {
+                  interval: "month",
+                },
+                unit_amount: 499, // $4.99
+              },
+              quantity: 1,
             },
-            unit_amount: 499, // $4.99
-          },
-          quantity: 1,
-        },
-      ],
+          ],
       success_url: `${env.BACKEND_URL}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${env.BACKEND_URL}/payment-cancel`,
       metadata: {

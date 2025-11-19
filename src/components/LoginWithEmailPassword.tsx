@@ -12,6 +12,7 @@ import { useSession } from "@/lib/useSession";
 import { api } from "@/lib/api";
 import type { RootStackParamList } from "@/navigation/types";
 import ForgotPasswordScreen from "./ForgotPasswordScreen";
+import PolicyViewerModal from "./PolicyViewerModal";
 
 export default function LoginWithEmailPassword() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -22,6 +23,8 @@ export default function LoginWithEmailPassword() {
   const [isLoading, setIsLoading] = useState(false);
   const [isCheckingOnboarding, setIsCheckingOnboarding] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [selectedPolicy, setSelectedPolicy] = useState<string | null>(null);
+  const [showPolicyViewer, setShowPolicyViewer] = useState(false);
   const { data: session, refetch } = useSession();
 
   // Close modal when user is logged in (AuthWrapper will handle navigation)
@@ -536,13 +539,66 @@ export default function LoginWithEmailPassword() {
               </View>
             </Pressable>
 
+            {/* Legal Links - Required for App Store compliance */}
+            <View className="mt-6 mb-4">
+              <Text className="text-white/60 text-xs text-center mb-3">
+                By continuing, you agree to our:
+              </Text>
+              <View className="flex-row flex-wrap justify-center gap-x-4 gap-y-2">
+                <Pressable
+                  onPress={() => {
+                    setSelectedPolicy("terms-of-service");
+                    setShowPolicyViewer(true);
+                  }}
+                >
+                  <Text className="text-cyan-300 text-xs underline">Terms of Service</Text>
+                </Pressable>
+                <Pressable
+                  onPress={() => {
+                    setSelectedPolicy("privacy-policy");
+                    setShowPolicyViewer(true);
+                  }}
+                >
+                  <Text className="text-cyan-300 text-xs underline">Privacy Policy</Text>
+                </Pressable>
+                <Pressable
+                  onPress={() => {
+                    setSelectedPolicy("content-guidelines");
+                    setShowPolicyViewer(true);
+                  }}
+                >
+                  <Text className="text-cyan-300 text-xs underline">Community Guidelines</Text>
+                </Pressable>
+                <Pressable
+                  onPress={() => {
+                    setSelectedPolicy("safety-policy");
+                    setShowPolicyViewer(true);
+                  }}
+                >
+                  <Text className="text-cyan-300 text-xs underline">Safety Policy</Text>
+                </Pressable>
+              </View>
+            </View>
+
             {/* Footer */}
-            <Text className="text-white/40 text-xs text-center mt-8">
-              By continuing, you agree to our Terms of Service and Privacy Policy
+            <Text className="text-white/40 text-xs text-center mt-4">
+              You must be 13+ to use this app. By signing up, you confirm you meet the age requirement.
             </Text>
           </View>
         </KeyboardAwareScrollView>
       </SafeAreaView>
+
+      {/* Policy Viewer Modal */}
+      {selectedPolicy && (
+        <PolicyViewerModal
+          visible={showPolicyViewer}
+          policyType={selectedPolicy as any}
+          onClose={() => {
+            setShowPolicyViewer(false);
+            setSelectedPolicy(null);
+          }}
+        />
+      )}
     </LinearGradient>
   );
 }

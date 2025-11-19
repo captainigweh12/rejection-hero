@@ -63,7 +63,7 @@ export async function decayConfidenceMeters() {
         
         if (shouldNotify) {
           // Create notification
-          await db.notification.create({
+          const notification = await db.notification.create({
             data: {
               userId: stats.userId,
               type: "CONFIDENCE_LOW",
@@ -75,6 +75,20 @@ export async function decayConfidenceMeters() {
               }),
             },
           });
+          
+          // Send push notification (in-app notification will be handled by frontend)
+          try {
+            const { sendPushNotificationForNotification } = await import("./pushNotifications");
+            await sendPushNotificationForNotification(
+              stats.userId,
+              notification.title,
+              notification.message,
+              JSON.parse(notification.data || "{}")
+            );
+          } catch (error) {
+            console.error("Error sending push notification:", error);
+            // Continue even if push notification fails
+          }
           
           notificationCount++;
         }

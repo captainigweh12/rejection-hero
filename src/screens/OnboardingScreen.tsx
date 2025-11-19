@@ -13,7 +13,7 @@ import PolicyViewerModal from "@/components/PolicyViewerModal";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { FileText, CheckCircle } from "lucide-react-native";
 
-type OnboardingStep = 0 | 1 | 2 | 3 | 4 | 5; // 0 = Policy Acceptance, 1 = Challenge Duration, 2 = Quest Mode, 3 = About You, 4 = Categories, 5 = Goals
+type OnboardingStep = 0 | 1 | 2 | 3 | 4 | 5 | 6; // 0 = Policy Acceptance, 1 = Safety Disclaimer, 2 = Challenge Duration, 3 = Quest Mode, 4 = About You, 5 = Categories, 6 = Goals
 
 const CATEGORIES = [
   { id: "sales", label: "Sales", emoji: "💼", description: "Pitch, cold call, negotiate" },
@@ -43,11 +43,12 @@ export default function OnboardingScreen() {
   const [currentStep, setCurrentStep] = useState<OnboardingStep>(0); // Start with policy acceptance
   const [isLoading, setIsLoading] = useState(false);
   const [selectedPolicy, setSelectedPolicy] = useState<string | null>(null);
+  const [safetyAcknowledged, setSafetyAcknowledged] = useState(false);
   
-  // Challenge Duration Selection (Step 1)
+  // Challenge Duration Selection (Step 2)
   const [challengeDuration, setChallengeDuration] = useState<14 | 30 | 100 | null>(null);
   
-  // Quest Mode Selection (Step 2)
+  // Quest Mode Selection (Step 3)
   const [questMode, setQuestMode] = useState<"QUEST_BY_QUEST" | "AI_SERIES" | null>(null);
 
   // Required policies for onboarding
@@ -122,24 +123,32 @@ export default function OnboardingScreen() {
       }
     }
     
-    // Step 1: Challenge Duration Selection
+    // Step 1: Safety Disclaimer
     if (currentStep === 1) {
+      if (!safetyAcknowledged) {
+        Alert.alert("Acknowledge Safety", "Please read and acknowledge the safety disclaimer to continue.");
+        return;
+      }
+    }
+    
+    // Step 2: Challenge Duration Selection
+    if (currentStep === 2) {
       if (!challengeDuration) {
         Alert.alert("Select Challenge Duration", "Please select a challenge duration to continue.");
         return;
       }
     }
     
-    // Step 2: Quest Mode Selection
-    if (currentStep === 2) {
+    // Step 3: Quest Mode Selection
+    if (currentStep === 3) {
       if (!questMode) {
         Alert.alert("Select Quest Mode", "Please select a quest mode to continue.");
         return;
       }
     }
     
-    // Step 3: About You & Username
-    if (currentStep === 3) {
+    // Step 4: About You & Username
+    if (currentStep === 4) {
       if (!username.trim() || username.trim().length < 3) {
         Alert.alert("Username Required", "Please enter a username (at least 3 characters).");
         return;
@@ -154,13 +163,13 @@ export default function OnboardingScreen() {
       }
     }
     
-    // Step 4: Categories
-    if (currentStep === 4 && selectedCategories.length === 0) {
+    // Step 5: Categories
+    if (currentStep === 5 && selectedCategories.length === 0) {
       Alert.alert("Select Categories", "Please select at least one category you're interested in.");
       return;
     }
     
-    if (currentStep < 5) {
+    if (currentStep < 6) {
       setCurrentStep((currentStep + 1) as OnboardingStep);
     } else {
       handleComplete();
@@ -174,7 +183,106 @@ export default function OnboardingScreen() {
     }
   };
   
-  // Render Step 1: Challenge Duration Selection
+  // Render Step 1: Safety Disclaimer
+  const renderSafetyDisclaimerStep = () => (
+    <ScrollView className="flex-1 px-6 py-8" showsVerticalScrollIndicator={true}>
+      <View className="items-center mb-6">
+        <Text className="text-6xl mb-4">⚠️</Text>
+        <Text className="text-3xl font-bold text-center mb-2" style={textPrimary}>
+          Safety First
+        </Text>
+        <Text className="text-base text-center px-4" style={textSecondary}>
+          Important safety information before you begin
+        </Text>
+      </View>
+
+      <View
+        className="p-6 rounded-2xl mb-6"
+        style={{
+          backgroundColor: "rgba(255, 107, 53, 0.15)",
+          borderWidth: 2,
+          borderColor: "#FF6B35",
+        }}
+      >
+        <Text className="text-lg font-bold mb-4" style={{ color: "#FF6B35" }}>
+          ⚠️ Critical Safety Guidelines
+        </Text>
+        <View className="gap-3">
+          <Text className="text-base" style={textPrimary}>
+            • <Text style={{ fontWeight: "600" }}>Do NOT film people without consent</Text> - Recording laws vary by state. You are solely responsible for following local recording laws.
+          </Text>
+          <Text className="text-base" style={textPrimary}>
+            • <Text style={{ fontWeight: "600" }}>Only attempt challenges in safe, legal environments</Text> - Avoid dangerous situations, private property, or restricted areas.
+          </Text>
+          <Text className="text-base" style={textPrimary}>
+            • <Text style={{ fontWeight: "600" }}>No harassment or threatening behavior</Text> - Be respectful. Harassment, stalking, or threatening behavior is strictly prohibited.
+          </Text>
+          <Text className="text-base" style={textPrimary}>
+            • <Text style={{ fontWeight: "600" }}>All challenges are optional</Text> - You choose which challenges to attempt. Never feel pressured to do anything unsafe.
+          </Text>
+          <Text className="text-base" style={textPrimary}>
+            • <Text style={{ fontWeight: "600" }}>You assume all personal risk</Text> - We are not responsible for outcomes of challenges or any harm that may occur.
+          </Text>
+        </View>
+      </View>
+
+      <View
+        className="p-6 rounded-2xl mb-6"
+        style={{
+          backgroundColor: "rgba(126, 63, 228, 0.15)",
+          borderWidth: 1,
+          borderColor: "#7E3FE4",
+        }}
+      >
+        <Text className="text-base font-semibold mb-3" style={textPrimary}>
+          📋 Legal Compliance
+        </Text>
+        <Text className="text-sm" style={textSecondary}>
+          • You must be 13+ to use this app (COPPA compliance)
+        </Text>
+        <Text className="text-sm mt-2" style={textSecondary}>
+          • Users 13-17 require parental consent
+        </Text>
+        <Text className="text-sm mt-2" style={textSecondary}>
+          • We do not provide legal advice - consult local laws regarding recording
+        </Text>
+        <Text className="text-sm mt-2" style={textSecondary}>
+          • Report any harmful content or behavior immediately
+        </Text>
+      </View>
+
+      <Pressable
+        onPress={() => {
+          setSafetyAcknowledged(true);
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        }}
+        className="p-4 rounded-2xl mb-4"
+        style={{
+          backgroundColor: safetyAcknowledged ? "rgba(16, 185, 129, 0.2)" : "rgba(255, 255, 255, 0.05)",
+          borderWidth: 2,
+          borderColor: safetyAcknowledged ? "#10b981" : "rgba(255, 255, 255, 0.2)",
+        }}
+      >
+        <View className="flex-row items-center justify-between">
+          <View className="flex-1">
+            <Text className="text-base font-semibold mb-1" style={textPrimary}>
+              I understand and agree to these safety guidelines
+            </Text>
+            <Text className="text-sm" style={textSecondary}>
+              I will follow all safety rules and local laws
+            </Text>
+          </View>
+          {safetyAcknowledged && (
+            <View className="w-6 h-6 rounded-full items-center justify-center" style={{ backgroundColor: "#10b981" }}>
+              <CheckCircle size={16} color="white" />
+            </View>
+          )}
+        </View>
+      </Pressable>
+    </ScrollView>
+  );
+
+  // Render Step 2: Challenge Duration Selection
   const renderChallengeDurationStep = () => (
     <View className="flex-1 px-6 py-8">
       <Text className="text-3xl font-bold mb-2" style={textPrimary}>
@@ -227,7 +335,7 @@ export default function OnboardingScreen() {
     </View>
   );
   
-  // Render Step 2: Quest Mode Selection
+  // Render Step 3: Quest Mode Selection
   const renderQuestModeStep = () => (
     <View className="flex-1 px-6 py-8">
       <Text className="text-3xl font-bold mb-2" style={textPrimary}>
@@ -526,6 +634,88 @@ export default function OnboardingScreen() {
   );
 
   const renderStep4 = () => (
+    <ScrollView className="flex-1 px-6 py-8" showsVerticalScrollIndicator={false}>
+      <View className="items-center mb-6">
+        <Text className="text-6xl mb-4">👤</Text>
+        <Text className="text-3xl font-bold text-center mb-2" style={textPrimary}>
+          Tell Us About Yourself
+        </Text>
+        <Text className="text-base text-center px-4" style={textSecondary}>
+          Help us personalize your experience
+        </Text>
+      </View>
+
+      <View className="mt-6">
+        <Text className="text-lg font-semibold mb-3" style={textPrimary}>
+          Create your username
+        </Text>
+        <Text className="text-sm mb-3" style={textSecondary}>
+          Choose a unique username that others will see. Use only letters, numbers, and underscores.
+        </Text>
+        <View
+          className="rounded-2xl p-4"
+          style={{
+            backgroundColor: "rgba(255, 255, 255, 0.05)",
+            borderWidth: 1,
+            borderColor: "rgba(126, 63, 228, 0.3)",
+          }}
+        >
+          <View className="flex-row items-center">
+            <Text className="text-lg mr-1" style={textSecondary}>
+              @
+            </Text>
+            <TextInput
+              value={username}
+              onChangeText={setUsername}
+              placeholder="warrior_123"
+              placeholderTextColor={colors.textTertiary}
+              className="text-base flex-1"
+              style={textPrimary}
+              autoCapitalize="none"
+              autoCorrect={false}
+            />
+          </View>
+        </View>
+        <Text className="text-xs mt-2" style={textTertiary}>
+          {username.length > 0 ? `@${username}` : "Your unique tag"}
+        </Text>
+      </View>
+
+      <View className="mt-6">
+        <Text className="text-lg font-semibold mb-3" style={textPrimary}>
+          Tell us about yourself
+        </Text>
+        <Text className="text-sm mb-3" style={textSecondary}>
+          Share your background, current situation, or what brings you here. This helps our AI create better quests
+          for you.
+        </Text>
+        <View
+          className="rounded-2xl p-4 min-h-[150px]"
+          style={{
+            backgroundColor: "rgba(255, 255, 255, 0.05)",
+            borderWidth: 1,
+            borderColor: "rgba(126, 63, 228, 0.3)",
+          }}
+        >
+          <TextInput
+            value={aboutYou}
+            onChangeText={setAboutYou}
+            placeholder="e.g., I'm a software developer looking to improve my networking skills and overcome fear of cold calling..."
+            placeholderTextColor={colors.textTertiary}
+            multiline
+            className="text-base"
+            style={[textPrimary, { minHeight: 120 }]}
+            textAlignVertical="top"
+          />
+        </View>
+        <Text className="text-xs mt-2" style={textTertiary}>
+          {aboutYou.length} characters
+        </Text>
+      </View>
+    </ScrollView>
+  );
+
+  const renderStep5 = () => (
     <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
       <View className="items-center mb-6">
         <Text className="text-6xl mb-4">🎯</Text>
@@ -574,7 +764,7 @@ export default function OnboardingScreen() {
     </ScrollView>
   );
 
-  const renderStep5 = () => (
+  const renderStep6 = () => (
     <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
       <View className="items-center mb-6">
         <Text className="text-6xl mb-4">🚀</Text>
@@ -651,11 +841,12 @@ export default function OnboardingScreen() {
           {renderProgressBar()}
 
           {currentStep === 0 && renderStep0()}
-          {currentStep === 1 && renderChallengeDurationStep()}
-          {currentStep === 2 && renderQuestModeStep()}
-          {currentStep === 3 && renderStep3()}
+          {currentStep === 1 && renderSafetyDisclaimerStep()}
+          {currentStep === 2 && renderChallengeDurationStep()}
+          {currentStep === 3 && renderQuestModeStep()}
           {currentStep === 4 && renderStep4()}
           {currentStep === 5 && renderStep5()}
+          {currentStep === 6 && renderStep6()}
 
           {/* Navigation Buttons */}
           <View className="pb-4 pt-6">

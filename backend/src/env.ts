@@ -41,6 +41,11 @@ const envSchema = z.object({
   STRIPE_SECRET_KEY: z.string().optional(),
   STRIPE_PUBLISHABLE_KEY: z.string().optional(),
   STRIPE_WEBHOOK_SECRET: z.string().optional(),
+  STRIPE_SUBSCRIPTION_PRICE_ID: z.string().optional(), // Price ID for monthly subscription
+  STRIPE_TOKEN_PACK_10_PRICE_ID: z.string().optional(), // Price ID for 10 tokens
+  STRIPE_TOKEN_PACK_25_PRICE_ID: z.string().optional(), // Price ID for 25 tokens
+  STRIPE_TOKEN_PACK_50_PRICE_ID: z.string().optional(), // Price ID for 50 tokens
+  STRIPE_TOKEN_PACK_100_PRICE_ID: z.string().optional(), // Price ID for 100 tokens
 });
 
 /**

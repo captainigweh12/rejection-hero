@@ -22,10 +22,13 @@ import {
   Flame,
   Calendar as CalendarIcon,
   MapPin,
+  Trophy,
+  ArrowLeft,
+  Zap,
 } from "lucide-react-native";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
-import type { BottomTabScreenProps } from "@/navigation/types";
+import type { RootStackScreenProps } from "@/navigation/types";
 import AddJournalModal from "@/components/AddJournalModal";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useSession } from "@/lib/useSession";
@@ -55,7 +58,7 @@ interface GetJournalEntriesResponse {
   entries: JournalEntry[];
 }
 
-type Props = BottomTabScreenProps<"JournalTab">;
+type Props = RootStackScreenProps<"Journal">;
 
 export default function JournalScreen({ navigation }: Props) {
   const { colors } = useTheme();
@@ -64,6 +67,7 @@ export default function JournalScreen({ navigation }: Props) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showInsights, setShowInsights] = useState(true);
+  const [showPastQuests, setShowPastQuests] = useState(false);
 
   // Fetch user stats
   const { data: statsData } = useQuery<GetUserStatsResponse>({

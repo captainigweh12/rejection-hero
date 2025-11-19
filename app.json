@@ -23,6 +23,10 @@
         ],
         "NSLocationWhenInUseUsageDescription": "We need your location to show you nearby rejection challenges and help you discover quests in your area.",
         "NSLocationAlwaysAndWhenInUseUsageDescription": "We need your location to show you nearby rejection challenges and help you discover quests in your area.",
+        "NSCameraUsageDescription": "Camera access is required to record optional challenge verification videos and take photos for your quest stories. We do not record without your explicit action.",
+        "NSMicrophoneUsageDescription": "Microphone access is required for voice quest recordings and live streaming features. Audio is only recorded when you explicitly start recording.",
+        "NSPhotoLibraryUsageDescription": "Photo library access is needed to select images for your quest stories and profile pictures.",
+        "NSPhotoLibraryAddUsageDescription": "Photo library write access is needed to save quest completion photos to your gallery.",
         "NSAppTransportSecurity": {
           "NSAllowsArbitraryLoads": true,
           "NSExceptionDomains": {
@@ -45,7 +49,11 @@
       "usesCleartextTraffic": true,
       "permissions": [
         "ACCESS_COARSE_LOCATION",
-        "ACCESS_FINE_LOCATION"
+        "ACCESS_FINE_LOCATION",
+        "CAMERA",
+        "RECORD_AUDIO",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
       ]
     },
     "web": {

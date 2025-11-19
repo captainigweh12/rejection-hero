@@ -2,12 +2,13 @@ import React from "react";
 import { View, Text, ScrollView, Pressable, ActivityIndicator, Image, RefreshControl } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
-import { ChevronLeft, Bell, Check, UserPlus, Users, X } from "lucide-react-native";
+import { ChevronLeft, Bell, Check, UserPlus, Users, X, TrendingUp, Trophy } from "lucide-react-native";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "@/navigation/types";
 import { api } from "@/lib/api";
 import * as Haptics from "expo-haptics";
+import { playSound } from "@/services/soundService";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Notifications">;
 
@@ -37,6 +38,16 @@ export default function NotificationsScreen({ navigation }: Props) {
       return response;
     },
   });
+
+  // Play sound when new notifications arrive
+  React.useEffect(() => {
+    if (notificationsData?.notifications) {
+      const unreadCount = notificationsData.notifications.filter((n) => !n.read).length;
+      if (unreadCount > 0) {
+        playSound("notificationReceived").catch(console.error);
+      }
+    }
+  }, [notificationsData?.notifications]);
 
   // Mark notification as read
   const markAsReadMutation = useMutation({
@@ -108,6 +119,12 @@ export default function NotificationsScreen({ navigation }: Props) {
     // Handle navigation based on notification type
     if (notification.type === "FRIEND_ACCEPTED") {
       navigation.navigate("Friends");
+    } else if (notification.type === "CONFIDENCE_LOW") {
+      // Navigate to home to see quests
+      navigation.navigate("Tabs", { screen: "HomeTab" });
+    } else if (notification.type === "LEADERBOARD_FALL_BEHIND") {
+      // Navigate to leaderboard
+      navigation.navigate("Leaderboard");
     }
   };
 
@@ -117,6 +134,10 @@ export default function NotificationsScreen({ navigation }: Props) {
         return <UserPlus size={24} color="#00D9FF" />;
       case "FRIEND_ACCEPTED":
         return <Users size={24} color="#4CAF50" />;
+      case "CONFIDENCE_LOW":
+        return <TrendingUp size={24} color="#FF6B35" />;
+      case "LEADERBOARD_FALL_BEHIND":
+        return <Trophy size={24} color="#FFD700" />;
       default:
         return <Bell size={24} color="#A78BFA" />;
     }

@@ -1,11 +1,15 @@
 import React, { useState } from "react";
-import { View, Text, Pressable, ScrollView, ActivityIndicator, Alert } from "react-native";
+import { View, Text, Pressable, ScrollView, ActivityIndicator, Alert, Dimensions } from "react-native";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { CheckCircle2, FileText, Clock, AlertCircle } from "lucide-react-native";
+import { CheckCircle2, FileText, Clock, AlertCircle, ChevronRight } from "lucide-react-native";
 import { api } from "@/lib/api";
 import { useTheme } from "@/contexts/ThemeContext";
 import type { GetPoliciesResponse } from "@/shared/contracts";
 import PolicyViewerModal from "./PolicyViewerModal";
+import { LinearGradient } from "expo-linear-gradient";
+
+const { width: SCREEN_WIDTH } = Dimensions.get("window");
+const CARD_WIDTH = SCREEN_WIDTH * 0.75; // 75% of screen width
 
 type PolicyType =
   | "terms-of-service"
@@ -66,9 +70,9 @@ export function LegalPoliciesTab() {
   const totalCount = policies.length;
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.backgroundSolid }}>
+    <View style={{ marginTop: 20, paddingBottom: 40 }}>
       {/* Summary Card */}
-      <View style={{ paddingHorizontal: 16, paddingTop: 16, paddingBottom: 12 }}>
+      <View style={{ marginBottom: 16, paddingHorizontal: 20 }}>
         <View
           style={{
             backgroundColor: "rgba(126, 63, 228, 0.15)",
@@ -106,159 +110,154 @@ export function LegalPoliciesTab() {
         </View>
       </View>
 
-      {/* Policies List */}
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 20 }}>
+      {/* Horizontal Scrollable Policies List */}
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }}
+        snapToInterval={CARD_WIDTH + 12}
+        decelerationRate="fast"
+        pagingEnabled={false}
+      >
         {policies.map((policy) => (
           <View
             key={policy.type}
             style={{
-              backgroundColor: colors.backgroundSolid,
-              borderRadius: 12,
-              marginBottom: 12,
+              width: CARD_WIDTH,
+              backgroundColor: colors.card,
+              borderRadius: 16,
               overflow: "hidden",
-              borderWidth: 1,
-              borderColor: policy.accepted ? "rgba(16, 185, 129, 0.3)" : "rgba(107, 114, 128, 0.2)",
+              borderWidth: 2,
+              borderColor: policy.accepted ? "rgba(16, 185, 129, 0.4)" : "rgba(107, 114, 128, 0.3)",
+              shadowColor: policy.accepted ? "#10b981" : colors.primary,
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.2,
+              shadowRadius: 8,
+              elevation: 4,
             }}
           >
-            {/* Policy Header */}
+            {/* Policy Card Content */}
             <Pressable
-              onPress={() => setExpandedPolicy(expandedPolicy === policy.type ? null : (policy.type as PolicyType))}
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 12,
-                padding: 16,
+              onPress={() => {
+                setSelectedPolicy(policy.type as PolicyType);
+                setShowPolicyViewer(true);
               }}
+              style={{ flex: 1 }}
             >
-              {/* Icon */}
-              <View
-                style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 20,
-                  backgroundColor: policy.accepted ? "rgba(16, 185, 129, 0.15)" : "rgba(107, 114, 128, 0.15)",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
+              <LinearGradient
+                colors={
+                  policy.accepted
+                    ? ["rgba(16, 185, 129, 0.1)", "transparent"]
+                    : ["rgba(126, 63, 228, 0.1)", "transparent"]
+                }
+                style={{ flex: 1, padding: 16 }}
               >
-                {policy.accepted ? (
-                  <CheckCircle2 size={24} color="#10b981" />
-                ) : (
-                  <FileText size={24} color={colors.textSecondary} />
-                )}
-              </View>
+                {/* Icon and Status */}
+                <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
+                  <View
+                    style={{
+                      width: 48,
+                      height: 48,
+                      borderRadius: 24,
+                      backgroundColor: policy.accepted ? "rgba(16, 185, 129, 0.2)" : "rgba(126, 63, 228, 0.2)",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    {policy.accepted ? (
+                      <CheckCircle2 size={24} color="#10b981" />
+                    ) : (
+                      <FileText size={24} color={colors.primary} />
+                    )}
+                  </View>
+                  <View
+                    style={{
+                      paddingHorizontal: 10,
+                      paddingVertical: 4,
+                      backgroundColor: policy.accepted ? "rgba(16, 185, 129, 0.2)" : "rgba(239, 68, 68, 0.2)",
+                      borderRadius: 12,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontSize: 10,
+                        fontWeight: "700",
+                        color: policy.accepted ? "#10b981" : "#ef4444",
+                        textTransform: "uppercase",
+                      }}
+                    >
+                      {policy.accepted ? "✓ Accepted" : "Pending"}
+                    </Text>
+                  </View>
+                </View>
 
-              {/* Content */}
-              <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: 16, fontWeight: "600", color: colors.text, marginBottom: 4 }}>
+                {/* Policy Name */}
+                <Text style={{ fontSize: 18, fontWeight: "700", color: colors.text, marginBottom: 8, lineHeight: 24 }}>
                   {policy.name}
                 </Text>
+
+                {/* Accepted Date */}
                 {policy.acceptedAt && (
-                  <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+                  <View style={{ flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 12 }}>
                     <Clock size={12} color={colors.textSecondary} />
-                    <Text style={{ fontSize: 12, color: colors.textSecondary }}>
-                      Accepted on {new Date(policy.acceptedAt).toLocaleDateString()}
+                    <Text style={{ fontSize: 11, color: colors.textSecondary }}>
+                      {new Date(policy.acceptedAt).toLocaleDateString()}
                     </Text>
                   </View>
                 )}
-              </View>
 
-              {/* Status Badge */}
-              <View
-                style={{
-                  paddingHorizontal: 12,
-                  paddingVertical: 6,
-                  backgroundColor: policy.accepted ? "rgba(16, 185, 129, 0.2)" : "rgba(239, 68, 68, 0.2)",
-                  borderRadius: 20,
-                }}
-              >
-                <Text
-                  style={{
-                    fontSize: 12,
-                    fontWeight: "600",
-                    color: policy.accepted ? "#10b981" : "#ef4444",
-                  }}
-                >
-                  {policy.accepted ? "Accepted" : "Pending"}
-                </Text>
-              </View>
+                {/* Version Info */}
+                <View style={{ marginTop: "auto", paddingTop: 12, borderTopWidth: 1, borderTopColor: colors.cardBorder }}>
+                  <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+                    <Text style={{ fontSize: 10, color: colors.textSecondary }}>
+                      Version {policy.version}
+                    </Text>
+                    <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+                      <Text style={{ fontSize: 11, color: colors.primary, fontWeight: "600" }}>
+                        Read More
+                      </Text>
+                      <ChevronRight size={14} color={colors.primary} />
+                    </View>
+                  </View>
+                </View>
+              </LinearGradient>
             </Pressable>
 
-            {/* Expanded Content */}
-            {expandedPolicy === policy.type && (
-              <View
-                style={{
-                  paddingHorizontal: 16,
-                  paddingBottom: 16,
-                  borderTopWidth: 1,
-                  borderTopColor: "rgba(107, 114, 128, 0.2)",
-                  gap: 12,
-                }}
-              >
-                {/* Read Policy Button */}
+            {/* Accept Button (if not accepted) */}
+            {!policy.accepted && (
+              <View style={{ padding: 16, paddingTop: 0 }}>
                 <Pressable
                   onPress={() => {
-                    setSelectedPolicy(policy.type as PolicyType);
-                    setShowPolicyViewer(true);
+                    Alert.alert(
+                      "Accept Policy",
+                      `Do you accept the ${policy.name}?`,
+                      [
+                        { text: "Cancel", onPress: () => {}, style: "cancel" },
+                        {
+                          text: "Accept",
+                          onPress: () => acceptPolicyMutation.mutate(policy.type),
+                          style: "default",
+                        },
+                      ]
+                    );
                   }}
+                  disabled={acceptPolicyMutation.isPending}
                   style={{
-                    paddingHorizontal: 16,
                     paddingVertical: 12,
-                    backgroundColor: "rgba(126, 63, 228, 0.15)",
-                    borderRadius: 8,
-                    borderWidth: 1,
-                    borderColor: "#7E3FE4",
+                    backgroundColor: "#7E3FE4",
+                    borderRadius: 10,
                     alignItems: "center",
+                    opacity: acceptPolicyMutation.isPending ? 0.6 : 1,
                   }}
                 >
-                  <Text style={{ fontSize: 14, fontWeight: "600", color: "#7E3FE4" }}>
-                    Read Full Policy
-                  </Text>
+                  {acceptPolicyMutation.isPending ? (
+                    <ActivityIndicator size="small" color="white" />
+                  ) : (
+                    <Text style={{ fontSize: 14, fontWeight: "700", color: "white" }}>
+                      Accept Policy
+                    </Text>
+                  )}
                 </Pressable>
-
-                {/* Accept Button (if not already accepted) */}
-                {!policy.accepted && (
-                  <Pressable
-                    onPress={() => {
-                      Alert.alert(
-                        "Accept Policy",
-                        `Do you accept the ${policy.name}?`,
-                        [
-                          { text: "Cancel", onPress: () => {}, style: "cancel" },
-                          {
-                            text: "Accept",
-                            onPress: () => acceptPolicyMutation.mutate(policy.type),
-                            style: "default",
-                          },
-                        ]
-                      );
-                    }}
-                    disabled={acceptPolicyMutation.isPending}
-                    style={{
-                      paddingHorizontal: 16,
-                      paddingVertical: 12,
-                      backgroundColor: "#7E3FE4",
-                      borderRadius: 8,
-                      alignItems: "center",
-                      opacity: acceptPolicyMutation.isPending ? 0.6 : 1,
-                    }}
-                  >
-                    {acceptPolicyMutation.isPending ? (
-                      <ActivityIndicator size="small" color="white" />
-                    ) : (
-                      <Text style={{ fontSize: 14, fontWeight: "600", color: "white" }}>
-                        Accept Policy
-                      </Text>
-                    )}
-                  </Pressable>
-                )}
-
-                {/* Info Text */}
-                <Text style={{ fontSize: 12, color: colors.textSecondary, fontStyle: "italic" }}>
-                  Version {policy.version}
-                  {policy.acceptedAt &&
-                    ` • Accepted on ${new Date(policy.acceptedAt).toLocaleString()}`}
-                </Text>
               </View>
             )}
           </View>

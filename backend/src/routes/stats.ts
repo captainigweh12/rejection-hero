@@ -93,6 +93,7 @@ statsRouter.get("/", async (c) => {
 
 // ============================================
 // GET /api/stats/leaderboard - Get leaderboard
+// Supports period query param: "day", "week", "month", or "all" (default)
 // ============================================
 statsRouter.get("/leaderboard", async (c) => {
   const user = c.get("user");
@@ -101,12 +102,59 @@ statsRouter.get("/leaderboard", async (c) => {
     return c.json({ message: "Unauthorized" }, 401);
   }
 
-  // Get top 100 users by totalXP
-  const topUsers = await db.userStats.findMany({
-    take: 100,
-    orderBy: {
-      totalXP: "desc",
-    },
+  const periodParam = c.req.query("period") || "all";
+  const period = (periodParam === "day" || periodParam === "week" || periodParam === "month" || periodParam === "all") 
+    ? periodParam 
+    : "all";
+  const now = new Date();
+  let startDate: Date | null = null;
+
+  // Calculate start date based on period
+  if (period === "day") {
+    startDate = new Date(now);
+    startDate.setHours(0, 0, 0, 0);
+  } else if (period === "week") {
+    startDate = new Date(now);
+    const dayOfWeek = startDate.getDay();
+    const diff = startDate.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1); // Monday
+    startDate.setDate(diff);
+    startDate.setHours(0, 0, 0, 0);
+  } else if (period === "month") {
+    startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+    startDate.setHours(0, 0, 0, 0);
+  }
+
+  // Get quest completions for the period
+  let periodCompletions: { userId: string; count: number }[] = [];
+  
+  if (startDate) {
+    // Count completed quests per user in the period
+    const completedQuests = await db.userQuest.findMany({
+      where: {
+        status: "COMPLETED",
+        completedAt: {
+          gte: startDate,
+        },
+      },
+      select: {
+        userId: true,
+      },
+    });
+
+    // Count completions per user
+    const completionMap = new Map<string, number>();
+    for (const quest of completedQuests) {
+      completionMap.set(quest.userId, (completionMap.get(quest.userId) || 0) + 1);
+    }
+
+    periodCompletions = Array.from(completionMap.entries()).map(([userId, count]) => ({
+      userId,
+      count,
+    }));
+  }
+
+  // Get all user stats
+  const allUserStats = await db.userStats.findMany({
     include: {
       user: {
         select: {
@@ -118,38 +166,66 @@ statsRouter.get("/leaderboard", async (c) => {
     },
   });
 
+  // Calculate ranking based on period
+  let rankedUsers: Array<{
+    userId: string;
+    userName: string;
+    score: number;
+    questsCompleted: number;
+    totalXP: number;
+    totalPoints: number;
+    currentStreak: number;
+  }> = [];
+
+  for (const userStat of allUserStats) {
+    const periodCompletionsCount = periodCompletions.find((p) => p.userId === userStat.userId)?.count || 0;
+    
+    let score: number;
+    if (period === "all") {
+      // For "all", use totalXP as score
+      score = userStat.totalXP;
+    } else {
+      // For day/week/month, use quest completions in that period
+      score = periodCompletionsCount;
+    }
+
+    rankedUsers.push({
+      userId: userStat.user.id,
+      userName: userStat.user.name || userStat.user.email || "Anonymous",
+      score,
+      questsCompleted: periodCompletionsCount,
+      totalXP: userStat.totalXP,
+      totalPoints: userStat.totalPoints,
+      currentStreak: userStat.currentStreak,
+    });
+  }
+
+  // Sort by score (descending)
+  rankedUsers.sort((a, b) => b.score - a.score);
+
+  // Get top 100
+  const topUsers = rankedUsers.slice(0, 100);
+
   // Find current user's rank
-  const allUsersCount = await db.userStats.count();
-  const currentUserStats = await db.userStats.findUnique({
-    where: { userId: user.id },
-  });
+  const currentUserIndex = rankedUsers.findIndex((u) => u.userId === user.id);
+  const currentUserRank = currentUserIndex >= 0 ? currentUserIndex + 1 : rankedUsers.length + 1;
 
-  const usersAbove = currentUserStats
-    ? await db.userStats.count({
-        where: {
-          totalXP: {
-            gt: currentUserStats.totalXP,
-          },
-        },
-      })
-    : 0;
-
-  const userRank = usersAbove + 1;
-
-  const leaderboard = topUsers.map((userStat, index) => ({
+  const leaderboard = topUsers.map((userData, index) => ({
     rank: index + 1,
-    userId: userStat.user.id,
-    userName: userStat.user.name || userStat.user.email || "Anonymous",
-    totalXP: userStat.totalXP,
-    totalPoints: userStat.totalPoints,
-    currentStreak: userStat.currentStreak,
-    isCurrentUser: userStat.user.id === user.id,
+    userId: userData.userId,
+    userName: userData.userName,
+    totalXP: userData.totalXP,
+    totalPoints: userData.totalPoints,
+    currentStreak: userData.currentStreak,
+    questsCompleted: userData.questsCompleted,
+    isCurrentUser: userData.userId === user.id,
   }));
 
   return c.json({
     leaderboard,
-    currentUserRank: userRank,
-    totalUsers: allUsersCount,
+    currentUserRank,
+    totalUsers: rankedUsers.length,
+    period,
   } satisfies GetLeaderboardResponse);
 });
 
@@ -284,11 +360,108 @@ statsRouter.get("/weekly-forecast", async (c) => {
 
   const recommendedTarget = Math.max(5, Math.ceil(totalNOs * 1.3)); // 30% increase
 
+  // Generate AI motivations and accomplishments
+  let motivations: string[] = [];
+  let accomplishments: string[] = [];
+  
+  try {
+    const OPENAI_API_KEY = process.env.OPENAI_API_KEY || process.env.EXPO_PUBLIC_VIBECODE_OPENAI_API_KEY;
+    
+    if (OPENAI_API_KEY) {
+      const aiPrompt = `You are a motivational coach for a rejection therapy app. Based on the user's stats:
+- Previous week NOs: ${totalNOs}
+- Trending category: ${trendingCategory}
+- Recommended target: ${recommendedTarget} NOs
+- Average difficulty: ${avgQuestDifficulty}
+
+Generate:
+1. 3-5 specific, actionable motivations/challenges for this week (e.g., "Try asking for discounts at 3 different stores", "Pitch your idea to 2 local business owners")
+2. 3-5 potential accomplishments they could achieve (e.g., "Complete your first HARD difficulty quest", "Reach 20 total NOs this week", "Master the ${trendingCategory} category")
+
+Return ONLY a JSON object with this exact structure:
+{
+  "motivations": ["motivation 1", "motivation 2", ...],
+  "accomplishments": ["accomplishment 1", "accomplishment 2", ...]
+}
+
+Make them specific, actionable, and encouraging. Focus on growth and building confidence.`;
+
+      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${OPENAI_API_KEY}`,
+        },
+        body: JSON.stringify({
+          model: "gpt-4o-mini",
+          messages: [
+            {
+              role: "system",
+              content: "You are a motivational coach. Return only valid JSON, no other text.",
+            },
+            { role: "user", content: aiPrompt },
+          ],
+          temperature: 0.7,
+        }),
+      });
+
+      if (response.ok) {
+        const data = (await response.json()) as {
+          choices?: Array<{
+            message?: {
+              content?: string;
+            };
+          }>;
+        };
+        const content = data.choices?.[0]?.message?.content;
+        if (content) {
+          const parsed = JSON.parse(content) as {
+            motivations?: string[];
+            accomplishments?: string[];
+          };
+          motivations = parsed.motivations || [];
+          accomplishments = parsed.accomplishments || [];
+        }
+      }
+    }
+  } catch (error) {
+    console.error("Error generating AI motivations/accomplishments:", error);
+    // Fallback motivations and accomplishments
+    motivations = [
+      `Aim for ${recommendedTarget} NOs this week`,
+      `Focus on ${trendingCategory} challenges`,
+      "Try one quest that pushes you out of your comfort zone",
+    ];
+    accomplishments = [
+      `Reach ${recommendedTarget} total NOs`,
+      `Complete a ${trendingCategory} quest`,
+      "Build your confidence meter to 100%",
+    ];
+  }
+
+  // If AI didn't generate enough, add fallbacks
+  if (motivations.length === 0) {
+    motivations = [
+      `Aim for ${recommendedTarget} NOs this week`,
+      `Focus on ${trendingCategory} challenges`,
+      "Try one quest that pushes you out of your comfort zone",
+    ];
+  }
+  if (accomplishments.length === 0) {
+    accomplishments = [
+      `Reach ${recommendedTarget} total NOs`,
+      `Complete a ${trendingCategory} quest`,
+      "Build your confidence meter to 100%",
+    ];
+  }
+
   return c.json({
     forecast,
     recommendedWeeklyTarget: recommendedTarget,
     trendingCategory,
     previousWeekNOs: totalNOs,
+    motivations,
+    accomplishments,
   } satisfies GetWeeklyForecastResponse);
 });
 

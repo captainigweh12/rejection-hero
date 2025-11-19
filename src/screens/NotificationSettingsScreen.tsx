@@ -21,6 +21,7 @@ interface NotificationPreferences {
   challengeReminder: boolean;
   dailyMotivation: boolean;
   achievementUnlocked: boolean;
+  leaderboardFallBehind: boolean;
 }
 
 export default function NotificationSettingsScreen({ navigation }: Props) {
@@ -75,6 +76,7 @@ export default function NotificationSettingsScreen({ navigation }: Props) {
     { key: "friendRequest" as const, label: "Friend Requests", description: "Get notified when someone sends you a friend request" },
     { key: "friendAccepted" as const, label: "Friend Accepted", description: "Get notified when someone accepts your friend request" },
     { key: "confidenceLow" as const, label: "Low Confidence Alert", description: "Get notified when your confidence meter is low" },
+    { key: "leaderboardFallBehind" as const, label: "Leaderboard Alerts", description: "Get notified when you're falling behind in the leaderboard" },
     { key: "challengeReminder" as const, label: "Challenge Reminders", description: "Get daily reminders for your active challenge" },
     { key: "dailyMotivation" as const, label: "Daily Motivation", description: "Receive daily motivational messages" },
     { key: "achievementUnlocked" as const, label: "Achievements", description: "Get notified when you unlock achievements" },

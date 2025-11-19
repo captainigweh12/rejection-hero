@@ -11,6 +11,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 import type { GenerateQuestRequest, GenerateQuestResponse, AudioTranscribeResponse, EnrollChallengeRequest, EnrollChallengeResponse, GetSubscriptionResponse, CreateSubscriptionResponse } from "@/shared/contracts";
 import { Audio } from "expo-av";
 import * as Linking from "expo-linking";
+import { playSound } from "@/services/soundService";
 
 type Props = NativeStackScreenProps<RootStackParamList, "CreateQuest">;
 
@@ -111,10 +112,16 @@ export default function CreateQuestScreen({ navigation }: Props) {
     onSuccess: async (data) => {
       queryClient.invalidateQueries({ queryKey: ["quests"] });
 
+      // Play quest created sound
+      await playSound("questCreated");
+
       // Auto-start the quest if less than 2 active quests
       try {
         await api.post(`/api/quests/${data.userQuestId}/start`, {});
         queryClient.invalidateQueries({ queryKey: ["quests"] });
+
+        // Play quest started sound
+        await playSound("questStarted");
 
         // Navigate to the quest detail page
         navigation.navigate("QuestDetail", { userQuestId: data.userQuestId });
