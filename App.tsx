@@ -10,6 +10,7 @@ import { ThemeProvider, useTheme } from "@/contexts/ThemeContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect } from "react";
+import * as Linking from "expo-linking";
 
 /*
 IMPORTANT NOTICE: DO NOT REMOVE
@@ -83,8 +84,57 @@ function AppContent() {
         },
       };
 
+  // Configure deep linking
+  const linking = {
+    prefixes: ["vibecode://"],
+    config: {
+      screens: {
+        Tabs: {
+          path: "",
+          screens: {
+            HomeTab: "home",
+          },
+        },
+      },
+    },
+  };
+
+  // Handle deep links when app is already open
+  useEffect(() => {
+    const handleDeepLink = (event: { url: string }) => {
+      const { path, queryParams } = Linking.parse(event.url);
+      console.log("🔗 Deep link received:", { path, queryParams });
+
+      // Handle payment success/cancel - both redirect to home
+      if (path === "payment-success") {
+        console.log("✅ Payment success - redirecting to home");
+        // The linking config will handle navigation to home
+      } else if (path === "payment-cancel") {
+        console.log("⚠️ Payment cancelled - redirecting to home");
+        // The linking config will handle navigation to home
+      } else if (path === "home") {
+        console.log("🏠 Home deep link received");
+        // The linking config will handle navigation to home
+      }
+    };
+
+    // Get initial URL if app was opened via deep link
+    Linking.getInitialURL().then((url) => {
+      if (url) {
+        handleDeepLink({ url });
+      }
+    });
+
+    // Listen for deep links when app is already open
+    const subscription = Linking.addEventListener("url", handleDeepLink);
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
+
   return (
-    <NavigationContainer theme={navigationTheme}>
+    <NavigationContainer linking={linking} theme={navigationTheme}>
       <RootStackNavigator />
       <StatusBar style={isDayMode ? "dark" : "light"} />
     </NavigationContainer>

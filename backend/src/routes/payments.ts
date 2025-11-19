@@ -415,6 +415,7 @@ const paymentRedirectRouter = new Hono<AppType>();
 // ============================================
 paymentRedirectRouter.get("/payment-success", async (c) => {
   const sessionId = c.req.query("session_id");
+  // Redirect to home page of the app
   const appDeepLink = `vibecode://home`;
 
   // Use HTTP redirect to avoid platform processing issues
@@ -425,6 +426,7 @@ paymentRedirectRouter.get("/payment-success", async (c) => {
 // GET /payment-cancel - Payment cancel redirect page
 // ============================================
 paymentRedirectRouter.get("/payment-cancel", async (c) => {
+  // Redirect to home page of the app
   const appDeepLink = `vibecode://home`;
 
   // Use HTTP redirect to avoid platform processing issues
