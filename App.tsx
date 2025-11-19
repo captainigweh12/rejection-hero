@@ -8,6 +8,7 @@ import { KeyboardProvider } from "react-native-keyboard-controller";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider, useTheme } from "@/contexts/ThemeContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import { ParentalGuidanceProvider } from "@/contexts/ParentalGuidanceContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect } from "react";
 import * as Linking from "expo-linking";
@@ -146,13 +147,15 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <LanguageProvider>
-          <KeyboardProvider>
-            <GestureHandlerRootView>
-              <SafeAreaProvider>
-                <AppContent />
-              </SafeAreaProvider>
-            </GestureHandlerRootView>
-          </KeyboardProvider>
+          <ParentalGuidanceProvider>
+            <KeyboardProvider>
+              <GestureHandlerRootView>
+                <SafeAreaProvider>
+                  <AppContent />
+                </SafeAreaProvider>
+              </GestureHandlerRootView>
+            </KeyboardProvider>
+          </ParentalGuidanceProvider>
         </LanguageProvider>
       </ThemeProvider>
     </QueryClientProvider>

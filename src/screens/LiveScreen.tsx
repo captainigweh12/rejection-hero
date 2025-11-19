@@ -27,6 +27,7 @@ import type { BottomTabScreenProps } from "@/navigation/types";
 import { api } from "@/lib/api";
 import { useSession } from "@/lib/useSession";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useParentalGuidance } from "@/contexts/ParentalGuidanceContext";
 import type {
   GetActiveLiveStreamsResponse,
   StartLiveStreamResponse,
@@ -44,6 +45,7 @@ export default function LiveScreen({ navigation }: Props) {
   const { data: sessionData } = useSession();
   const queryClient = useQueryClient();
   const { colors } = useTheme();
+  const { canAccessFeature, isEnforcingRestrictions } = useParentalGuidance();
   const [isStreaming, setIsStreaming] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [isVideoOff, setIsVideoOff] = useState(false);
@@ -53,6 +55,25 @@ export default function LiveScreen({ navigation }: Props) {
   const [viewingStreamId, setViewingStreamId] = useState<string | null>(null);
   const [facing, setFacing] = useState<"front" | "back">("front");
   const [permission, requestPermission] = useCameraPermissions();
+
+  // Check if live streaming is disabled by parental guidance
+  useEffect(() => {
+    if (isEnforcingRestrictions && !canAccessFeature("liveStreamingDisabled")) {
+      Alert.alert(
+        "Streaming Disabled",
+        "Live streaming is not allowed due to parental guidance settings.",
+        [
+          {
+            text: "OK",
+            onPress: () => {
+              // Redirect to home or settings
+              navigation.navigate("HomeTab" as any);
+            },
+          },
+        ]
+      );
+    }
+  }, [isEnforcingRestrictions, canAccessFeature, navigation]);
 
   // Chat and suggestions UI
   const [showChat, setShowChat] = useState(true);
