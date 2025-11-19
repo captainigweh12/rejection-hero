@@ -71,6 +71,11 @@ export default function AdminScreen({ navigation }: Props) {
   const [emailBody, setEmailBody] = useState("");
   const [emailRecipient, setEmailRecipient] = useState<User | null>(null);
 
+  // Debug logging - moved to top level to comply with React hooks rules
+  React.useEffect(() => {
+    console.log("[AdminScreen] Rendering - sessionData:", !!sessionData?.user);
+  }, [sessionData]);
+
   // Check if current user is admin
   const { data: profileData } = useQuery<GetProfileResponse>({
     queryKey: ["profile"],
@@ -252,12 +257,6 @@ export default function AdminScreen({ navigation }: Props) {
     );
   }
 
-  // Debug logging
-  React.useEffect(() => {
-    console.log("[AdminScreen] Rendering - isAdmin:", isAdmin, "profileData:", !!profileData, "sessionData:", !!sessionData?.user);
-    console.log("[AdminScreen] usersData:", !!usersData, "isLoading:", isLoading, "usersError:", !!usersError);
-  }, [isAdmin, profileData, sessionData, usersData, isLoading, usersError]);
-
   return (
     <LinearGradient colors={backgroundColors} className="flex-1">
       <SafeAreaView edges={["top"]} className="flex-1" style={{ flex: 1 }}>
@@ -409,8 +408,8 @@ export default function AdminScreen({ navigation }: Props) {
               {usersData?.users && usersData.users.length > 0 ? (
                 <View className="gap-3">
                   {usersData.users.map((user) => (
-                  <View
-                    key={user.id}
+                    <View
+                      key={user.id}
                     className="p-4 rounded-2xl"
                     style={{
                       backgroundColor: colors.card,

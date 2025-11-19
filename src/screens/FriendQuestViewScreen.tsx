@@ -73,14 +73,13 @@ export default function FriendQuestViewScreen({ route, navigation }: Props) {
         {
           text: "Send Support",
           onPress: () => {
-            // Navigate to chat with a pre-filled support message
+            // Navigate to chat with friend
             const user = questData?.user;
             if (user) {
               navigation.navigate("Chat", {
                 userId: user.id,
                 userName: user.Profile?.displayName || user.name || user.email?.split("@")[0] || "Friend",
                 userAvatar: user.Profile?.avatar || null,
-                initialMessage: "You've got this! Keep going! 💪",
               });
             }
           },
@@ -163,7 +162,7 @@ export default function FriendQuestViewScreen({ route, navigation }: Props) {
           </Pressable>
           <View className="flex-1">
             <Text className="text-xl font-bold" style={{ color: colors.text }}>
-              {userName}'s Quest
+              {userName}&apos;s Quest
             </Text>
             <Text className="text-sm" style={{ color: colors.textSecondary }}>
               View Only
