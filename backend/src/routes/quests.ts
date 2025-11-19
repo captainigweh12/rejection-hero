@@ -44,32 +44,38 @@ questsRouter.get("/", async (c) => {
     },
   });
 
-  const activeQuests = userQuests
-    .filter((uq) => uq.status === "ACTIVE")
-    .map((uq) => ({
-      id: uq.id,
-      quest: {
-        id: uq.quest.id,
-        title: uq.quest.title,
-        description: uq.quest.description,
-        category: uq.quest.category,
-        difficulty: uq.quest.difficulty,
-        goalType: uq.quest.goalType,
-        goalCount: uq.quest.goalCount,
-        xpReward: uq.quest.xpReward,
-        pointReward: uq.quest.pointReward,
-        location: uq.quest.location,
-        latitude: uq.quest.latitude,
-        longitude: uq.quest.longitude,
-        timeContext: uq.quest.timeContext,
-        dateContext: uq.quest.dateContext,
-      },
-      noCount: uq.noCount,
-      yesCount: uq.yesCount,
-      actionCount: uq.actionCount,
-      status: uq.status,
-      startedAt: uq.startedAt?.toISOString() || null,
-    }));
+  // Get badges for completed quests (only active quests that are completed can have badges)
+  const activeQuestsData = userQuests.filter((uq) => uq.status === "ACTIVE");
+  const completedActiveQuests = activeQuestsData.filter((uq) => uq.status === "COMPLETED");
+  const completedIds = completedActiveQuests.map((uq) => uq.id);
+  const { getQuestBadgesBatch } = await import("../services/questBadges");
+  const badgesMap = completedIds.length > 0 ? await getQuestBadgesBatch(completedIds) : {};
+
+  const activeQuests = activeQuestsData.map((uq) => ({
+    id: uq.id,
+    quest: {
+      id: uq.quest.id,
+      title: uq.quest.title,
+      description: uq.quest.description,
+      category: uq.quest.category,
+      difficulty: uq.quest.difficulty,
+      goalType: uq.quest.goalType,
+      goalCount: uq.quest.goalCount,
+      xpReward: uq.quest.xpReward,
+      pointReward: uq.quest.pointReward,
+      location: uq.quest.location,
+      latitude: uq.quest.latitude,
+      longitude: uq.quest.longitude,
+      timeContext: uq.quest.timeContext,
+      dateContext: uq.quest.dateContext,
+    },
+    noCount: uq.noCount,
+    yesCount: uq.yesCount,
+    actionCount: uq.actionCount,
+    status: uq.status,
+    startedAt: uq.startedAt?.toISOString() || null,
+    badges: badgesMap[uq.id] || { silver: false, gold: false, bronze: false, blue: false },
+  }));
 
   const queuedQuests = userQuests
     .filter((uq) => uq.status === "QUEUED")
@@ -120,6 +126,11 @@ questsRouter.get("/completed", async (c) => {
     },
   });
 
+  // Get badges for all completed quests
+  const { getQuestBadgesBatch } = await import("../services/questBadges");
+  const questIds = completedUserQuests.map((uq) => uq.id);
+  const badgesMap = await getQuestBadgesBatch(questIds);
+
   const quests = completedUserQuests.map((uq) => ({
     id: uq.id,
     completedAt: uq.completedAt?.toISOString() || "",
@@ -133,6 +144,7 @@ questsRouter.get("/completed", async (c) => {
     noCount: uq.noCount,
     yesCount: uq.yesCount,
     actionCount: uq.actionCount,
+    badges: badgesMap[uq.id] || { silver: false, gold: false, bronze: false, blue: false },
   }));
 
   return c.json({ quests });
@@ -494,6 +506,34 @@ questsRouter.post("/:id/start", async (c) => {
     },
   });
 
+  // Send quest started reminder notification
+  try {
+    const { sendPushNotificationForNotification } = await import("../services/pushNotifications");
+    const questStartedNotification = await db.notification.create({
+      data: {
+        userId: user.id,
+        type: "QUEST_STARTED_REMINDER",
+        title: "🎯 Quest Started!",
+        message: `You started "${userQuest.quest.title}"! Complete it to earn rewards!`,
+        data: JSON.stringify({
+          type: "quest_started_reminder",
+          userQuestId: userQuest.id,
+          questId: userQuest.questId,
+        }),
+      },
+    });
+
+    await sendPushNotificationForNotification(
+      user.id,
+      questStartedNotification.title,
+      questStartedNotification.message,
+      JSON.parse(questStartedNotification.data || "{}")
+    );
+  } catch (error) {
+    console.error("Error sending quest started reminder push notification:", error);
+    // Continue even if push notification fails
+  }
+
   // Only send notifications for non-friend quests (user's own quests)
   if (!userQuest.isFromFriend) {
     // Get user's friends
@@ -514,9 +554,9 @@ questsRouter.post("/:id/start", async (c) => {
     const userProfile = userQuest.user.Profile;
     const userName = userProfile?.displayName || userQuest.user.name || user.email?.split("@")[0] || "A friend";
 
-    // Create notifications for all friends
+    // Create notifications for all friends and send push notifications
     if (friendIds.length > 0) {
-      await db.notification.createMany({
+      const notifications = await db.notification.createMany({
         data: friendIds.map((friendId) => ({
           userId: friendId,
           senderId: user.id,
@@ -527,9 +567,33 @@ questsRouter.post("/:id/start", async (c) => {
             userQuestId: userQuest.id,
             questId: userQuest.questId,
             userId: user.id,
+            type: "quest_started",
           }),
         })),
       });
+
+      // Send push notifications to all friends
+      try {
+        const { sendPushNotificationForNotification } = await import("../services/pushNotifications");
+        await Promise.all(
+          friendIds.map((friendId) =>
+            sendPushNotificationForNotification(
+              friendId,
+              "Friend Started a Quest!",
+              `${userName} started a quest: ${userQuest.quest.title}`,
+              {
+                type: "quest_started",
+                userQuestId: userQuest.id,
+                questId: userQuest.questId,
+                userId: user.id,
+              }
+            )
+          )
+        );
+      } catch (error) {
+        console.error("Error sending push notifications for quest started:", error);
+        // Continue even if push notifications fail
+      }
     }
   }
 
@@ -719,10 +783,25 @@ questsRouter.post("/:id/record", zValidator("json", recordQuestActionRequestSche
     return c.json({ message: "Quest not found" }, 404);
   }
 
-  // Update counts based on action type
+  // No blocking - all actions are allowed (transparent system)
+
+  // Calculate new counts
   const newNoCount = action === "NO" ? userQuest.noCount + 1 : userQuest.noCount;
   const newYesCount = action === "YES" ? userQuest.yesCount + 1 : userQuest.yesCount;
   const newActionCount = action === "ACTION" ? userQuest.actionCount + 1 : userQuest.actionCount;
+  const totalNewActions = newNoCount + newYesCount + newActionCount;
+
+  // Run AI detection for suspicious activity
+  const { detectSuspiciousActivity } = await import("../services/questIntegrityDetection");
+  const detectionResult = await detectSuspiciousActivity(
+    userQuestId,
+    user.id,
+    action,
+    totalNewActions
+  );
+
+  // Never block actions - just flag and notify transparently
+  // All actions are allowed, but we provide feedback for authenticity
 
   // Check if quest is completed
   const isCompleted =
@@ -730,23 +809,104 @@ questsRouter.post("/:id/record", zValidator("json", recordQuestActionRequestSche
     (userQuest.quest.goalType === "COLLECT_YES" && newYesCount >= userQuest.quest.goalCount) ||
     (userQuest.quest.goalType === "TAKE_ACTION" && newActionCount >= userQuest.quest.goalCount);
 
-  // Update user quest
-  const updated = await db.userQuest.update({
-    where: { id: userQuestId },
+  // Log the action for integrity tracking
+  await db.questActionLog.create({
     data: {
-      noCount: newNoCount,
-      yesCount: newYesCount,
-      actionCount: newActionCount,
-      ...(isCompleted && {
-        status: "COMPLETED",
-        completedAt: new Date(),
-      }),
+      userQuestId: userQuestId,
+      action: action,
     },
   });
 
-    // If completed, update user stats and award tokens
+  // Update user quest with counts and suspicious flags
+  const updateData: any = {
+    noCount: newNoCount,
+    yesCount: newYesCount,
+    actionCount: newActionCount,
+    lastActionAt: new Date(),
+    ...(detectionResult.isSuspicious && {
+      isFlaggedAsSuspicious: true,
+      suspiciousScore: detectionResult.suspiciousScore,
+      suspiciousReasons: JSON.stringify(detectionResult.reasons),
+    }),
+    ...(isCompleted && {
+      status: "COMPLETED",
+      completedAt: new Date(),
+    }),
+  };
+
+  const updated = await db.userQuest.update({
+    where: { id: userQuestId },
+    data: updateData,
+  });
+
+  // Send transparent notification if flagged (motivational and helpful)
+  if (detectionResult.isSuspicious && detectionResult.shouldFlag) {
+    console.log(`⚠️ [Quest Integrity] FLAGGED activity for quest ${userQuestId}:`, detectionResult.reasons);
+    
+    // Send transparent, motivational notification to user
+    try {
+      const { sendPushNotificationForNotification } = await import("../services/pushNotifications");
+      const notification = await db.notification.create({
+        data: {
+          userId: user.id,
+          type: "QUEST_INTEGRITY_TIP",
+          title: "💡 Quest Authenticity Tip",
+          message: detectionResult.motivationalMessage || "Remember to take your time with each quest action - authenticity is what makes them meaningful!",
+          data: JSON.stringify({
+            userQuestId: userQuest.id,
+            questId: userQuest.questId,
+            type: "quest_integrity_tip",
+            suspiciousScore: detectionResult.suspiciousScore,
+            canVerify: isCompleted, // Can verify if completed
+          }),
+        },
+      });
+
+      await sendPushNotificationForNotification(
+        user.id,
+        notification.title,
+        notification.message,
+        JSON.parse(notification.data || "{}")
+      );
+    } catch (error) {
+      console.error("Error sending integrity tip notification:", error);
+      // Continue even if notification fails
+    }
+  }
+
+    // If completed, always award rewards (transparent system - no blocking)
     if (isCompleted) {
       await updateUserStats(user.id, userQuest.quest.xpReward, userQuest.quest.pointReward, userQuest.quest.difficulty);
+      
+      // Send quest completion notification with rewards
+      try {
+        const { sendPushNotificationForNotification } = await import("../services/pushNotifications");
+        const notification = await db.notification.create({
+          data: {
+            userId: user.id,
+            type: "QUEST_COMPLETED",
+            title: "🎉 Quest Completed!",
+            message: `Congratulations! You completed "${userQuest.quest.title}" and earned ${userQuest.quest.xpReward} XP + ${userQuest.quest.pointReward} points!`,
+            data: JSON.stringify({
+              userQuestId: userQuest.id,
+              questId: userQuest.questId,
+              type: "quest_completed",
+              xpReward: userQuest.quest.xpReward,
+              pointReward: userQuest.quest.pointReward,
+            }),
+          },
+        });
+
+        await sendPushNotificationForNotification(
+          user.id,
+          notification.title,
+          notification.message,
+          JSON.parse(notification.data || "{}")
+        );
+      } catch (error) {
+        console.error("Error sending quest completion push notification:", error);
+        // Continue even if push notification fails
+      }
 
       // Check leaderboard fall-behind after quest completion (async, don't block)
       try {
@@ -758,34 +918,34 @@ questsRouter.post("/:id/record", zValidator("json", recordQuestActionRequestSche
         // Ignore errors - this is non-critical
       }
 
-    // Award tokens proportional to the number of "No"s collected
-    // Formula: 1 token per "No" collected (minimum 1 token if quest was completed)
-    const tokensEarned = userQuest.quest.goalType === "COLLECT_NOS" 
-      ? Math.max(1, newNoCount) // At least 1 token, or number of NOs collected
-      : userQuest.quest.goalType === "COLLECT_YES"
-      ? Math.max(1, newYesCount) // For YES quests, use YES count
-      : Math.max(1, newActionCount); // For ACTION quests, use action count
+        // Award tokens proportional to the number of "No"s collected
+        // Formula: 1 token per "No" collected (minimum 1 token if quest was completed)
+        const tokensEarned = userQuest.quest.goalType === "COLLECT_NOS" 
+          ? Math.max(1, newNoCount) // At least 1 token, or number of NOs collected
+          : userQuest.quest.goalType === "COLLECT_YES"
+          ? Math.max(1, newYesCount) // For YES quests, use YES count
+          : Math.max(1, newActionCount); // For ACTION quests, use action count
 
-    // Update user stats with tokens
-    await db.userStats.update({
-      where: { userId: user.id },
-      data: {
-        tokens: {
-          increment: tokensEarned,
-        },
-      },
-    });
+        // Update user stats with tokens
+        await db.userStats.update({
+          where: { userId: user.id },
+          data: {
+            tokens: {
+              increment: tokensEarned,
+            },
+          },
+        });
 
-    // Create token transaction record
-    await db.tokenTransaction.create({
-      data: {
-        userId: user.id,
-        type: "earned",
-        amount: tokensEarned,
-        description: `Earned ${tokensEarned} token${tokensEarned > 1 ? "s" : ""} from completing quest: ${userQuest.quest.title}`,
-        questId: userQuest.quest.id,
-      },
-    });
+        // Create token transaction record
+        await db.tokenTransaction.create({
+          data: {
+            userId: user.id,
+            type: "earned",
+            amount: tokensEarned,
+            description: `Earned ${tokensEarned} token${tokensEarned > 1 ? "s" : ""} from completing quest: ${userQuest.quest.title}`,
+            questId: userQuest.quest.id,
+          },
+        });
 
     // Check if this is a challenge daily quest and mark it as completed
     const challengeDailyQuest = await db.challengeDailyQuest.findFirst({
@@ -817,8 +977,8 @@ questsRouter.post("/:id/record", zValidator("json", recordQuestActionRequestSche
         },
       });
 
-      // Send completion notification
-      await db.notification.create({
+      // Send completion notification with push notification
+      const challengeNotification = await db.notification.create({
         data: {
           userId: user.id,
           type: "CHALLENGE_DAY_COMPLETED",
@@ -827,6 +987,20 @@ questsRouter.post("/:id/record", zValidator("json", recordQuestActionRequestSche
           data: JSON.stringify({ challengeId: challengeDailyQuest.challengeId, day: challengeDailyQuest.day }),
         },
       });
+
+      // Send push notification
+      try {
+        const { sendPushNotificationForNotification } = await import("../services/pushNotifications");
+        await sendPushNotificationForNotification(
+          user.id,
+          challengeNotification.title,
+          challengeNotification.message,
+          JSON.parse(challengeNotification.data || "{}")
+        );
+      } catch (error) {
+        console.error("Error sending challenge day completion push notification:", error);
+        // Continue even if push notification fails
+      }
     }
 
     // Check if user is in AI_SERIES mode and handle series generation
@@ -868,6 +1042,11 @@ questsRouter.post("/:id/record", zValidator("json", recordQuestActionRequestSche
     noCount: newNoCount,
     yesCount: newYesCount,
     actionCount: newActionCount,
+    suspicious: detectionResult.isSuspicious,
+    flagged: detectionResult.shouldFlag,
+    ...(detectionResult.isSuspicious && {
+      warning: detectionResult.reasons.length > 0 ? detectionResult.reasons[0] : "Activity pattern detected",
+    }),
   } satisfies RecordQuestActionResponse);
 });
 
@@ -1495,8 +1674,8 @@ async function generateAISeries(userId: string, previousSeriesId?: string) {
     }
 
     if (generatedQuests.length > 0) {
-      // Send notification about new series
-      await db.notification.create({
+      // Send notification about new series with push notification
+      const notification = await db.notification.create({
         data: {
           userId,
           type: "AI_SERIES_GENERATED",
@@ -1505,6 +1684,20 @@ async function generateAISeries(userId: string, previousSeriesId?: string) {
           data: JSON.stringify({ seriesId, questCount: generatedQuests.length }),
         },
       });
+
+      // Send push notification
+      try {
+        const { sendPushNotificationForNotification } = await import("../services/pushNotifications");
+        await sendPushNotificationForNotification(
+          userId,
+          notification.title,
+          notification.message,
+          JSON.parse(notification.data || "{}")
+        );
+      } catch (error) {
+        console.error("Error sending AI series push notification:", error);
+        // Continue even if push notification fails
+      }
 
       console.log(`✅ [AI Series] Generated ${generatedQuests.length} quests for user ${userId}`);
     }
@@ -1548,6 +1741,59 @@ export async function updateUserStats(userId: string, xpReward: number, pointRew
 
     // Update longest streak if current streak is higher
     newLongestStreak = Math.max(newCurrentStreak, currentStats.longestStreak);
+    
+    // Check for streak milestones and send notifications
+    if (currentStats && newCurrentStreak > currentStats.currentStreak) {
+      // User is on a new streak day
+      const streakMilestones = [3, 7, 14, 30, 50, 100];
+      
+      if (streakMilestones.includes(newCurrentStreak)) {
+        // This is a milestone streak day
+        let milestoneMessage = "";
+        if (newCurrentStreak === 3) {
+          milestoneMessage = "🔥 3 day streak! You're on fire!";
+        } else if (newCurrentStreak === 7) {
+          milestoneMessage = "🌟 7 day streak! You're building momentum!";
+        } else if (newCurrentStreak === 14) {
+          milestoneMessage = "💪 14 day streak! You're unstoppable!";
+        } else if (newCurrentStreak === 30) {
+          milestoneMessage = "🏆 30 day streak! You're a champion!";
+        } else if (newCurrentStreak === 50) {
+          milestoneMessage = "👑 50 day streak! You're legendary!";
+        } else if (newCurrentStreak === 100) {
+          milestoneMessage = "🎉 100 day streak! You've achieved greatness!";
+        }
+
+        if (milestoneMessage) {
+          try {
+            const notification = await db.notification.create({
+              data: {
+                userId,
+                type: "STREAK_MILESTONE",
+                title: `🔥 ${newCurrentStreak} Day Streak!`,
+                message: milestoneMessage,
+                data: JSON.stringify({
+                  type: "streak_milestone",
+                  streak: newCurrentStreak,
+                }),
+              },
+            });
+
+            // Send push notification
+            const { sendPushNotificationForNotification } = await import("../services/pushNotifications");
+            await sendPushNotificationForNotification(
+              userId,
+              notification.title,
+              notification.message,
+              JSON.parse(notification.data || "{}")
+            );
+          } catch (error) {
+            console.error("Error sending streak milestone push notification:", error);
+            // Continue even if push notification fails
+          }
+        }
+      }
+    }
   }
 
   // Calculate confidence meter increase based on quest difficulty

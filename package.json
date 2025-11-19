@@ -9,7 +9,11 @@
     "web": "expo start --web",
     "lint": "expo lint",
     "format": "bunx prettier --write .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "build:android:production": "eas build --platform android --profile production",
+    "build:android:preview": "eas build --platform android --profile preview",
+    "submit:android": "eas submit --platform android --latest",
+    "credentials:android": "eas credentials --platform android"
   },
   "dependencies": {
     "@better-auth/expo": "1.3.24",

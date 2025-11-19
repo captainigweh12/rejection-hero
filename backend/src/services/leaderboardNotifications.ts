@@ -142,8 +142,8 @@ export async function checkLeaderboardFallBehind() {
           });
 
           if (!existingNotification) {
-            // Create notification
-            await db.notification.create({
+            // Create notification with push notification
+            const notification = await db.notification.create({
               data: {
                 userId: userRanking.userId,
                 type: "LEADERBOARD_FALL_BEHIND",
@@ -157,6 +157,20 @@ export async function checkLeaderboardFallBehind() {
                 }),
               },
             });
+
+            // Send push notification
+            try {
+              const { sendPushNotificationForNotification } = await import("./pushNotifications");
+              await sendPushNotificationForNotification(
+                userRanking.userId,
+                notification.title,
+                notification.message,
+                JSON.parse(notification.data || "{}")
+              );
+            } catch (error) {
+              console.error("Error sending leaderboard push notification:", error);
+              // Continue even if push notification fails
+            }
 
             notificationCount++;
           }

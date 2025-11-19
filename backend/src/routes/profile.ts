@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
+import { z } from "zod";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { randomUUID } from "node:crypto";
@@ -406,6 +407,33 @@ profileRouter.put("/parental-guidance", async (c) => {
   } catch (error) {
     console.error("❌ [Profile] Error in PUT /api/profile/parental-guidance:", error);
     return c.json({ message: "Internal server error" }, 500);
+  }
+});
+
+// ============================================
+// POST /api/profile/push-token - Register/update push notification token
+// ============================================
+profileRouter.post("/push-token", zValidator("json", z.object({ pushToken: z.string() })), async (c) => {
+  const user = c.get("user");
+
+  if (!user) {
+    return c.json({ message: "Unauthorized" }, 401);
+  }
+
+  try {
+    const { pushToken } = c.req.valid("json");
+
+    // Update user's profile with push token
+    await db.profile.update({
+      where: { userId: user.id },
+      data: { pushToken },
+    });
+
+    console.log(`✅ [Profile] Push token registered for user ${user.id}`);
+    return c.json({ success: true, message: "Push token registered successfully" });
+  } catch (error) {
+    console.error("Error registering push token:", error);
+    return c.json({ success: false, message: "Failed to register push token" }, 500);
   }
 });
 

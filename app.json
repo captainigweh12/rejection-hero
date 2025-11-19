@@ -1,7 +1,8 @@
 {
   "expo": {
-    "name": "vibecode",
-    "slug": "vibecode",
+    "name": "Rejection HERO",
+    "slug": "goforno",
+    "owner": "captainigweh12",
     "scheme": "vibecode",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -16,7 +17,9 @@
       "infoPlist": {
         "CFBundleURLTypes": [
           {
-            "CFBundleURLSchemes": ["com.googleusercontent.apps.94427138884-vp4hj04sfr29fndq917iau9alpiv52e6"],
+            "CFBundleURLSchemes": [
+              "com.googleusercontent.apps.94427138884-vp4hj04sfr29fndq917iau9alpiv52e6"
+            ],
             "CFBundleTypeRole": "Editor",
             "CFBundleURLName": "GoogleOAuth"
           }
@@ -45,6 +48,11 @@
     },
     "android": {
       "package": "com.vibecode.goforno",
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#FFFFFF"
+      },
       "edgeToEdgeEnabled": true,
       "usesCleartextTraffic": true,
       "permissions": [
@@ -54,11 +62,18 @@
         "RECORD_AUDIO",
         "READ_EXTERNAL_STORAGE",
         "WRITE_EXTERNAL_STORAGE"
-      ]
+      ],
+      "playStoreUrl": "https://play.google.com/store/apps/details?id=com.vibecode.goforno"
     },
     "web": {
       "favicon": "./assets/favicon.png",
       "bundler": "metro"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "68e0c407-252d-49d4-a0f4-77ae4f37f619"
+      }
+    },
+    "owner": "captainigweh12"
   }
 }

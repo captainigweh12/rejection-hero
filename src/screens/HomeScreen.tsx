@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { QuestBadges } from "@/components/QuestBadges";
 import {
   View,
   Text,
@@ -803,6 +804,12 @@ export default function HomeScreen({ navigation }: Props) {
                       }}
                     >
                       <View className="p-6">
+                        {/* Badges for completed quests */}
+                        {userQuest.status === "COMPLETED" && userQuest.badges && (
+                          <View className="mb-3">
+                            <QuestBadges badges={userQuest.badges} size="small" />
+                          </View>
+                        )}
                         {/* Category & Difficulty */}
                         <View className="flex-row items-center gap-2 mb-3">
                           <View

@@ -3,6 +3,7 @@ import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
 import { type AppType } from "../types";
 import { db } from "../db";
+import { isUserBlocked } from "./moderation";
 
 const messagesRouter = new Hono<AppType>();
 
@@ -16,13 +17,21 @@ messagesRouter.get("/conversations", async (c) => {
     return c.json({ message: "Unauthorized" }, 401);
   }
 
-  // Get all messages where user is sender or receiver
+  // Get blocked users
+  const blockedUsers = await db.userBlock.findMany({
+    where: { blockerId: user.id },
+    select: { blockedId: true },
+  });
+  const blockedIds = blockedUsers.map((b) => b.blockedId);
+
+  // Get all messages where user is sender or receiver (excluding blocked users and deleted messages)
   const messages = await db.message.findMany({
     where: {
       OR: [
-        { senderId: user.id },
-        { receiverId: user.id },
+        { senderId: user.id, receiverId: { notIn: blockedIds } },
+        { receiverId: user.id, senderId: { notIn: blockedIds } },
       ],
+      isDeleted: false,
     },
     include: {
       sender: {
@@ -78,13 +87,22 @@ messagesRouter.get("/:userId", async (c) => {
 
   const otherUserId = c.req.param("userId");
 
-  // Get all messages between the two users
+  // Check if user is blocked
+  const isBlocked = await isUserBlocked(user.id, otherUserId);
+  const hasBlockedYou = await isUserBlocked(otherUserId, user.id);
+
+  if (isBlocked || hasBlockedYou) {
+    return c.json({ message: "Cannot access messages with blocked user" }, 403);
+  }
+
+  // Get all messages between the two users (excluding deleted/moderated)
   const messages = await db.message.findMany({
     where: {
       OR: [
         { senderId: user.id, receiverId: otherUserId },
         { senderId: otherUserId, receiverId: user.id },
       ],
+      isDeleted: false,
     },
     include: {
       sender: {
@@ -108,16 +126,20 @@ messagesRouter.get("/:userId", async (c) => {
     },
   });
 
-  const formattedMessages = messages.map((message) => ({
-    id: message.id,
-    content: message.content,
-    senderId: message.senderId,
-    senderName: message.sender.Profile?.displayName || message.sender.email?.split("@")[0] || "User",
-    senderAvatar: message.sender.Profile?.avatar || null,
-    createdAt: message.createdAt,
-    read: message.read,
-    isMine: message.senderId === user.id,
-  }));
+  const formattedMessages = messages
+    .filter((message) => !message.isDeleted && !message.isModerated) // Filter deleted/moderated messages
+    .map((message) => ({
+      id: message.id,
+      content: message.isModerated ? "[Message removed by moderation]" : message.content,
+      senderId: message.senderId,
+      senderName: message.sender.Profile?.displayName || message.sender.email?.split("@")[0] || "User",
+      senderAvatar: message.sender.Profile?.avatar || null,
+      createdAt: message.createdAt,
+      read: message.read,
+      isMine: message.senderId === user.id,
+      isModerated: message.isModerated,
+      isDeleted: message.isDeleted,
+    }));
 
   return c.json({ messages: formattedMessages });
 });
@@ -146,6 +168,37 @@ messagesRouter.post("/send", zValidator("json", sendMessageSchema), async (c) =>
 
   if (!receiver) {
     return c.json({ message: "Receiver not found" }, 404);
+  }
+
+  // Check if user is blocked
+  const isBlocked = await isUserBlocked(user.id, receiverId);
+  const hasBlockedYou = await isUserBlocked(receiverId, user.id);
+
+  if (isBlocked || hasBlockedYou) {
+    return c.json({ message: "Cannot send messages to blocked user" }, 403);
+  }
+
+  // Basic content moderation - check for inappropriate content
+  const inappropriateWords = ["spam", "scam"]; // Add more as needed
+  const contentLower = content.toLowerCase();
+  const containsInappropriate = inappropriateWords.some((word) => contentLower.includes(word));
+
+  if (containsInappropriate) {
+    // Log for review but still allow (auto-flag for moderation)
+    console.log(`⚠️ [Moderation] Potentially inappropriate message from ${user.id}: ${content.substring(0, 50)}`);
+    
+    // Create a report for admin review
+    await db.report.create({
+      data: {
+        reporterId: user.id, // System report
+        reportedUserId: user.id,
+        contentType: "message",
+        contentId: null, // Will be set after message creation
+        reason: "Potential inappropriate content",
+        description: `Auto-flagged message: ${content.substring(0, 200)}`,
+        status: "pending",
+      },
+    });
   }
 
   // Create the message

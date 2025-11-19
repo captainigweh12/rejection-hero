@@ -200,6 +200,13 @@ export type GetMatchesResponse = z.infer<typeof getMatchesResponseSchema>;
 // ==========================================
 
 // GET /api/quests - Get user's quests
+const questBadgesSchema = z.object({
+  silver: z.boolean().optional(),
+  gold: z.boolean().optional(),
+  bronze: z.boolean().optional(),
+  blue: z.boolean().optional(),
+});
+
 export const getUserQuestsResponseSchema = z.object({
   activeQuests: z.array(
     z.object({
@@ -225,6 +232,7 @@ export const getUserQuestsResponseSchema = z.object({
       actionCount: z.number(),
       status: z.string(),
       startedAt: z.string().nullable(),
+      badges: questBadgesSchema.optional(),
     })
   ),
   queuedQuests: z.array(
@@ -312,6 +320,11 @@ export const recordQuestActionResponseSchema = z.object({
   noCount: z.number(),
   yesCount: z.number(),
   actionCount: z.number(),
+  suspicious: z.boolean().optional(),
+  flagged: z.boolean().optional(),
+  warning: z.string().optional(),
+  blocked: z.boolean().optional(),
+  reasons: z.array(z.string()).optional(),
 });
 export type RecordQuestActionResponse = z.infer<typeof recordQuestActionResponseSchema>;
 
@@ -750,6 +763,7 @@ export type GetGrowthAchievementsResponse = z.infer<typeof getGrowthAchievements
 
 // POST /api/posts - Create a new post
 export const createPostRequestSchema = z.object({
+  userQuestId: z.string().optional(), // If this post is about a completed quest
   content: z.string().min(1),
   privacy: z.enum(["PUBLIC", "FRIENDS", "GROUPS"]),
   groupId: z.string().optional(),

@@ -7,6 +7,7 @@ import type { RootStackScreenProps } from "@/navigation/types";
 import { api } from "@/lib/api";
 import { useTheme } from "@/contexts/ThemeContext";
 import { LinearGradient } from "expo-linear-gradient";
+import { QuestBadges } from "@/components/QuestBadges";
 
 type Props = RootStackScreenProps<"QuestCalendar">;
 
@@ -23,6 +24,12 @@ interface CompletedQuest {
   noCount: number;
   yesCount: number;
   actionCount: number;
+  badges?: {
+    silver?: boolean;
+    gold?: boolean;
+    bronze?: boolean;
+    blue?: boolean;
+  };
 }
 
 export default function QuestCalendarScreen({ navigation }: Props) {
@@ -317,6 +324,12 @@ export default function QuestCalendarScreen({ navigation }: Props) {
                       borderColor: `${getCategoryColor(quest.quest.category)}40`,
                     }}
                   >
+                    {/* Badges */}
+                    {quest.badges && (
+                      <View style={{ marginBottom: 12 }}>
+                        <QuestBadges badges={quest.badges} size="small" />
+                      </View>
+                    )}
                     <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 8 }}>
                       <View
                         style={{

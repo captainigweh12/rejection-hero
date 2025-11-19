@@ -311,6 +311,7 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
       return api.post("/api/posts", {
         content: postContent,
         privacy: "PUBLIC",
+        userQuestId: savedQuestData.id, // Link post to quest for badge tracking
       });
     },
     onSuccess: () => {

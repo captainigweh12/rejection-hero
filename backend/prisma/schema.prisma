@@ -8,69 +8,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id                       String                  @id
-  email                    String                  @unique
-  name                     String?
-  emailVerified            Boolean                 @default(false)
-  image                    String?
-  isAdmin                  Boolean                 @default(false) // Admin users have full access
-  createdAt                DateTime                @default(now())
-  updatedAt                DateTime                @default(now()) @updatedAt
-  accounts                 Account[]
-  LiveStreams              LiveStream[]
-  LiveStreamComments       LiveStreamComment[]
-  MatchesAsUser2           Match[]                 @relation("MatchUser2")
-  MatchesAsUser1           Match[]                 @relation("MatchUser1")
-  Profile                  Profile?
-  sessions                 Session[]
-  SwipesReceived           Swipe[]                 @relation("SwipesReceived")
-  SwipesGiven              Swipe[]                 @relation("SwipesGiven")
-  UserQuests               UserQuest[]
-  UserStats                UserStats?
-  FriendshipsInitiated     Friendship[]            @relation("FriendshipInitiator")
-  FriendshipsReceived      Friendship[]            @relation("FriendshipReceiver")
-  MessagesSent             Message[]               @relation("MessageSender")
-  MessagesReceived         Message[]               @relation("MessageReceiver")
-  GroupMemberships         GroupMember[]
-  GroupsCreated            Group[]                 @relation("GroupCreator")
-  SharedQuests             SharedQuest[]
-  QuestSuggestions         QuestSuggestion[]
-  JournalEntries           JournalEntry[]
-  GrowthAchievements       GrowthAchievement[]
-  Posts                    Post[]
-  PostLikes                PostLike[]
-  PostComments             PostComment[]
-  Moments                  Moment[]
-  NotificationsSent        Notification[]          @relation("NotificationSender")
-  NotificationsReceived    Notification[]          @relation("NotificationReceiver")
-  GroupQuestsCreated       GroupQuest[]            @relation("GroupQuestCreator")
-  GroupQuestParticipations GroupQuestParticipant[]
-  GroupQuestAssignments    GroupQuestAssignment[]
-  Challenges               Challenge[]
-  Subscription             Subscription?
-  TokenTransactions        TokenTransaction[]
-  PolicyAcceptances        PolicyAcceptance[]
-  BugReports               BugReport[]
-
-  @@map("user")
-}
-
-model Session {
-  id        String   @id
-  expiresAt DateTime
-  token     String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  ipAddress String?
-  userAgent String?
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("session")
-}
-
-model Account {
+model account {
   id                    String    @id
   accountId             String
   providerId            String
@@ -83,570 +21,691 @@ model Account {
   scope                 String?
   password              String?
   createdAt             DateTime  @default(now())
-  updatedAt             DateTime  @updatedAt
-  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("account")
+  updatedAt             DateTime
+  user                  user      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model Verification {
-  id         String   @id
-  identifier String
-  value      String
-  expiresAt  DateTime
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @default(now()) @updatedAt
-
-  @@map("verification")
+model bug_report {
+  id               String   @id
+  userId           String
+  subject          String
+  description      String
+  category         String   @default("OTHER")
+  stepsToReproduce String?
+  deviceInfo       String?
+  status           String   @default("PENDING")
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime
+  user             user     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model Profile {
-  id                      String   @id @default(cuid())
+model challenge {
+  id                    String                  @id
+  userId                String
+  category              String
+  startDate             DateTime                @default(now())
+  endDate               DateTime
+  currentDay            Int                     @default(1)
+  isActive              Boolean                 @default(true)
+  completedDays         Int                     @default(0)
+  createdAt             DateTime                @default(now())
+  updatedAt             DateTime
+  user                  user                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  challenge_daily_quest challenge_daily_quest[]
+}
+
+model challenge_daily_quest {
+  id          String      @id
+  challengeId String
+  day         Int
+  questId     String?
+  userQuestId String?
+  status      String      @default("PENDING")
+  generatedAt DateTime?
+  completedAt DateTime?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime
+  user_quest  user_quest? @relation(fields: [userQuestId], references: [id])
+  quest       quest?      @relation(fields: [questId], references: [id])
+  challenge   challenge   @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+
+  @@unique([challengeId, day])
+}
+
+model content_moderation {
+  id          String   @id
+  contentId   String
+  contentType String
+  action      String
+  reason      String
+  moderatedBy String?
+  reportId    String?
+  createdAt   DateTime @default(now())
+  userId      String?
+  user        user?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([contentType, contentId])
+}
+
+model friendship {
+  id                                String   @id
+  initiatorId                       String
+  receiverId                        String
+  status                            String
+  createdAt                         DateTime @default(now())
+  updatedAt                         DateTime
+  user_friendship_receiverIdTouser  user     @relation("friendship_receiverIdTouser", fields: [receiverId], references: [id], onDelete: Cascade)
+  user_friendship_initiatorIdTouser user     @relation("friendship_initiatorIdTouser", fields: [initiatorId], references: [id], onDelete: Cascade)
+
+  @@unique([initiatorId, receiverId])
+}
+
+model group {
+  id           String         @id
+  name         String
+  description  String?
+  coverImage   String?
+  creatorId    String
+  isPrivate    Boolean        @default(false)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime
+  user         user           @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  group_member group_member[]
+  group_quest  group_quest[]
+  live_stream  live_stream[]
+  moment       moment[]
+  post         post[]
+}
+
+model group_member {
+  id       String   @id
+  groupId  String
+  userId   String
+  role     String   @default("member")
+  joinedAt DateTime @default(now())
+  user     user     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group    group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, userId])
+}
+
+model group_quest {
+  id                      String                    @id
+  groupId                 String
+  questId                 String
+  createdBy               String
+  assignmentType          String                    @default("all")
+  createdAt               DateTime                  @default(now())
+  updatedAt               DateTime
+  user                    user                      @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  quest                   quest                     @relation(fields: [questId], references: [id], onDelete: Cascade)
+  group                   group                     @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  group_quest_assignment  group_quest_assignment[]
+  group_quest_participant group_quest_participant[]
+}
+
+model group_quest_assignment {
+  id           String      @id
+  groupQuestId String
+  userId       String
+  assignedAt   DateTime    @default(now())
+  user         user        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group_quest  group_quest @relation(fields: [groupQuestId], references: [id], onDelete: Cascade)
+
+  @@unique([groupQuestId, userId])
+}
+
+model group_quest_participant {
+  id           String      @id
+  groupQuestId String
+  userId       String
+  status       String      @default("joined")
+  noCount      Int         @default(0)
+  yesCount     Int         @default(0)
+  actionCount  Int         @default(0)
+  startedAt    DateTime?
+  completedAt  DateTime?
+  joinedAt     DateTime    @default(now())
+  user         user        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group_quest  group_quest @relation(fields: [groupQuestId], references: [id], onDelete: Cascade)
+
+  @@unique([groupQuestId, userId])
+}
+
+model growth_achievement {
+  id             String        @id
+  userId         String
+  journalEntryId String
+  type           String
+  description    String
+  earnedAt       DateTime      @default(now())
+  journal_entry  journal_entry @relation(fields: [journalEntryId], references: [id], onDelete: Cascade)
+  user           user          @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model journal_entry {
+  id                 String               @id
+  userId             String
+  audioUrl           String?
+  audioTranscript    String?
+  aiSummary          String
+  userEditedSummary  String?
+  outcome            String
+  imageUrls          String?
+  location           String?
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime
+  growth_achievement growth_achievement[]
+  user               user                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model live_stream {
+  id                  String                @id
+  userId              String
+  roomUrl             String                @unique
+  roomName            String                @unique
+  userQuestId         String?
+  groupId             String?
+  isActive            Boolean               @default(true)
+  viewerCount         Int                   @default(0)
+  startedAt           DateTime              @default(now())
+  endedAt             DateTime?
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime
+  group               group?                @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user                user                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user_quest          user_quest?           @relation(fields: [userQuestId], references: [id])
+  live_stream_comment live_stream_comment[]
+  quest_suggestion    quest_suggestion[]
+}
+
+model live_stream_comment {
+  id           String      @id
+  liveStreamId String
+  userId       String
+  message      String
+  createdAt    DateTime    @default(now())
+  live_stream  live_stream @relation(fields: [liveStreamId], references: [id], onDelete: Cascade)
+  user         user        @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model match {
+  id                       String   @id
+  user1Id                  String
+  user2Id                  String
+  createdAt                DateTime @default(now())
+  user_match_user1IdTouser user     @relation("match_user1IdTouser", fields: [user1Id], references: [id], onDelete: Cascade)
+  user_match_user2IdTouser user     @relation("match_user2IdTouser", fields: [user2Id], references: [id], onDelete: Cascade)
+
+  @@unique([user1Id, user2Id])
+}
+
+model message {
+  id                            String               @id
+  senderId                      String
+  receiverId                    String
+  content                       String
+  read                          Boolean              @default(false)
+  isDeleted                     Boolean              @default(false)
+  deletedAt                     DateTime?
+  isModerated                   Boolean              @default(false)
+  moderatedAt                   DateTime?
+  moderationReason              String?
+  createdAt                     DateTime             @default(now())
+  user_message_receiverIdTouser user                 @relation("message_receiverIdTouser", fields: [receiverId], references: [id], onDelete: Cascade)
+  user_message_senderIdTouser   user                 @relation("message_senderIdTouser", fields: [senderId], references: [id], onDelete: Cascade)
+  message_moderation            message_moderation[]
+}
+
+model message_moderation {
+  id          String   @id
+  messageId   String
+  action      String
+  reason      String
+  moderatedBy String?
+  reportId    String?
+  createdAt   DateTime @default(now())
+  message     message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@index([messageId])
+}
+
+model moment {
+  id        String   @id
+  userId    String
+  groupId   String?
+  imageUrl  String?
+  videoUrl  String?
+  content   String?
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  group     group?   @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user      user     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model notification {
+  id                               String   @id
+  userId                           String
+  senderId                         String?
+  type                             String
+  title                            String
+  message                          String
+  read                             Boolean  @default(false)
+  data                             String?
+  createdAt                        DateTime @default(now())
+  user_notification_senderIdTouser user?    @relation("notification_senderIdTouser", fields: [senderId], references: [id], onDelete: Cascade)
+  user_notification_userIdTouser   user     @relation("notification_userIdTouser", fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model policy_acceptance {
+  id          String    @id
+  userId      String
+  policyType  String
+  version     String    @default("1.0")
+  acceptedAt  DateTime  @default(now())
+  ipAddress   String?
+  userAgent   String?
+  emailSent   Boolean   @default(false)
+  emailSentAt DateTime?
+  user        user      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, policyType])
+}
+
+model post {
+  id           String         @id
+  userId       String
+  content      String
+  privacy      String         @default("PUBLIC")
+  groupId      String?
+  userQuestId  String?
+  isHidden     Boolean        @default(false)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime
+  deletedAt    DateTime?
+  user_quest   user_quest?    @relation(fields: [userQuestId], references: [id])
+  group        group?         @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user         user           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post_comment post_comment[]
+  post_image   post_image[]
+  post_like    post_like[]
+}
+
+model post_comment {
+  id        String   @id
+  postId    String
+  userId    String
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+  user      user     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post      post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
+
+model post_image {
+  id        String   @id
+  postId    String
+  imageUrl  String
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  post      post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
+
+model post_like {
+  id        String   @id
+  postId    String
+  userId    String
+  createdAt DateTime @default(now())
+  user      user     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post      post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId])
+}
+
+model profile {
+  id                      String   @id
   userId                  String   @unique
-  username                String?  @unique // Unique username/tag name (e.g., @johndoe)
+  username                String?  @unique
   displayName             String
   bio                     String?
   age                     Int?
-  ageVerified             Boolean  @default(false) // Whether age has been verified
-  parentalConsent         Boolean  @default(false) // For users 13-17
+  ageVerified             Boolean  @default(false)
+  parentalConsent         Boolean  @default(false)
   photos                  String?
-  avatar                  String? // AI-generated or uploaded avatar URL
-  interests               String? // JSON array of interest tags
+  avatar                  String?
+  interests               String?
   location                String?
   latitude                Float?
   longitude               Float?
   isLive                  Boolean  @default(false)
   liveViewers             Int      @default(0)
-  userContext             String? // About you - for AI quest generation
-  userGoals               String? // User's goals - for AI quest generation
-  onboardingCompleted     Boolean  @default(false) // Track if user completed onboarding
-  challengeDuration       Int? // 14, 30, or 100 days
-  questMode               String?  @default("QUEST_BY_QUEST") // QUEST_BY_QUEST or AI_SERIES
-  notificationPreferences String? // JSON object with notification type preferences
-  parentalGuidance        String? // JSON object with parental guidance settings
+  userContext             String?
+  userGoals               String?
+  onboardingCompleted     Boolean  @default(false)
+  challengeDuration       Int?
+  questMode               String?  @default("QUEST_BY_QUEST")
+  notificationPreferences String?
+  parentalGuidance        String?
   createdAt               DateTime @default(now())
-  updatedAt               DateTime @updatedAt
-  user                    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("profile")
+  updatedAt               DateTime
+  pushToken               String?
+  user                    user     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model Swipe {
-  id        String   @id @default(cuid())
-  swiperId  String
-  swipedId  String
-  direction String
-  createdAt DateTime @default(now())
-  swiped    User     @relation("SwipesReceived", fields: [swipedId], references: [id], onDelete: Cascade)
-  swiper    User     @relation("SwipesGiven", fields: [swiperId], references: [id], onDelete: Cascade)
-
-  @@unique([swiperId, swipedId])
-  @@map("swipe")
+model quest {
+  id                    String                  @id
+  title                 String
+  description           String
+  category              String
+  difficulty            String
+  goalType              String
+  goalCount             Int                     @default(1)
+  xpReward              Int
+  pointReward           Int
+  isAIGenerated         Boolean                 @default(false)
+  createdAt             DateTime                @default(now())
+  updatedAt             DateTime
+  dateContext           String?
+  latitude              Float?
+  location              String?
+  longitude             Float?
+  timeContext           String?
+  challenge_daily_quest challenge_daily_quest[]
+  group_quest           group_quest[]
+  quest_suggestion      quest_suggestion[]
+  shared_quest          shared_quest[]
+  user_quest            user_quest[]
 }
 
-model Match {
-  id        String   @id @default(cuid())
-  user1Id   String
-  user2Id   String
-  createdAt DateTime @default(now())
-  user2     User     @relation("MatchUser2", fields: [user2Id], references: [id], onDelete: Cascade)
-  user1     User     @relation("MatchUser1", fields: [user1Id], references: [id], onDelete: Cascade)
+model quest_action_log {
+  id          String     @id
+  userQuestId String
+  action      String
+  recordedAt  DateTime   @default(now())
+  user_quest  user_quest @relation(fields: [userQuestId], references: [id], onDelete: Cascade)
 
-  @@unique([user1Id, user2Id])
-  @@map("match")
+  @@index([recordedAt])
+  @@index([userQuestId])
 }
 
-model UserStats {
-  id            String   @id @default(cuid())
-  userId        String   @unique
-  currentStreak Int      @default(0)
-  longestStreak Int      @default(0)
-  totalXP       Int      @default(0)
-  totalPoints   Int      @default(0)
-  trophies      Int      @default(0)
-  diamonds      Int      @default(0)
-  tokens        Int      @default(0) // Tokens for sending quests to friends
-  lastActiveAt  DateTime @default(now())
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  // Confidence & Fear Zone Tracking
-  confidenceLevel       Int      @default(50) // 0-100 confidence percentage
-  previousConfidence    Int      @default(50) // For calculating weekly change
-  confidenceUpdatedAt   DateTime @default(now())
-  dailyConfidenceMeter  Float    @default(0) // 0-100, grows with quests, decays over time
-  lastConfidenceDecayAt DateTime @default(now()) // Last time confidence meter was updated
-
-  // Fear Zone Stats
-  easyZoneCount   Int @default(0) // Count of easy difficulty quests
-  growthZoneCount Int @default(0) // Count of medium difficulty quests
-  fearZoneCount   Int @default(0) // Count of hard/extreme difficulty quests
-
-  // Activity Tracking for AI
-  lastQuestAttemptAt   DateTime?
-  lastQuestCompletedAt DateTime?
-  questCompletionRate  Float     @default(0) // Percentage of quests completed
-  avgQuestDifficulty   Float     @default(1) // Average difficulty level
-
-  // Warm-up tracking
-  warmUpsCompleted Int       @default(0)
-  lastWarmUpAt     DateTime?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("user_stats")
-}
-
-model Quest {
-  id                   String                @id @default(cuid())
-  title                String
-  description          String
-  category             String
-  difficulty           String
-  goalType             String // COLLECT_NOS, COLLECT_YES, or TAKE_ACTION
-  goalCount            Int                   @default(1)
-  xpReward             Int
-  pointReward          Int
-  isAIGenerated        Boolean               @default(false)
-  createdAt            DateTime              @default(now())
-  updatedAt            DateTime              @updatedAt
-  dateContext          String?
-  latitude             Float?
-  location             String?
-  longitude            Float?
-  timeContext          String?
-  UserQuests           UserQuest[]
-  SharedQuests         SharedQuest[]
-  QuestSuggestions     QuestSuggestion[]
-  GroupQuests          GroupQuest[]
-  ChallengeDailyQuests ChallengeDailyQuest[]
-
-  @@map("quest")
-}
-
-model UserQuest {
-  id                   String                @id @default(cuid())
-  userId               String
-  questId              String
-  status               String
-  noCount              Int                   @default(0)
-  yesCount             Int                   @default(0)
-  actionCount          Int                   @default(0) // For TAKE_ACTION quests
-  startedAt            DateTime?
-  completedAt          DateTime?
-  createdAt            DateTime              @default(now())
-  updatedAt            DateTime              @updatedAt
-  isFromFriend         Boolean               @default(false) // Track if quest came from a friend
-  sharedById           String? // ID of friend who shared this quest
-  seriesId             String? // For AI series mode - groups quests together
-  seriesIndex          Int? // Position in the series (0-7)
-  isSeriesQuest        Boolean               @default(false) // Whether this is part of an AI series
-  LiveStreams          LiveStream[]
-  ChallengeDailyQuests ChallengeDailyQuest[]
-  quest                Quest                 @relation(fields: [questId], references: [id], onDelete: Cascade)
-  user                 User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, questId])
-  @@map("user_quest")
-}
-
-model LiveStream {
-  id               String              @id @default(cuid())
-  userId           String
-  roomUrl          String              @unique
-  roomName         String              @unique
-  userQuestId      String?
-  groupId          String? // For group live streams
-  isActive         Boolean             @default(true)
-  viewerCount      Int                 @default(0)
-  startedAt        DateTime            @default(now())
-  endedAt          DateTime?
-  createdAt        DateTime            @default(now())
-  updatedAt        DateTime            @updatedAt
-  userQuest        UserQuest?          @relation(fields: [userQuestId], references: [id])
-  user             User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-  group            Group?              @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  comments         LiveStreamComment[]
-  questSuggestions QuestSuggestion[]
-
-  @@map("live_stream")
-}
-
-model LiveStreamComment {
-  id           String     @id @default(cuid())
-  liveStreamId String
-  userId       String
-  message      String
-  createdAt    DateTime   @default(now())
-  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  liveStream   LiveStream @relation(fields: [liveStreamId], references: [id], onDelete: Cascade)
-
-  @@map("live_stream_comment")
-}
-
-model QuestSuggestion {
-  id           String     @id @default(cuid())
+model quest_suggestion {
+  id           String      @id
   liveStreamId String
   suggestedBy  String
   questId      String
-  boostAmount  Int        @default(0) // Diamonds paid to boost this suggestion
-  status       String     @default("pending") // pending, accepted, declined
-  message      String? // Optional message from viewer
-  createdAt    DateTime   @default(now())
+  boostAmount  Int         @default(0)
+  status       String      @default("pending")
+  message      String?
+  createdAt    DateTime    @default(now())
   respondedAt  DateTime?
-  liveStream   LiveStream @relation(fields: [liveStreamId], references: [id], onDelete: Cascade)
-  suggester    User       @relation(fields: [suggestedBy], references: [id], onDelete: Cascade)
-  quest        Quest      @relation(fields: [questId], references: [id], onDelete: Cascade)
-
-  @@map("quest_suggestion")
+  quest        quest       @relation(fields: [questId], references: [id], onDelete: Cascade)
+  user         user        @relation(fields: [suggestedBy], references: [id], onDelete: Cascade)
+  live_stream  live_stream @relation(fields: [liveStreamId], references: [id], onDelete: Cascade)
 }
 
-model Friendship {
-  id          String   @id @default(cuid())
-  initiatorId String
-  receiverId  String
-  status      String // PENDING, ACCEPTED, BLOCKED
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  initiator   User     @relation("FriendshipInitiator", fields: [initiatorId], references: [id], onDelete: Cascade)
-  receiver    User     @relation("FriendshipReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+model quest_verification {
+  id                         String                      @id
+  userQuestId                String
+  verifiedBy                 String
+  verificationRequestId      String?                     @unique
+  createdAt                  DateTime                    @default(now())
+  quest_verification_request quest_verification_request? @relation(fields: [verificationRequestId], references: [id])
+  user                       user                        @relation(fields: [verifiedBy], references: [id], onDelete: Cascade)
+  user_quest                 user_quest                  @relation(fields: [userQuestId], references: [id], onDelete: Cascade)
 
-  @@unique([initiatorId, receiverId])
-  @@map("friendship")
+  @@unique([userQuestId, verifiedBy])
+  @@index([userQuestId])
 }
 
-model Message {
-  id         String   @id @default(cuid())
-  senderId   String
-  receiverId String
-  content    String
-  read       Boolean  @default(false)
-  createdAt  DateTime @default(now())
-  sender     User     @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
-  receiver   User     @relation("MessageReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+model quest_verification_request {
+  id                                               String              @id
+  userQuestId                                      String
+  senderId                                         String
+  receiverId                                       String
+  message                                          String?
+  status                                           String              @default("pending")
+  createdAt                                        DateTime            @default(now())
+  verifiedAt                                       DateTime?
+  quest_verification                               quest_verification?
+  user_quest_verification_request_receiverIdTouser user                @relation("quest_verification_request_receiverIdTouser", fields: [receiverId], references: [id], onDelete: Cascade)
+  user_quest_verification_request_senderIdTouser   user                @relation("quest_verification_request_senderIdTouser", fields: [senderId], references: [id], onDelete: Cascade)
+  user_quest                                       user_quest          @relation(fields: [userQuestId], references: [id], onDelete: Cascade)
 
-  @@map("message")
+  @@unique([userQuestId, receiverId])
+  @@index([receiverId, status])
 }
 
-model Group {
-  id          String        @id @default(cuid())
-  name        String
-  description String?
-  coverImage  String? // Group avatar/picture
-  creatorId   String
-  isPrivate   Boolean       @default(false)
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  creator     User          @relation("GroupCreator", fields: [creatorId], references: [id], onDelete: Cascade)
-  members     GroupMember[]
-  posts       Post[]
-  groupQuests GroupQuest[]
-  liveStreams LiveStream[]
-  moments     Moment[] // Group stories
+model report {
+  id             String    @id
+  reporterId     String
+  reportedUserId String?
+  contentType    String
+  contentId      String?
+  reason         String
+  description    String?
+  status         String    @default("pending")
+  reviewedBy     String?
+  reviewedAt     DateTime?
+  resolution     String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime
+  user           user      @relation(fields: [reporterId], references: [id], onDelete: Cascade)
 
-  @@map("group")
+  @@index([status])
+  @@index([reporterId])
+  @@index([contentType, contentId])
 }
 
-model GroupMember {
-  id       String   @id @default(cuid())
-  groupId  String
-  userId   String
-  role     String   @default("member") // admin, moderator, member
-  joinedAt DateTime @default(now())
-  group    Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([groupId, userId])
-  @@map("group_member")
-}
-
-model SharedQuest {
-  id         String   @id @default(cuid())
-  senderId   String
-  receiverId String
-  questId    String
-  message    String?
-  status     String   @default("pending") // pending, accepted, declined
-  createdAt  DateTime @default(now())
-
-  // Custom quest fields
-  isCustomQuest     Boolean @default(false) // True if this is a custom-created quest
-  customTitle       String? // Custom quest title
-  customDescription String? // Custom quest description
-  customCategory    String? // Custom category
-  customDifficulty  String? // Custom difficulty
-  customGoalType    String? // COLLECT_NOS, COLLECT_YES, or TAKE_ACTION
-  customGoalCount   Int? // Custom goal count
-  audioTranscript   String? // Voice-to-text transcript if created by voice
-
-  // Gifting fields
-  giftedXP     Int @default(0) // XP gifted from sender's balance
-  giftedPoints Int @default(0) // Points gifted from sender's balance
-
-  sender User  @relation(fields: [senderId], references: [id], onDelete: Cascade)
-  quest  Quest @relation(fields: [questId], references: [id], onDelete: Cascade)
-
-  @@map("shared_quest")
-}
-
-model JournalEntry {
-  id                String              @id @default(cuid())
-  userId            String
-  audioUrl          String? // URL to the stored audio recording
-  audioTranscript   String? // AI transcription of the audio
-  aiSummary         String // AI-generated summary
-  userEditedSummary String? // User's modified version of the summary
-  outcome           String // YES, NO, ACTIVITY
-  imageUrls         String? // JSON array of image URLs
-  location          String? // Optional location/place name
-  createdAt         DateTime            @default(now())
-  updatedAt         DateTime            @updatedAt
-  user              User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-  achievements      GrowthAchievement[]
-
-  @@map("journal_entry")
-}
-
-model GrowthAchievement {
-  id             String       @id @default(cuid())
-  userId         String
-  journalEntryId String
-  type           String // Type of achievement: "gold_star", "bronze_star", "silver_star"
-  description    String // Description of what was achieved
-  earnedAt       DateTime     @default(now())
-  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  journalEntry   JournalEntry @relation(fields: [journalEntryId], references: [id], onDelete: Cascade)
-
-  @@map("growth_achievement")
-}
-
-model Post {
-  id        String        @id @default(cuid())
+model session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+  ipAddress String?
+  userAgent String?
   userId    String
-  content   String
-  privacy   String        @default("PUBLIC") // PUBLIC, FRIENDS, GROUPS
-  groupId   String? // If posted to a specific group
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
-  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  group     Group?        @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  images    PostImage[]
-  likes     PostLike[]
-  comments  PostComment[]
-
-  @@map("post")
+  user      user     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model PostImage {
-  id        String   @id @default(cuid())
-  postId    String
-  imageUrl  String
-  order     Int      @default(0)
-  createdAt DateTime @default(now())
-  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
-
-  @@map("post_image")
+model shared_quest {
+  id                String   @id
+  senderId          String
+  receiverId        String
+  questId           String
+  message           String?
+  status            String   @default("pending")
+  createdAt         DateTime @default(now())
+  isCustomQuest     Boolean  @default(false)
+  customTitle       String?
+  customDescription String?
+  customCategory    String?
+  customDifficulty  String?
+  customGoalType    String?
+  customGoalCount   Int?
+  audioTranscript   String?
+  giftedXP          Int      @default(0)
+  giftedPoints      Int      @default(0)
+  quest             quest    @relation(fields: [questId], references: [id], onDelete: Cascade)
+  user              user     @relation(fields: [senderId], references: [id], onDelete: Cascade)
 }
 
-model PostLike {
-  id        String   @id @default(cuid())
-  postId    String
-  userId    String
-  createdAt DateTime @default(now())
-  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([postId, userId])
-  @@map("post_like")
-}
-
-model PostComment {
-  id        String   @id @default(cuid())
-  postId    String
-  userId    String
-  content   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("post_comment")
-}
-
-model Moment {
-  id        String   @id @default(cuid())
-  userId    String
-  groupId   String? // If posted to a specific group
-  imageUrl  String?
-  videoUrl  String?
-  content   String?
-  expiresAt DateTime // Stories expire after 24 hours
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  group     Group?   @relation(fields: [groupId], references: [id], onDelete: Cascade)
-
-  @@map("moment")
-}
-
-model Notification {
-  id        String   @id @default(cuid())
-  userId    String // User receiving the notification
-  senderId  String? // User who triggered the notification (optional)
-  type      String // FRIEND_REQUEST, FRIEND_ACCEPTED, QUEST_SHARED, QUEST_COMPLETED, etc.
-  title     String
-  message   String
-  read      Boolean  @default(false)
-  data      String? // JSON data for navigation/actions
-  createdAt DateTime @default(now())
-  user      User     @relation("NotificationReceiver", fields: [userId], references: [id], onDelete: Cascade)
-  sender    User?    @relation("NotificationSender", fields: [senderId], references: [id], onDelete: Cascade)
-
-  @@map("notification")
-}
-
-model Challenge {
-  id            String                @id @default(cuid())
-  userId        String
-  category      String // SALES, SOCIAL, ENTREPRENEURSHIP, etc.
-  startDate     DateTime              @default(now())
-  endDate       DateTime // startDate + 100 days
-  currentDay    Int                   @default(1) // Current day in the challenge (1-100)
-  isActive      Boolean               @default(true)
-  completedDays Int                   @default(0) // Number of days with completed quests
-  createdAt     DateTime              @default(now())
-  updatedAt     DateTime              @updatedAt
-  user          User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  dailyQuests   ChallengeDailyQuest[]
-
-  @@map("challenge")
-}
-
-model ChallengeDailyQuest {
-  id          String     @id @default(cuid())
-  challengeId String
-  day         Int // Day number (1-100)
-  questId     String? // Generated quest ID
-  userQuestId String? // User's quest instance
-  status      String     @default("PENDING") // PENDING, ACTIVE, COMPLETED, SKIPPED
-  generatedAt DateTime? // When the quest was generated
-  completedAt DateTime? // When the quest was completed
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  challenge   Challenge  @relation(fields: [challengeId], references: [id], onDelete: Cascade)
-  quest       Quest?     @relation(fields: [questId], references: [id], onDelete: SetNull)
-  userQuest   UserQuest? @relation(fields: [userQuestId], references: [id], onDelete: SetNull)
-
-  @@unique([challengeId, day])
-  @@map("challenge_daily_quest")
-}
-
-model GroupQuest {
-  id             String                  @id @default(cuid())
-  groupId        String
-  questId        String
-  createdBy      String // User who created this group quest
-  assignmentType String                  @default("all") // "all" (anyone can join) or "assigned" (specific members)
-  createdAt      DateTime                @default(now())
-  updatedAt      DateTime                @updatedAt
-  group          Group                   @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  quest          Quest                   @relation(fields: [questId], references: [id], onDelete: Cascade)
-  creator        User                    @relation("GroupQuestCreator", fields: [createdBy], references: [id], onDelete: Cascade)
-  participants   GroupQuestParticipant[]
-  assignments    GroupQuestAssignment[] // Specific member assignments
-
-  @@map("group_quest")
-}
-
-model GroupQuestParticipant {
-  id           String     @id @default(cuid())
-  groupQuestId String
-  userId       String
-  status       String     @default("joined") // joined, in_progress, completed, failed
-  noCount      Int        @default(0)
-  yesCount     Int        @default(0)
-  actionCount  Int        @default(0)
-  startedAt    DateTime?
-  completedAt  DateTime?
-  joinedAt     DateTime   @default(now())
-  groupQuest   GroupQuest @relation(fields: [groupQuestId], references: [id], onDelete: Cascade)
-  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([groupQuestId, userId])
-  @@map("group_quest_participant")
-}
-
-model GroupQuestAssignment {
-  id           String     @id @default(cuid())
-  groupQuestId String
-  userId       String // Assigned member
-  assignedAt   DateTime   @default(now())
-  groupQuest   GroupQuest @relation(fields: [groupQuestId], references: [id], onDelete: Cascade)
-  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([groupQuestId, userId])
-  @@map("group_quest_assignment")
-}
-
-model Subscription {
-  id                   String    @id @default(cuid())
+model subscription {
+  id                   String    @id
   userId               String    @unique
   stripeCustomerId     String?   @unique
   stripeSubscriptionId String?   @unique
-  status               String    @default("inactive") // active, canceled, past_due, trialing, inactive
-  plan                 String    @default("monthly") // monthly, annual
+  status               String    @default("inactive")
+  plan                 String    @default("monthly")
   currentPeriodStart   DateTime?
   currentPeriodEnd     DateTime?
   cancelAtPeriodEnd    Boolean   @default(false)
   canceledAt           DateTime?
   createdAt            DateTime  @default(now())
-  updatedAt            DateTime  @updatedAt
-  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("subscription")
+  updatedAt            DateTime
+  user                 user      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model TokenTransaction {
-  id                    String   @id @default(cuid())
+model swipe {
+  id                        String   @id
+  swiperId                  String
+  swipedId                  String
+  direction                 String
+  createdAt                 DateTime @default(now())
+  user_swipe_swiperIdTouser user     @relation("swipe_swiperIdTouser", fields: [swiperId], references: [id], onDelete: Cascade)
+  user_swipe_swipedIdTouser user     @relation("swipe_swipedIdTouser", fields: [swipedId], references: [id], onDelete: Cascade)
+
+  @@unique([swiperId, swipedId])
+}
+
+model token_transaction {
+  id                    String   @id
   userId                String
-  type                  String // purchase, earned, spent
-  amount                Int // Positive for purchase/earned, negative for spent
+  type                  String
+  amount                Int
   description           String?
-  stripePaymentIntentId String? // For purchases
-  questId               String? // For earned tokens from quest completion
+  stripePaymentIntentId String?
+  questId               String?
   createdAt             DateTime @default(now())
-  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("token_transaction")
+  user                  user     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model PolicyAcceptance {
-  id          String    @id @default(cuid())
-  userId      String
-  policyType  String // terms-of-service, privacy-policy, content-guidelines, dmca, recording-consent, liability-waiver, age-policy, safety-policy, payment-policy
-  version     String    @default("1.0") // Policy version
-  acceptedAt  DateTime  @default(now())
-  ipAddress   String?
-  userAgent   String?
-  emailSent   Boolean   @default(false) // Whether email confirmation was sent
-  emailSentAt DateTime?
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, policyType]) // One acceptance per policy type per user
-  @@map("policy_acceptance")
+model user {
+  id                                                                     String                       @id
+  email                                                                  String                       @unique
+  name                                                                   String?
+  emailVerified                                                          Boolean                      @default(false)
+  image                                                                  String?
+  isAdmin                                                                Boolean                      @default(false)
+  createdAt                                                              DateTime                     @default(now())
+  updatedAt                                                              DateTime                     @default(now())
+  account                                                                account[]
+  bug_report                                                             bug_report[]
+  challenge                                                              challenge[]
+  content_moderation                                                     content_moderation[]
+  friendship_friendship_receiverIdTouser                                 friendship[]                 @relation("friendship_receiverIdTouser")
+  friendship_friendship_initiatorIdTouser                                friendship[]                 @relation("friendship_initiatorIdTouser")
+  group                                                                  group[]
+  group_member                                                           group_member[]
+  group_quest                                                            group_quest[]
+  group_quest_assignment                                                 group_quest_assignment[]
+  group_quest_participant                                                group_quest_participant[]
+  growth_achievement                                                     growth_achievement[]
+  journal_entry                                                          journal_entry[]
+  live_stream                                                            live_stream[]
+  live_stream_comment                                                    live_stream_comment[]
+  match_match_user1IdTouser                                              match[]                      @relation("match_user1IdTouser")
+  match_match_user2IdTouser                                              match[]                      @relation("match_user2IdTouser")
+  message_message_receiverIdTouser                                       message[]                    @relation("message_receiverIdTouser")
+  message_message_senderIdTouser                                         message[]                    @relation("message_senderIdTouser")
+  moment                                                                 moment[]
+  notification_notification_senderIdTouser                               notification[]               @relation("notification_senderIdTouser")
+  notification_notification_userIdTouser                                 notification[]               @relation("notification_userIdTouser")
+  policy_acceptance                                                      policy_acceptance[]
+  post                                                                   post[]
+  post_comment                                                           post_comment[]
+  post_like                                                              post_like[]
+  profile                                                                profile?
+  quest_suggestion                                                       quest_suggestion[]
+  quest_verification                                                     quest_verification[]
+  quest_verification_request_quest_verification_request_receiverIdTouser quest_verification_request[] @relation("quest_verification_request_receiverIdTouser")
+  quest_verification_request_quest_verification_request_senderIdTouser   quest_verification_request[] @relation("quest_verification_request_senderIdTouser")
+  report                                                                 report[]
+  session                                                                session[]
+  shared_quest                                                           shared_quest[]
+  subscription                                                           subscription?
+  swipe_swipe_swiperIdTouser                                             swipe[]                      @relation("swipe_swiperIdTouser")
+  swipe_swipe_swipedIdTouser                                             swipe[]                      @relation("swipe_swipedIdTouser")
+  token_transaction                                                      token_transaction[]
+  user_block_user_block_blockedIdTouser                                  user_block[]                 @relation("user_block_blockedIdTouser")
+  user_block_user_block_blockerIdTouser                                  user_block[]                 @relation("user_block_blockerIdTouser")
+  user_quest                                                             user_quest[]
+  user_stats                                                             user_stats?
 }
 
-model BugReport {
-  id                String   @id @default(cuid())
-  userId            String
-  subject           String
-  description       String
-  category          String   @default("OTHER") // BUG, FEATURE_REQUEST, UI_ISSUE, PERFORMANCE, OTHER
-  stepsToReproduce  String?
-  deviceInfo        String?
-  status            String   @default("PENDING") // PENDING, REVIEWING, RESOLVED, CLOSED
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+model user_block {
+  id                              String   @id
+  blockerId                       String
+  blockedId                       String
+  reason                          String?
+  createdAt                       DateTime @default(now())
+  user_user_block_blockedIdTouser user     @relation("user_block_blockedIdTouser", fields: [blockedId], references: [id], onDelete: Cascade)
+  user_user_block_blockerIdTouser user     @relation("user_block_blockerIdTouser", fields: [blockerId], references: [id], onDelete: Cascade)
 
-  @@map("bug_report")
+  @@unique([blockerId, blockedId])
+  @@index([blockedId])
+  @@index([blockerId])
+}
+
+model user_quest {
+  id                         String                       @id
+  userId                     String
+  questId                    String
+  status                     String
+  noCount                    Int                          @default(0)
+  yesCount                   Int                          @default(0)
+  actionCount                Int                          @default(0)
+  startedAt                  DateTime?
+  completedAt                DateTime?
+  createdAt                  DateTime                     @default(now())
+  updatedAt                  DateTime
+  isFromFriend               Boolean                      @default(false)
+  sharedById                 String?
+  seriesId                   String?
+  seriesIndex                Int?
+  isSeriesQuest              Boolean                      @default(false)
+  isFlaggedAsSuspicious      Boolean                      @default(false)
+  suspiciousScore            Int?
+  suspiciousReasons          String?
+  lastActionAt               DateTime?
+  challenge_daily_quest      challenge_daily_quest[]
+  live_stream                live_stream[]
+  post                       post[]
+  quest_action_log           quest_action_log[]
+  quest_verification         quest_verification[]
+  quest_verification_request quest_verification_request[]
+  user                       user                         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quest                      quest                        @relation(fields: [questId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, questId])
+}
+
+model user_stats {
+  id                    String    @id
+  userId                String    @unique
+  currentStreak         Int       @default(0)
+  longestStreak         Int       @default(0)
+  totalXP               Int       @default(0)
+  totalPoints           Int       @default(0)
+  trophies              Int       @default(0)
+  diamonds              Int       @default(0)
+  tokens                Int       @default(0)
+  lastActiveAt          DateTime  @default(now())
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime
+  confidenceLevel       Int       @default(50)
+  previousConfidence    Int       @default(50)
+  confidenceUpdatedAt   DateTime  @default(now())
+  dailyConfidenceMeter  Float     @default(0)
+  lastConfidenceDecayAt DateTime  @default(now())
+  easyZoneCount         Int       @default(0)
+  growthZoneCount       Int       @default(0)
+  fearZoneCount         Int       @default(0)
+  lastQuestAttemptAt    DateTime?
+  lastQuestCompletedAt  DateTime?
+  questCompletionRate   Float     @default(0)
+  avgQuestDifficulty    Float     @default(1)
+  warmUpsCompleted      Int       @default(0)
+  lastWarmUpAt          DateTime?
+  user                  user      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now())
 }

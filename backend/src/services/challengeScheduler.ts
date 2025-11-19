@@ -127,9 +127,9 @@ export async function generateDailyChallengesForAllUsers() {
           },
         });
 
-        // Send notification with motivation
+        // Send notification with motivation and push notification
         const motivationMessages = getMotivationMessage(currentDay, challenge.category);
-        await db.notification.create({
+        const notification = await db.notification.create({
           data: {
             userId: challenge.userId,
             type: "DAILY_CHALLENGE",
@@ -139,10 +139,24 @@ export async function generateDailyChallengesForAllUsers() {
           },
         });
 
+        // Send push notification
+        try {
+          const { sendPushNotificationForNotification } = await import("./pushNotifications");
+          await sendPushNotificationForNotification(
+            challenge.userId,
+            notification.title,
+            notification.message,
+            JSON.parse(notification.data || "{}")
+          );
+        } catch (error) {
+          console.error("Error sending daily challenge push notification:", error);
+          // Continue even if push notification fails
+        }
+
         // Send additional motivational notification (random chance)
         if (Math.random() < 0.3) {
           // 30% chance to send extra motivation
-          await db.notification.create({
+          const motivationNotification = await db.notification.create({
             data: {
               userId: challenge.userId,
               type: "CHALLENGE_MOTIVATION",
@@ -151,6 +165,20 @@ export async function generateDailyChallengesForAllUsers() {
               data: JSON.stringify({ challengeId: challenge.id, day: currentDay }),
             },
           });
+
+          // Send push notification
+          try {
+            const { sendPushNotificationForNotification } = await import("./pushNotifications");
+            await sendPushNotificationForNotification(
+              challenge.userId,
+              motivationNotification.title,
+              motivationNotification.message,
+              JSON.parse(motivationNotification.data || "{}")
+            );
+          } catch (error) {
+            console.error("Error sending motivation push notification:", error);
+            // Continue even if push notification fails
+          }
         }
 
         console.log(`[Challenge Scheduler] Generated quest for challenge ${challenge.id}, day ${currentDay}`);
@@ -243,8 +271,8 @@ function getMotivationMessage(day: number, category: string): { daily: string; m
   ];
 
   return {
-    daily: dailyMessages[day % dailyMessages.length],
-    motivational: motivationalMessages[day % motivationalMessages.length],
+    daily: dailyMessages[day % dailyMessages.length] || dailyMessages[0],
+    motivational: motivationalMessages[day % motivationalMessages.length] || motivationalMessages[0],
   };
 }
 

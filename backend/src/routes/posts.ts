@@ -6,6 +6,7 @@ import {
   createPostRequestSchema,
   addCommentRequestSchema,
 } from "../../../shared/contracts";
+import { filterBlockedUsers } from "./moderation";
 
 const postsRouter = new Hono<AppType>();
 
@@ -19,7 +20,7 @@ postsRouter.post("/", zValidator("json", createPostRequestSchema), async (c) => 
     return c.json({ message: "Unauthorized" }, 401);
   }
 
-  const { content, privacy, groupId, imageUrls } = c.req.valid("json");
+  const { content, privacy, groupId, imageUrls, userQuestId } = c.req.valid("json");
 
   try {
     // Verify group exists if groupId provided
@@ -49,6 +50,7 @@ postsRouter.post("/", zValidator("json", createPostRequestSchema), async (c) => 
         content,
         privacy,
         groupId: groupId || null,
+        userQuestId: userQuestId || null,
       },
       include: {
         user: {
@@ -120,9 +122,19 @@ postsRouter.get("/feed", async (c) => {
       },
     });
 
-    const friendIds = friendships.map((f) =>
+    let friendIds = friendships.map((f) =>
       f.initiatorId === user.id ? f.receiverId : f.initiatorId
     );
+
+    // Filter out blocked users from friends list
+    friendIds = await filterBlockedUsers(user.id, friendIds);
+
+    // Get blocked users
+    const blockedUsers = await db.userBlock.findMany({
+      where: { blockerId: user.id },
+      select: { blockedId: true },
+    });
+    const blockedIds = blockedUsers.map((b) => b.blockedId);
 
     // Get user's groups
     const userGroups = await db.groupMember.findMany({
@@ -132,24 +144,31 @@ postsRouter.get("/feed", async (c) => {
 
     const groupIds = userGroups.map((g) => g.groupId);
 
-    // Fetch posts with privacy filtering
+    // Fetch posts with privacy filtering (excluding blocked users and deleted/hidden posts)
     const posts = await db.post.findMany({
       where: {
-        OR: [
-          // Public posts from everyone
-          { privacy: "PUBLIC" },
-          // Friends-only posts from friends
+        AND: [
           {
-            privacy: "FRIENDS",
-            userId: { in: [...friendIds, user.id] },
+            OR: [
+              // Public posts from everyone (except blocked)
+              { privacy: "PUBLIC", userId: { notIn: blockedIds } },
+              // Friends-only posts from friends
+              {
+                privacy: "FRIENDS",
+                userId: { in: [...friendIds, user.id] },
+              },
+              // Group posts from user's groups
+              {
+                privacy: "GROUPS",
+                groupId: { in: groupIds },
+              },
+              // User's own posts
+              { userId: user.id },
+            ],
           },
-          // Group posts from user's groups
-          {
-            privacy: "GROUPS",
-            groupId: { in: groupIds },
-          },
-          // User's own posts
-          { userId: user.id },
+          // Exclude deleted/hidden posts
+          { deletedAt: null },
+          { isHidden: false },
         ],
       },
       include: {

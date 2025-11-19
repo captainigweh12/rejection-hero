@@ -381,5 +381,112 @@ adminRouter.post(
   }
 );
 
+// ============================================
+// POST /api/admin/send-push-notification - Send push notification to user(s)
+// ============================================
+adminRouter.post(
+  "/send-push-notification",
+  zValidator(
+    "json",
+    z.object({
+      userId: z.string().optional(), // Send to specific user
+      userIds: z.array(z.string()).optional(), // Send to multiple users
+      sendToAll: z.boolean().optional().default(false), // Send to all users
+      title: z.string().min(1),
+      body: z.string().min(1),
+      data: z.record(z.any()).optional(), // Additional data for the notification
+    })
+  ),
+  async (c) => {
+    const { userId, userIds, sendToAll, title, body, data } = c.req.valid("json");
+
+    try {
+      const { sendPushNotificationToUsers, sendPushNotificationToAllUsers } = await import("../services/pushNotifications");
+
+      if (sendToAll) {
+        // Send to all users
+        const result = await sendPushNotificationToAllUsers(title, body, data);
+        return c.json({
+          success: true,
+          message: `Push notification sent to ${result.sent} user(s)`,
+          sent: result.sent,
+          failed: result.failed,
+          errors: result.errors,
+        });
+      } else if (userIds && userIds.length > 0) {
+        // Send to multiple users
+        const result = await sendPushNotificationToUsers(userIds, title, body, data);
+        return c.json({
+          success: true,
+          message: `Push notification sent to ${result.sent} user(s)`,
+          sent: result.sent,
+          failed: result.failed,
+          errors: result.errors,
+        });
+      } else if (userId) {
+        // Send to single user
+        const result = await sendPushNotificationToUsers([userId], title, body, data);
+        if (result.sent > 0) {
+          return c.json({
+            success: true,
+            message: "Push notification sent successfully",
+            sent: result.sent,
+            failed: result.failed,
+          });
+        } else {
+          return c.json(
+            {
+              success: false,
+              message: "Failed to send push notification. User may not have a push token registered.",
+              errors: result.errors,
+            },
+            400
+          );
+        }
+      } else {
+        return c.json({ message: "Either userId, userIds, or sendToAll is required" }, 400);
+      }
+    } catch (error: any) {
+      console.error("Error sending push notification:", error);
+      return c.json(
+        {
+          success: false,
+          message: error?.message || "Failed to send push notification",
+        },
+        500
+      );
+    }
+  }
+);
+
+// ============================================
+// GET /api/admin/push-stats - Get push notification statistics
+// ============================================
+adminRouter.get("/push-stats", async (c) => {
+  try {
+    const totalUsers = await db.user.count();
+    const usersWithPushTokens = await db.profile.count({
+      where: {
+        pushToken: { not: null },
+      },
+    });
+
+    return c.json({
+      totalUsers,
+      usersWithPushTokens,
+      percentageWithTokens: totalUsers > 0 ? ((usersWithPushTokens / totalUsers) * 100).toFixed(1) : "0",
+    });
+  } catch (error: any) {
+    console.error("Error getting push stats:", error);
+    return c.json(
+      {
+        success: false,
+        message: error?.message || "Failed to get push stats",
+      },
+      500
+    );
+  }
+});
+
 export { adminRouter };
 

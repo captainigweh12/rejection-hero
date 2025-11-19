@@ -25,6 +25,8 @@ import {
   Mail,
   CreditCard,
   Activity,
+  Bell,
+  Send,
 } from "lucide-react-native";
 import * as Haptics from "expo-haptics";
 
@@ -78,6 +80,11 @@ export default function AdminScreen({ navigation }: Props) {
   const [emailSubject, setEmailSubject] = useState("");
   const [emailBody, setEmailBody] = useState("");
   const [emailRecipient, setEmailRecipient] = useState<User | null>(null);
+  const [showPushModal, setShowPushModal] = useState(false);
+  const [pushTitle, setPushTitle] = useState("");
+  const [pushBody, setPushBody] = useState("");
+  const [pushRecipients, setPushRecipients] = useState<string[]>([]);
+  const [sendToAll, setSendToAll] = useState(false);
 
   // Check if current user is admin
   const { data: profileData } = useQuery<GetProfileResponse>({
@@ -95,6 +102,15 @@ export default function AdminScreen({ navigation }: Props) {
     queryKey: ["admin-stats"],
     queryFn: async () => {
       return api.get<AdminStats>("/api/admin/stats");
+    },
+    enabled: isAdmin,
+  });
+
+  // Fetch push notification stats
+  const { data: pushStats } = useQuery<{ totalUsers: number; usersWithPushTokens: number; percentageWithTokens: string }>({
+    queryKey: ["admin-push-stats"],
+    queryFn: async () => {
+      return api.get("/api/admin/push-stats");
     },
     enabled: isAdmin,
   });
@@ -180,6 +196,26 @@ export default function AdminScreen({ navigation }: Props) {
     },
     onError: (error: any) => {
       Alert.alert("Error", error?.message || "Failed to send email");
+    },
+  });
+
+  const sendPushNotificationMutation = useMutation({
+    mutationFn: async ({ userId, userIds, sendToAll, title, body, data }: { userId?: string; userIds?: string[]; sendToAll?: boolean; title: string; body: string; data?: any }) => {
+      return api.post("/api/admin/send-push-notification", { userId, userIds, sendToAll, title, body, data });
+    },
+    onSuccess: (data: any) => {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      const message = `Push notification sent to ${data.sent} user(s)${data.failed > 0 ? `. ${data.failed} failed.` : ""}`;
+      Alert.alert("Success", message);
+      setShowPushModal(false);
+      setPushTitle("");
+      setPushBody("");
+      setPushRecipients([]);
+      setSendToAll(false);
+      queryClient.invalidateQueries({ queryKey: ["admin-push-stats"] });
+    },
+    onError: (error: any) => {
+      Alert.alert("Error", error?.message || "Failed to send push notification");
     },
   });
 
@@ -448,6 +484,77 @@ export default function AdminScreen({ navigation }: Props) {
                   )}
                 </Pressable>
               </View>
+            </View>
+          </View>
+
+          {/* Push Notifications Section */}
+          <View style={{ paddingHorizontal: 20, marginBottom: 20 }}>
+            <Text style={{ fontSize: 18, fontWeight: "bold", color: colors.text, marginBottom: 12 }}>
+              Push Notifications
+            </Text>
+            
+            {/* Push Stats */}
+            {pushStats && (
+              <View
+                style={{
+                  padding: 16,
+                  borderRadius: 16,
+                  backgroundColor: "rgba(0, 217, 255, 0.15)",
+                  borderWidth: 1,
+                  borderColor: "#00D9FF",
+                  marginBottom: 12,
+                }}
+              >
+                <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 12 }}>
+                  <Bell size={20} color="#00D9FF" style={{ marginRight: 8 }} />
+                  <Text style={{ fontSize: 14, fontWeight: "600", color: colors.text }}>
+                    Push Notification Stats
+                  </Text>
+                </View>
+                <View style={{ flexDirection: "row", gap: 16 }}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 12, color: colors.textSecondary, marginBottom: 4 }}>
+                      Users with Push Tokens
+                    </Text>
+                    <Text style={{ fontSize: 20, fontWeight: "bold", color: "#00D9FF" }}>
+                      {pushStats.usersWithPushTokens} / {pushStats.totalUsers}
+                    </Text>
+                    <Text style={{ fontSize: 12, color: colors.textSecondary, marginTop: 4 }}>
+                      {pushStats.percentageWithTokens}%
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            )}
+
+            {/* Send Push Notification */}
+            <View
+              style={{
+                padding: 16,
+                borderRadius: 16,
+                backgroundColor: "rgba(0, 217, 255, 0.15)",
+                borderWidth: 1,
+                borderColor: "#00D9FF",
+              }}
+            >
+              <Pressable
+                onPress={() => setShowPushModal(true)}
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  paddingVertical: 12,
+                  paddingHorizontal: 16,
+                  borderRadius: 12,
+                  backgroundColor: "#00D9FF",
+                  gap: 8,
+                }}
+              >
+                <Bell size={20} color="white" />
+                <Text style={{ color: "white", fontWeight: "600", fontSize: 16 }}>
+                  Send Push Notification
+                </Text>
+              </Pressable>
             </View>
           </View>
 
@@ -816,6 +923,219 @@ export default function AdminScreen({ navigation }: Props) {
                   <ActivityIndicator size="small" color="white" />
                 ) : (
                   <Text style={{ color: "white", fontWeight: "600", fontSize: 16 }}>Send Email</Text>
+                )}
+              </Pressable>
+            </View>
+          </View>
+        )}
+
+        {/* Push Notification Modal */}
+        {showPushModal && (
+          <View
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: "rgba(0, 0, 0, 0.8)",
+              justifyContent: "center",
+              alignItems: "center",
+              padding: 20,
+            }}
+          >
+            <View
+              style={{
+                width: "100%",
+                maxWidth: 500,
+                backgroundColor: colors.card || "#1A1A24",
+                borderRadius: 20,
+                padding: 24,
+                maxHeight: "90%",
+              }}
+            >
+              <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+                  <Bell size={24} color="#00D9FF" />
+                  <Text style={{ fontSize: 20, fontWeight: "bold", color: colors.text }}>
+                    Send Push Notification
+                  </Text>
+                </View>
+                <Pressable
+                  onPress={() => {
+                    setShowPushModal(false);
+                    setPushTitle("");
+                    setPushBody("");
+                    setPushRecipients([]);
+                    setSendToAll(false);
+                  }}
+                  style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: 16,
+                    backgroundColor: "rgba(255, 255, 255, 0.1)",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <X size={20} color={colors.text} />
+                </Pressable>
+              </View>
+
+              {/* Recipient Selection */}
+              <View style={{ marginBottom: 16 }}>
+                <Text style={{ fontSize: 14, fontWeight: "600", color: colors.text, marginBottom: 8 }}>
+                  Recipients
+                </Text>
+                <View style={{ flexDirection: "row", gap: 8, marginBottom: 8 }}>
+                  <Pressable
+                    onPress={() => {
+                      setSendToAll(true);
+                      setPushRecipients([]);
+                    }}
+                    style={{
+                      flex: 1,
+                      paddingVertical: 10,
+                      paddingHorizontal: 12,
+                      borderRadius: 8,
+                      backgroundColor: sendToAll ? "#00D9FF" : "rgba(255, 255, 255, 0.1)",
+                      borderWidth: 1,
+                      borderColor: sendToAll ? "#00D9FF" : "rgba(255, 255, 255, 0.2)",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Text style={{ color: sendToAll ? "white" : colors.text, fontWeight: "600", fontSize: 14 }}>
+                      All Users
+                    </Text>
+                  </Pressable>
+                  <Pressable
+                    onPress={() => {
+                      setSendToAll(false);
+                      if (selectedUser && !pushRecipients.includes(selectedUser.id)) {
+                        setPushRecipients([selectedUser.id]);
+                      }
+                    }}
+                    style={{
+                      flex: 1,
+                      paddingVertical: 10,
+                      paddingHorizontal: 12,
+                      borderRadius: 8,
+                      backgroundColor: !sendToAll && (pushRecipients.length > 0 || selectedUser) ? "#00D9FF" : "rgba(255, 255, 255, 0.1)",
+                      borderWidth: 1,
+                      borderColor: !sendToAll && (pushRecipients.length > 0 || selectedUser) ? "#00D9FF" : "rgba(255, 255, 255, 0.2)",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Text style={{ color: !sendToAll && (pushRecipients.length > 0 || selectedUser) ? "white" : colors.text, fontWeight: "600", fontSize: 14 }}>
+                      Selected ({pushRecipients.length || (selectedUser ? 1 : 0)})
+                    </Text>
+                  </Pressable>
+                </View>
+                {!sendToAll && selectedUser && (
+                  <View
+                    style={{
+                      padding: 12,
+                      borderRadius: 8,
+                      backgroundColor: "rgba(0, 217, 255, 0.1)",
+                      borderWidth: 1,
+                      borderColor: "#00D9FF",
+                    }}
+                  >
+                    <Text style={{ color: colors.text, fontSize: 12 }}>
+                      Selected: {selectedUser.email}
+                    </Text>
+                  </View>
+                )}
+              </View>
+
+              <TextInput
+                value={pushTitle}
+                onChangeText={setPushTitle}
+                placeholder="Notification title"
+                placeholderTextColor={colors.textTertiary}
+                style={{
+                  paddingVertical: 12,
+                  paddingHorizontal: 12,
+                  borderRadius: 8,
+                  backgroundColor: "rgba(255, 255, 255, 0.1)",
+                  borderWidth: 1,
+                  borderColor: "rgba(255, 255, 255, 0.2)",
+                  color: colors.text,
+                  marginBottom: 16,
+                  fontSize: 16,
+                }}
+              />
+
+              <TextInput
+                value={pushBody}
+                onChangeText={setPushBody}
+                placeholder="Notification message"
+                placeholderTextColor={colors.textTertiary}
+                multiline
+                numberOfLines={4}
+                textAlignVertical="top"
+                style={{
+                  paddingVertical: 12,
+                  paddingHorizontal: 12,
+                  borderRadius: 8,
+                  backgroundColor: "rgba(255, 255, 255, 0.1)",
+                  borderWidth: 1,
+                  borderColor: "rgba(255, 255, 255, 0.2)",
+                  color: colors.text,
+                  minHeight: 100,
+                  marginBottom: 16,
+                  fontSize: 14,
+                }}
+              />
+
+              <Pressable
+                onPress={() => {
+                  if (pushTitle.trim() && pushBody.trim()) {
+                    if (sendToAll) {
+                      sendPushNotificationMutation.mutate({
+                        sendToAll: true,
+                        title: pushTitle.trim(),
+                        body: pushBody.trim(),
+                      });
+                    } else if (pushRecipients.length > 0) {
+                      sendPushNotificationMutation.mutate({
+                        userIds: pushRecipients,
+                        title: pushTitle.trim(),
+                        body: pushBody.trim(),
+                      });
+                    } else if (selectedUser) {
+                      sendPushNotificationMutation.mutate({
+                        userId: selectedUser.id,
+                        title: pushTitle.trim(),
+                        body: pushBody.trim(),
+                      });
+                    } else {
+                      Alert.alert("Error", "Please select recipients or enable 'All Users'");
+                    }
+                  } else {
+                    Alert.alert("Error", "Please fill in both title and message");
+                  }
+                }}
+                disabled={sendPushNotificationMutation.isPending || !pushTitle.trim() || !pushBody.trim()}
+                style={{
+                  paddingVertical: 12,
+                  paddingHorizontal: 16,
+                  borderRadius: 8,
+                  backgroundColor: "#00D9FF",
+                  alignItems: "center",
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  gap: 8,
+                  opacity: sendPushNotificationMutation.isPending || !pushTitle.trim() || !pushBody.trim() ? 0.5 : 1,
+                }}
+              >
+                {sendPushNotificationMutation.isPending ? (
+                  <ActivityIndicator size="small" color="white" />
+                ) : (
+                  <>
+                    <Send size={20} color="white" />
+                    <Text style={{ color: "white", fontWeight: "600", fontSize: 16 }}>Send Push Notification</Text>
+                  </>
                 )}
               </Pressable>
             </View>

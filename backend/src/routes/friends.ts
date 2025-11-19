@@ -3,6 +3,7 @@ import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
 import { type AppType } from "../types";
 import { db } from "../db";
+import { isUserBlocked, filterBlockedUsers } from "./moderation";
 
 const friendsRouter = new Hono<AppType>();
 
@@ -16,12 +17,19 @@ friendsRouter.get("/", async (c) => {
     return c.json({ message: "Unauthorized" }, 401);
   }
 
-  // Get all accepted friendships where user is either initiator or receiver
+  // Get blocked users
+  const blockedUsers = await db.userBlock.findMany({
+    where: { blockerId: user.id },
+    select: { blockedId: true },
+  });
+  const blockedIds = blockedUsers.map((b) => b.blockedId);
+
+  // Get all accepted friendships where user is either initiator or receiver (excluding blocked)
   const friendships = await db.friendship.findMany({
     where: {
       OR: [
-        { initiatorId: user.id, status: "ACCEPTED" },
-        { receiverId: user.id, status: "ACCEPTED" },
+        { initiatorId: user.id, status: "ACCEPTED", receiverId: { notIn: blockedIds } },
+        { receiverId: user.id, status: "ACCEPTED", initiatorId: { notIn: blockedIds } },
       ],
     },
     include: {
@@ -122,6 +130,14 @@ friendsRouter.post("/request", zValidator("json", sendRequestSchema), async (c) 
     return c.json({ message: "You cannot add yourself as a friend" }, 400);
   }
 
+  // Check if user is blocked
+  const isBlocked = await isUserBlocked(user.id, userId);
+  const hasBlockedYou = await isUserBlocked(userId, user.id);
+
+  if (isBlocked || hasBlockedYou) {
+    return c.json({ message: "Cannot send friend request to blocked user" }, 403);
+  }
+
   // Check if friendship already exists
   const existing = await db.friendship.findFirst({
     where: {
@@ -150,8 +166,8 @@ friendsRouter.post("/request", zValidator("json", sendRequestSchema), async (c) 
     where: { userId: user.id },
   });
 
-  // Create notification for the receiver
-  await db.notification.create({
+  // Create notification for the receiver and send push notification
+  const notification = await db.notification.create({
     data: {
       userId: userId,
       senderId: user.id,
@@ -161,6 +177,20 @@ friendsRouter.post("/request", zValidator("json", sendRequestSchema), async (c) 
       data: JSON.stringify({ friendshipId: friendship.id }),
     },
   });
+
+  // Send push notification
+  try {
+    const { sendPushNotificationForNotification } = await import("../services/pushNotifications");
+    await sendPushNotificationForNotification(
+      userId,
+      notification.title,
+      notification.message,
+      JSON.parse(notification.data || "{}")
+    );
+  } catch (error) {
+    console.error("Error sending push notification for friend request:", error);
+    // Continue even if push notification fails
+  }
 
   return c.json({ success: true, friendshipId: friendship.id });
 });
@@ -202,8 +232,8 @@ friendsRouter.post("/accept/:id", async (c) => {
     where: { userId: user.id },
   });
 
-  // Create notification for the initiator
-  await db.notification.create({
+  // Create notification for the initiator and send push notification
+  const notification = await db.notification.create({
     data: {
       userId: friendship.initiatorId,
       senderId: user.id,
@@ -213,6 +243,20 @@ friendsRouter.post("/accept/:id", async (c) => {
       data: JSON.stringify({ friendshipId: friendship.id, userId: user.id }),
     },
   });
+
+  // Send push notification
+  try {
+    const { sendPushNotificationForNotification } = await import("../services/pushNotifications");
+    await sendPushNotificationForNotification(
+      friendship.initiatorId,
+      notification.title,
+      notification.message,
+      JSON.parse(notification.data || "{}")
+    );
+  } catch (error) {
+    console.error("Error sending push notification for friend acceptance:", error);
+    // Continue even if push notification fails
+  }
 
   return c.json({ success: true, message: "Friend request accepted" });
 });

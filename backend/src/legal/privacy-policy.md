@@ -68,7 +68,7 @@ Depending on your location, you may have rights including:
 - Portability of your data
 - Opt-out of certain processing
 
-To exercise these rights, contact us at privacy@rejectionhero.com
+To exercise these rights, contact us at captainigweh12@gmail.com
 
 ## 8. Cookies and Tracking
 
@@ -89,4 +89,4 @@ We may update this Privacy Policy periodically. We will notify you of significan
 ## 12. Contact Us
 
 For privacy-related questions or concerns, contact us at:
-Email: privacy@rejectionhero.com
+Email: captainigweh12@gmail.com

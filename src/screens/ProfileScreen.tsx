@@ -907,6 +907,122 @@ export default function ProfileScreen({ navigation }: Props) {
                 </View>
               </LinearGradient>
 
+              {/* Quest Badge System Explanation */}
+              <View
+                style={{
+                  backgroundColor: colors.card,
+                  borderRadius: 16,
+                  padding: 20,
+                  borderWidth: 1,
+                  borderColor: colors.cardBorder,
+                }}
+              >
+                <Text style={{ fontSize: 18, fontWeight: "bold", color: colors.text, marginBottom: 12 }}>
+                  Quest Verification Badges
+                </Text>
+                <Text style={{ fontSize: 13, color: colors.textSecondary, marginBottom: 16, lineHeight: 20 }}>
+                  Earn special badges for completing quests in unique ways:
+                </Text>
+
+                <View style={{ gap: 12 }}>
+                  {/* Silver Badge */}
+                  <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+                    <View
+                      style={{
+                        width: 36,
+                        height: 36,
+                        borderRadius: 18,
+                        backgroundColor: "#9CA3AF20",
+                        borderWidth: 1.5,
+                        borderColor: "#9CA3AF",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Camera size={18} color="#9CA3AF" />
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ fontSize: 14, fontWeight: "700", color: "#9CA3AF" }}>Silver Badge</Text>
+                      <Text style={{ fontSize: 12, color: colors.textSecondary, marginTop: 2 }}>
+                        Quest shared to community with photos
+                      </Text>
+                    </View>
+                  </View>
+
+                  {/* Gold Badge */}
+                  <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+                    <View
+                      style={{
+                        width: 36,
+                        height: 36,
+                        borderRadius: 18,
+                        backgroundColor: "#F59E0B20",
+                        borderWidth: 1.5,
+                        borderColor: "#F59E0B",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Video size={18} color="#F59E0B" />
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ fontSize: 14, fontWeight: "700", color: "#F59E0B" }}>Gold Badge</Text>
+                      <Text style={{ fontSize: 12, color: colors.textSecondary, marginTop: 2 }}>
+                        Quest was live streamed
+                      </Text>
+                    </View>
+                  </View>
+
+                  {/* Bronze Badge */}
+                  <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+                    <View
+                      style={{
+                        width: 36,
+                        height: 36,
+                        borderRadius: 18,
+                        backgroundColor: "#CD7F3220",
+                        borderWidth: 1.5,
+                        borderColor: "#CD7F32",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Users size={18} color="#CD7F32" />
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ fontSize: 14, fontWeight: "700", color: "#CD7F32" }}>Bronze Badge</Text>
+                      <Text style={{ fontSize: 12, color: colors.textSecondary, marginTop: 2 }}>
+                        Quest performed with others (group quest or live viewers)
+                      </Text>
+                    </View>
+                  </View>
+
+                  {/* Blue Badge */}
+                  <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+                    <View
+                      style={{
+                        width: 36,
+                        height: 36,
+                        borderRadius: 18,
+                        backgroundColor: "#3B82F620",
+                        borderWidth: 1.5,
+                        borderColor: "#3B82F6",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Users size={18} color="#3B82F6" />
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ fontSize: 14, fontWeight: "700", color: "#3B82F6" }}>Blue Badge</Text>
+                      <Text style={{ fontSize: 12, color: colors.textSecondary, marginTop: 2 }}>
+                        Group quest (completed with a group)
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+              </View>
+
               {/* Growth Zone Progress */}
               <View
                 style={{

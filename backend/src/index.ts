@@ -36,6 +36,7 @@ import paymentsRouter, { paymentRedirectRouter } from "./routes/payments";
 import policiesRouter from "./routes/policies";
 import { adminRouter } from "./routes/admin";
 import bugReportRouter from "./routes/bug-reports";
+import { questVerificationRouter } from "./routes/questVerification";
 import { generateDailyChallengesForAllUsers, sendMotivationalNotifications } from "./services/challengeScheduler";
 import { type AppType } from "./types";
 
@@ -132,6 +133,13 @@ app.route("/api/group-live", groupLiveRouter);
 
 console.log("🎁 Mounting shared quests routes at /api/shared-quests");
 app.route("/api/shared-quests", sharedQuestsRouter);
+
+console.log("✅ Mounting quest verification routes at /api/quest-verification");
+app.route("/api/quest-verification", questVerificationRouter);
+
+console.log("🛡️ Mounting moderation routes at /api/moderation");
+import { moderationRouter } from "./routes/moderation";
+app.route("/api/moderation", moderationRouter);
 
 console.log("📓 Mounting journal routes at /api/journal");
 app.route("/api/journal", journalRouter);
@@ -241,6 +249,32 @@ setInterval(async () => {
     console.error("❌ [Leaderboard Notifications] Error:", error);
   }
 }, 6 * 60 * 60 * 1000); // Every 6 hours
+
+// Check quest time warnings every minute
+setInterval(async () => {
+  try {
+    const { checkQuestTimeWarnings } = await import("./services/questTimeWarnings");
+    const result = await checkQuestTimeWarnings();
+    if (result.warningsSent > 0) {
+      console.log(`⏰ [Quest Time Warnings] Sent ${result.warningsSent} time warning(s)`);
+    }
+  } catch (error) {
+    console.error("❌ [Quest Time Warnings] Error:", error);
+  }
+}, 60 * 1000); // Every minute
+
+// Send quest reminders every 2 hours
+setInterval(async () => {
+  try {
+    const { sendQuestReminders } = await import("./services/questTimeWarnings");
+    const result = await sendQuestReminders();
+    if (result.remindersSent > 0) {
+      console.log(`📋 [Quest Reminders] Sent ${result.remindersSent} reminder(s)`);
+    }
+  } catch (error) {
+    console.error("❌ [Quest Reminders] Error:", error);
+  }
+}, 2 * 60 * 60 * 1000); // Every 2 hours
 
 serve({ fetch: app.fetch, port: Number(env.PORT) }, () => {
   console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");

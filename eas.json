@@ -21,7 +21,8 @@
     },
     "production": {
       "android": {
-        "buildType": "app-bundle"
+        "buildType": "app-bundle",
+        "credentialsSource": "remote"
       },
       "ios": {
         "simulator": false
@@ -31,7 +32,8 @@
   "submit": {
     "production": {
       "android": {
-        "serviceAccountKeyPath": "./path/to/api-key.json"
+        "serviceAccountKeyPath": "./google-play-api-key.json",
+        "track": "internal"
       },
       "ios": {
         "ascAppId": "your-app-store-connect-app-id"

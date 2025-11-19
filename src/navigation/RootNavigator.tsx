@@ -255,6 +255,26 @@ function AuthWrapper() {
   const { data: sessionData, isPending } = useSession();
   const [hasChecked, setHasChecked] = useState(false);
 
+  // Register push token when user logs in
+  useEffect(() => {
+    if (sessionData?.user) {
+      const registerPushToken = async () => {
+        try {
+          const { getPushToken } = await import("@/services/notificationService");
+          const token = await getPushToken();
+          if (token) {
+            await api.post("/api/profile/push-token", { pushToken: token });
+            console.log("✅ [Push] Push token registered successfully");
+          }
+        } catch (error) {
+          console.error("❌ [Push] Failed to register push token:", error);
+          // Don't block login if push token registration fails
+        }
+      };
+      registerPushToken();
+    }
+  }, [sessionData?.user]);
+
   // Fetch user profile to check onboarding status and age verification
   const { data: profile, error: profileError, isLoading: profileLoading } = useQuery({
     queryKey: ["profile"],
