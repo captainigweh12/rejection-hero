@@ -356,6 +356,7 @@ export default function SettingsScreen({ navigation }: Props) {
                 shadowOpacity: 0.1,
                 shadowRadius: 4,
                 elevation: 2,
+                marginBottom: 12,
               }}
             >
               <View style={{ flexDirection: "row", alignItems: "center", gap: 16 }}>
@@ -382,6 +383,50 @@ export default function SettingsScreen({ navigation }: Props) {
               </View>
               <ChevronRight size={20} color={colors.textSecondary} />
             </Pressable>
+            {profileData?.age && profileData.age < 18 && (
+              <Pressable
+                onPress={() => navigation.navigate("ParentalGuidanceSettings")}
+                style={{
+                  backgroundColor: colors.card,
+                  borderRadius: 16,
+                  padding: 20,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  borderWidth: 1,
+                  borderColor: colors.cardBorder,
+                  shadowColor: colors.shadow,
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.1,
+                  shadowRadius: 4,
+                  elevation: 2,
+                }}
+              >
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 16 }}>
+                  <View
+                    style={{
+                      width: 48,
+                      height: 48,
+                      borderRadius: 24,
+                      backgroundColor: colors.surface,
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Smartphone size={24} color="#7E3FE4" />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontWeight: "600", fontSize: 16, color: colors.text, marginBottom: 4 }}>
+                      Parental Guidance Settings
+                    </Text>
+                    <Text style={{ color: colors.textSecondary, fontSize: 14 }}>
+                      Configure safety features for your account
+                    </Text>
+                  </View>
+                </View>
+                <ChevronRight size={20} color={colors.textSecondary} />
+              </Pressable>
+            )}
           </View>
 
           {/* Account Actions */}

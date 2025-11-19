@@ -122,6 +122,7 @@ model Profile {
   challengeDuration       Int? // 14, 30, or 100 days
   questMode               String?  @default("QUEST_BY_QUEST") // QUEST_BY_QUEST or AI_SERIES
   notificationPreferences String? // JSON object with notification type preferences
+  parentalGuidance        String? // JSON object with parental guidance settings
   createdAt               DateTime @default(now())
   updatedAt               DateTime @updatedAt
   user                    User     @relation(fields: [userId], references: [id], onDelete: Cascade)

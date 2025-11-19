@@ -42,6 +42,7 @@ import ChatScreen from "@/screens/ChatScreen";
 import CreateCustomQuestScreen from "@/screens/CreateCustomQuestScreen";
 import LeaderboardScreen from "@/screens/LeaderboardScreen";
 import LegalPoliciesScreen from "@/screens/LegalPoliciesScreen";
+import ParentalGuidanceSettingsScreen from "@/screens/ParentalGuidanceSettingsScreen";
 import { useSession } from "@/lib/useSession";
 import { api } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
@@ -120,6 +121,11 @@ const RootNavigator = () => {
         <RootStack.Screen
           name="LegalPolicies"
           component={LegalPoliciesScreen}
+          options={{ headerShown: false }}
+        />
+        <RootStack.Screen
+          name="ParentalGuidanceSettings"
+          component={ParentalGuidanceSettingsScreen}
           options={{ headerShown: false }}
         />
         <RootStack.Screen

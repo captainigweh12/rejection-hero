@@ -39,6 +39,7 @@ export type RootStackParamList = {
   Leaderboard: undefined;
   Journal: undefined;
   LegalPolicies: undefined;
+  ParentalGuidanceSettings: undefined;
 };
 
 export type BottomTabParamList = {
