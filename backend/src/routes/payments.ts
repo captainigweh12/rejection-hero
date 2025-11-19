@@ -415,190 +415,20 @@ const paymentRedirectRouter = new Hono<AppType>();
 // ============================================
 paymentRedirectRouter.get("/payment-success", async (c) => {
   const sessionId = c.req.query("session_id");
-  const appDeepLink = `vibecode://payment-success${sessionId ? `?session_id=${sessionId}` : ""}`;
+  const appDeepLink = `vibecode://home`;
 
-  return c.html(`
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Payment Successful - Rejection Hero</title>
-      <meta http-equiv="refresh" content="2;url=${appDeepLink}">
-      <script>
-        // Try to open app immediately
-        window.location.href = "${appDeepLink}";
-      </script>
-      <style>
-        body {
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          min-height: 100vh;
-          margin: 0;
-          background: linear-gradient(135deg, #0A0A0F 0%, #1A1A24 50%, #2A1A34 100%);
-          color: white;
-        }
-        .container {
-          text-align: center;
-          padding: 40px;
-          max-width: 500px;
-        }
-        .logo {
-          font-size: 32px;
-          font-weight: bold;
-          background: linear-gradient(135deg, #7E3FE4 0%, #00D9FF 100%);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          margin-bottom: 20px;
-        }
-        .success-icon {
-          font-size: 64px;
-          margin-bottom: 20px;
-        }
-        h1 { font-size: 24px; margin-bottom: 16px; }
-        p { font-size: 16px; opacity: 0.8; margin-bottom: 24px; }
-        .spinner {
-          border: 3px solid rgba(76, 175, 80, 0.3);
-          border-top: 3px solid #4CAF50;
-          border-radius: 50%;
-          width: 40px;
-          height: 40px;
-          animation: spin 1s linear infinite;
-          margin: 20px auto;
-        }
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-        .button {
-          display: inline-block;
-          background: linear-gradient(135deg, #4CAF50 0%, #45A049 100%);
-          color: white;
-          padding: 14px 32px;
-          border-radius: 24px;
-          text-decoration: none;
-          font-weight: bold;
-          margin-top: 20px;
-        }
-      </style>
-    </head>
-    <body>
-      <div class="container">
-        <div class="logo">🎯 Rejection Hero</div>
-        <div class="success-icon">✅</div>
-        <h1>Payment Successful!</h1>
-        <p>Your subscription has been activated. Redirecting to the app...</p>
-        <div class="spinner"></div>
-        <p style="font-size: 14px; opacity: 0.6;">If the app doesn't open automatically, click below:</p>
-        <a href="${appDeepLink}" class="button">Open in App</a>
-        <script>
-          // Fallback: if app doesn't open in 2 seconds, show manual link
-          setTimeout(function() {
-            const button = document.querySelector('.button');
-            if (button) button.style.display = 'inline-block';
-          }, 2000);
-        </script>
-      </div>
-    </body>
-    </html>
-  `);
+  // Use HTTP redirect to avoid platform processing issues
+  return c.redirect(appDeepLink, 302);
 });
 
 // ============================================
 // GET /payment-cancel - Payment cancel redirect page
 // ============================================
 paymentRedirectRouter.get("/payment-cancel", async (c) => {
-  const appDeepLink = `vibecode://payment-cancel`;
+  const appDeepLink = `vibecode://home`;
 
-  return c.html(`
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Payment Cancelled - Rejection Hero</title>
-      <meta http-equiv="refresh" content="2;url=${appDeepLink}">
-      <script>
-        // Try to open app immediately
-        window.location.href = "${appDeepLink}";
-      </script>
-      <style>
-        body {
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          min-height: 100vh;
-          margin: 0;
-          background: linear-gradient(135deg, #0A0A0F 0%, #1A1A24 50%, #2A1A34 100%);
-          color: white;
-        }
-        .container {
-          text-align: center;
-          padding: 40px;
-          max-width: 500px;
-        }
-        .logo {
-          font-size: 32px;
-          font-weight: bold;
-          background: linear-gradient(135deg, #7E3FE4 0%, #00D9FF 100%);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          margin-bottom: 20px;
-        }
-        .cancel-icon {
-          font-size: 64px;
-          margin-bottom: 20px;
-        }
-        h1 { font-size: 24px; margin-bottom: 16px; }
-        p { font-size: 16px; opacity: 0.8; margin-bottom: 24px; }
-        .spinner {
-          border: 3px solid rgba(255, 107, 53, 0.3);
-          border-top: 3px solid #FF6B35;
-          border-radius: 50%;
-          width: 40px;
-          height: 40px;
-          animation: spin 1s linear infinite;
-          margin: 20px auto;
-        }
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-        .button {
-          display: inline-block;
-          background: linear-gradient(135deg, #7E3FE4 0%, #5E1FA8 100%);
-          color: white;
-          padding: 14px 32px;
-          border-radius: 24px;
-          text-decoration: none;
-          font-weight: bold;
-          margin-top: 20px;
-        }
-      </style>
-    </head>
-    <body>
-      <div class="container">
-        <div class="logo">🎯 Rejection Hero</div>
-        <div class="cancel-icon">⚠️</div>
-        <h1>Payment Cancelled</h1>
-        <p>Your payment was cancelled. No charges were made. Redirecting to the app...</p>
-        <div class="spinner"></div>
-        <p style="font-size: 14px; opacity: 0.6;">If the app doesn't open automatically, click below:</p>
-        <a href="${appDeepLink}" class="button">Open in App</a>
-        <script>
-          // Fallback: if app doesn't open in 2 seconds, show manual link
-          setTimeout(function() {
-            const button = document.querySelector('.button');
-            if (button) button.style.display = 'inline-block';
-          }, 2000);
-        </script>
-      </div>
-    </body>
-    </html>
-  `);
+  // Use HTTP redirect to avoid platform processing issues
+  return c.redirect(appDeepLink, 302);
 });
 
 export { paymentRedirectRouter };
