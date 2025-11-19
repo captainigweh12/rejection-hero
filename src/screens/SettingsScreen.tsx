@@ -509,7 +509,7 @@ export default function SettingsScreen({ navigation }: Props) {
                     justifyContent: "center",
                   }}
                 >
-                  <Shield size={24} color="#FF6B35" />
+                  <Bug size={24} color="#FF6B35" />
                 </View>
                 <View style={{ flex: 1 }}>
                   <Text style={{ fontWeight: "600", fontSize: 16, color: colors.text, marginBottom: 4 }}>
