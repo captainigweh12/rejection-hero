@@ -86,6 +86,7 @@ export const getProfileResponseSchema = z.object({
   onboardingCompleted: z.boolean().optional(), // Track onboarding completion
   ageVerified: z.boolean().optional(), // Whether age has been verified
   parentalConsent: z.boolean().optional(), // For users 13-17
+  parentalGuidance: z.record(z.string(), z.boolean()).optional(), // Parental guidance settings
   isAdmin: z.boolean().optional(), // Whether user is an admin
 });
 export type GetProfileResponse = z.infer<typeof getProfileResponseSchema>;

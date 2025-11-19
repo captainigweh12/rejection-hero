@@ -1,5 +1,43 @@
 ## 🔧 Bug Fixes & Features
 
+### Parental Guidance Settings for Users Under 18 (2025-11-19)
+- **Added**: Comprehensive parental guidance features in Settings for users under 18
+- **Features**:
+  - **Content Safety Controls**:
+    - Content Restrictions: Filter mature content from quests
+    - Disable Live Streaming: Prevent streaming to public audience
+  - **Financial & Social Controls**:
+    - Purchase Restrictions: Require approval for in-app purchases
+    - Limit Social Features: Restrict direct messaging and social interaction
+  - **Monitoring & Safety**:
+    - Screen Time Alerts: Get notified of excessive app usage
+    - Safety Reporting: Enable reports on safety and moderation issues
+- **How It Works**:
+  - New screen: `ParentalGuidanceSettingsScreen` appears in Settings only for users under 18
+  - Age-based detection shows badge indicating enhanced safety features available
+  - All settings are toggles for easy enable/disable
+  - Changes save to backend and persist across sessions
+  - Settings stored as JSON in Profile model
+- **UI/UX**:
+  - Beautiful card-based interface matching app design
+  - Color-coded icons for each setting type (Shield, Eye, Lock, MessageSquare, AlertCircle)
+  - Age status badge shows "Enhanced safety features are available for your account"
+  - Info section explains purpose of parental guidance settings
+  - Save button appears only when changes are made
+- **Backend Integration**:
+  - New database field: `Profile.parentalGuidance` (JSON string)
+  - New endpoint: `PUT /api/profile/parental-guidance` to update settings
+  - Profile GET endpoint returns `parentalGuidance` object
+  - Settings validated and stored as JSON for flexibility
+- **Implementation Files**:
+  - Frontend: `/src/screens/ParentalGuidanceSettingsScreen.tsx` - New screen
+  - Frontend: `/src/screens/SettingsScreen.tsx` - Added link to parental guidance (conditional for under 18)
+  - Navigation: `/src/navigation/types.ts` - Added screen type
+  - Navigation: `/src/navigation/RootNavigator.tsx` - Registered screen
+  - Backend: `/backend/src/routes/profile.ts` - New PUT endpoint for updating settings
+  - Database: `/backend/prisma/schema.prisma` - Added parentalGuidance field to Profile
+  - Contracts: `/shared/contracts.ts` - Added parentalGuidance to response schema
+
 ### Journal Screen Navigation & UI Cleanup (2025-11-19)
 - **Added**: Back button to Journal screen for easy navigation
 - **Removed**: Unnecessary calendar picker section to simplify UI

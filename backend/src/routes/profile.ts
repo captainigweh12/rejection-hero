@@ -102,6 +102,7 @@ profileRouter.get("/", async (c) => {
       onboardingCompleted: profile.onboardingCompleted,
       ageVerified: profile.ageVerified,
       parentalConsent: profile.parentalConsent,
+      parentalGuidance: profile.parentalGuidance ? JSON.parse(profile.parentalGuidance) : undefined,
       isAdmin: userRecord?.isAdmin || false,
     } satisfies GetProfileResponse);
   } catch (error) {
@@ -345,6 +346,50 @@ profileRouter.post("/generate-avatar", zValidator("json", generateAvatarRequestS
       avatarUrl: "",
       message: "An error occurred while generating your avatar. Please try again.",
     } satisfies GenerateAvatarResponse, 500);
+  }
+});
+
+// ============================================
+// PUT /api/profile/parental-guidance - Update parental guidance settings
+// ============================================
+profileRouter.put("/parental-guidance", async (c) => {
+  try {
+    const user = c.get("user");
+
+    if (!user) {
+      return c.json({ message: "Unauthorized" }, 401);
+    }
+
+    const data = await c.req.json();
+    const { parentalGuidance } = data;
+
+    if (!parentalGuidance) {
+      return c.json({ message: "parentalGuidance is required" }, 400);
+    }
+
+    // Store parental guidance settings as JSON string
+    const parentalGuidanceJson = JSON.stringify(parentalGuidance);
+
+    const profile = await db.profile.update({
+      where: { userId: user.id },
+      data: {
+        parentalGuidance: parentalGuidanceJson,
+      },
+    });
+
+    console.log(`✅ [Profile] Updated parental guidance for user ${user.id}`);
+
+    return c.json({
+      success: true,
+      profile: {
+        id: profile.id,
+        userId: profile.userId,
+        parentalGuidance: JSON.parse(profile.parentalGuidance || "{}"),
+      },
+    });
+  } catch (error) {
+    console.error("❌ [Profile] Error in PUT /api/profile/parental-guidance:", error);
+    return c.json({ message: "Internal server error" }, 500);
   }
 });
 
