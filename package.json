@@ -1,6 +1,7 @@
 {
   "name": "template-app-53",
   "version": "1.0.0",
+  "packageManager": "bun@1.2.19",
   "main": "index.ts",
   "scripts": {
     "start": "expo start",
@@ -10,6 +11,7 @@
     "lint": "expo lint",
     "format": "bunx prettier --write .",
     "typecheck": "tsc --noEmit",
+    "postinstall": "node scripts/fix-menu-kotlin.js",
     "build:android:production": "eas build --platform android --profile production",
     "build:android:preview": "eas build --platform android --profile preview",
     "submit:android": "eas submit --platform android --latest",
@@ -153,10 +155,6 @@
     "typescript": "5.8.3"
   },
   "private": true,
-  "patchedDependencies": {
-    "react-native@0.79.2": "patches/react-native@0.79.2.patch",
-    "expo-asset@11.1.5": "patches/expo-asset@11.1.5.patch"
-  },
   "overrides": {
     "react-native-css-interop": "0.1.22",
     "react-native-reanimated": "3.17.4"

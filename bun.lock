@@ -142,10 +142,6 @@
       },
     },
   },
-  "patchedDependencies": {
-    "expo-asset@11.1.5": "patches/expo-asset@11.1.5.patch",
-    "react-native@0.79.2": "patches/react-native@0.79.2.patch",
-  },
   "overrides": {
     "react-native-css-interop": "0.1.22",
     "react-native-reanimated": "3.17.4",
