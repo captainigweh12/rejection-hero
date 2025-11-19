@@ -31,13 +31,18 @@ profileRouter.get("/", async (c) => {
     }
 
     console.log(`🔍 [Profile] Fetching profile for user ${user.id}`);
-    
-    // Get user's admin status
+
+    // Verify user exists in database (check for stale sessions)
     const userRecord = await db.user.findUnique({
       where: { id: user.id },
-      select: { isAdmin: true },
+      select: { id: true, isAdmin: true },
     });
-    
+
+    if (!userRecord) {
+      console.error(`❌ [Profile] User ${user.id} not found in database (stale session)`);
+      return c.json({ message: "User session invalid - please log in again" }, 401);
+    }
+
     let profile = await db.profile.findUnique({
       where: { userId: user.id },
     });

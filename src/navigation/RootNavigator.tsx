@@ -47,6 +47,7 @@ import ReportBugScreen from "@/screens/ReportBugScreen";
 import FriendQuestViewScreen from "@/screens/FriendQuestViewScreen";
 import { useSession } from "@/lib/useSession";
 import { api } from "@/lib/api";
+import { authClient } from "@/lib/authClient";
 import { useQuery } from "@tanstack/react-query";
 import { setupNotificationListeners, requestNotificationPermissions } from "@/services/notificationService";
 
@@ -263,13 +264,20 @@ function AuthWrapper() {
         const response = await api.get("/api/profile");
         return response as { onboardingCompleted?: boolean; ageVerified?: boolean; age?: number };
       } catch (error) {
+        // Check if it's a 401 (stale session) error
+        const errorMessage = String(error);
+        if (errorMessage.includes("401")) {
+          console.warn("🔐 [AuthWrapper] Session is stale (401), will clear session");
+          // Return a flag indicating session is invalid
+          return null;
+        }
         console.error("🔐 [AuthWrapper] Error fetching profile:", error);
         // Return default profile if fetch fails (assume onboarding not completed)
         return { onboardingCompleted: false, ageVerified: false };
       }
     },
     enabled: !!sessionData?.user,
-    retry: 2,
+    retry: 1,
     retryDelay: 1000,
   });
 
@@ -330,6 +338,20 @@ function AuthWrapper() {
         // Reset hasChecked to allow future checks if needed
         if (hasChecked) {
           setHasChecked(false);
+        }
+      } else if (profile === null) {
+        // Session is stale (401 error) - sign out and show login modal
+        if (!hasChecked) {
+          console.warn("🔐 [AuthWrapper] Stale session detected (401), signing out...");
+          setHasChecked(true);
+          // Sign out the user
+          authClient.signOut().then(() => {
+            // Redirect to login after sign out
+            navigation.reset({
+              index: 0,
+              routes: [{ name: "LoginModalScreen" }],
+            });
+          });
         }
       } else if (profileError) {
         // If profile fetch failed, assume age not verified and redirect

@@ -24,6 +24,17 @@ statsRouter.get("/", async (c) => {
     return c.json({ message: "Unauthorized" }, 401);
   }
 
+  // Verify user exists in database (check for stale sessions)
+  const userExists = await db.user.findUnique({
+    where: { id: user.id },
+    select: { id: true },
+  });
+
+  if (!userExists) {
+    console.error(`❌ [Stats] User ${user.id} not found in database (stale session)`);
+    return c.json({ message: "User session invalid - please log in again" }, 401);
+  }
+
   const stats = await db.userStats.findUnique({
     where: { userId: user.id },
   });
