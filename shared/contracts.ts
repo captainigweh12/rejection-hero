@@ -393,6 +393,11 @@ export const getSubscriptionResponseSchema = z.object({
 export type GetSubscriptionResponse = z.infer<typeof getSubscriptionResponseSchema>;
 
 // POST /api/payments/create-subscription - Create subscription checkout
+export const createSubscriptionRequestSchema = z.object({
+  plan: z.enum(["monthly", "yearly"]).optional().default("monthly"),
+});
+export type CreateSubscriptionRequest = z.infer<typeof createSubscriptionRequestSchema>;
+
 export const createSubscriptionResponseSchema = z.object({
   sessionId: z.string(),
   url: z.string().nullable(),

@@ -51,7 +51,11 @@ paymentsRouter.get("/subscription", async (c) => {
 // ============================================
 // POST /api/payments/create-subscription - Create subscription checkout session
 // ============================================
-paymentsRouter.post("/create-subscription", async (c) => {
+const createSubscriptionRequestSchema = z.object({
+  plan: z.enum(["monthly", "yearly"]).optional().default("monthly"),
+});
+
+paymentsRouter.post("/create-subscription", zValidator("json", createSubscriptionRequestSchema), async (c) => {
   const user = c.get("user");
 
   if (!user) {
@@ -63,6 +67,8 @@ paymentsRouter.post("/create-subscription", async (c) => {
   }
 
   try {
+    const { plan } = c.req.valid("json");
+
     // Get or create Stripe customer
     let subscription = await db.subscription.findUnique({
       where: { userId: user.id },
@@ -93,41 +99,50 @@ paymentsRouter.post("/create-subscription", async (c) => {
       });
     }
 
-    // Use stored price ID if available, otherwise create inline price
-    const subscriptionPriceId = env.STRIPE_SUBSCRIPTION_PRICE_ID;
+    // Define pricing for both plans
+    const pricing = {
+      monthly: {
+        name: "Rejection Hero Premium - Monthly",
+        description: "Monthly subscription for unlimited AI-powered quest generation",
+        interval: "month" as const,
+        amount: 499, // $4.99/month
+      },
+      yearly: {
+        name: "Rejection Hero Premium - Annual",
+        description: "Annual subscription for unlimited AI-powered quest generation (Save 33%!)",
+        interval: "year" as const,
+        amount: 4000, // $40/year (normally $59.88)
+      },
+    };
+
+    const selectedPlan = pricing[plan];
 
     // Create checkout session
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       payment_method_types: ["card"],
       mode: "subscription",
-      line_items: subscriptionPriceId
-        ? [
-            {
-              price: subscriptionPriceId,
-              quantity: 1,
+      line_items: [
+        {
+          price_data: {
+            currency: "usd",
+            product_data: {
+              name: selectedPlan.name,
+              description: selectedPlan.description,
             },
-          ]
-        : [
-            {
-              price_data: {
-                currency: "usd",
-                product_data: {
-                  name: "Rejection Hero Premium",
-                  description: "Monthly subscription for AI-powered quest generation",
-                },
-                recurring: {
-                  interval: "month",
-                },
-                unit_amount: 499, // $4.99
-              },
-              quantity: 1,
+            recurring: {
+              interval: selectedPlan.interval,
             },
-          ],
+            unit_amount: selectedPlan.amount,
+          },
+          quantity: 1,
+        },
+      ],
       success_url: `${env.BACKEND_URL}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${env.BACKEND_URL}/payment-cancel`,
       metadata: {
         userId: user.id,
+        plan,
       },
     });
 

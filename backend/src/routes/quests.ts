@@ -155,6 +155,46 @@ async function hasActiveSubscription(userId: string): Promise<boolean> {
   return subscription?.status === "active" || subscription?.status === "trialing";
 }
 
+// Helper function to check if user has active subscription or is within free tier
+async function canGenerateQuest(userId: string): Promise<{ canGenerate: boolean; questCount: number; hasSubscription: boolean }> {
+  // Check if user is admin - admins have full access
+  const user = await db.user.findUnique({
+    where: { id: userId },
+    select: { isAdmin: true },
+  });
+
+  if (user?.isAdmin) {
+    return { canGenerate: true, questCount: 0, hasSubscription: true };
+  }
+
+  // Check subscription status
+  const subscription = await db.subscription.findUnique({
+    where: { userId },
+  });
+
+  const hasActiveSubscription = subscription?.status === "active" || subscription?.status === "trialing";
+
+  if (hasActiveSubscription) {
+    return { canGenerate: true, questCount: 0, hasSubscription: true };
+  }
+
+  // Count AI-generated quests created by user
+  const questCount = await db.userQuest.count({
+    where: {
+      userId,
+      quest: {
+        isAIGenerated: true,
+      },
+    },
+  });
+
+  // Free tier: 10 quests
+  const FREE_QUEST_LIMIT = 10;
+  const canGenerate = questCount < FREE_QUEST_LIMIT;
+
+  return { canGenerate, questCount, hasSubscription: false };
+}
+
 // ============================================
 // POST /api/quests/generate - Generate AI quest
 // ============================================
@@ -163,6 +203,21 @@ questsRouter.post("/generate", zValidator("json", generateQuestRequestSchema), a
 
   if (!user) {
     return c.json({ message: "Unauthorized" }, 401);
+  }
+
+  // Check if user can generate quests (subscription or free tier)
+  const { canGenerate, questCount, hasSubscription } = await canGenerateQuest(user.id);
+
+  if (!canGenerate) {
+    return c.json(
+      {
+        message: "You've reached your free quest limit! Subscribe to continue creating unlimited AI-powered quests.",
+        requiresSubscription: true,
+        questCount,
+        freeLimit: 10,
+      },
+      403
+    );
   }
 
   const { category, difficulty, customPrompt, userLocation, userLatitude, userLongitude, preferredQuestType } = c.req.valid("json");

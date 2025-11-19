@@ -8,8 +8,9 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "@/navigation/types";
 import { api } from "@/lib/api";
 import { useTheme } from "@/contexts/ThemeContext";
-import type { GenerateQuestRequest, GenerateQuestResponse, AudioTranscribeResponse, EnrollChallengeRequest, EnrollChallengeResponse } from "@/shared/contracts";
+import type { GenerateQuestRequest, GenerateQuestResponse, AudioTranscribeResponse, EnrollChallengeRequest, EnrollChallengeResponse, GetSubscriptionResponse, CreateSubscriptionRequest, CreateSubscriptionResponse } from "@/shared/contracts";
 import { Audio } from "expo-av";
+import * as Linking from "expo-linking";
 import { playSound } from "@/services/soundService";
 
 type Props = NativeStackScreenProps<RootStackParamList, "CreateQuest">;
@@ -39,6 +40,36 @@ export default function CreateQuestScreen({ navigation }: Props) {
   const [isTranscribing, setIsTranscribing] = useState(false);
 
   const queryClient = useQueryClient();
+
+  // Fetch subscription status
+  const { data: subscriptionData } = useQuery<GetSubscriptionResponse>({
+    queryKey: ["subscription"],
+    queryFn: async () => {
+      return api.get<GetSubscriptionResponse>("/api/payments/subscription");
+    },
+  });
+
+  const hasActiveSubscription = subscriptionData?.hasActiveSubscription || false;
+
+  // Create subscription mutation with plan selection
+  const createSubscriptionMutation = useMutation({
+    mutationFn: async (data: CreateSubscriptionRequest) => {
+      return api.post<CreateSubscriptionResponse>("/api/payments/create-subscription", data);
+    },
+    onSuccess: async (data) => {
+      if (data.url) {
+        const canOpen = await Linking.canOpenURL(data.url);
+        if (canOpen) {
+          await Linking.openURL(data.url);
+        } else {
+          Alert.alert("Error", "Could not open payment page. Please try again.");
+        }
+      }
+    },
+    onError: (error) => {
+      Alert.alert("Error", error instanceof Error ? error.message : "Failed to create subscription");
+    },
+  });
 
   // Enroll in 100 Day Challenge mutation
   const enrollChallengeMutation = useMutation({
@@ -100,7 +131,28 @@ export default function CreateQuestScreen({ navigation }: Props) {
     },
     onError: (error: any) => {
       const errorMessage = error?.message || error?.toString() || "Failed to create quest";
-      Alert.alert("Error", errorMessage);
+
+      // Check if error is about subscription/quest limit
+      if (error?.requiresSubscription || errorMessage.includes("free quest limit") || errorMessage.includes("subscription") || errorMessage.includes("premium")) {
+        // Show plan selection modal
+        Alert.alert(
+          "Upgrade to Premium",
+          "You've used all 10 free quests! Choose a plan to continue creating unlimited AI-powered quests:",
+          [
+            {
+              text: "Monthly - $4.99/mo",
+              onPress: () => createSubscriptionMutation.mutate({ plan: "monthly" }),
+            },
+            {
+              text: "Annual - $40/yr (Save 33%!)",
+              onPress: () => createSubscriptionMutation.mutate({ plan: "yearly" }),
+            },
+            { text: "Cancel", style: "cancel" },
+          ]
+        );
+      } else {
+        Alert.alert("Error", errorMessage);
+      }
     },
   });
 

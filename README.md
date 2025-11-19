@@ -2094,9 +2094,10 @@ See `ENV_SETUP.md` for complete environment variable setup guide.
    - Secret Key: Added to backend `.env`
    - Publishable Key: Added to backend `.env`
    - **Features**:
+     - **Freemium Model**: 10 free AI-generated quests for all users
+     - **Monthly Subscription**: $4.99/month for unlimited AI quests
+     - **Annual Subscription**: $40/year for unlimited AI quests (Save 33%!)
      - Token purchases: $0.10 per token (for sending quests to friends)
-     - Users can start for free with all features unlocked
-     - AI quest generation is FREE for all users (no subscription required)
      - Users earn tokens by completing quests (proportional to NOs collected)
    - Backend environment variables: `STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`
    - **Webhook Setup Required**:
@@ -2135,7 +2136,36 @@ See `ENV_SETUP.md` for complete environment variable setup guide.
 
 ## Recent Updates
 
+### 2025-11-19: Implemented Freemium Model with 10 Free Quests 🎁
+- **Change**: Users get 10 free AI-generated quests, then need subscription for unlimited access
+- **Pricing**:
+  - **Monthly Plan**: $4.99/month for unlimited AI quests
+  - **Annual Plan**: $40/year (Save 33% - normally $59.88)
+- **What Changed**:
+  - Added `canGenerateQuest()` helper function to track user's quest count and subscription status
+  - Free users can create up to 10 AI-generated quests without payment
+  - After 10 quests, users see a plan selection modal with monthly and yearly options
+  - Backend validates quest limit before generating new quests (403 error with details when limit reached)
+  - Updated Stripe checkout to support both monthly ($4.99) and yearly ($40) subscriptions
+  - Admin users bypass all limits automatically
+- **Files Modified**:
+  - `/backend/src/routes/quests.ts` - Added quest limit tracking and validation
+  - `/backend/src/routes/payments.ts` - Added plan parameter (monthly/yearly) to subscription creation
+  - `/shared/contracts.ts` - Added CreateSubscriptionRequest schema with plan enum
+  - `/src/screens/CreateQuestScreen.tsx` - Added subscription query, mutation, and plan selection UI
+  - `/README.md` - Updated documentation
+- **User Experience**:
+  - New users can try the app with 10 free AI-generated quests
+  - Clear upgrade prompt with pricing when limit is reached
+  - Choice between monthly and annual plans with 33% savings on annual
+  - Subscribed users get unlimited AI quest generation
+- **Technical Details**:
+  - Quest count only includes AI-generated quests (isAIGenerated = true)
+  - Subscription status checked: "active" or "trialing" = unlimited access
+  - Error response includes: requiresSubscription, questCount, and freeLimit fields
+
 ### 2025-11-19: Removed Subscription Requirement for AI Quest Generation 🎉
+[SUPERSEDED BY FREEMIUM MODEL ABOVE]
 - **Change**: AI quest generation is now FREE for all users (no subscription required)
 - **Motivation**: Removed paywall to make core app features accessible to everyone
 - **What Changed**:
