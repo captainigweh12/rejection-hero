@@ -16,6 +16,7 @@ import { playSound, initializeSounds } from "@/services/soundService";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useFocusEffect } from "@react-navigation/native";
 import {
   Flame,
   Trophy,
@@ -91,6 +92,15 @@ export default function HomeScreen({ navigation }: Props) {
     },
     enabled: !!sessionData?.user,
   });
+
+  // Refetch quests when screen comes into focus to ensure active quests are displayed
+  useFocusEffect(
+    React.useCallback(() => {
+      if (sessionData?.user) {
+        refetchQuests();
+      }
+    }, [sessionData?.user, refetchQuests])
+  );
 
   const { data: statsData } = useQuery<GetUserStatsResponse>({
     queryKey: ["stats"],

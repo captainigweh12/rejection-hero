@@ -586,8 +586,54 @@ sharedQuestsRouter.post("/create-custom", zValidator("json", createCustomQuestSc
     select: { isAdmin: true },
   });
 
-  // Note: Custom quest creation is now available to all users (no subscription required)
-  // AI will still be used for quest generation, but no paywall
+  // Check free tier limit: max 10 custom quests for free users
+  if (!userRecord?.isAdmin) {
+    // Check if user has active premium subscription
+    const subscription = await db.subscription.findUnique({
+      where: { userId: user.id },
+      select: { status: true },
+    });
+
+    const isPremium = subscription?.status === "active";
+
+    // If not premium, count custom quests created by this user
+    if (!isPremium) {
+      const customQuestCount = await db.userQuest.count({
+        where: {
+          userId: user.id,
+          quest: {
+            isAIGenerated: true, // Only count AI-generated (custom) quests
+          },
+        },
+      });
+
+      // Also count shared custom quests sent by this user
+      const sharedCustomQuestCount = await db.sharedQuest.count({
+        where: {
+          senderId: user.id,
+          isCustomQuest: true,
+        },
+      });
+
+      const totalCustomQuests = customQuestCount + sharedCustomQuestCount;
+
+      if (totalCustomQuests >= 10) {
+        return c.json(
+          {
+            success: false,
+            message: "You've reached your free tier limit of 10 custom quests. Upgrade to premium to create unlimited custom quests!",
+            requiresPremium: true,
+            currentCustomQuests: totalCustomQuests,
+            limit: 10,
+          },
+          403
+        );
+      }
+    }
+  }
+
+  // Note: Custom quest creation is now available to all users
+  // Free users can create up to 10 custom quests, premium users have unlimited
 
   // Only verify friendships if friends are selected
   let validFriendIds: string[] = [];

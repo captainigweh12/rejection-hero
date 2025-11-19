@@ -110,24 +110,23 @@ export default function CreateQuestScreen({ navigation }: Props) {
       return api.post<GenerateQuestResponse>("/api/quests/generate", data);
     },
     onSuccess: async (data) => {
-      queryClient.invalidateQueries({ queryKey: ["quests"] });
-
       // Play quest created sound
       await playSound("questCreated");
 
       // Auto-start the quest if less than 2 active quests
       try {
         await api.post(`/api/quests/${data.userQuestId}/start`, {});
-        queryClient.invalidateQueries({ queryKey: ["quests"] });
+        await queryClient.refetchQueries({ queryKey: ["quests"] });
 
         // Play quest started sound
         await playSound("questStarted");
 
-        // Navigate to the quest detail page
-        navigation.navigate("QuestDetail", { userQuestId: data.userQuestId });
+        // Navigate to home tab to show active quests
+        navigation.navigate("Tabs", { screen: "HomeTab" });
       } catch (error) {
-        // If auto-start fails (e.g., already 2 active quests), just navigate to quest detail
-        navigation.navigate("QuestDetail", { userQuestId: data.userQuestId });
+        // If auto-start fails (e.g., already 2 active quests), refetch and navigate to home
+        await queryClient.refetchQueries({ queryKey: ["quests"] });
+        navigation.navigate("Tabs", { screen: "HomeTab" });
       }
     },
     onError: (error: any) => {

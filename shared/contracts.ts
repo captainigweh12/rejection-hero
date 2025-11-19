@@ -1364,6 +1364,11 @@ export const createCustomQuestResponseSchema = z.object({
   // Safety check result
   isSafe: z.boolean(),
   safetyWarning: z.string().optional(),
+
+  // Premium tier limit response (when free user exceeds 10 quests)
+  requiresPremium: z.boolean().optional(),
+  currentCustomQuests: z.number().optional(),
+  limit: z.number().optional(),
 });
 export type CreateCustomQuestResponse = z.infer<typeof createCustomQuestResponseSchema>;
 

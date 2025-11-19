@@ -101,33 +101,28 @@ export default function CreateCustomQuestScreen({ route, navigation }: Props) {
     mutationFn: async (data: CreateCustomQuestRequest) => {
       return api.post<CreateCustomQuestResponse>("/api/shared-quests/create-custom", data);
     },
-    onSuccess: (response) => {
+    onSuccess: async (response) => {
       if (response.success) {
         // Invalidate queries to refresh data
         queryClient.invalidateQueries({ queryKey: ["stats"] });
         queryClient.invalidateQueries({ queryKey: ["friends"] });
-        queryClient.invalidateQueries({ queryKey: ["quests"] }); // Refresh active quests list
+
+        // Refetch quests to ensure they're loaded before navigation
+        await queryClient.refetchQueries({ queryKey: ["quests"] });
 
         const isPersonalQuest = selectedFriendIds.length === 0;
 
         if (isPersonalQuest) {
-          // Personal quest created - navigate to quest detail
+          // Personal quest created - navigate to active quests
           Alert.alert(
             "Quest Created! 🎉",
             `Your custom quest has been created and is now active!`,
             [
               {
-                text: "Start Quest",
-                onPress: async () => {
-                  // Wait for the quests query to be refetched
-                  await new Promise((resolve) => setTimeout(resolve, 500));
-
-                  // Navigate to quest detail screen
-                  if (response.userQuestId) {
-                    navigation.navigate("QuestDetail", { userQuestId: response.userQuestId });
-                  } else {
-                    navigation.goBack();
-                  }
+                text: "View Quests",
+                onPress: () => {
+                  // Navigate to home tab to show active quests
+                  navigation.navigate("Tabs", { screen: "HomeTab" });
                 },
               },
             ]
@@ -150,6 +145,27 @@ export default function CreateCustomQuestScreen({ route, navigation }: Props) {
             ]
           );
         }
+      } else if ((response as any).requiresPremium) {
+        // Hit free tier limit - show upgrade prompt
+        const currentCount = (response as any).currentCustomQuests || 10;
+        Alert.alert(
+          "Free Tier Limit Reached 🔒",
+          `You've created ${currentCount} custom quests. Upgrade to premium for unlimited custom quests!`,
+          [
+            {
+              text: "Upgrade to Premium",
+              onPress: () => {
+                // TODO: Navigate to premium subscription screen
+                // navigation.navigate("Premium");
+                console.log("User wants to upgrade to premium");
+              },
+            },
+            {
+              text: "Cancel",
+              onPress: () => {},
+            },
+          ]
+        );
       } else if (!response.isSafe && response.safetyWarning) {
         Alert.alert("Quest Rejected ⚠️", response.safetyWarning);
       } else {

@@ -11,6 +11,7 @@
 | **Tokens System** | ✅ **UPDATED** | Changed from diamonds to tokens throughout |
 | **Onboarding Flow** | ✅ **FIXED** | New users now see age verification → onboarding |
 | **Custom Quests** | ✅ **FIXED** | Users can create custom quests without selecting friends |
+| **Free Tier Limits** | ✅ **IMPLEMENTED** | Free users limited to 10 custom quests, premium unlimited |
 | Database | ⚠️ Dev-Only | SQLite (needs PostgreSQL for production) |
 | SSL/TLS | ⚠️ Required | Not set up (needs Let's Encrypt for rejectionhero.com) |
 
@@ -22,6 +23,35 @@
 ---
 
 ## 🔧 Bug Fixes & Features
+
+### 🎁 Free Tier Limit: 10 Custom Quests (2025-11-19)
+- **✅ IMPLEMENTED**: Free users can now create up to 10 custom quests, premium users get unlimited
+- **How it Works**:
+  - **Free Users**: Limited to 10 total custom quests (personal + shared combined)
+  - **Premium Users** (Subscription.status = "active"): Unlimited custom quests
+  - **Admins**: Unlimited quests (no restrictions)
+- **Backend Logic** (`/backend/src/routes/sharedQuests.ts`):
+  - New validation check after admin check and before friendship verification
+  - Counts custom quests using: `db.userQuest.count()` for personal quests + `db.sharedQuest.count()` for shared quests
+  - Filters by `isAIGenerated: true` and `isCustomQuest: true` respectively
+  - Returns 403 with `requiresPremium: true` when limit reached
+  - Response includes: `currentCustomQuests` (total created), `limit: 10`
+- **Frontend Handling** (`/src/screens/CreateCustomQuestScreen.tsx`):
+  - Checks for `requiresPremium` flag in response
+  - Shows "Free Tier Limit Reached 🔒" alert with count of quests created
+  - Offers "Upgrade to Premium" button (placeholder for future premium flow)
+  - Falls back to existing error handling if not premium response
+- **Response Schema** (`/shared/contracts.ts`):
+  - Added optional fields: `requiresPremium`, `currentCustomQuests`, `limit`
+  - Maintains backward compatibility with existing response structure
+- **Database Queries**:
+  - Checks user's subscription status via `db.subscription.findUnique()`
+  - Counts personal custom quests: `UserQuest where userId AND quest.isAIGenerated = true`
+  - Counts shared custom quests: `SharedQuest where senderId AND isCustomQuest = true`
+- **Impact**:
+  - Free users encouraged to upgrade after 10 quests
+  - Premium subscription unlocks unlimited custom quest creation
+  - Admins bypass all limits for testing purposes
 
 ### 🎁 Custom Quest Creation Now Free & Optional for Friends (2025-11-19)
 - **✅ COMPLETELY FIXED**: Users can now create custom quests without selecting friends or requiring a subscription
