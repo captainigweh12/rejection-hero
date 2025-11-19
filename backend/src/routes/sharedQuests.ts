@@ -763,9 +763,9 @@ sharedQuestsRouter.post("/create-custom", zValidator("json", createCustomQuestSc
         userId: user.id,
         questId: quest.id,
         status: "active",
-        progress: 0,
-        yesCount: 0,
         noCount: 0,
+        yesCount: 0,
+        actionCount: 0,
       },
     });
 
