@@ -93,18 +93,21 @@ const fetchFn = async <T>(path: string, options: FetchOptions): Promise<T> => {
       } catch {
         errorData = { message: response.statusText };
       }
-      // Throw a descriptive error with status code, status text, and server error data
-      throw new Error(
-        `API Error: ${response.status} ${response.statusText} - ${JSON.stringify(errorData)}`,
-      );
+      // Create error object with parsed data attached
+      const error: any = new Error(errorData.message || `API Error: ${response.status} ${response.statusText}`);
+      // Attach all error data properties to the error object for easy access
+      Object.assign(error, errorData);
+      error.status = response.status;
+      error.statusText = response.statusText;
+      throw error;
     }
 
     // Step 4: Parse and return the successful response as JSON
     // The response is cast to the expected type T for type safety
     return response.json() as Promise<T>;
   } catch (error: any) {
-    // Enhanced error logging for debugging - but skip 400 errors (validation errors)
-    const is400Error = error.message && error.message.includes('400 bad request');
+    // Enhanced error logging for debugging - but skip 400 errors (validation/safety errors)
+    const is400Error = error.status === 400;
     if (!is400Error) {
       console.error(`[API Error] ${method} ${path}:`, error);
     }

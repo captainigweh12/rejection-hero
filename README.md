@@ -2136,6 +2136,22 @@ See `ENV_SETUP.md` for complete environment variable setup guide.
 
 ## Recent Updates
 
+### 2025-11-19: Improved API Error Handling for Safety Checks 🛡️
+- **Change**: Enhanced error handling to properly display safety rejection messages to users
+- **What Changed**:
+  - Updated `/src/lib/api.ts` to parse error response data and attach properties to error object
+  - Errors now include all response data (isSafe, safetyWarning, requiresSubscription, etc.)
+  - Removed `console.error()` logging for 400 errors to avoid red error screens
+  - Updated `/src/screens/CreateCustomQuestScreen.tsx` to handle safety rejections gracefully
+- **User Experience**:
+  - Safety-rejected quests now show user-friendly alert: "Quest Cannot Be Created" with specific reason
+  - No more red error screens for content safety checks
+  - Clear guidance when quests contain inappropriate content
+- **Technical Details**:
+  - Error object now has all backend response fields accessible (e.g., error.isSafe, error.safetyWarning)
+  - 400 status errors (validation/safety) are no longer logged to console
+  - Error messages come directly from backend instead of stringified JSON
+
 ### 2025-11-19: Implemented Freemium Model with 10 Free Quests 🎁
 - **Change**: Users get 10 free AI-generated quests, then need subscription for unlimited access
 - **Pricing**:

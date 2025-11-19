@@ -808,7 +808,8 @@ sharedQuestsRouter.post("/create-custom", zValidator("json", createCustomQuestSc
       data: {
         userId: user.id,
         questId: quest.id,
-        status: "active",
+        status: "ACTIVE",
+        startedAt: new Date(),
         noCount: 0,
         yesCount: 0,
         actionCount: 0,

@@ -173,8 +173,38 @@ export default function CreateCustomQuestScreen({ route, navigation }: Props) {
       }
     },
     onError: (error: any) => {
-      console.error("Create quest error:", error);
-      Alert.alert("Error", error.message || "Failed to create custom quest");
+      // Check if this is a safety rejection
+      if (error?.isSafe === false && error?.safetyWarning) {
+        Alert.alert(
+          "Quest Cannot Be Created",
+          error.safetyWarning || "This quest contains content that may be inappropriate or harmful. Please try a different quest idea.",
+          [{ text: "OK" }]
+        );
+        return;
+      }
+
+      // Check if this is a subscription/limit error
+      if (error?.requiresPremium) {
+        const currentCount = error?.currentCustomQuests || 10;
+        Alert.alert(
+          "Free Tier Limit Reached",
+          `You've created ${currentCount} custom quests. Upgrade to premium for unlimited custom quests!`,
+          [
+            {
+              text: "Upgrade to Premium",
+              onPress: () => {
+                // TODO: Navigate to premium subscription screen
+                console.log("User wants to upgrade to premium");
+              },
+            },
+            { text: "Cancel", style: "cancel" },
+          ]
+        );
+        return;
+      }
+
+      // Generic error
+      Alert.alert("Error", error?.message || "Failed to create custom quest");
     },
   });
 
