@@ -118,7 +118,10 @@ export default function CreateCustomQuestScreen({ route, navigation }: Props) {
             [
               {
                 text: "Start Quest",
-                onPress: () => {
+                onPress: async () => {
+                  // Wait for the quests query to be refetched
+                  await new Promise((resolve) => setTimeout(resolve, 500));
+
                   // Navigate to quest detail screen
                   if (response.userQuestId) {
                     navigation.navigate("QuestDetail", { userQuestId: response.userQuestId });

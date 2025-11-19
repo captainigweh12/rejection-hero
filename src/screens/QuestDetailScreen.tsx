@@ -482,6 +482,22 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
   }
 
   if (!userQuest && !showLoading && !showCompletion) {
+    // If still loading the quests query, show loading indicator instead of "Quest not found"
+    if (isLoading) {
+      return (
+        <View style={{ flex: 1, backgroundColor: colors.backgroundSolid }}>
+          <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
+            <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+              <ActivityIndicator size="large" color={colors.primary} />
+              <Text style={{ color: colors.textSecondary, fontSize: 16, marginTop: 16 }}>
+                Loading quest...
+              </Text>
+            </View>
+          </SafeAreaView>
+        </View>
+      );
+    }
+
     return (
       <View style={{ flex: 1, backgroundColor: colors.backgroundSolid }}>
         <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
