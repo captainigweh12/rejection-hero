@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
+import { useSession } from "@/lib/useSession";
 import type { GetProfileResponse } from "@/shared/contracts";
 
 export interface ParentalGuidancePreferences {
@@ -23,6 +24,7 @@ interface ParentalGuidanceContextType {
 const ParentalGuidanceContext = createContext<ParentalGuidanceContextType | undefined>(undefined);
 
 export function ParentalGuidanceProvider({ children }: { children: React.ReactNode }) {
+  const { data: sessionData } = useSession();
   const [settings, setSettings] = useState<ParentalGuidancePreferences>({
     contentRestrictions: false,
     liveStreamingDisabled: false,
@@ -37,6 +39,8 @@ export function ParentalGuidanceProvider({ children }: { children: React.ReactNo
     queryFn: async () => {
       return api.get<GetProfileResponse>("/api/profile");
     },
+    enabled: !!sessionData?.user, // Only fetch when user is authenticated
+    retry: 1,
   });
 
   // Update settings when profile data changes
