@@ -48,7 +48,7 @@ export async function createOrUpdateContact(contact: GoHighLevelContact) {
       console.error("❌ [GoHighLevel] API Error:", errorText);
 
       // Handle duplicate contact error - extract existing contact ID
-      if (response.status === 400 && errorText.includes("duplicated contacts")) {
+      if (response.status === 400 && (errorText.includes("duplicated contacts") || errorText.includes("does not allow duplicated contacts"))) {
         try {
           const errorData = JSON.parse(errorText);
           const existingContactId = errorData.meta?.contactId;
@@ -57,8 +57,8 @@ export async function createOrUpdateContact(contact: GoHighLevelContact) {
             console.log("ℹ️ [GoHighLevel] Contact already exists, using existing ID:", existingContactId);
             return {
               success: true,
-              contactId: existingContactId,
-              data: { contact: { id: existingContactId } },
+              contact: { id: existingContactId },
+              id: existingContactId,
               isDuplicate: true
             };
           }
@@ -70,7 +70,7 @@ export async function createOrUpdateContact(contact: GoHighLevelContact) {
       return {
         success: false,
         error: `GoHighLevel API failed: ${response.status} - ${errorText}`,
-        contactId: null
+        id: null
       };
     }
 
@@ -83,7 +83,8 @@ export async function createOrUpdateContact(contact: GoHighLevelContact) {
 
     return {
       success: true,
-      contactId,
+      contact: data.contact || { id: contactId },
+      id: contactId,
       data
     };
   } catch (error) {
@@ -91,7 +92,7 @@ export async function createOrUpdateContact(contact: GoHighLevelContact) {
     return {
       success: false,
       error: error instanceof Error ? error.message : String(error),
-      contactId: null
+      id: null
     };
   }
 }
