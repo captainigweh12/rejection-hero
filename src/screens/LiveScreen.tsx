@@ -127,7 +127,7 @@ export default function LiveScreen({ navigation }: Props) {
     queryFn: async () => {
       return api.get<GetQuestSuggestionsResponse>(`/api/live/${currentStreamId}/quest-suggestions`);
     },
-    enabled: !!currentStreamId && isStreaming,
+    enabled: !!currentStreamId && isStreaming && !!sessionData?.user,
     refetchInterval: 5000,
   });
 
