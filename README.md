@@ -2,16 +2,25 @@
 
 ### Database Schema Sync Fix (2025-11-19)
 - **Fixed**: API error 500 on `/api/challenges/active` endpoint
-- **Issue**: Database was not migrated, causing Prisma to fail when querying Challenge table
-- **Solution**: Used `prisma db push` to sync database schema with Prisma schema
+- **Fixed**: API error 500 on `/api/stats` and `/api/profile` endpoints (foreign key constraint violations)
+- **Issue**: Database was not migrated, causing Prisma to fail when querying Challenge table. When database was synced, user data was accidentally deleted.
+- **Root Cause**:
+  - Initial sync with `prisma db push --accept-data-loss` wiped existing user data from Better Auth
+  - Sessions still existed but referenced users that were deleted
+  - Profile and UserStats creation failed due to missing User foreign keys
+- **Solution**:
+  - Used `prisma db push` to sync database schema with Prisma schema
+  - Created migration baseline at `prisma/migrations/0_init/`
+  - Created backup at `prisma/dev.db.backup` before fixes
+  - **⚠️ Users need to log out and log back in** to recreate their accounts
 - **Result**: Challenge endpoints now work correctly, including:
   - GET `/api/challenges/active` - Get active challenge
   - POST `/api/challenges/enroll` - Enroll in 100 Day Challenge
   - POST `/api/challenges/generate-daily` - Generate daily quest
 - **Technical Details**:
   - Database migrations were missing causing schema mismatch
-  - Prisma Studio and backend server were locking database
-  - Used `--accept-data-loss` flag to force schema sync
+  - Prisma Studio and backend server were locking database during migration attempts
+  - Migration history established for future schema changes
 - **TypeScript Fixes**:
   - Fixed NotificationSettingsScreen Props type (was using "Settings" instead of "NotificationSettings")
   - Fixed AdminScreen profileData type (added GetProfileResponse type import and generic)
