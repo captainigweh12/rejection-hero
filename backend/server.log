@@ -7,14 +7,14 @@ $ prisma generate
 Environment variables loaded from .env
 Prisma schema loaded from prisma/schema.prisma
 
-✔ Generated Prisma Client (v6.17.1) to ./generated/prisma in 367ms
+✔ Generated Prisma Client (v6.17.1) to ./generated/prisma in 356ms
 
 Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
 
-Tip: Want to turn off tips and other hints? https://pris.ly/tip-4-nohints
+Tip: Need your database queries to be 1000x faster? Accelerate offers you that and more: https://pris.ly/tip-2-accelerate
 
 
-Checked 778 installs across 720 packages (no changes) [1.94s]
+Checked 778 installs across 720 packages (no changes) [1.90s]
 Starting server in dev mode with hot reload...
 $ NODE_ENV=development bun run --hot src/index.ts
 Failed to find Response internal state key
@@ -173,68 +173,42 @@ Failed to find Response internal state key
 ⏰ Challenge Scheduler: Active (Daily at 9 AM & 2 PM UTC)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-<-- GET /api/challenges/active
-🔐 [Auth Middleware] GET /api/challenges/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/challenges/active [32m200[0m 7ms
 <-- GET /api/auth/get-session
---> GET /api/auth/get-session [32m200[0m 4ms
+--> GET /api/auth/get-session [32m200[0m 8ms
 <-- GET /api/quests
 🔐 [Auth Middleware] GET /api/quests - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/quests [32m200[0m 3ms
-<-- GET /api/challenges/active
+--> GET /api/quests [32m200[0m 4ms
 <-- GET /api/stats/weekly-forecast
+<-- GET /api/challenges/active
+🔐 [Auth Middleware] GET /api/stats/weekly-forecast - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+<-- GET /api/profile
 <-- GET /api/stats
 <-- GET /api/stats/reflection-prompt
 🔐 [Auth Middleware] GET /api/challenges/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
-🔐 [Auth Middleware] GET /api/stats/weekly-forecast - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+🔐 [Auth Middleware] GET /api/profile - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+👤 [Profile] GET request - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+🔍 [Profile] Fetching profile for user N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
 🔐 [Auth Middleware] GET /api/stats - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/challenges/active [32m200[0m 11ms
 🔐 [Auth Middleware] GET /api/stats/reflection-prompt - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/stats/reflection-prompt [32m200[0m 7ms
---> GET /api/challenges/active [32m200[0m 8ms
+--> GET /api/stats/reflection-prompt [32m200[0m 8ms
 --> GET /api/stats [32m200[0m 9ms
-<-- GET /api/profile
-🔐 [Auth Middleware] GET /api/profile - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
-👤 [Profile] GET request - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
-🔍 [Profile] Fetching profile for user N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
 ✅ [Profile] Successfully fetched profile for user N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/profile [32m200[0m 3ms
---> GET /api/stats/weekly-forecast [32m200[0m 5s
-<-- GET /api/auth/get-session
---> GET /api/auth/get-session [32m200[0m 2ms
-<-- GET /api/quests
-<-- GET /api/stats/reflection-prompt
-🔐 [Auth Middleware] GET /api/quests - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
-🔐 [Auth Middleware] GET /api/stats/reflection-prompt - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/stats/reflection-prompt [32m200[0m 1ms
---> GET /api/quests [32m200[0m 3ms
-<-- GET /api/profile
-🔐 [Auth Middleware] GET /api/profile - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
-👤 [Profile] GET request - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
-🔍 [Profile] Fetching profile for user N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
-<-- GET /api/challenges/active
-<-- GET /api/stats/weekly-forecast
-🔐 [Auth Middleware] GET /api/challenges/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
-✅ [Profile] Successfully fetched profile for user N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/profile [32m200[0m 5ms
-🔐 [Auth Middleware] GET /api/stats/weekly-forecast - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/challenges/active [32m200[0m 1ms
-<-- GET /api/stats
-🔐 [Auth Middleware] GET /api/stats - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/stats [32m200[0m 2ms
+--> GET /api/profile [32m200[0m 10ms
 <-- GET /api/payments/subscription
 🔐 [Auth Middleware] GET /api/payments/subscription - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
 --> GET /api/payments/subscription [32m200[0m 2ms
 <-- GET /api/friends
 🔐 [Auth Middleware] GET /api/friends - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
 --> GET /api/friends [32m200[0m 2ms
---> GET /api/stats/weekly-forecast [32m200[0m 8s
+--> GET /api/stats/weekly-forecast [32m200[0m 5s
 <-- POST /api/shared-quests/create-custom
 🔐 [Auth Middleware] POST /api/shared-quests/create-custom - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
 🛡️ Running AI safety check on quest description...
 ✅ Quest passed safety check
 🤖 Running AI fine-tuning to optimize quest...
 ✅ AI fine-tuning completed: {
-  description: "Practice your social skills by saying hi to 5 different people today. Each interaction is a chance to build your confidence and embrace the possibilities of rejection. Remember, it's all about the experience, not just the outcome!",
+  description: "Practice your social confidence by saying hi to 5 different people. This quest will help you build networking skills and become more comfortable with social interactions. Remember, each 'no' is a step closer to your goal of overcoming fear of rejection!",
   category: "SOCIAL",
   goalType: "COLLECT_NOS",
   goalCount: 5,
@@ -242,10 +216,19 @@ Failed to find Response internal state key
   location: null,
 }
 ✅ Personal custom quest created for user N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> POST /api/shared-quests/create-custom [32m200[0m 5s
+--> POST /api/shared-quests/create-custom [32m200[0m 4s
 <-- GET /api/stats
 🔐 [Auth Middleware] GET /api/stats - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
 --> GET /api/stats [32m200[0m 3ms
+<-- GET /api/quests
 <-- GET /api/friends
+🔐 [Auth Middleware] GET /api/quests - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
 🔐 [Auth Middleware] GET /api/friends - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/friends [32m200[0m 2ms
+--> GET /api/quests [32m200[0m 18ms
+--> GET /api/friends [32m200[0m 18ms
+<-- GET /api/stats/leaderboard
+🔐 [Auth Middleware] GET /api/stats/leaderboard - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/stats/leaderboard [32m200[0m 3ms
+<-- GET /api/challenges/active
+🔐 [Auth Middleware] GET /api/challenges/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/challenges/active [32m200[0m 2ms
