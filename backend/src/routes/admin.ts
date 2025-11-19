@@ -85,10 +85,28 @@ adminRouter.get("/users", async (c) => {
       email: u.email,
       name: u.name,
       isAdmin: u.isAdmin,
-      createdAt: u.createdAt,
-      profile: u.Profile,
-      subscription: u.Subscription,
-      stats: u.UserStats,
+      createdAt: u.createdAt.toISOString(),
+      profile: u.Profile
+        ? {
+            displayName: u.Profile.displayName,
+            username: u.Profile.username,
+            createdAt: u.Profile.createdAt.toISOString(),
+          }
+        : null,
+      subscription: u.Subscription
+        ? {
+            status: u.Subscription.status,
+            plan: u.Subscription.plan,
+            currentPeriodEnd: u.Subscription.currentPeriodEnd?.toISOString() || null,
+          }
+        : null,
+      stats: u.UserStats
+        ? {
+            totalXP: u.UserStats.totalXP,
+            currentStreak: u.UserStats.currentStreak,
+            createdAt: u.UserStats.createdAt.toISOString(),
+          }
+        : null,
     })),
     total,
     page,
@@ -134,6 +152,9 @@ adminRouter.delete("/users/:id", async (c) => {
 
   // Prevent deleting yourself
   const currentUser = c.get("user");
+  if (!currentUser) {
+    return c.json({ message: "Unauthorized" }, 401);
+  }
   if (userId === currentUser.id) {
     return c.json({ message: "Cannot delete your own account" }, 400);
   }
@@ -286,6 +307,76 @@ adminRouter.post(
         message: `Invitation would be sent to ${email}. User will become admin upon signup.`,
         note: "In production, implement email invitation system",
       });
+    }
+  }
+);
+
+// ============================================
+// POST /api/admin/send-email - Send email to user(s)
+// ============================================
+adminRouter.post(
+  "/send-email",
+  zValidator(
+    "json",
+    z.object({
+      userId: z.string().optional(), // Send to specific user
+      email: z.string().email().optional(), // Or send to specific email
+      subject: z.string().min(1),
+      html: z.string().min(1),
+    })
+  ),
+  async (c) => {
+    const { userId, email: emailAddress, subject, html } = c.req.valid("json");
+
+    // Import email service
+    const { sendEmail } = await import("../services/email");
+
+    try {
+      if (userId) {
+        // Send to specific user
+        const user = await db.user.findUnique({
+          where: { id: userId },
+          select: { email: true, name: true },
+        });
+
+        if (!user) {
+          return c.json({ message: "User not found" }, 404);
+        }
+
+        await sendEmail({
+          to: user.email,
+          subject,
+          html,
+        });
+
+        return c.json({
+          success: true,
+          message: `Email sent to ${user.email}`,
+        });
+      } else if (emailAddress) {
+        // Send to specific email address
+        await sendEmail({
+          to: emailAddress,
+          subject,
+          html,
+        });
+
+        return c.json({
+          success: true,
+          message: `Email sent to ${emailAddress}`,
+        });
+      } else {
+        return c.json({ message: "Either userId or email is required" }, 400);
+      }
+    } catch (error: any) {
+      console.error("Error sending email:", error);
+      return c.json(
+        {
+          success: false,
+          message: error?.message || "Failed to send email",
+        },
+        500
+      );
     }
   }
 );

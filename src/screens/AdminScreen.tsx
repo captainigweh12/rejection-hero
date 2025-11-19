@@ -66,6 +66,10 @@ export default function AdminScreen({ navigation }: Props) {
   const [page, setPage] = useState(1);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [inviteEmail, setInviteEmail] = useState("");
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  const [emailSubject, setEmailSubject] = useState("");
+  const [emailBody, setEmailBody] = useState("");
+  const [emailRecipient, setEmailRecipient] = useState<User | null>(null);
 
   // Check if current user is admin
   const { data: profileData } = useQuery<GetProfileResponse>({
@@ -156,6 +160,23 @@ export default function AdminScreen({ navigation }: Props) {
     },
     onError: (error: any) => {
       Alert.alert("Error", error?.message || "Failed to manage subscription");
+    },
+  });
+
+  const sendEmailMutation = useMutation({
+    mutationFn: async ({ userId, subject, html }: { userId: string; subject: string; html: string }) => {
+      return api.post("/api/admin/send-email", { userId, subject, html });
+    },
+    onSuccess: (data: any) => {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      Alert.alert("Success", data.message || "Email sent successfully");
+      setShowEmailModal(false);
+      setEmailSubject("");
+      setEmailBody("");
+      setEmailRecipient(null);
+    },
+    onError: (error: any) => {
+      Alert.alert("Error", error?.message || "Failed to send email");
     },
   });
 
@@ -474,6 +495,16 @@ export default function AdminScreen({ navigation }: Props) {
                         </Pressable>
                       )}
                       <Pressable
+                        onPress={() => {
+                          setEmailRecipient(user);
+                          setShowEmailModal(true);
+                        }}
+                        className="py-2 px-4 rounded-xl items-center"
+                        style={{ backgroundColor: "rgba(126, 63, 228, 0.2)" }}
+                      >
+                        <Mail size={16} color="#7E3FE4" />
+                      </Pressable>
+                      <Pressable
                         onPress={() => handleDeleteUser(user)}
                         disabled={deleteUserMutation.isPending}
                         className="py-2 px-4 rounded-xl items-center"
@@ -602,6 +633,93 @@ export default function AdminScreen({ navigation }: Props) {
                   <Text className="text-white font-semibold">Extend Subscription</Text>
                 </Pressable>
               </View>
+            </View>
+          </View>
+        )}
+
+        {/* Email Modal */}
+        {showEmailModal && emailRecipient && (
+          <View
+            className="absolute inset-0 items-center justify-center"
+            style={{ backgroundColor: "rgba(0, 0, 0, 0.7)" }}
+          >
+            <View
+              className="w-11/12 p-6 rounded-2xl max-h-[90%]"
+              style={{ backgroundColor: colors.card, borderWidth: 1, borderColor: colors.cardBorder }}
+            >
+              <View className="flex-row items-center justify-between mb-4">
+                <Text className="text-xl font-bold" style={{ color: colors.text }}>
+                  Send Email
+                </Text>
+                <Pressable
+                  onPress={() => {
+                    setShowEmailModal(false);
+                    setEmailSubject("");
+                    setEmailBody("");
+                    setEmailRecipient(null);
+                  }}
+                >
+                  <X size={24} color={colors.textSecondary} />
+                </Pressable>
+              </View>
+              <Text className="text-sm mb-4" style={{ color: colors.textSecondary }}>
+                To: {emailRecipient.email}
+              </Text>
+              <TextInput
+                value={emailSubject}
+                onChangeText={setEmailSubject}
+                placeholder="Subject"
+                placeholderTextColor={colors.textTertiary}
+                className="py-3 px-4 rounded-xl mb-4"
+                style={{
+                  backgroundColor: "rgba(255, 255, 255, 0.1)",
+                  borderWidth: 1,
+                  borderColor: "rgba(255, 255, 255, 0.2)",
+                  color: colors.text,
+                }}
+              />
+              <TextInput
+                value={emailBody}
+                onChangeText={setEmailBody}
+                placeholder="Email body (HTML supported)"
+                placeholderTextColor={colors.textTertiary}
+                multiline
+                numberOfLines={10}
+                textAlignVertical="top"
+                className="py-3 px-4 rounded-xl mb-4"
+                style={{
+                  backgroundColor: "rgba(255, 255, 255, 0.1)",
+                  borderWidth: 1,
+                  borderColor: "rgba(255, 255, 255, 0.2)",
+                  color: colors.text,
+                  minHeight: 200,
+                }}
+              />
+              <Pressable
+                onPress={() => {
+                  if (emailSubject.trim() && emailBody.trim()) {
+                    sendEmailMutation.mutate({
+                      userId: emailRecipient.id,
+                      subject: emailSubject.trim(),
+                      html: emailBody.trim(),
+                    });
+                  } else {
+                    Alert.alert("Error", "Please fill in both subject and body");
+                  }
+                }}
+                disabled={sendEmailMutation.isPending || !emailSubject.trim() || !emailBody.trim()}
+                className="py-3 px-4 rounded-xl items-center"
+                style={{
+                  backgroundColor: "#7E3FE4",
+                  opacity: sendEmailMutation.isPending || !emailSubject.trim() || !emailBody.trim() ? 0.5 : 1,
+                }}
+              >
+                {sendEmailMutation.isPending ? (
+                  <ActivityIndicator size="small" color="white" />
+                ) : (
+                  <Text className="text-white font-semibold">Send Email</Text>
+                )}
+              </Pressable>
             </View>
           </View>
         )}
