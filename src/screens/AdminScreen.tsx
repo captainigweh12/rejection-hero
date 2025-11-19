@@ -207,13 +207,18 @@ export default function AdminScreen({ navigation }: Props) {
 
   const isLoadingProfile = !profileData && !!sessionData?.user;
 
+  // Ensure background is an array for LinearGradient
+  const backgroundColors: readonly [string, string, ...string[]] = Array.isArray(colors.background) 
+    ? colors.background as readonly [string, string, ...string[]]
+    : ["#0A0A0F", "#1A1A24", "#2A1A34"] as const;
+
   if (isLoadingProfile) {
     return (
-      <LinearGradient colors={colors.background} className="flex-1">
+      <LinearGradient colors={backgroundColors} className="flex-1">
         <SafeAreaView edges={["top"]} className="flex-1">
           <View className="flex-1 items-center justify-center">
             <ActivityIndicator size="large" color="#7E3FE4" />
-            <Text className="text-base mt-4" style={{ color: colors.textSecondary }}>
+            <Text className="text-base mt-4" style={{ color: colors.textSecondary || "#999" }}>
               Loading...
             </Text>
           </View>
@@ -224,20 +229,20 @@ export default function AdminScreen({ navigation }: Props) {
 
   if (!isAdmin) {
     return (
-      <LinearGradient colors={colors.background} className="flex-1">
+      <LinearGradient colors={backgroundColors} className="flex-1">
         <SafeAreaView edges={["top"]} className="flex-1">
           <View className="flex-1 items-center justify-center px-6">
-            <Shield size={64} color={colors.error} className="mb-4" />
-            <Text className="text-2xl font-bold mb-2 text-center" style={{ color: colors.text }}>
+            <Shield size={64} color={colors.error || "#ef4444"} className="mb-4" />
+            <Text className="text-2xl font-bold mb-2 text-center" style={{ color: colors.text || "#fff" }}>
               Access Denied
             </Text>
-            <Text className="text-base text-center" style={{ color: colors.textSecondary }}>
+            <Text className="text-base text-center" style={{ color: colors.textSecondary || "#999" }}>
               You need admin privileges to access this page.
             </Text>
             <Pressable
               onPress={() => navigation.goBack()}
               className="mt-6 px-6 py-3 rounded-xl"
-              style={{ backgroundColor: colors.primary }}
+              style={{ backgroundColor: colors.primary || "#7E3FE4" }}
             >
               <Text className="text-white font-semibold">Go Back</Text>
             </Pressable>
@@ -247,9 +252,15 @@ export default function AdminScreen({ navigation }: Props) {
     );
   }
 
+  // Debug logging
+  React.useEffect(() => {
+    console.log("[AdminScreen] Rendering - isAdmin:", isAdmin, "profileData:", !!profileData, "sessionData:", !!sessionData?.user);
+    console.log("[AdminScreen] usersData:", !!usersData, "isLoading:", isLoading, "usersError:", !!usersError);
+  }, [isAdmin, profileData, sessionData, usersData, isLoading, usersError]);
+
   return (
-    <LinearGradient colors={colors.background} className="flex-1">
-      <SafeAreaView edges={["top"]} className="flex-1">
+    <LinearGradient colors={backgroundColors} className="flex-1">
+      <SafeAreaView edges={["top"]} className="flex-1" style={{ flex: 1 }}>
         {/* Header */}
         <View
           className="flex-row items-center px-6 py-4 border-b"
