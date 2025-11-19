@@ -19,11 +19,12 @@ import {
   Trash2,
   Crown,
   X,
-  Check,
-  UserPlus,
+  Users,
+  TrendingUp,
+  AlertCircle,
   Mail,
   CreditCard,
-  Calendar,
+  Activity,
 } from "lucide-react-native";
 import * as Haptics from "expo-haptics";
 
@@ -58,6 +59,13 @@ interface User {
   } | null;
 }
 
+interface AdminStats {
+  totalUsers: number;
+  activeUsers: number;
+  subscribedUsers: number;
+  adminCount: number;
+}
+
 export default function AdminScreen({ navigation }: Props) {
   const { colors } = useTheme();
   const { data: sessionData } = useSession();
@@ -80,8 +88,16 @@ export default function AdminScreen({ navigation }: Props) {
     enabled: !!sessionData?.user,
   });
 
-  // Check if user is admin
   const isAdmin = profileData?.isAdmin || false;
+
+  // Fetch admin stats
+  const { data: adminStats } = useQuery<AdminStats>({
+    queryKey: ["admin-stats"],
+    queryFn: async () => {
+      return api.get<AdminStats>("/api/admin/stats");
+    },
+    enabled: isAdmin,
+  });
 
   // Fetch users
   const {
@@ -94,22 +110,16 @@ export default function AdminScreen({ navigation }: Props) {
     queryFn: async () => {
       const params = new URLSearchParams({
         page: page.toString(),
-        limit: "20",
+        limit: "15",
         ...(searchQuery && { search: searchQuery }),
       });
       return api.get<{ users: User[]; total: number; page: number; limit: number; totalPages: number }>(
         `/api/admin/users?${params.toString()}`
       );
     },
-    enabled: !!sessionData?.user && isAdmin,
+    enabled: isAdmin,
     retry: false,
   });
-
-  // Debug logging - after all queries are defined
-  React.useEffect(() => {
-    console.log("[AdminScreen] Rendering - sessionData:", !!sessionData?.user, "profileData:", !!profileData, "isAdmin:", isAdmin);
-    console.log("[AdminScreen] usersData:", !!usersData, "isLoading:", isLoading, "usersError:", !!usersError);
-  }, [sessionData, profileData, isAdmin, usersData, isLoading, usersError]);
 
   const deleteUserMutation = useMutation({
     mutationFn: async (userId: string) => {
@@ -117,6 +127,7 @@ export default function AdminScreen({ navigation }: Props) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-stats"] });
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       Alert.alert("Success", "User deleted successfully");
     },
@@ -131,6 +142,7 @@ export default function AdminScreen({ navigation }: Props) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-stats"] });
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       Alert.alert("Success", "User is now an admin");
     },
@@ -151,21 +163,6 @@ export default function AdminScreen({ navigation }: Props) {
     },
     onError: (error: any) => {
       Alert.alert("Error", error?.message || "Failed to invite admin");
-    },
-  });
-
-  const manageSubscriptionMutation = useMutation({
-    mutationFn: async ({ userId, action, days }: { userId: string; action: string; days?: number }) => {
-      return api.post(`/api/admin/users/${userId}/subscription`, { action, days });
-    },
-    onSuccess: (data: any) => {
-      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      Alert.alert("Success", data.message || "Subscription updated");
-      setSelectedUser(null);
-    },
-    onError: (error: any) => {
-      Alert.alert("Error", error?.message || "Failed to manage subscription");
     },
   });
 
@@ -214,17 +211,17 @@ export default function AdminScreen({ navigation }: Props) {
   const isLoadingProfile = !profileData && !!sessionData?.user;
 
   // Ensure background is an array for LinearGradient
-  const backgroundColors: readonly [string, string, ...string[]] = Array.isArray(colors.background) 
-    ? colors.background as readonly [string, string, ...string[]]
-    : ["#0A0A0F", "#1A1A24", "#2A1A34"] as const;
+  const backgroundColors: readonly [string, string, ...string[]] = Array.isArray(colors.background)
+    ? (colors.background as readonly [string, string, ...string[]])
+    : (["#0A0A0F", "#1A1A24", "#2A1A34"] as const);
 
   if (isLoadingProfile) {
     return (
-      <LinearGradient colors={backgroundColors} className="flex-1">
-        <SafeAreaView edges={["top"]} className="flex-1">
-          <View className="flex-1 items-center justify-center">
+      <LinearGradient colors={backgroundColors} style={{ flex: 1 }}>
+        <SafeAreaView edges={["top"]} style={{ flex: 1 }}>
+          <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
             <ActivityIndicator size="large" color="#7E3FE4" />
-            <Text className="text-base mt-4" style={{ color: colors.textSecondary || "#999" }}>
+            <Text style={{ color: colors.textSecondary || "#999", marginTop: 16, fontSize: 16 }}>
               Loading...
             </Text>
           </View>
@@ -235,22 +232,21 @@ export default function AdminScreen({ navigation }: Props) {
 
   if (!isAdmin) {
     return (
-      <LinearGradient colors={backgroundColors} className="flex-1">
-        <SafeAreaView edges={["top"]} className="flex-1">
-          <View className="flex-1 items-center justify-center px-6">
-            <Shield size={64} color={colors.error || "#ef4444"} className="mb-4" />
-            <Text className="text-2xl font-bold mb-2 text-center" style={{ color: colors.text || "#fff" }}>
+      <LinearGradient colors={backgroundColors} style={{ flex: 1 }}>
+        <SafeAreaView edges={["top"]} style={{ flex: 1 }}>
+          <View style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 24 }}>
+            <Shield size={64} color={colors.error || "#ef4444"} style={{ marginBottom: 16 }} />
+            <Text style={{ fontSize: 24, fontWeight: "bold", marginBottom: 8, textAlign: "center", color: colors.text || "#fff" }}>
               Access Denied
             </Text>
-            <Text className="text-base text-center" style={{ color: colors.textSecondary || "#999" }}>
+            <Text style={{ fontSize: 16, textAlign: "center", color: colors.textSecondary || "#999", marginBottom: 32 }}>
               You need admin privileges to access this page.
             </Text>
             <Pressable
               onPress={() => navigation.goBack()}
-              className="mt-6 px-6 py-3 rounded-xl"
-              style={{ backgroundColor: colors.primary || "#7E3FE4" }}
+              style={{ backgroundColor: colors.primary || "#7E3FE4", paddingHorizontal: 24, paddingVertical: 12, borderRadius: 12 }}
             >
-              <Text className="text-white font-semibold">Go Back</Text>
+              <Text style={{ color: "white", fontWeight: "600", fontSize: 16 }}>Go Back</Text>
             </Pressable>
           </View>
         </SafeAreaView>
@@ -258,245 +254,354 @@ export default function AdminScreen({ navigation }: Props) {
     );
   }
 
-  // Always render something - even if query is disabled
-  const shouldShowContent = isAdmin && !!sessionData?.user;
-
   return (
-    <LinearGradient colors={backgroundColors} className="flex-1">
-      <SafeAreaView edges={["top"]} className="flex-1" style={{ flex: 1 }}>
+    <LinearGradient colors={backgroundColors} style={{ flex: 1 }}>
+      <SafeAreaView edges={["top"]} style={{ flex: 1 }}>
         {/* Header */}
         <View
-          className="flex-row items-center px-6 py-4 border-b"
-          style={{ borderBottomColor: "rgba(255, 255, 255, 0.1)" }}
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            paddingHorizontal: 20,
+            paddingVertical: 16,
+            borderBottomWidth: 1,
+            borderBottomColor: "rgba(255, 255, 255, 0.1)",
+          }}
         >
           <Pressable
             onPress={() => navigation.goBack()}
-            className="w-10 h-10 items-center justify-center rounded-full mr-3"
-            style={{ backgroundColor: "rgba(255, 255, 255, 0.1)" }}
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: 20,
+              backgroundColor: "rgba(255, 255, 255, 0.1)",
+              alignItems: "center",
+              justifyContent: "center",
+              marginRight: 12,
+            }}
           >
             <ArrowLeft size={20} color={colors.text || "#fff"} />
           </Pressable>
-          <View className="flex-1 flex-row items-center">
-            <Shield size={24} color="#7E3FE4" className="mr-3" />
-            <Text className="text-xl font-bold" style={{ color: colors.text || "#fff" }}>
+          <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
+            <Shield size={24} color="#7E3FE4" style={{ marginRight: 12 }} />
+            <Text style={{ fontSize: 24, fontWeight: "bold", color: colors.text || "#fff" }}>
               Admin Panel
             </Text>
           </View>
         </View>
 
-        {!shouldShowContent ? (
-          <View className="flex-1 items-center justify-center px-6">
-            <ActivityIndicator size="large" color="#7E3FE4" />
-            <Text className="text-base mt-4 text-center" style={{ color: colors.textSecondary || "#999" }}>
-              Verifying admin access...
-            </Text>
-          </View>
-        ) : (
-          <ScrollView
-            className="flex-1 px-6 py-4"
-            showsVerticalScrollIndicator={false}
-            refreshControl={<RefreshControl refreshing={isLoading} onRefresh={() => refetch()} />}
-          >
-          {/* Invite Admin Section */}
-          <View
-            className="p-4 rounded-2xl mb-6"
-            style={{ backgroundColor: "rgba(126, 63, 228, 0.15)", borderWidth: 1, borderColor: "#7E3FE4" }}
-          >
-            <Text className="text-lg font-bold mb-3" style={{ color: colors.text }}>
-              Invite Admin
-            </Text>
-            <View className="flex-row gap-2">
-              <TextInput
-                value={inviteEmail}
-                onChangeText={setInviteEmail}
-                placeholder="Enter email address"
-                placeholderTextColor={colors.textTertiary}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                className="flex-1 py-3 px-4 rounded-xl"
-                style={{
-                  backgroundColor: "rgba(255, 255, 255, 0.1)",
-                  borderWidth: 1,
-                  borderColor: "rgba(255, 255, 255, 0.2)",
-                  color: colors.text,
-                }}
-              />
-              <Pressable
-                onPress={() => {
-                  if (inviteEmail.trim()) {
-                    inviteAdminMutation.mutate(inviteEmail.trim());
-                  }
-                }}
-                disabled={inviteAdminMutation.isPending || !inviteEmail.trim()}
-                className="px-6 py-3 rounded-xl items-center justify-center"
-                style={{
-                  backgroundColor: "#7E3FE4",
-                  opacity: inviteAdminMutation.isPending || !inviteEmail.trim() ? 0.5 : 1,
-                }}
-              >
-                {inviteAdminMutation.isPending ? (
-                  <ActivityIndicator size="small" color="white" />
-                ) : (
-                  <UserPlus size={20} color="white" />
-                )}
-              </Pressable>
-            </View>
-          </View>
-
-          {/* Search */}
-          <View className="mb-4">
-            <View
-              className="flex-row items-center px-4 py-3 rounded-xl"
-              style={{
-                backgroundColor: colors.card,
-                borderWidth: 1,
-                borderColor: colors.cardBorder,
-              }}
-            >
-              <Search size={20} color={colors.textSecondary} className="mr-3" />
-              <TextInput
-                value={searchQuery}
-                onChangeText={setSearchQuery}
-                placeholder="Search users by email or name..."
-                placeholderTextColor={colors.textTertiary}
-                className="flex-1"
-                style={{ color: colors.text }}
-              />
-            </View>
-          </View>
-
-          {/* Error Message */}
-          {usersError && (
-            <View
-              className="p-4 rounded-2xl mb-4"
-              style={{ backgroundColor: "rgba(239, 68, 68, 0.15)", borderWidth: 1, borderColor: "#ef4444" }}
-            >
-              <Text className="text-base font-semibold mb-1" style={{ color: "#ef4444" }}>
-                Error Loading Users
+        <ScrollView
+          style={{ flex: 1 }}
+          showsVerticalScrollIndicator={false}
+          refreshControl={<RefreshControl refreshing={isLoading} onRefresh={() => refetch()} />}
+          contentContainerStyle={{ paddingBottom: 32 }}
+        >
+          {/* Stats Dashboard */}
+          {adminStats && (
+            <View style={{ paddingHorizontal: 20, paddingTop: 20, marginBottom: 20 }}>
+              <Text style={{ fontSize: 18, fontWeight: "bold", color: colors.text, marginBottom: 12 }}>
+                Dashboard
               </Text>
-              <Text className="text-sm mb-2" style={{ color: colors.textSecondary }}>
-                {(() => {
-                  const error = usersError as any;
-                  if (error?.message) {
-                    // Extract a cleaner error message
-                    const msg = error.message;
-                    if (msg.includes("403") || msg.includes("Forbidden")) {
-                      return "Access denied. Please ensure you have admin privileges.";
-                    }
-                    if (msg.includes("401") || msg.includes("Unauthorized")) {
-                      return "Please log in again to access the admin panel.";
-                    }
-                    if (msg.includes("Network") || msg.includes("Connection")) {
-                      return "Network error. Please check your connection and try again.";
-                    }
-                    return msg;
-                  }
-                  return "Failed to load users. Please try again.";
-                })()}
-              </Text>
-              <Pressable
-                onPress={() => refetch()}
-                className="mt-3 py-2 px-4 rounded-xl items-center"
-                style={{ backgroundColor: "#ef4444" }}
-              >
-                <Text className="text-white font-semibold">Retry</Text>
-              </Pressable>
+              <View style={{ gap: 12 }}>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    padding: 16,
+                    borderRadius: 16,
+                    backgroundColor: "rgba(126, 63, 228, 0.15)",
+                    borderWidth: 1,
+                    borderColor: "#7E3FE4",
+                  }}
+                >
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 12, color: colors.textSecondary, marginBottom: 4 }}>
+                      Total Users
+                    </Text>
+                    <Text style={{ fontSize: 28, fontWeight: "bold", color: colors.text }}>
+                      {adminStats.totalUsers}
+                    </Text>
+                  </View>
+                  <Users size={32} color="#7E3FE4" />
+                </View>
+
+                <View
+                  style={{
+                    flexDirection: "row",
+                    gap: 12,
+                  }}
+                >
+                  <View
+                    style={{
+                      flex: 1,
+                      padding: 16,
+                      borderRadius: 16,
+                      backgroundColor: "rgba(16, 185, 129, 0.15)",
+                      borderWidth: 1,
+                      borderColor: "#10b981",
+                    }}
+                  >
+                    <Text style={{ fontSize: 12, color: colors.textSecondary, marginBottom: 4 }}>
+                      Active Users
+                    </Text>
+                    <Text style={{ fontSize: 24, fontWeight: "bold", color: "#10b981" }}>
+                      {adminStats.activeUsers}
+                    </Text>
+                  </View>
+
+                  <View
+                    style={{
+                      flex: 1,
+                      padding: 16,
+                      borderRadius: 16,
+                      backgroundColor: "rgba(0, 217, 255, 0.15)",
+                      borderWidth: 1,
+                      borderColor: "#00D9FF",
+                    }}
+                  >
+                    <Text style={{ fontSize: 12, color: colors.textSecondary, marginBottom: 4 }}>
+                      Subscribed
+                    </Text>
+                    <Text style={{ fontSize: 24, fontWeight: "bold", color: "#00D9FF" }}>
+                      {adminStats.subscribedUsers}
+                    </Text>
+                  </View>
+
+                  <View
+                    style={{
+                      flex: 1,
+                      padding: 16,
+                      borderRadius: 16,
+                      backgroundColor: "rgba(255, 107, 53, 0.15)",
+                      borderWidth: 1,
+                      borderColor: "#FF6B35",
+                    }}
+                  >
+                    <Text style={{ fontSize: 12, color: colors.textSecondary, marginBottom: 4 }}>
+                      Admins
+                    </Text>
+                    <Text style={{ fontSize: 24, fontWeight: "bold", color: "#FF6B35" }}>
+                      {adminStats.adminCount}
+                    </Text>
+                  </View>
+                </View>
+              </View>
             </View>
           )}
 
-          {/* Users List */}
-          {isLoading ? (
-            <View className="py-20 items-center">
-              <ActivityIndicator size="large" color="#7E3FE4" />
-              <Text className="text-sm mt-4" style={{ color: colors.textSecondary || "#999" }}>
-                Loading users...
+          {/* Invite Admin Section */}
+          <View style={{ paddingHorizontal: 20, marginBottom: 20 }}>
+            <Text style={{ fontSize: 18, fontWeight: "bold", color: colors.text, marginBottom: 12 }}>
+              Manage Admins
+            </Text>
+            <View
+              style={{
+                padding: 16,
+                borderRadius: 16,
+                backgroundColor: "rgba(126, 63, 228, 0.15)",
+                borderWidth: 1,
+                borderColor: "#7E3FE4",
+              }}
+            >
+              <Text style={{ fontSize: 14, fontWeight: "600", color: colors.text, marginBottom: 12 }}>
+                Invite Admin
               </Text>
+              <View style={{ flexDirection: "row", gap: 8 }}>
+                <TextInput
+                  value={inviteEmail}
+                  onChangeText={setInviteEmail}
+                  placeholder="Enter email address"
+                  placeholderTextColor={colors.textTertiary}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  style={{
+                    flex: 1,
+                    paddingVertical: 12,
+                    paddingHorizontal: 16,
+                    borderRadius: 12,
+                    backgroundColor: "rgba(255, 255, 255, 0.1)",
+                    borderWidth: 1,
+                    borderColor: "rgba(255, 255, 255, 0.2)",
+                    color: colors.text,
+                  }}
+                />
+                <Pressable
+                  onPress={() => {
+                    if (inviteEmail.trim()) {
+                      inviteAdminMutation.mutate(inviteEmail.trim());
+                    }
+                  }}
+                  disabled={inviteAdminMutation.isPending || !inviteEmail.trim()}
+                  style={{
+                    paddingHorizontal: 16,
+                    paddingVertical: 12,
+                    borderRadius: 12,
+                    backgroundColor: "#7E3FE4",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    opacity: inviteAdminMutation.isPending || !inviteEmail.trim() ? 0.5 : 1,
+                  }}
+                >
+                  {inviteAdminMutation.isPending ? (
+                    <ActivityIndicator size="small" color="white" />
+                  ) : (
+                    <Shield size={20} color="white" />
+                  )}
+                </Pressable>
+              </View>
             </View>
-          ) : usersError ? (
-            <View className="py-10 items-center">
-              <Text className="text-sm" style={{ color: colors.textSecondary || "#999" }}>
-                Error loading users. Please try again.
-              </Text>
+          </View>
+
+          {/* Users Management */}
+          <View style={{ paddingHorizontal: 20, marginBottom: 20 }}>
+            <Text style={{ fontSize: 18, fontWeight: "bold", color: colors.text, marginBottom: 12 }}>
+              Manage Users
+            </Text>
+
+            {/* Search */}
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                paddingHorizontal: 12,
+                paddingVertical: 8,
+                borderRadius: 12,
+                backgroundColor: colors.card,
+                borderWidth: 1,
+                borderColor: colors.cardBorder,
+                marginBottom: 16,
+              }}
+            >
+              <Search size={20} color={colors.textSecondary} style={{ marginRight: 8 }} />
+              <TextInput
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+                placeholder="Search by email or name..."
+                placeholderTextColor={colors.textTertiary}
+                style={{ flex: 1, color: colors.text, paddingVertical: 8, fontSize: 14 }}
+              />
             </View>
-          ) : !usersData || usersData.users.length === 0 ? (
-            <View className="py-20 items-center">
-              <Text className="text-base mb-2" style={{ color: colors.text || "#fff" }}>
-                No users found
-              </Text>
-              <Text className="text-sm" style={{ color: colors.textSecondary || "#999" }}>
-                {searchQuery ? "Try a different search term" : "No users in the system"}
-              </Text>
-            </View>
-          ) : (
-            <>
-              <Text className="text-sm mb-4" style={{ color: colors.textSecondary }}>
-                {usersData?.total || 0} total users
-              </Text>
-              {usersData?.users && usersData.users.length > 0 ? (
-                <View className="gap-3">
-                  {usersData.users.map((user) => (
-                    <View
-                      key={user.id}
-                    className="p-4 rounded-2xl"
+
+            {/* Error Message */}
+            {usersError && (
+              <View
+                style={{
+                  padding: 16,
+                  borderRadius: 12,
+                  backgroundColor: "rgba(239, 68, 68, 0.15)",
+                  borderWidth: 1,
+                  borderColor: "#ef4444",
+                  marginBottom: 16,
+                }}
+              >
+                <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 8 }}>
+                  <AlertCircle size={20} color="#ef4444" style={{ marginRight: 8 }} />
+                  <Text style={{ fontSize: 14, fontWeight: "600", color: "#ef4444", flex: 1 }}>
+                    Error Loading Users
+                  </Text>
+                </View>
+                <Pressable
+                  onPress={() => refetch()}
+                  style={{
+                    paddingVertical: 8,
+                    paddingHorizontal: 12,
+                    borderRadius: 8,
+                    backgroundColor: "#ef4444",
+                    alignItems: "center",
+                  }}
+                >
+                  <Text style={{ color: "white", fontWeight: "600", fontSize: 12 }}>Retry</Text>
+                </Pressable>
+              </View>
+            )}
+
+            {/* Users List */}
+            {isLoading ? (
+              <View style={{ paddingVertical: 40, alignItems: "center" }}>
+                <ActivityIndicator size="large" color="#7E3FE4" />
+                <Text style={{ color: colors.textSecondary, marginTop: 12, fontSize: 14 }}>
+                  Loading users...
+                </Text>
+              </View>
+            ) : !usersData || usersData.users.length === 0 ? (
+              <View style={{ paddingVertical: 40, alignItems: "center" }}>
+                <Text style={{ color: colors.text, fontSize: 16, marginBottom: 8 }}>
+                  No users found
+                </Text>
+                <Text style={{ color: colors.textSecondary, fontSize: 14 }}>
+                  {searchQuery ? "Try a different search" : "No users in system"}
+                </Text>
+              </View>
+            ) : (
+              <View style={{ gap: 12 }}>
+                <Text style={{ fontSize: 12, color: colors.textSecondary }}>
+                  {usersData?.total || 0} users total
+                </Text>
+                {usersData?.users.map((user) => (
+                  <View
+                    key={user.id}
                     style={{
+                      padding: 16,
+                      borderRadius: 12,
                       backgroundColor: colors.card,
                       borderWidth: 1,
                       borderColor: colors.cardBorder,
                     }}
                   >
-                    <View className="flex-row items-start justify-between mb-3">
-                      <View className="flex-1">
-                        <View className="flex-row items-center gap-2 mb-1">
-                          <Text className="text-base font-bold" style={{ color: colors.text }}>
+                    <View style={{ flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 12 }}>
+                      <View style={{ flex: 1 }}>
+                        <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                          <Text style={{ fontSize: 16, fontWeight: "bold", color: colors.text, flex: 1 }}>
                             {user.profile?.displayName || user.name || user.email}
                           </Text>
                           {user.isAdmin && (
                             <View
-                              className="px-2 py-1 rounded"
-                              style={{ backgroundColor: "rgba(126, 63, 228, 0.2)" }}
+                              style={{
+                                paddingHorizontal: 8,
+                                paddingVertical: 4,
+                                borderRadius: 6,
+                                backgroundColor: "rgba(126, 63, 228, 0.2)",
+                              }}
                             >
-                              <Text className="text-xs font-semibold" style={{ color: "#7E3FE4" }}>
+                              <Text style={{ fontSize: 10, fontWeight: "600", color: "#7E3FE4" }}>
                                 ADMIN
                               </Text>
                             </View>
                           )}
                         </View>
-                        <Text className="text-sm" style={{ color: colors.textSecondary }}>
+                        <Text style={{ fontSize: 12, color: colors.textSecondary }}>
                           {user.email}
                         </Text>
-                        {user.profile?.username && (
-                          <Text className="text-sm" style={{ color: colors.textSecondary }}>
-                            @{user.profile.username}
-                          </Text>
-                        )}
                       </View>
                     </View>
 
-                    {/* Stats */}
+                    {/* Stats Row */}
                     {user.stats && (
-                      <View className="flex-row gap-4 mb-3">
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          gap: 16,
+                          paddingVertical: 12,
+                          borderTopWidth: 1,
+                          borderTopColor: "rgba(255, 255, 255, 0.1)",
+                          marginBottom: 12,
+                        }}
+                      >
                         <View>
-                          <Text className="text-xs" style={{ color: colors.textSecondary }}>
-                            XP
-                          </Text>
-                          <Text className="text-sm font-semibold" style={{ color: colors.text }}>
+                          <Text style={{ fontSize: 11, color: colors.textSecondary }}>XP</Text>
+                          <Text style={{ fontSize: 13, fontWeight: "600", color: colors.text }}>
                             {user.stats.totalXP}
                           </Text>
                         </View>
                         <View>
-                          <Text className="text-xs" style={{ color: colors.textSecondary }}>
-                            Streak
-                          </Text>
-                          <Text className="text-sm font-semibold" style={{ color: colors.text }}>
-                            {user.stats.currentStreak} days
+                          <Text style={{ fontSize: 11, color: colors.textSecondary }}>Streak</Text>
+                          <Text style={{ fontSize: 13, fontWeight: "600", color: colors.text }}>
+                            {user.stats.currentStreak}d
                           </Text>
                         </View>
                         {user.subscription && (
                           <View>
-                            <Text className="text-xs" style={{ color: colors.textSecondary }}>
-                              Subscription
-                            </Text>
-                            <Text className="text-sm font-semibold" style={{ color: "#10b981" }}>
+                            <Text style={{ fontSize: 11, color: colors.textSecondary }}>Status</Text>
+                            <Text style={{ fontSize: 13, fontWeight: "600", color: "#10b981" }}>
                               {user.subscription.status}
                             </Text>
                           </View>
@@ -505,30 +610,22 @@ export default function AdminScreen({ navigation }: Props) {
                     )}
 
                     {/* Actions */}
-                    <View className="flex-row gap-2 mt-3">
+                    <View style={{ flexDirection: "row", gap: 8 }}>
                       {!user.isAdmin && (
                         <Pressable
                           onPress={() => handleMakeAdmin(user)}
                           disabled={makeAdminMutation.isPending}
-                          className="flex-1 py-2 px-4 rounded-xl items-center"
                           style={{
+                            flex: 1,
+                            paddingVertical: 8,
+                            paddingHorizontal: 12,
+                            borderRadius: 8,
                             backgroundColor: "rgba(126, 63, 228, 0.2)",
+                            alignItems: "center",
                             opacity: makeAdminMutation.isPending ? 0.5 : 1,
                           }}
                         >
                           <Crown size={16} color="#7E3FE4" />
-                        </Pressable>
-                      )}
-                      {user.subscription && (
-                        <Pressable
-                          onPress={() => setSelectedUser(user)}
-                          className="flex-1 py-2 px-4 rounded-xl items-center flex-row justify-center gap-2"
-                          style={{ backgroundColor: "rgba(0, 217, 255, 0.2)" }}
-                        >
-                          <CreditCard size={16} color="#00D9FF" />
-                          <Text className="text-xs font-semibold" style={{ color: "#00D9FF" }}>
-                            Subscription
-                          </Text>
                         </Pressable>
                       )}
                       <Pressable
@@ -536,17 +633,27 @@ export default function AdminScreen({ navigation }: Props) {
                           setEmailRecipient(user);
                           setShowEmailModal(true);
                         }}
-                        className="py-2 px-4 rounded-xl items-center"
-                        style={{ backgroundColor: "rgba(126, 63, 228, 0.2)" }}
+                        style={{
+                          flex: 1,
+                          paddingVertical: 8,
+                          paddingHorizontal: 12,
+                          borderRadius: 8,
+                          backgroundColor: "rgba(126, 63, 228, 0.2)",
+                          alignItems: "center",
+                        }}
                       >
                         <Mail size={16} color="#7E3FE4" />
                       </Pressable>
                       <Pressable
                         onPress={() => handleDeleteUser(user)}
                         disabled={deleteUserMutation.isPending}
-                        className="py-2 px-4 rounded-xl items-center"
                         style={{
+                          flex: 1,
+                          paddingVertical: 8,
+                          paddingHorizontal: 12,
+                          borderRadius: 8,
                           backgroundColor: "rgba(239, 68, 68, 0.2)",
+                          alignItems: "center",
                           opacity: deleteUserMutation.isPending ? 0.5 : 1,
                         }}
                       >
@@ -554,300 +661,77 @@ export default function AdminScreen({ navigation }: Props) {
                       </Pressable>
                     </View>
                   </View>
-                  ))}
-                </View>
-              ) : (
-                <View className="py-20 items-center">
-                  <Text className="text-base" style={{ color: colors.textSecondary }}>
-                    No users found
-                  </Text>
-                </View>
-              )}
+                ))}
 
-              {/* Pagination */}
-              {usersData && usersData.totalPages > 1 && (
-                <View className="flex-row justify-center items-center gap-4 mt-6">
-                  <Pressable
-                    onPress={() => setPage(Math.max(1, page - 1))}
-                    disabled={page === 1}
-                    className="px-4 py-2 rounded-xl"
-                    style={{
-                      backgroundColor: page === 1 ? "transparent" : colors.primary,
-                      opacity: page === 1 ? 0.5 : 1,
-                    }}
-                  >
-                    <Text style={{ color: page === 1 ? colors.textSecondary : "white" }}>Previous</Text>
-                  </Pressable>
-                  <Text style={{ color: colors.text }}>
-                    Page {page} of {usersData.totalPages}
-                  </Text>
-                  <Pressable
-                    onPress={() => setPage(Math.min(usersData.totalPages, page + 1))}
-                    disabled={page === usersData.totalPages}
-                    className="px-4 py-2 rounded-xl"
-                    style={{
-                      backgroundColor: page === usersData.totalPages ? "transparent" : colors.primary,
-                      opacity: page === usersData.totalPages ? 0.5 : 1,
-                    }}
-                  >
-                    <Text style={{ color: page === usersData.totalPages ? colors.textSecondary : "white" }}>
-                      Next
+                {/* Pagination */}
+                {usersData && usersData.totalPages > 1 && (
+                  <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", gap: 16, marginTop: 20 }}>
+                    <Pressable
+                      onPress={() => setPage(Math.max(1, page - 1))}
+                      disabled={page === 1}
+                      style={{
+                        paddingHorizontal: 16,
+                        paddingVertical: 8,
+                        borderRadius: 8,
+                        backgroundColor: page === 1 ? "transparent" : colors.primary,
+                        opacity: page === 1 ? 0.5 : 1,
+                      }}
+                    >
+                      <Text style={{ color: page === 1 ? colors.textSecondary : "white", fontWeight: "600" }}>
+                        Previous
+                      </Text>
+                    </Pressable>
+                    <Text style={{ color: colors.text, fontWeight: "600" }}>
+                      Page {page} of {usersData.totalPages}
                     </Text>
-                  </Pressable>
-                </View>
-              )}
-            </>
-          )}
-          </ScrollView>
-        )}
-
-        {/* Subscription Management Modal */}
-        {selectedUser && (
-          <View
-            className="absolute inset-0 items-center justify-center"
-            style={{ backgroundColor: "rgba(0, 0, 0, 0.7)" }}
-          >
-            <View
-              className="w-11/12 p-6 rounded-2xl"
-              style={{ backgroundColor: colors.card, borderWidth: 1, borderColor: colors.cardBorder }}
-            >
-              <View className="flex-row items-center justify-between mb-4">
-                <Text className="text-xl font-bold" style={{ color: colors.text }}>
-                  Manage Subscription
-                </Text>
-                <Pressable onPress={() => setSelectedUser(null)}>
-                  <X size={24} color={colors.textSecondary} />
-                </Pressable>
-              </View>
-              <Text className="text-sm mb-4" style={{ color: colors.textSecondary }}>
-                {selectedUser.email}
-              </Text>
-              <View className="gap-3">
-                <Pressable
-                  onPress={() => {
-                    manageSubscriptionMutation.mutate({ userId: selectedUser.id, action: "activate" });
-                  }}
-                  className="py-3 px-4 rounded-xl items-center"
-                  style={{ backgroundColor: "#10b981" }}
-                >
-                  <Text className="text-white font-semibold">Activate Subscription</Text>
-                </Pressable>
-                <Pressable
-                  onPress={() => {
-                    manageSubscriptionMutation.mutate({ userId: selectedUser.id, action: "cancel" });
-                  }}
-                  className="py-3 px-4 rounded-xl items-center"
-                  style={{ backgroundColor: "#ef4444" }}
-                >
-                  <Text className="text-white font-semibold">Cancel Subscription</Text>
-                </Pressable>
-                <Pressable
-                  onPress={() => {
-                    Alert.prompt(
-                      "Extend Subscription",
-                      "Enter number of days to extend:",
-                      [
-                        { text: "Cancel", style: "cancel" },
-                        {
-                          text: "Extend",
-                          onPress: (days) => {
-                            if (days && !isNaN(parseInt(days))) {
-                              manageSubscriptionMutation.mutate({
-                                userId: selectedUser.id,
-                                action: "extend",
-                                days: parseInt(days),
-                              });
-                            }
-                          },
-                        },
-                      ],
-                      "plain-text",
-                      "30"
-                    );
-                  }}
-                  className="py-3 px-4 rounded-xl items-center"
-                  style={{ backgroundColor: "#7E3FE4" }}
-                >
-                  <Text className="text-white font-semibold">Extend Subscription</Text>
-                </Pressable>
-              </View>
-            </View>
-          </View>
-        )}
-
-        {/* Email Modal */}
-        {showEmailModal && emailRecipient && (
-          <View
-            className="absolute inset-0 items-center justify-center"
-            style={{ backgroundColor: "rgba(0, 0, 0, 0.7)" }}
-          >
-            <View
-              className="w-11/12 p-6 rounded-2xl max-h-[90%]"
-              style={{ backgroundColor: colors.card, borderWidth: 1, borderColor: colors.cardBorder }}
-            >
-              <View className="flex-row items-center justify-between mb-4">
-                <Text className="text-xl font-bold" style={{ color: colors.text }}>
-                  Send Email
-                </Text>
-                <Pressable
-                  onPress={() => {
-                    setShowEmailModal(false);
-                    setEmailSubject("");
-                    setEmailBody("");
-                    setEmailRecipient(null);
-                  }}
-                >
-                  <X size={24} color={colors.textSecondary} />
-                </Pressable>
-              </View>
-              <Text className="text-sm mb-4" style={{ color: colors.textSecondary }}>
-                To: {emailRecipient.email}
-              </Text>
-              <TextInput
-                value={emailSubject}
-                onChangeText={setEmailSubject}
-                placeholder="Subject"
-                placeholderTextColor={colors.textTertiary}
-                className="py-3 px-4 rounded-xl mb-4"
-                style={{
-                  backgroundColor: "rgba(255, 255, 255, 0.1)",
-                  borderWidth: 1,
-                  borderColor: "rgba(255, 255, 255, 0.2)",
-                  color: colors.text,
-                }}
-              />
-              <TextInput
-                value={emailBody}
-                onChangeText={setEmailBody}
-                placeholder="Email body (HTML supported)"
-                placeholderTextColor={colors.textTertiary}
-                multiline
-                numberOfLines={10}
-                textAlignVertical="top"
-                className="py-3 px-4 rounded-xl mb-4"
-                style={{
-                  backgroundColor: "rgba(255, 255, 255, 0.1)",
-                  borderWidth: 1,
-                  borderColor: "rgba(255, 255, 255, 0.2)",
-                  color: colors.text,
-                  minHeight: 200,
-                }}
-              />
-              <Pressable
-                onPress={() => {
-                  if (emailSubject.trim() && emailBody.trim()) {
-                    sendEmailMutation.mutate({
-                      userId: emailRecipient.id,
-                      subject: emailSubject.trim(),
-                      html: emailBody.trim(),
-                    });
-                  } else {
-                    Alert.alert("Error", "Please fill in both subject and body");
-                  }
-                }}
-                disabled={sendEmailMutation.isPending || !emailSubject.trim() || !emailBody.trim()}
-                className="py-3 px-4 rounded-xl items-center"
-                style={{
-                  backgroundColor: "#7E3FE4",
-                  opacity: sendEmailMutation.isPending || !emailSubject.trim() || !emailBody.trim() ? 0.5 : 1,
-                }}
-              >
-                {sendEmailMutation.isPending ? (
-                  <ActivityIndicator size="small" color="white" />
-                ) : (
-                  <Text className="text-white font-semibold">Send Email</Text>
+                    <Pressable
+                      onPress={() => setPage(Math.min(usersData.totalPages, page + 1))}
+                      disabled={page === usersData.totalPages}
+                      style={{
+                        paddingHorizontal: 16,
+                        paddingVertical: 8,
+                        borderRadius: 8,
+                        backgroundColor: page === usersData.totalPages ? "transparent" : colors.primary,
+                        opacity: page === usersData.totalPages ? 0.5 : 1,
+                      }}
+                    >
+                      <Text style={{ color: page === usersData.totalPages ? colors.textSecondary : "white", fontWeight: "600" }}>
+                        Next
+                      </Text>
+                    </Pressable>
+                  </View>
                 )}
-              </Pressable>
-            </View>
-          </View>
-        )}
-
-        {/* Subscription Management Modal */}
-        {selectedUser && (
-          <View
-            className="absolute inset-0 items-center justify-center"
-            style={{ backgroundColor: "rgba(0, 0, 0, 0.7)" }}
-          >
-            <View
-              className="w-11/12 p-6 rounded-2xl"
-              style={{ backgroundColor: colors.card, borderWidth: 1, borderColor: colors.cardBorder }}
-            >
-              <View className="flex-row items-center justify-between mb-4">
-                <Text className="text-xl font-bold" style={{ color: colors.text }}>
-                  Manage Subscription
-                </Text>
-                <Pressable onPress={() => setSelectedUser(null)}>
-                  <X size={24} color={colors.textSecondary} />
-                </Pressable>
               </View>
-              <Text className="text-sm mb-4" style={{ color: colors.textSecondary }}>
-                {selectedUser.email}
-              </Text>
-              <View className="gap-3">
-                <Pressable
-                  onPress={() => {
-                    manageSubscriptionMutation.mutate({ userId: selectedUser.id, action: "activate" });
-                  }}
-                  className="py-3 px-4 rounded-xl items-center"
-                  style={{ backgroundColor: "#10b981" }}
-                >
-                  <Text className="text-white font-semibold">Activate Subscription</Text>
-                </Pressable>
-                <Pressable
-                  onPress={() => {
-                    manageSubscriptionMutation.mutate({ userId: selectedUser.id, action: "cancel" });
-                  }}
-                  className="py-3 px-4 rounded-xl items-center"
-                  style={{ backgroundColor: "#ef4444" }}
-                >
-                  <Text className="text-white font-semibold">Cancel Subscription</Text>
-                </Pressable>
-                <Pressable
-                  onPress={() => {
-                    Alert.prompt(
-                      "Extend Subscription",
-                      "Enter number of days to extend:",
-                      [
-                        { text: "Cancel", style: "cancel" },
-                        {
-                          text: "Extend",
-                          onPress: (days) => {
-                            if (days && !isNaN(parseInt(days))) {
-                              manageSubscriptionMutation.mutate({
-                                userId: selectedUser.id,
-                                action: "extend",
-                                days: parseInt(days),
-                              });
-                            }
-                          },
-                        },
-                      ],
-                      "plain-text",
-                      "30"
-                    );
-                  }}
-                  className="py-3 px-4 rounded-xl items-center"
-                  style={{ backgroundColor: "#7E3FE4" }}
-                >
-                  <Text className="text-white font-semibold">Extend Subscription</Text>
-                </Pressable>
-              </View>
-            </View>
+            )}
           </View>
-        )}
+        </ScrollView>
 
         {/* Email Modal */}
         {showEmailModal && emailRecipient && (
           <View
-            className="absolute inset-0 items-center justify-center"
-            style={{ backgroundColor: "rgba(0, 0, 0, 0.7)" }}
+            style={{
+              position: "absolute",
+              inset: 0,
+              backgroundColor: "rgba(0, 0, 0, 0.7)",
+              alignItems: "center",
+              justifyContent: "center",
+              paddingHorizontal: 20,
+            }}
           >
             <View
-              className="w-11/12 p-6 rounded-2xl max-h-[90%]"
-              style={{ backgroundColor: colors.card, borderWidth: 1, borderColor: colors.cardBorder }}
+              style={{
+                width: "100%",
+                maxWidth: 400,
+                maxHeight: "90%",
+                padding: 20,
+                borderRadius: 16,
+                backgroundColor: colors.card,
+                borderWidth: 1,
+                borderColor: colors.cardBorder,
+              }}
             >
-              <View className="flex-row items-center justify-between mb-4">
-                <Text className="text-xl font-bold" style={{ color: colors.text }}>
+              <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+                <Text style={{ fontSize: 18, fontWeight: "bold", color: colors.text }}>
                   Send Email
                 </Text>
                 <Pressable
@@ -861,39 +745,51 @@ export default function AdminScreen({ navigation }: Props) {
                   <X size={24} color={colors.textSecondary} />
                 </Pressable>
               </View>
-              <Text className="text-sm mb-4" style={{ color: colors.textSecondary }}>
+
+              <Text style={{ fontSize: 12, color: colors.textSecondary, marginBottom: 16 }}>
                 To: {emailRecipient.email}
               </Text>
+
               <TextInput
                 value={emailSubject}
                 onChangeText={setEmailSubject}
                 placeholder="Subject"
                 placeholderTextColor={colors.textTertiary}
-                className="py-3 px-4 rounded-xl mb-4"
                 style={{
+                  paddingVertical: 12,
+                  paddingHorizontal: 12,
+                  borderRadius: 8,
                   backgroundColor: "rgba(255, 255, 255, 0.1)",
                   borderWidth: 1,
                   borderColor: "rgba(255, 255, 255, 0.2)",
                   color: colors.text,
+                  marginBottom: 12,
+                  fontSize: 14,
                 }}
               />
+
               <TextInput
                 value={emailBody}
                 onChangeText={setEmailBody}
                 placeholder="Email body (HTML supported)"
                 placeholderTextColor={colors.textTertiary}
                 multiline
-                numberOfLines={10}
+                numberOfLines={8}
                 textAlignVertical="top"
-                className="py-3 px-4 rounded-xl mb-4"
                 style={{
+                  paddingVertical: 12,
+                  paddingHorizontal: 12,
+                  borderRadius: 8,
                   backgroundColor: "rgba(255, 255, 255, 0.1)",
                   borderWidth: 1,
                   borderColor: "rgba(255, 255, 255, 0.2)",
                   color: colors.text,
-                  minHeight: 200,
+                  minHeight: 150,
+                  marginBottom: 16,
+                  fontSize: 14,
                 }}
               />
+
               <Pressable
                 onPress={() => {
                   if (emailSubject.trim() && emailBody.trim()) {
@@ -907,16 +803,19 @@ export default function AdminScreen({ navigation }: Props) {
                   }
                 }}
                 disabled={sendEmailMutation.isPending || !emailSubject.trim() || !emailBody.trim()}
-                className="py-3 px-4 rounded-xl items-center"
                 style={{
+                  paddingVertical: 12,
+                  paddingHorizontal: 16,
+                  borderRadius: 8,
                   backgroundColor: "#7E3FE4",
+                  alignItems: "center",
                   opacity: sendEmailMutation.isPending || !emailSubject.trim() || !emailBody.trim() ? 0.5 : 1,
                 }}
               >
                 {sendEmailMutation.isPending ? (
                   <ActivityIndicator size="small" color="white" />
                 ) : (
-                  <Text className="text-white font-semibold">Send Email</Text>
+                  <Text style={{ color: "white", fontWeight: "600", fontSize: 16 }}>Send Email</Text>
                 )}
               </Pressable>
             </View>
@@ -926,4 +825,3 @@ export default function AdminScreen({ navigation }: Props) {
     </LinearGradient>
   );
 }
-
