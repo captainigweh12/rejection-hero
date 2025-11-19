@@ -41,18 +41,14 @@ export default function ParentalGuidanceSettingsScreen({ navigation }: Props) {
     },
   });
 
-  // Load existing preferences from localStorage or profile
+  // Load existing preferences from profile data
   useEffect(() => {
-    const savedPrefs = localStorage.getItem("parentalGuidancePrefs");
-    if (savedPrefs) {
-      try {
-        setPreferences(JSON.parse(savedPrefs));
-      } catch (e) {
-        console.log("Could not parse saved preferences");
-      }
+    if (profileData?.parentalGuidance) {
+      const prefs = profileData.parentalGuidance as unknown as ParentalGuidancePreferences;
+      setPreferences(prefs);
+      setHasChanges(false);
     }
-    setHasChanges(false);
-  }, []);
+  }, [profileData?.parentalGuidance]);
 
   const isMinor = profileData?.age && profileData.age < 18;
 

@@ -1059,3 +1059,50 @@ Failed to find Response internal state key
 ⏰ Challenge Scheduler: Active (Daily at 9 AM & 2 PM UTC)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+<-- GET /api/challenges/active
+🔐 [Auth Middleware] GET /api/challenges/active - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+--> GET /api/challenges/active [32m200[0m 4ms
+<-- GET /api/auth/get-session
+--> GET /api/auth/get-session [32m200[0m 3ms
+<-- GET /api/profile
+🔐 [Auth Middleware] GET /api/profile - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+👤 [Profile] GET request - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+🔍 [Profile] Fetching profile for user 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+✅ [Profile] Successfully fetched profile for user 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+--> GET /api/profile [32m200[0m 9ms
+<-- GET /api/challenges/active
+<-- GET /api/stats/weekly-forecast
+<-- GET /api/stats/reflection-prompt
+🔐 [Auth Middleware] GET /api/challenges/active - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+🔐 [Auth Middleware] GET /api/stats/reflection-prompt - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+--> GET /api/stats/reflection-prompt [32m200[0m 2ms
+<-- GET /api/stats
+--> GET /api/challenges/active [32m200[0m 5ms
+🔐 [Auth Middleware] GET /api/stats/weekly-forecast - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+<-- GET /api/quests
+🔐 [Auth Middleware] GET /api/stats - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+🔐 [Auth Middleware] GET /api/quests - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+--> GET /api/stats [32m200[0m 5ms
+--> GET /api/quests [32m200[0m 8ms
+<-- GET /api/profile
+<-- GET /api/stats
+🔐 [Auth Middleware] GET /api/profile - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+👤 [Profile] GET request - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+🔍 [Profile] Fetching profile for user 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+🔐 [Auth Middleware] GET /api/stats - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+--> GET /api/stats [32m200[0m 2ms
+✅ [Profile] Successfully fetched profile for user 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+--> GET /api/profile [32m200[0m 4ms
+--> GET /api/stats/weekly-forecast [32m200[0m 3s
+<-- GET /api/profile
+🔐 [Auth Middleware] GET /api/profile - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+👤 [Profile] GET request - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+🔍 [Profile] Fetching profile for user 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+✅ [Profile] Successfully fetched profile for user 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+--> GET /api/profile [32m200[0m 3ms
+<-- GET /api/profile
+🔐 [Auth Middleware] GET /api/profile - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+👤 [Profile] GET request - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+🔍 [Profile] Fetching profile for user 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+✅ [Profile] Successfully fetched profile for user 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+--> GET /api/profile [32m200[0m 3ms
