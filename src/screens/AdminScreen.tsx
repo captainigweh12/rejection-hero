@@ -31,6 +31,7 @@ import { api } from "@/lib/api";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useSession } from "@/lib/useSession";
 import type { RootStackScreenProps } from "@/navigation/types";
+import type { GetProfileResponse } from "@/shared/contracts";
 
 type Props = RootStackScreenProps<"Admin">;
 
@@ -67,7 +68,7 @@ export default function AdminScreen({ navigation }: Props) {
   const [inviteEmail, setInviteEmail] = useState("");
 
   // Check if current user is admin
-  const { data: profileData } = useQuery({
+  const { data: profileData } = useQuery<GetProfileResponse>({
     queryKey: ["profile"],
     queryFn: async () => {
       return api.get("/api/profile");

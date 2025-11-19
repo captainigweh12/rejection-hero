@@ -116,7 +116,7 @@ const RootNavigator = () => {
         <RootStack.Screen
           name="NotificationSettings"
           component={NotificationSettingsScreen}
-          options={{ headerShown: false }}
+          options={{ title: "Notification Settings", headerShown: false }}
         />
         <RootStack.Screen
           name="LegalPolicies"

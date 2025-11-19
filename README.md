@@ -1,5 +1,22 @@
 ## 🔧 Bug Fixes & Features
 
+### Database Schema Sync Fix (2025-11-19)
+- **Fixed**: API error 500 on `/api/challenges/active` endpoint
+- **Issue**: Database was not migrated, causing Prisma to fail when querying Challenge table
+- **Solution**: Used `prisma db push` to sync database schema with Prisma schema
+- **Result**: Challenge endpoints now work correctly, including:
+  - GET `/api/challenges/active` - Get active challenge
+  - POST `/api/challenges/enroll` - Enroll in 100 Day Challenge
+  - POST `/api/challenges/generate-daily` - Generate daily quest
+- **Technical Details**:
+  - Database migrations were missing causing schema mismatch
+  - Prisma Studio and backend server were locking database
+  - Used `--accept-data-loss` flag to force schema sync
+- **TypeScript Fixes**:
+  - Fixed NotificationSettingsScreen Props type (was using "Settings" instead of "NotificationSettings")
+  - Fixed AdminScreen profileData type (added GetProfileResponse type import and generic)
+  - Fixed notificationService NotificationBehavior (added shouldShowBanner and shouldShowList properties)
+
 ### Parental Guidance Settings for Users Under 18 (2025-11-19)
 - **Added**: Comprehensive parental guidance features in Settings for users under 18
 - **Features**:

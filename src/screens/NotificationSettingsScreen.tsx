@@ -10,7 +10,7 @@ import { api } from "@/lib/api";
 import { useTheme } from "@/contexts/ThemeContext";
 import type { RootStackScreenProps } from "@/navigation/types";
 
-type Props = RootStackScreenProps<"Settings">;
+type Props = RootStackScreenProps<"NotificationSettings">;
 
 interface NotificationPreferences {
   questCompleted: boolean;
