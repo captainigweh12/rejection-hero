@@ -23,8 +23,8 @@
 
 ## 🔧 Bug Fixes & Features
 
-### 🎁 Custom Quest Creation Now Optional for Friends (2025-11-19)
-- **✅ FIXED**: Users can now create custom quests without selecting friends to invite
+### 🎁 Custom Quest Creation Now Free & Optional for Friends (2025-11-19)
+- **✅ FIXED**: Users can now create custom quests without selecting friends or requiring a subscription
 - **Changes**:
   - **Frontend (CreateCustomQuestScreen.tsx)**:
     - Removed mandatory friend selection requirement
@@ -32,16 +32,18 @@
     - Friend selection is now optional (users can invite friends or create for themselves)
     - Validation now only checks for: description, location (if custom), and sufficient balance
   - **Backend (sharedQuests.ts)**:
+    - **Removed subscription requirement** - All users can now create custom quests (no paywall)
     - Removed `.refine()` validation that required friendId or friendIds
     - Added `isPersonalQuest` flag to differentiate personal vs shared quests
     - Personal quests: Created as UserQuest and assigned directly to the user
     - Shared quests: Created as SharedQuest, deduct tokens, send to friends
     - No token cost for personal quests (tokens only required when sharing with friends)
   - **Behavior**:
+    - **Free for all users** - No subscription required for custom quest creation
     - If no friends selected → Quest created as personal UserQuest (free, no tokens required)
     - If friends selected → Quest created as SharedQuest, costs 1 token per friend
     - Users still have the option to invite friends if they want to
-- **Impact**: More flexibility for users to create solo challenges or personal tracking quests without needing friends
+- **Impact**: All users can now create unlimited personal custom quests without friends or subscriptions
 
 ### 💰 Diamonds → Tokens Rebranding (2025-11-19)
 - **✅ COMPLETED**: All references to "diamonds" changed to "tokens"

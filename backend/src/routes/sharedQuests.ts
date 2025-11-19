@@ -586,23 +586,8 @@ sharedQuestsRouter.post("/create-custom", zValidator("json", createCustomQuestSc
     select: { isAdmin: true },
   });
 
-  // Check subscription for AI features (custom quest uses AI fine-tuning)
-  const subscription = await db.subscription.findUnique({
-    where: { userId: user.id },
-  });
-  const hasSubscription = userRecord?.isAdmin || subscription?.status === "active" || subscription?.status === "trialing";
-
-  if (!hasSubscription) {
-    return c.json(
-      {
-        success: false,
-        message: "AI-powered custom quest creation requires a premium subscription. Subscribe to unlock this feature!",
-        isSafe: false,
-        requiresSubscription: true,
-      },
-      403
-    );
-  }
+  // Note: Custom quest creation is now available to all users (no subscription required)
+  // AI will still be used for quest generation, but no paywall
 
   // Only verify friendships if friends are selected
   let validFriendIds: string[] = [];
