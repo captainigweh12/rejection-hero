@@ -2094,13 +2094,12 @@ See `ENV_SETUP.md` for complete environment variable setup guide.
    - Secret Key: Added to backend `.env`
    - Publishable Key: Added to backend `.env`
    - **Features**:
-     - Monthly subscription: $4.99/month for AI features
      - Token purchases: $0.10 per token (for sending quests to friends)
-     - Users can start for free (basic features)
-     - AI quest generation requires premium subscription
+     - Users can start for free with all features unlocked
+     - AI quest generation is FREE for all users (no subscription required)
      - Users earn tokens by completing quests (proportional to NOs collected)
    - Backend environment variables: `STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`
-   - **Webhook Setup Required**: 
+   - **Webhook Setup Required**:
      - Point Stripe webhook to: `https://your-backend-url.com/api/payments/webhook`
      - Subscribe to: `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`
 
@@ -2135,6 +2134,21 @@ See `ENV_SETUP.md` for complete environment variable setup guide.
 - **Database**: Prisma migrations required for schema changes
 
 ## Recent Updates
+
+### 2025-11-19: Removed Subscription Requirement for AI Quest Generation 🎉
+- **Change**: AI quest generation is now FREE for all users (no subscription required)
+- **Motivation**: Removed paywall to make core app features accessible to everyone
+- **What Changed**:
+  - Removed subscription checks from `/backend/src/routes/quests.ts` (POST /api/quests/generate and POST /api/quests/refresh-all)
+  - Removed premium badge and subscription checks from `CreateQuestScreen.tsx`
+  - Updated UI to remove "Premium Required" modal and subscription prompts
+  - Cleaned up unused subscription-related imports and code
+- **Files Modified**:
+  - `/backend/src/routes/quests.ts` - Removed hasActiveSubscription() checks from AI generation endpoints
+  - `/src/screens/CreateQuestScreen.tsx` - Removed subscription UI, queries, and mutations
+  - `/README.md` - Updated documentation to reflect free AI generation
+- **User Experience**: All users can now freely generate AI-powered quests without any payment or subscription
+- **Note**: Token purchases for sending quests to friends remain available via Stripe
 
 ### 2025-11-17: Fixed Audio Transcription 500 Error (FormData Support) 🎤
 - **Issue Fixed**: Audio transcription failed with "500 internal server error - Failed to transcribe audio"

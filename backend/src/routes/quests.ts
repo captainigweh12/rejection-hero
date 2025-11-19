@@ -165,18 +165,6 @@ questsRouter.post("/generate", zValidator("json", generateQuestRequestSchema), a
     return c.json({ message: "Unauthorized" }, 401);
   }
 
-  // Check subscription for AI features
-  const hasSubscription = await hasActiveSubscription(user.id);
-  if (!hasSubscription) {
-    return c.json(
-      {
-        message: "AI quest generation requires a premium subscription. Subscribe to unlock AI-powered quests!",
-        requiresSubscription: true,
-      },
-      403
-    );
-  }
-
   const { category, difficulty, customPrompt, userLocation, userLatitude, userLongitude, preferredQuestType } = c.req.valid("json");
 
   // Safety check: If custom prompt provided, check for harmful content
@@ -304,18 +292,6 @@ questsRouter.post("/refresh-all", zValidator("json", refreshAllQuestsRequestSche
 
   if (!user) {
     return c.json({ message: "Unauthorized" }, 401);
-  }
-
-  // Check subscription for AI features
-  const hasSubscription = await hasActiveSubscription(user.id);
-  if (!hasSubscription) {
-    return c.json(
-      {
-        message: "AI quest generation requires a premium subscription. Subscribe to unlock AI-powered quests!",
-        requiresSubscription: true,
-      },
-      403
-    );
   }
 
   const { count = 3, userLocation, userLatitude, userLongitude } = c.req.valid("json");

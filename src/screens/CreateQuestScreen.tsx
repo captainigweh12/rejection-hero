@@ -3,14 +3,13 @@ import { View, Text, Pressable, ActivityIndicator, TextInput, ScrollView, Alert,
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
-import { Sparkles, X, ChevronLeft, Star, ThumbsDown, Mic, MapPin, Globe, Users, Square, Crown, Coins } from "lucide-react-native";
+import { Sparkles, X, ChevronLeft, Star, ThumbsDown, Mic, MapPin, Globe, Users, Square } from "lucide-react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "@/navigation/types";
 import { api } from "@/lib/api";
 import { useTheme } from "@/contexts/ThemeContext";
-import type { GenerateQuestRequest, GenerateQuestResponse, AudioTranscribeResponse, EnrollChallengeRequest, EnrollChallengeResponse, GetSubscriptionResponse, CreateSubscriptionResponse } from "@/shared/contracts";
+import type { GenerateQuestRequest, GenerateQuestResponse, AudioTranscribeResponse, EnrollChallengeRequest, EnrollChallengeResponse } from "@/shared/contracts";
 import { Audio } from "expo-av";
-import * as Linking from "expo-linking";
 import { playSound } from "@/services/soundService";
 
 type Props = NativeStackScreenProps<RootStackParamList, "CreateQuest">;
@@ -40,36 +39,6 @@ export default function CreateQuestScreen({ navigation }: Props) {
   const [isTranscribing, setIsTranscribing] = useState(false);
 
   const queryClient = useQueryClient();
-
-  // Fetch subscription status
-  const { data: subscriptionData } = useQuery<GetSubscriptionResponse>({
-    queryKey: ["subscription"],
-    queryFn: async () => {
-      return api.get<GetSubscriptionResponse>("/api/payments/subscription");
-    },
-  });
-
-  const hasActiveSubscription = subscriptionData?.hasActiveSubscription || false;
-
-  // Create subscription mutation
-  const createSubscriptionMutation = useMutation({
-    mutationFn: async () => {
-      return api.post<CreateSubscriptionResponse>("/api/payments/create-subscription", {});
-    },
-    onSuccess: async (data) => {
-      if (data.url) {
-        const canOpen = await Linking.canOpenURL(data.url);
-        if (canOpen) {
-          await Linking.openURL(data.url);
-        } else {
-          Alert.alert("Error", "Could not open payment page. Please try again.");
-        }
-      }
-    },
-    onError: (error) => {
-      Alert.alert("Error", error instanceof Error ? error.message : "Failed to create subscription");
-    },
-  });
 
   // Enroll in 100 Day Challenge mutation
   const enrollChallengeMutation = useMutation({
@@ -131,23 +100,7 @@ export default function CreateQuestScreen({ navigation }: Props) {
     },
     onError: (error: any) => {
       const errorMessage = error?.message || error?.toString() || "Failed to create quest";
-      
-      // Check if error is about subscription
-      if (error?.requiresSubscription || errorMessage.includes("subscription") || errorMessage.includes("premium")) {
-        Alert.alert(
-          "Premium Required",
-          "AI quest generation requires a premium subscription. Subscribe now to unlock AI-powered quests!",
-          [
-            {
-              text: "Subscribe",
-              onPress: () => createSubscriptionMutation.mutate(),
-            },
-            { text: "Cancel", style: "cancel" },
-          ]
-        );
-      } else {
-        Alert.alert("Error", errorMessage);
-      }
+      Alert.alert("Error", errorMessage);
     },
   });
 
@@ -327,23 +280,7 @@ export default function CreateQuestScreen({ navigation }: Props) {
               {/* Generate with AI Card - Modern 3D Glass */}
               <View style={{ paddingHorizontal: 24, marginBottom: 20 }}>
                 <Pressable
-                  onPress={() => {
-                    if (!hasActiveSubscription) {
-                      Alert.alert(
-                        "Premium Required",
-                        "AI quest generation requires a premium subscription ($4.99/month). Subscribe now to unlock AI-powered quests!",
-                        [
-                          {
-                            text: "Subscribe",
-                            onPress: () => createSubscriptionMutation.mutate(),
-                          },
-                          { text: "Cancel", style: "cancel" },
-                        ]
-                      );
-                    } else {
-                      setShowAIForm(true);
-                    }
-                  }}
+                  onPress={() => setShowAIForm(true)}
                   style={{
                     borderRadius: 24,
                     overflow: "hidden",
@@ -373,31 +310,11 @@ export default function CreateQuestScreen({ navigation }: Props) {
                       <Sparkles size={32} color={colors.text} />
                     </View>
                     <View style={{ flex: 1 }}>
-                      <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 4 }}>
-                        <Text style={{ fontSize: 22, fontWeight: "bold", color: colors.text }}>
-                          Generate with AI
-                        </Text>
-                        {!hasActiveSubscription && (
-                          <View
-                            style={{
-                              backgroundColor: "#FFD700",
-                              paddingHorizontal: 8,
-                              paddingVertical: 2,
-                              borderRadius: 8,
-                              flexDirection: "row",
-                              alignItems: "center",
-                              gap: 4,
-                            }}
-                          >
-                            <Crown size={12} color="#000" />
-                            <Text style={{ fontSize: 10, fontWeight: "bold", color: "#000" }}>PREMIUM</Text>
-                          </View>
-                        )}
-                      </View>
+                      <Text style={{ fontSize: 22, fontWeight: "bold", color: colors.text, marginBottom: 4 }}>
+                        Generate with AI
+                      </Text>
                       <Text style={{ fontSize: 14, color: colors.text }}>
-                        {hasActiveSubscription
-                          ? "Let AI create a personalized quest"
-                          : "Subscribe to unlock AI-powered quests"}
+                        Let AI create a personalized quest
                       </Text>
                     </View>
                   </LinearGradient>
