@@ -1,5 +1,33 @@
 ## 🔧 Bug Fixes & Features
 
+### Group Quest Type Selection & Rejection Nos (2025-11-19)
+- **Added**: Quest type selection for group quests (Action vs Rejection)
+- **Features**:
+  - Users can now select quest type when creating a group quest
+  - **Action Quests**: Complete a specific action or challenge
+  - **Rejection Quests**: Get rejected a specific number of times
+  - For rejection quests, users can set the number of "No's" required (1-100)
+  - Number selector with +/- buttons for easy adjustment
+  - Multi-step creation flow (4 steps total):
+    1. Select quest type (Action/Rejection) + rejection nos if applicable
+    2. Choose quest source (From My Quests / Create Custom)
+    3. Select assignment type (All Members / Specific Members)
+    4. Select specific members if assigned to specific members
+- **UI Improvements**:
+  - 4-step progress indicator showing creation progress
+  - Quest type displayed with intuitive icons (Target for Action, XCircle for Rejection)
+  - Rejection nos display with clear instructional text
+  - Back button for easy navigation through steps
+  - Button states intelligently show "Next" or "Create Quest"
+- **Backend Integration**:
+  - Updated `CreateGroupQuestRequest` schema with `questType` and `rejectionNos` fields
+  - Backend logs quest type and rejection nos for tracking
+  - Values are validated (questType: "action" | "rejection", rejectionNos: 1-100)
+- **Implementation Files**:
+  - Frontend: `/src/screens/GroupQuestsScreen.tsx` - Updated `CreateGroupQuestModal`
+  - Backend: `/backend/src/routes/groupQuests.ts` - Updated request handler
+  - Contracts: `/shared/contracts.ts` - Updated `CreateGroupQuestRequest` schema
+
 ### Google OAuth 502 Error Fixed (2025-11-19)
 - **Fixed**: Resolved 502 Bad Gateway error when attempting Google OAuth sign-in
 - **Root Cause**: Backend server was crashing on startup due to two issues:

@@ -1075,6 +1075,8 @@ export const createGroupQuestRequestSchema = z.object({
   groupId: z.string(),
   questId: z.string().optional(), // Optional for custom quests
   customQuestDescription: z.string().optional(), // For custom quests
+  questType: z.enum(["action", "rejection"]).default("action"), // Quest type
+  rejectionNos: z.number().int().min(1).max(100).optional(), // Number of No's required for rejection quests
   assignmentType: z.enum(["all", "assigned"]).default("all"),
   assignedMemberIds: z.array(z.string()).optional(),
 });

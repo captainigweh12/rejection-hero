@@ -53,11 +53,13 @@ function CreateGroupQuestModal({ visible, onClose, groupId, onSuccess }: CreateG
   const { colors } = useTheme();
 
   const [creationType, setCreationType] = useState<"existing" | "custom">("existing");
+  const [questType, setQuestType] = useState<"action" | "rejection">("action");
+  const [rejectionNos, setRejectionNos] = useState("1");
   const [customQuestText, setCustomQuestText] = useState("");
   const [selectedQuestId, setSelectedQuestId] = useState<string | null>(null);
   const [assignmentType, setAssignmentType] = useState<"all" | "assigned">("all");
   const [selectedMemberIds, setSelectedMemberIds] = useState<string[]>([]);
-  const [step, setStep] = useState<1 | 2 | 3>(1); // 1: Select Quest Type, 2: Assignment Type, 3: Select Members (if assigned)
+  const [step, setStep] = useState<1 | 2 | 3 | 4>(1); // 1: Quest Type, 2: Select Quest, 3: Assignment Type, 4: Select Members (if assigned)
 
   // Fetch user's quests
   const { data: questsData, isLoading: questsLoading } = useQuery({
@@ -105,7 +107,10 @@ function CreateGroupQuestModal({ visible, onClose, groupId, onSuccess }: CreateG
 
   const handleNext = () => {
     if (step === 1) {
-      // Validate based on creation type
+      // Step 1: Quest type selected, move to step 2
+      setStep(2);
+    } else if (step === 2) {
+      // Step 2: Validate quest selection
       if (creationType === "existing" && !selectedQuestId) {
         Alert.alert("Error", "Please select a quest");
         return;
@@ -114,14 +119,19 @@ function CreateGroupQuestModal({ visible, onClose, groupId, onSuccess }: CreateG
         Alert.alert("Error", "Please enter a quest description");
         return;
       }
-      setStep(2);
-    } else if (step === 2) {
+      // Move to assignment type selection
+      setStep(3);
+    } else if (step === 3) {
+      // Step 3: Assignment type selected
       if (assignmentType === "all") {
+        // All members, create the quest
         handleCreate();
       } else {
-        setStep(3);
+        // Need to assign specific members
+        setStep(4);
       }
-    } else if (step === 3) {
+    } else if (step === 4) {
+      // Step 4: Verify members selected
       if (selectedMemberIds.length === 0) {
         Alert.alert("Error", "Please select at least one member");
         return;
@@ -133,6 +143,8 @@ function CreateGroupQuestModal({ visible, onClose, groupId, onSuccess }: CreateG
   const handleCreate = () => {
     const requestData: CreateGroupQuestRequest = {
       groupId,
+      questType,
+      rejectionNos: questType === "rejection" ? parseInt(rejectionNos, 10) : undefined,
       assignmentType,
       assignedMemberIds: assignmentType === "assigned" ? selectedMemberIds : undefined,
     };
@@ -208,7 +220,7 @@ function CreateGroupQuestModal({ visible, onClose, groupId, onSuccess }: CreateG
 
             {/* Step Indicators */}
             <View style={{ flexDirection: "row", paddingHorizontal: 20, paddingVertical: 16, gap: 8 }}>
-              {[1, 2, 3].map((s) => (
+              {[1, 2, 3, 4].map((s) => (
                 <View
                   key={s}
                   style={{
@@ -222,12 +234,157 @@ function CreateGroupQuestModal({ visible, onClose, groupId, onSuccess }: CreateG
             </View>
 
             <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
-              {/* Step 1: Choose Quest Type and Select/Create Quest */}
+              {/* Step 1: Choose Quest Type (Action vs Rejection) */}
               {step === 1 && (
                 <View style={{ padding: 20 }}>
-                  {/* Quest Type Selector */}
-                  <Text style={{ color: colors.text, fontSize: 16, fontWeight: "600", marginBottom: 12 }}>
-                    Choose Quest Type
+                  <Text style={{ color: colors.text, fontSize: 18, fontWeight: "700", marginBottom: 16 }}>
+                    Select Quest Type
+                  </Text>
+                  <Text style={{ color: colors.textSecondary, fontSize: 14, marginBottom: 16 }}>
+                    Choose what type of challenge your group will face.
+                  </Text>
+
+                  {/* Action Quest */}
+                  <Pressable
+                    onPress={() => setQuestType("action")}
+                    style={{
+                      backgroundColor: questType === "action" ? colors.primaryLight : colors.surface,
+                      borderRadius: 16,
+                      padding: 16,
+                      marginBottom: 12,
+                      borderWidth: 2,
+                      borderColor: questType === "action" ? colors.primary : colors.cardBorder,
+                    }}
+                  >
+                    <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+                      <View
+                        style={{
+                          width: 24,
+                          height: 24,
+                          borderRadius: 12,
+                          backgroundColor: questType === "action" ? colors.primary : colors.surface,
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        {questType === "action" && <Check size={16} color={colors.text} />}
+                      </View>
+                      <View style={{ flex: 1 }}>
+                        <Text style={{ color: colors.text, fontSize: 16, fontWeight: "700", marginBottom: 4 }}>
+                          Action Quest
+                        </Text>
+                        <Text style={{ color: colors.textSecondary, fontSize: 13 }}>
+                          Complete a specific action or challenge
+                        </Text>
+                      </View>
+                      <Target size={24} color={questType === "action" ? colors.primary : colors.textTertiary} />
+                    </View>
+                  </Pressable>
+
+                  {/* Rejection Quest */}
+                  <Pressable
+                    onPress={() => setQuestType("rejection")}
+                    style={{
+                      backgroundColor: questType === "rejection" ? colors.primaryLight : colors.surface,
+                      borderRadius: 16,
+                      padding: 16,
+                      marginBottom: 12,
+                      borderWidth: 2,
+                      borderColor: questType === "rejection" ? colors.primary : colors.cardBorder,
+                    }}
+                  >
+                    <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+                      <View
+                        style={{
+                          width: 24,
+                          height: 24,
+                          borderRadius: 12,
+                          backgroundColor: questType === "rejection" ? colors.primary : colors.surface,
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        {questType === "rejection" && <Check size={16} color={colors.text} />}
+                      </View>
+                      <View style={{ flex: 1 }}>
+                        <Text style={{ color: colors.text, fontSize: 16, fontWeight: "700", marginBottom: 4 }}>
+                          Rejection Quest
+                        </Text>
+                        <Text style={{ color: colors.textSecondary, fontSize: 13 }}>
+                          Get rejected a specific number of times
+                        </Text>
+                      </View>
+                      <XCircle size={24} color={questType === "rejection" ? colors.primary : colors.textTertiary} />
+                    </View>
+                  </Pressable>
+
+                  {/* Rejection Nos Input */}
+                  {questType === "rejection" && (
+                    <View style={{ marginTop: 20, paddingHorizontal: 12 }}>
+                      <Text style={{ color: colors.text, fontSize: 14, fontWeight: "600", marginBottom: 8 }}>
+                        Number of &quot;No&apos;s&quot; Required
+                      </Text>
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                          gap: 12,
+                          backgroundColor: colors.surface,
+                          borderRadius: 12,
+                          borderWidth: 1,
+                          borderColor: colors.cardBorder,
+                          paddingHorizontal: 12,
+                        }}
+                      >
+                        <Pressable
+                          onPress={() => {
+                            const num = Math.max(1, parseInt(rejectionNos, 10) - 1);
+                            setRejectionNos(num.toString());
+                          }}
+                          style={{ paddingVertical: 12 }}
+                        >
+                          <Text style={{ fontSize: 20, color: colors.primary, fontWeight: "700" }}>−</Text>
+                        </Pressable>
+                        <TextInput
+                          value={rejectionNos}
+                          onChangeText={(text) => {
+                            const num = Math.min(100, Math.max(1, parseInt(text || "1", 10)));
+                            setRejectionNos(num.toString());
+                          }}
+                          keyboardType="number-pad"
+                          style={{
+                            flex: 1,
+                            textAlign: "center",
+                            fontSize: 16,
+                            fontWeight: "700",
+                            color: colors.text,
+                            paddingVertical: 12,
+                          }}
+                          maxLength={3}
+                        />
+                        <Pressable
+                          onPress={() => {
+                            const num = Math.min(100, parseInt(rejectionNos, 10) + 1);
+                            setRejectionNos(num.toString());
+                          }}
+                          style={{ paddingVertical: 12 }}
+                        >
+                          <Text style={{ fontSize: 20, color: colors.primary, fontWeight: "700" }}>+</Text>
+                        </Pressable>
+                      </View>
+                      <Text style={{ color: colors.textTertiary, fontSize: 12, marginTop: 8 }}>
+                        Members will need to collect {rejectionNos} rejections to complete this quest
+                      </Text>
+                    </View>
+                  )}
+                </View>
+              )}
+
+              {/* Step 2: Choose Quest Source (Existing or Custom) */}
+              {step === 2 && (
+                <View style={{ padding: 20 }}>
+                  <Text style={{ color: colors.text, fontSize: 18, fontWeight: "700", marginBottom: 16 }}>
+                    Choose Quest Source
                   </Text>
                   <View style={{ flexDirection: "row", gap: 12, marginBottom: 24 }}>
                     <Pressable
@@ -496,10 +653,95 @@ function CreateGroupQuestModal({ visible, onClose, groupId, onSuccess }: CreateG
                 </View>
               )}
 
-              {/* Step 3: Select Members (only if assigned) */}
+              {/* Step 3: Assignment Type */}
               {step === 3 && (
                 <View style={{ padding: 20 }}>
-                  <Text style={{ color: colors.text, fontSize: 16, fontWeight: "600", marginBottom: 16 }}>
+                  <Text style={{ color: colors.text, fontSize: 18, fontWeight: "700", marginBottom: 16 }}>
+                    Assign To Members
+                  </Text>
+                  <Text style={{ color: colors.textSecondary, fontSize: 14, marginBottom: 20 }}>
+                    Who should complete this quest?
+                  </Text>
+
+                  {/* All Members Option */}
+                  <Pressable
+                    onPress={() => setAssignmentType("all")}
+                    style={{
+                      backgroundColor: assignmentType === "all" ? colors.primaryLight : colors.surface,
+                      borderRadius: 16,
+                      padding: 16,
+                      marginBottom: 12,
+                      borderWidth: 2,
+                      borderColor: assignmentType === "all" ? colors.primary : colors.cardBorder,
+                    }}
+                  >
+                    <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+                      <View
+                        style={{
+                          width: 24,
+                          height: 24,
+                          borderRadius: 12,
+                          backgroundColor: assignmentType === "all" ? colors.primary : colors.surface,
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        {assignmentType === "all" && <Check size={16} color={colors.text} />}
+                      </View>
+                      <View style={{ flex: 1 }}>
+                        <Text style={{ color: colors.text, fontSize: 16, fontWeight: "700", marginBottom: 4 }}>
+                          All Members
+                        </Text>
+                        <Text style={{ color: colors.textSecondary, fontSize: 13 }}>
+                          Everyone in the group can participate
+                        </Text>
+                      </View>
+                      <Users size={24} color={assignmentType === "all" ? colors.primary : colors.textTertiary} />
+                    </View>
+                  </Pressable>
+
+                  {/* Specific Members Option */}
+                  <Pressable
+                    onPress={() => setAssignmentType("assigned")}
+                    style={{
+                      backgroundColor: assignmentType === "assigned" ? colors.primaryLight : colors.surface,
+                      borderRadius: 16,
+                      padding: 16,
+                      borderWidth: 2,
+                      borderColor: assignmentType === "assigned" ? colors.primary : colors.cardBorder,
+                    }}
+                  >
+                    <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+                      <View
+                        style={{
+                          width: 24,
+                          height: 24,
+                          borderRadius: 12,
+                          backgroundColor: assignmentType === "assigned" ? colors.primary : colors.surface,
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        {assignmentType === "assigned" && <Check size={16} color={colors.text} />}
+                      </View>
+                      <View style={{ flex: 1 }}>
+                        <Text style={{ color: colors.text, fontSize: 16, fontWeight: "700", marginBottom: 4 }}>
+                          Specific Members
+                        </Text>
+                        <Text style={{ color: colors.textSecondary, fontSize: 13 }}>
+                          Assign to selected members only
+                        </Text>
+                      </View>
+                      <UserCheck size={24} color={assignmentType === "assigned" ? colors.primary : colors.textTertiary} />
+                    </View>
+                  </Pressable>
+                </View>
+              )}
+
+              {/* Step 4: Select Members (only if assigned) */}
+              {step === 4 && (
+                <View style={{ padding: 20 }}>
+                  <Text style={{ color: colors.text, fontSize: 18, fontWeight: "700", marginBottom: 16 }}>
                     Select Members ({selectedMemberIds.length} selected)
                   </Text>
                   {membersLoading ? (
@@ -577,7 +819,7 @@ function CreateGroupQuestModal({ visible, onClose, groupId, onSuccess }: CreateG
             >
               {step > 1 && (
                 <Pressable
-                  onPress={() => setStep((step - 1) as 1 | 2)}
+                  onPress={() => setStep((step - 1) as 1 | 2 | 3 | 4)}
                   style={{
                     backgroundColor: colors.surface,
                     paddingVertical: 16,
@@ -592,15 +834,15 @@ function CreateGroupQuestModal({ visible, onClose, groupId, onSuccess }: CreateG
                 onPress={handleNext}
                 disabled={
                   createMutation.isPending ||
-                  (step === 1 && creationType === "existing" && !selectedQuestId) ||
-                  (step === 1 && creationType === "custom" && !customQuestText.trim()) ||
-                  (step === 3 && selectedMemberIds.length === 0)
+                  (step === 2 && creationType === "existing" && !selectedQuestId) ||
+                  (step === 2 && creationType === "custom" && !customQuestText.trim()) ||
+                  (step === 4 && selectedMemberIds.length === 0)
                 }
                 style={{
                   backgroundColor:
-                    (step === 1 && creationType === "existing" && !selectedQuestId) ||
-                    (step === 1 && creationType === "custom" && !customQuestText.trim()) ||
-                    (step === 3 && selectedMemberIds.length === 0)
+                    (step === 2 && creationType === "existing" && !selectedQuestId) ||
+                    (step === 2 && creationType === "custom" && !customQuestText.trim()) ||
+                    (step === 4 && selectedMemberIds.length === 0)
                       ? colors.primaryLight
                       : colors.primary,
                   paddingVertical: 16,
@@ -613,7 +855,7 @@ function CreateGroupQuestModal({ visible, onClose, groupId, onSuccess }: CreateG
                   <ActivityIndicator size="small" color={colors.text} />
                 ) : (
                   <Text style={{ color: colors.text, fontSize: 16, fontWeight: "700" }}>
-                    {step === 2 && assignmentType === "all" ? "Create Quest" : step === 3 ? "Create Quest" : "Next"}
+                    {step === 3 && assignmentType === "all" ? "Create Quest" : step === 4 ? "Create Quest" : "Next"}
                   </Text>
                 )}
               </Pressable>

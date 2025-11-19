@@ -116,6 +116,8 @@ const createGroupQuestSchema = z.object({
   groupId: z.string(),
   questId: z.string().optional(), // Optional for custom quests
   customQuestDescription: z.string().optional(), // For custom quests
+  questType: z.enum(["action", "rejection"]).default("action"), // Quest type
+  rejectionNos: z.number().int().min(1).max(100).optional(), // Number of No's required for rejection quests
   assignmentType: z.enum(["all", "assigned"]).default("all"),
   assignedMemberIds: z.array(z.string()).optional(), // Only used if assignmentType is "assigned"
 });
@@ -127,7 +129,10 @@ groupQuestsRouter.post("/create", zValidator("json", createGroupQuestSchema), as
     return c.json({ message: "Unauthorized" }, 401);
   }
 
-  const { groupId, questId, customQuestDescription, assignmentType, assignedMemberIds } = c.req.valid("json");
+  const { groupId, questId, customQuestDescription, questType, rejectionNos, assignmentType, assignedMemberIds } = c.req.valid("json");
+
+  // Log quest type and rejection nos
+  console.log("🎯 [Group Quest] Creating quest - Type:", questType, "Rejection Nos:", rejectionNos);
 
   // Validate that either questId or customQuestDescription is provided
   if (!questId && !customQuestDescription) {
