@@ -42,7 +42,7 @@ export async function requestNotificationPermissions(): Promise<boolean> {
 
     return true;
   } catch (error) {
-    console.error("Error requesting notification permissions:", error);
+    console.log("⚠️ Error requesting notification permissions:", error);
     return false;
   }
 }
@@ -57,13 +57,22 @@ export async function getPushToken(): Promise<string | null> {
       return null;
     }
 
+    // Check if projectId is configured and valid
+    const projectId = process.env.EXPO_PUBLIC_VIBECODE_PROJECT_ID;
+    if (!projectId || projectId === 'undefined' || projectId.length === 0) {
+      console.log("⚠️ Push notifications disabled: EXPO_PUBLIC_VIBECODE_PROJECT_ID not configured");
+      return null;
+    }
+
     const tokenData = await Notifications.getExpoPushTokenAsync({
-      projectId: process.env.EXPO_PUBLIC_VIBECODE_PROJECT_ID,
+      projectId,
     });
 
     return tokenData.data;
-  } catch (error) {
-    console.error("Error getting push token:", error);
+  } catch (error: any) {
+    // Don't use console.error to avoid red error screens
+    // Push notifications are optional, so gracefully fail
+    console.log("⚠️ Could not get push token:", error?.message || error);
     return null;
   }
 }
@@ -97,7 +106,7 @@ export async function scheduleLocalNotification(
 
     return notificationId;
   } catch (error) {
-    console.error("Error scheduling notification:", error);
+    console.log("⚠️ Error scheduling notification:", error);
     return "";
   }
 }
@@ -109,7 +118,7 @@ export async function sendInAppNotification(title: string, body: string, data?: 
   try {
     await scheduleLocalNotification(title, body, data);
   } catch (error) {
-    console.error("Error sending in-app notification:", error);
+    console.log("⚠️ Error sending in-app notification:", error);
   }
 }
 
@@ -120,7 +129,7 @@ export async function cancelNotification(notificationId: string): Promise<void> 
   try {
     await Notifications.cancelScheduledNotificationAsync(notificationId);
   } catch (error) {
-    console.error("Error canceling notification:", error);
+    console.log("⚠️ Error canceling notification:", error);
   }
 }
 
@@ -131,7 +140,7 @@ export async function cancelAllNotifications(): Promise<void> {
   try {
     await Notifications.cancelAllScheduledNotificationsAsync();
   } catch (error) {
-    console.error("Error canceling all notifications:", error);
+    console.log("⚠️ Error canceling all notifications:", error);
   }
 }
 

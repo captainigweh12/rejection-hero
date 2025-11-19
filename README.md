@@ -2136,6 +2136,21 @@ See `ENV_SETUP.md` for complete environment variable setup guide.
 
 ## Recent Updates
 
+### 2025-11-19: Fixed Notification Service Error Logging 🔔
+- **Change**: Removed red error screens from push notification setup
+- **What Changed**:
+  - Replaced all `console.error()` with `console.log()` in `/src/services/notificationService.ts`
+  - Added validation for `EXPO_PUBLIC_VIBECODE_PROJECT_ID` before attempting to get push token
+  - Gracefully handles missing or invalid project ID (notifications become optional)
+- **User Experience**:
+  - No red error screens when push notifications fail to initialize
+  - App continues working normally even if push notifications aren't configured
+  - Clear warning logs for debugging without disrupting UX
+- **Technical Details**:
+  - Push notifications are now truly optional - app works without them
+  - Invalid project IDs are detected early and logged clearly
+  - All notification errors use `console.log()` instead of `console.error()`
+
 ### 2025-11-19: Improved API Error Handling for Safety Checks 🛡️
 - **Change**: Enhanced error handling to properly display safety rejection messages to users
 - **What Changed**:
