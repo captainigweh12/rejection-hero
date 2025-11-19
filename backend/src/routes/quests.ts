@@ -1431,13 +1431,7 @@ export async function updateUserStats(userId: string, xpReward: number, pointRew
     }
   }
 
-  // Calculate confidence meter for create case
-  const difficultyMultiplier: Record<string, number> = {
-    easy: 5,
-    medium: 10,
-    hard: 15,
-    expert: 20,
-  };
+  // Calculate confidence meter for create case (use existing difficultyMultiplier above)
   const initialConfidence = difficultyMultiplier[difficulty?.toLowerCase() || "medium"] || 10;
 
   await db.userStats.upsert({

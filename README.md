@@ -1,5 +1,15 @@
 ## 🔧 Bug Fixes & Features
 
+### Google OAuth 502 Error Fixed (2025-11-19)
+- **Fixed**: Resolved 502 Bad Gateway error when attempting Google OAuth sign-in
+- **Root Cause**: Backend server was crashing on startup due to two issues:
+  1. Missing `stripe` package dependency in backend
+  2. Duplicate `difficultyMultiplier` variable declaration in quests.ts
+- **Solution**:
+  - Installed `stripe` package in backend dependencies
+  - Removed duplicate variable declaration in quests route
+- **Impact**: Google OAuth authentication now works properly, backend server starts successfully
+
 ### Stripe Payment Integration & Token System (2025-11-18)
 - **Added**: Complete Stripe payment integration for token purchases with beautiful UI
 - **Components Created**:
