@@ -35,6 +35,7 @@ import challengesRouter from "./routes/challenges";
 import paymentsRouter, { paymentRedirectRouter } from "./routes/payments";
 import policiesRouter from "./routes/policies";
 import { adminRouter } from "./routes/admin";
+import bugReportRouter from "./routes/bug-reports";
 import { generateDailyChallengesForAllUsers, sendMotivationalNotifications } from "./services/challengeScheduler";
 import { type AppType } from "./types";
 
@@ -167,6 +168,9 @@ app.route("/api/policies", policiesRouter);
 
 console.log("👑 Mounting admin routes at /api/admin");
 app.route("/api/admin", adminRouter);
+
+console.log("🐛 Mounting bug report routes at /api/bug-reports");
+app.route("/api/bug-reports", bugReportRouter);
 
 console.log("🌐 Mounting web redirect routes");
 app.route("/", webRedirectRouter);
