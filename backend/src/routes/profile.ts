@@ -68,6 +68,7 @@ profileRouter.get("/", async (c) => {
           displayName: displayName,
           bio: null,
           age: null,
+          ageVerified: false, // Explicitly set to false - user must verify age during onboarding
           photos: null,
           avatar: null,
           interests: null,

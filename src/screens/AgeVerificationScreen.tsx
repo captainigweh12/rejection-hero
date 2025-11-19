@@ -5,6 +5,7 @@ import { useNavigation } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Haptics from "expo-haptics";
 import { Shield, AlertTriangle } from "lucide-react-native";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { api } from "@/lib/api";
 import { useSession } from "@/lib/useSession";
@@ -14,6 +15,7 @@ export default function AgeVerificationScreen() {
   const navigation = useNavigation();
   const { data: session } = useSession();
   const { colors } = useTheme();
+  const queryClient = useQueryClient();
   const [age, setAge] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -47,6 +49,12 @@ export default function AgeVerificationScreen() {
         ageVerified: true,
         parentalConsent: ageNum >= 13 && ageNum < 18, // Require parental consent for 13-17
       });
+
+      // Invalidate profile cache to trigger AuthWrapper re-check
+      await queryClient.invalidateQueries({ queryKey: ["profile"] });
+
+      // Small delay to ensure cache is updated
+      await new Promise((resolve) => setTimeout(resolve, 300));
 
       // If user is 13-17, show parental consent notice
       if (ageNum >= 13 && ageNum < 18) {

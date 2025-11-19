@@ -92,8 +92,8 @@ export default function LiveScreen({ navigation }: Props) {
     enabled: !!sessionData?.user,
   });
 
-  // Fetch user stats for diamond balance
-  const { data: userStats } = useQuery<{ diamonds: number; currentStreak: number; totalXP: number }>({
+  // Fetch user stats for token balance
+  const { data: userStats } = useQuery<{ tokens: number; currentStreak: number; totalXP: number }>({
     queryKey: ["userStats"],
     queryFn: async () => {
       return api.get("/api/stats");
@@ -288,9 +288,9 @@ export default function LiveScreen({ navigation }: Props) {
       return;
     }
 
-    const userDiamonds = userStats?.diamonds || 0;
-    if (boostAmount > userDiamonds) {
-      Alert.alert("Insufficient Diamonds", `You only have ${userDiamonds} diamonds`);
+    const userTokens = userStats?.tokens || 0;
+    if (boostAmount > userTokens) {
+      Alert.alert("Insufficient Tokens", `You only have ${userTokens} tokens`);
       return;
     }
 
@@ -632,13 +632,13 @@ export default function LiveScreen({ navigation }: Props) {
 
               <ScrollView showsVerticalScrollIndicator={false}>
                 <Text style={{ color: colors.textSecondary, fontSize: 14, marginBottom: 16 }}>
-                  Challenge {viewingStream.user.name} to complete a quest! Boost with diamonds for higher priority.
+                  Challenge {viewingStream.user.name} to complete a quest! Boost with tokens for higher priority.
                 </Text>
 
-                {/* Diamond Balance */}
+                {/* Token Balance */}
                 <View style={{ backgroundColor: colors.warning + "20", borderRadius: 12, padding: 12, marginBottom: 16 }}>
                   <Text style={{ color: colors.warning, fontSize: 12, fontWeight: "600" }}>
-                    Your Diamonds: {userStats?.diamonds || 0} 💎
+                    Your Tokens: {userStats?.tokens || 0} 🪙
                   </Text>
                 </View>
 

@@ -8,6 +8,8 @@
 | Frontend App | ✅ Working | Expo SDK 53, React Native 0.76.7 |
 | Authentication | ✅ Fixed | 3-layer protection system, 401 errors eliminated |
 | **Backend URLs** | ✅ **SYNCHRONIZED** | Both frontend & backend now use same URL |
+| **Tokens System** | ✅ **UPDATED** | Changed from diamonds to tokens throughout |
+| **Onboarding Flow** | ✅ **FIXED** | New users now see age verification → onboarding |
 | Database | ⚠️ Dev-Only | SQLite (needs PostgreSQL for production) |
 | SSL/TLS | ⚠️ Required | Not set up (needs Let's Encrypt for rejectionhero.com) |
 
@@ -19,6 +21,37 @@
 ---
 
 ## 🔧 Bug Fixes & Features
+
+### 💰 Diamonds → Tokens Rebranding (2025-11-19)
+- **✅ COMPLETED**: All references to "diamonds" changed to "tokens"
+- **Changes**:
+  - **LiveScreen.tsx**:
+    - Changed query type from `diamonds: number` to `tokens: number`
+    - Updated UI text: "Your Diamonds" → "Your Tokens"
+    - Updated error messages: "Insufficient Diamonds" → "Insufficient Tokens"
+    - Updated icon: 💎 → 🪙 (coin emoji)
+    - Updated variable names: `userDiamonds` → `userTokens`
+    - Updated descriptions: "Boost with diamonds" → "Boost with tokens"
+  - **Backend query**: Automatically returns `tokens` field instead of `diamonds`
+- **Impact**: All new quest challenges and boosts now reference "tokens" for better user understanding
+
+### 🎯 Onboarding Flow Fixed for New Users (2025-11-19)
+- **✅ COMPLETELY FIXED**: New users now properly see the onboarding flow after sign-up
+- **Issues Fixed**:
+  1. **Backend Profile Creation**: When new profile auto-created, `ageVerified` now explicitly set to `false`
+  2. **Query Cache Invalidation**: AgeVerificationScreen now invalidates profile cache after updating age
+  3. **AuthWrapper Navigation**: Profile cache refresh triggers proper navigation to Onboarding screen
+- **New User Flow**:
+  1. User signs up → Profile created with `ageVerified: false`, `onboardingCompleted: false`
+  2. AuthWrapper detects unauthenticated age → Redirects to **AgeVerificationScreen**
+  3. User enters age → Profile updated with `ageVerified: true`
+  4. Cache invalidated → AuthWrapper detects profile change → Redirects to **OnboardingScreen**
+  5. User completes onboarding → `onboardingCompleted: true`
+  6. AuthWrapper navigates to **Main App (Tabs)**
+- **Files Modified**:
+  - `/backend/src/routes/profile.ts` - Added explicit `ageVerified: false` in profile creation
+  - `/src/screens/AgeVerificationScreen.tsx` - Added `useQueryClient` import and cache invalidation
+- **Result**: New users experience seamless onboarding → age verification → onboarding flow
 
 ### 🔐 Authentication Error Prevention System - 3-Layer Protection (2025-11-19)
 - **✅ PERMANENTLY FIXED**: 401 Unauthorized errors completely eliminated
