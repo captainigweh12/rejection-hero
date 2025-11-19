@@ -24,13 +24,15 @@
 ## 🔧 Bug Fixes & Features
 
 ### 🎁 Custom Quest Creation Now Free & Optional for Friends (2025-11-19)
-- **✅ FIXED**: Users can now create custom quests without selecting friends or requiring a subscription
+- **✅ COMPLETELY FIXED**: Users can now create custom quests without selecting friends or requiring a subscription
 - **Changes**:
   - **Frontend (CreateCustomQuestScreen.tsx)**:
     - Removed mandatory friend selection requirement
     - Users can create personal custom quests
     - Friend selection is now optional (users can invite friends or create for themselves)
     - Validation now only checks for: description, location (if custom), and sufficient balance
+    - **Auto-navigation**: Personal quests automatically navigate to quest detail screen after creation
+    - **Quest list refresh**: Invalidates quests query to show new quest in active quests immediately
   - **Backend (sharedQuests.ts)**:
     - **Removed subscription requirement** - All users can now create custom quests (no paywall)
     - Removed `.refine()` validation that required friendId or friendIds
@@ -38,12 +40,20 @@
     - Personal quests: Created as UserQuest and assigned directly to the user
     - Shared quests: Created as SharedQuest, deduct tokens, send to friends
     - No token cost for personal quests (tokens only required when sharing with friends)
+    - Fixed Prisma field error: Using `noCount`, `yesCount`, `actionCount` instead of `progress`
+  - **Response Schema (contracts.ts)**:
+    - Added `userQuestId` field for personal quest responses
+    - Added `sharedQuestIds` array for multiple friend responses
+    - Maintains backward compatibility with `sharedQuestId`
   - **Behavior**:
     - **Free for all users** - No subscription required for custom quest creation
     - If no friends selected → Quest created as personal UserQuest (free, no tokens required)
+      - Shows in Active Quests immediately
+      - Alert with "Start Quest" button that navigates to quest detail
     - If friends selected → Quest created as SharedQuest, costs 1 token per friend
+      - Alert showing which friends received the quest
     - Users still have the option to invite friends if they want to
-- **Impact**: All users can now create unlimited personal custom quests without friends or subscriptions
+- **Impact**: All users can now create unlimited personal custom quests without friends or subscriptions, with seamless navigation to start them immediately
 
 ### 💰 Diamonds → Tokens Rebranding (2025-11-19)
 - **✅ COMPLETED**: All references to "diamonds" changed to "tokens"

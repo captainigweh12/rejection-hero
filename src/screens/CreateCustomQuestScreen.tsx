@@ -103,24 +103,50 @@ export default function CreateCustomQuestScreen({ route, navigation }: Props) {
     },
     onSuccess: (response) => {
       if (response.success) {
+        // Invalidate queries to refresh data
         queryClient.invalidateQueries({ queryKey: ["stats"] });
         queryClient.invalidateQueries({ queryKey: ["friends"] });
+        queryClient.invalidateQueries({ queryKey: ["quests"] }); // Refresh active quests list
 
-        const friendCount = selectedFriendIds.length;
-        const friendNames = selectedFriendIds
-          .map((id) => friends.find((f) => f.id === id)?.displayName || friendName || "Friend")
-          .join(", ");
-        
-        Alert.alert(
-          "Quest Created! 🎉",
-          `Your custom quest has been sent to ${friendCount} friend${friendCount > 1 ? 's' : ''}${friendCount <= 3 ? `: ${friendNames}` : ''}!${giftXP > 0 || giftPoints > 0 ? `\n\n💎 Gifted: ${giftXP} XP + ${giftPoints} Points` : ""}`,
-          [
-            {
-              text: "OK",
-              onPress: () => navigation.goBack(),
-            },
-          ]
-        );
+        const isPersonalQuest = selectedFriendIds.length === 0;
+
+        if (isPersonalQuest) {
+          // Personal quest created - navigate to quest detail
+          Alert.alert(
+            "Quest Created! 🎉",
+            `Your custom quest has been created and is now active!`,
+            [
+              {
+                text: "Start Quest",
+                onPress: () => {
+                  // Navigate to quest detail screen
+                  if (response.userQuestId) {
+                    navigation.navigate("QuestDetail", { userQuestId: response.userQuestId });
+                  } else {
+                    navigation.goBack();
+                  }
+                },
+              },
+            ]
+          );
+        } else {
+          // Shared quest - show success message
+          const friendCount = selectedFriendIds.length;
+          const friendNames = selectedFriendIds
+            .map((id) => friends.find((f) => f.id === id)?.displayName || friendName || "Friend")
+            .join(", ");
+
+          Alert.alert(
+            "Quest Created! 🎉",
+            `Your custom quest has been sent to ${friendCount} friend${friendCount > 1 ? 's' : ''}${friendCount <= 3 ? `: ${friendNames}` : ''}!${giftXP > 0 || giftPoints > 0 ? `\n\n💎 Gifted: ${giftXP} XP + ${giftPoints} Points` : ""}`,
+            [
+              {
+                text: "OK",
+                onPress: () => navigation.goBack(),
+              },
+            ]
+          );
+        }
       } else if (!response.isSafe && response.safetyWarning) {
         Alert.alert("Quest Rejected ⚠️", response.safetyWarning);
       } else {

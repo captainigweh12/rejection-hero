@@ -1342,7 +1342,9 @@ export type CreateCustomQuestRequest = z.infer<typeof createCustomQuestRequestSc
 
 export const createCustomQuestResponseSchema = z.object({
   success: z.boolean(),
-  sharedQuestId: z.string().optional(),
+  sharedQuestId: z.string().optional(), // For shared quests (deprecated - use sharedQuestIds)
+  sharedQuestIds: z.array(z.string()).optional(), // For multiple friends
+  userQuestId: z.string().optional(), // For personal quests
   message: z.string(),
 
   // Quest details (after AI safety filtering)
