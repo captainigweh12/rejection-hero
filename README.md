@@ -1,5 +1,22 @@
 ## 🔧 Bug Fixes & Features
 
+### User Session Recovery - Auto-Recovery After Database Changes (2025-11-19)
+- **✅ FIXED**: Foreign key constraint errors when user exists in session but not in database
+- **Problem**: After `prisma db push` created new schema, users with existing sessions couldn't access API endpoints
+- **Solution**: Backend now auto-recovers users from session data:
+  - `/api/stats` - Auto-creates missing User and UserStats records from session
+  - `/api/profile` - Auto-creates missing User and Profile records from session
+  - Both endpoints gracefully handle missing database records and recreate them
+- **How It Works**:
+  1. User has valid session cookie with user ID
+  2. User tries to access API endpoint
+  3. Backend checks if user exists in database
+  4. If missing, backend recreates User record from session data (email, name, etc.)
+  5. Then creates missing Profile/Stats records with defaults
+  6. User seamlessly continues without needing to log in again
+- **Frontend**: Removed stale session detection logic (backend now handles recovery)
+- **Result**: Users maintain their sessions across database schema updates
+
 ### Bug Report Feature - Now Connected to GoHighLevel (2025-11-19)
 - **✅ FULLY FUNCTIONAL**: Dedicated Report Bug screen with GoHighLevel integration and database storage
 - **Frontend Features** (ReportBugScreen.tsx - New Dedicated Screen):

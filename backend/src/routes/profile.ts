@@ -32,22 +32,32 @@ profileRouter.get("/", async (c) => {
 
     console.log(`🔍 [Profile] Fetching profile for user ${user.id}`);
 
-    // Verify user exists in database (check for stale sessions)
-    const userRecord = await db.user.findUnique({
+    // Check if user exists in database
+    let userRecord = await db.user.findUnique({
       where: { id: user.id },
       select: { id: true, isAdmin: true },
     });
 
+    // Auto-recover user from session if not in database (for DB wipe recovery)
     if (!userRecord) {
-      console.error(`❌ [Profile] User ${user.id} not found in database (stale session)`);
-      return c.json({ message: "User session invalid - please log in again" }, 401);
+      console.log(`📝 [Profile] Recreating user ${user.id} from session (${user.email})`);
+      userRecord = await db.user.create({
+        data: {
+          id: user.id,
+          email: user.email,
+          emailVerified: user.emailVerified ?? false,
+          name: user.name ?? null,
+          image: user.image ?? null,
+        },
+      });
+      console.log(`✅ [Profile] User ${user.id} recreated from session`);
     }
 
     let profile = await db.profile.findUnique({
       where: { userId: user.id },
     });
 
-    // Auto-create profile if it doesn't exist (for OAuth users)
+    // Auto-create profile if it doesn't exist (for OAuth users or DB recovery)
     if (!profile) {
       console.log(`📝 Creating default profile for user ${user.id} (${user.email})`);
       const displayName = user.name || user.email?.split("@")[0] || "User";

@@ -24,58 +24,73 @@ statsRouter.get("/", async (c) => {
     return c.json({ message: "Unauthorized" }, 401);
   }
 
-  // Verify user exists in database (check for stale sessions)
-  const userExists = await db.user.findUnique({
-    where: { id: user.id },
-    select: { id: true },
-  });
-
-  if (!userExists) {
-    console.error(`❌ [Stats] User ${user.id} not found in database (stale session)`);
-    return c.json({ message: "User session invalid - please log in again" }, 401);
-  }
-
   const stats = await db.userStats.findUnique({
     where: { userId: user.id },
   });
 
   if (!stats) {
-    // Create default stats if not exists
-    const newStats = await db.userStats.create({
-      data: {
-        userId: user.id,
-        currentStreak: 0,
-        longestStreak: 0,
-        totalXP: 0,
-        totalPoints: 0,
-        trophies: 0,
-        diamonds: 0,
-        tokens: 0,
-      },
-    });
+    // Auto-create user and stats if they don't exist (for session recovery after DB wipe)
+    try {
+      // First, check if user exists in database
+      const userExists = await db.user.findUnique({
+        where: { id: user.id },
+      });
 
-    return c.json({
-      currentStreak: newStats.currentStreak,
-      longestStreak: newStats.longestStreak,
-      totalXP: newStats.totalXP,
-      totalPoints: newStats.totalPoints,
-      trophies: newStats.trophies,
-      diamonds: newStats.diamonds,
-      tokens: newStats.tokens || 0,
-      confidenceLevel: newStats.confidenceLevel,
-      previousConfidence: newStats.previousConfidence,
-      confidenceChange: newStats.confidenceLevel - newStats.previousConfidence,
-      dailyConfidenceMeter: newStats.dailyConfidenceMeter || 0,
-      easyZoneCount: newStats.easyZoneCount,
-      growthZoneCount: newStats.growthZoneCount,
-      fearZoneCount: newStats.fearZoneCount,
-      lastQuestAttemptAt: newStats.lastQuestAttemptAt?.toISOString() || null,
-      lastQuestCompletedAt: newStats.lastQuestCompletedAt?.toISOString() || null,
-      questCompletionRate: newStats.questCompletionRate,
-      avgQuestDifficulty: newStats.avgQuestDifficulty,
-      warmUpsCompleted: newStats.warmUpsCompleted,
-      lastWarmUpAt: newStats.lastWarmUpAt?.toISOString() || null,
-    } satisfies GetUserStatsResponse);
+      if (!userExists) {
+        // User exists in session but not in database - recreate from session data
+        console.log(`📝 [Stats] Recreating user ${user.id} from session (${user.email})`);
+        await db.user.create({
+          data: {
+            id: user.id,
+            email: user.email,
+            emailVerified: user.emailVerified ?? false,
+            name: user.name ?? null,
+            image: user.image ?? null,
+          },
+        });
+        console.log(`✅ [Stats] User ${user.id} recreated from session`);
+      }
+
+      // Create default stats
+      const newStats = await db.userStats.create({
+        data: {
+          userId: user.id,
+          currentStreak: 0,
+          longestStreak: 0,
+          totalXP: 0,
+          totalPoints: 0,
+          trophies: 0,
+          diamonds: 0,
+          tokens: 0,
+        },
+      });
+
+      return c.json({
+        currentStreak: newStats.currentStreak,
+        longestStreak: newStats.longestStreak,
+        totalXP: newStats.totalXP,
+        totalPoints: newStats.totalPoints,
+        trophies: newStats.trophies,
+        diamonds: newStats.diamonds,
+        tokens: newStats.tokens || 0,
+        confidenceLevel: newStats.confidenceLevel,
+        previousConfidence: newStats.previousConfidence,
+        confidenceChange: newStats.confidenceLevel - newStats.previousConfidence,
+        dailyConfidenceMeter: newStats.dailyConfidenceMeter || 0,
+        easyZoneCount: newStats.easyZoneCount,
+        growthZoneCount: newStats.growthZoneCount,
+        fearZoneCount: newStats.fearZoneCount,
+        lastQuestAttemptAt: newStats.lastQuestAttemptAt?.toISOString() || null,
+        lastQuestCompletedAt: newStats.lastQuestCompletedAt?.toISOString() || null,
+        questCompletionRate: newStats.questCompletionRate,
+        avgQuestDifficulty: newStats.avgQuestDifficulty,
+        warmUpsCompleted: newStats.warmUpsCompleted,
+        lastWarmUpAt: newStats.lastWarmUpAt?.toISOString() || null,
+      } satisfies GetUserStatsResponse);
+    } catch (error) {
+      console.error(`❌ [Stats] Error recovering user/stats:`, error);
+      throw error;
+    }
   }
 
   return c.json({
