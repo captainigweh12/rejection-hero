@@ -1006,7 +1006,7 @@ export default function HomeScreen({ navigation }: Props) {
           {/* AI Reflection Prompt of the Day - NEW */}
           {reflectionPrompt && (
             <Pressable
-              onPress={() => navigation.navigate("JournalTab")}
+              onPress={() => navigation.navigate("Journal")}
               style={{ paddingHorizontal: 24, marginTop: 20 }}
             >
               <LinearGradient
@@ -1067,7 +1067,7 @@ export default function HomeScreen({ navigation }: Props) {
                 {weeklyForecast.motivations && weeklyForecast.motivations.length > 0 && (
                   <View style={{ marginBottom: 12 }}>
                     <Text style={{ color: colors.primary, fontSize: 12, fontWeight: "600", marginBottom: 8 }}>
-                      💪 This Week's Challenges
+                      💪 This Week&apos;s Challenges
                     </Text>
                     {weeklyForecast.motivations.map((motivation, index) => (
                       <View
