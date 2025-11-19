@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, Pressable, ScrollView, Switch, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ChevronRight, Shield, AlertCircle, Lock, Eye, MessageSquare } from "lucide-react-native";
+import { ChevronRight, Shield, AlertCircle, Lock, Eye, MessageSquare, ArrowLeft } from "lucide-react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "@/navigation/types";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -91,13 +91,29 @@ export default function ParentalGuidanceSettingsScreen({ navigation }: Props) {
   return (
     <View style={{ flex: 1, backgroundColor: colors.backgroundSolid }}>
       <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
+        {/* Back Button Header */}
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            paddingHorizontal: 20,
+            paddingVertical: 16,
+            borderBottomWidth: 1,
+            borderBottomColor: colors.cardBorder,
+          }}
+        >
+          <Pressable onPress={() => navigation.goBack()} style={{ marginRight: 16 }}>
+            <ArrowLeft size={24} color={colors.text} />
+          </Pressable>
+          <Text style={{ fontSize: 24, fontWeight: "bold", color: colors.text, flex: 1 }}>
+            Parental Guidance
+          </Text>
+        </View>
+
         <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 32 }}>
           {/* Header */}
           <View style={{ paddingHorizontal: 20, paddingTop: 24, paddingBottom: 16 }}>
-            <Text style={{ fontSize: 28, fontWeight: "bold", color: colors.text, marginBottom: 8 }}>
-              Parental Guidance
-            </Text>
-            <Text style={{ fontSize: 14, color: colors.textSecondary }}>
+            <Text style={{ fontSize: 16, color: colors.textSecondary }}>
               {isMinor
                 ? "Manage guidance settings for your account (under 18)"
                 : "Configure parental guidance features if managing a minor account"}
