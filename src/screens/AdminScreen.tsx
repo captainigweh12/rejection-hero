@@ -258,6 +258,9 @@ export default function AdminScreen({ navigation }: Props) {
     );
   }
 
+  // Always render something - even if query is disabled
+  const shouldShowContent = isAdmin && !!sessionData?.user;
+
   return (
     <LinearGradient colors={backgroundColors} className="flex-1">
       <SafeAreaView edges={["top"]} className="flex-1" style={{ flex: 1 }}>
@@ -271,21 +274,29 @@ export default function AdminScreen({ navigation }: Props) {
             className="w-10 h-10 items-center justify-center rounded-full mr-3"
             style={{ backgroundColor: "rgba(255, 255, 255, 0.1)" }}
           >
-            <ArrowLeft size={20} color={colors.text} />
+            <ArrowLeft size={20} color={colors.text || "#fff"} />
           </Pressable>
           <View className="flex-1 flex-row items-center">
             <Shield size={24} color="#7E3FE4" className="mr-3" />
-            <Text className="text-xl font-bold" style={{ color: colors.text }}>
+            <Text className="text-xl font-bold" style={{ color: colors.text || "#fff" }}>
               Admin Panel
             </Text>
           </View>
         </View>
 
-        <ScrollView
-          className="flex-1 px-6 py-4"
-          showsVerticalScrollIndicator={false}
-          refreshControl={<RefreshControl refreshing={isLoading} onRefresh={() => refetch()} />}
-        >
+        {!shouldShowContent ? (
+          <View className="flex-1 items-center justify-center px-6">
+            <ActivityIndicator size="large" color="#7E3FE4" />
+            <Text className="text-base mt-4 text-center" style={{ color: colors.textSecondary || "#999" }}>
+              Verifying admin access...
+            </Text>
+          </View>
+        ) : (
+          <ScrollView
+            className="flex-1 px-6 py-4"
+            showsVerticalScrollIndicator={false}
+            refreshControl={<RefreshControl refreshing={isLoading} onRefresh={() => refetch()} />}
+          >
           {/* Invite Admin Section */}
           <View
             className="p-4 rounded-2xl mb-6"
@@ -588,6 +599,167 @@ export default function AdminScreen({ navigation }: Props) {
             </>
           )}
         </ScrollView>
+
+        {/* Subscription Management Modal */}
+        {selectedUser && (
+          <View
+            className="absolute inset-0 items-center justify-center"
+            style={{ backgroundColor: "rgba(0, 0, 0, 0.7)" }}
+          >
+            <View
+              className="w-11/12 p-6 rounded-2xl"
+              style={{ backgroundColor: colors.card, borderWidth: 1, borderColor: colors.cardBorder }}
+            >
+              <View className="flex-row items-center justify-between mb-4">
+                <Text className="text-xl font-bold" style={{ color: colors.text }}>
+                  Manage Subscription
+                </Text>
+                <Pressable onPress={() => setSelectedUser(null)}>
+                  <X size={24} color={colors.textSecondary} />
+                </Pressable>
+              </View>
+              <Text className="text-sm mb-4" style={{ color: colors.textSecondary }}>
+                {selectedUser.email}
+              </Text>
+              <View className="gap-3">
+                <Pressable
+                  onPress={() => {
+                    manageSubscriptionMutation.mutate({ userId: selectedUser.id, action: "activate" });
+                  }}
+                  className="py-3 px-4 rounded-xl items-center"
+                  style={{ backgroundColor: "#10b981" }}
+                >
+                  <Text className="text-white font-semibold">Activate Subscription</Text>
+                </Pressable>
+                <Pressable
+                  onPress={() => {
+                    manageSubscriptionMutation.mutate({ userId: selectedUser.id, action: "cancel" });
+                  }}
+                  className="py-3 px-4 rounded-xl items-center"
+                  style={{ backgroundColor: "#ef4444" }}
+                >
+                  <Text className="text-white font-semibold">Cancel Subscription</Text>
+                </Pressable>
+                <Pressable
+                  onPress={() => {
+                    Alert.prompt(
+                      "Extend Subscription",
+                      "Enter number of days to extend:",
+                      [
+                        { text: "Cancel", style: "cancel" },
+                        {
+                          text: "Extend",
+                          onPress: (days) => {
+                            if (days && !isNaN(parseInt(days))) {
+                              manageSubscriptionMutation.mutate({
+                                userId: selectedUser.id,
+                                action: "extend",
+                                days: parseInt(days),
+                              });
+                            }
+                          },
+                        },
+                      ],
+                      "plain-text",
+                      "30"
+                    );
+                  }}
+                  className="py-3 px-4 rounded-xl items-center"
+                  style={{ backgroundColor: "#7E3FE4" }}
+                >
+                  <Text className="text-white font-semibold">Extend Subscription</Text>
+                </Pressable>
+              </View>
+            </View>
+          </View>
+        )}
+
+        {/* Email Modal */}
+        {showEmailModal && emailRecipient && (
+          <View
+            className="absolute inset-0 items-center justify-center"
+            style={{ backgroundColor: "rgba(0, 0, 0, 0.7)" }}
+          >
+            <View
+              className="w-11/12 p-6 rounded-2xl max-h-[90%]"
+              style={{ backgroundColor: colors.card, borderWidth: 1, borderColor: colors.cardBorder }}
+            >
+              <View className="flex-row items-center justify-between mb-4">
+                <Text className="text-xl font-bold" style={{ color: colors.text }}>
+                  Send Email
+                </Text>
+                <Pressable
+                  onPress={() => {
+                    setShowEmailModal(false);
+                    setEmailSubject("");
+                    setEmailBody("");
+                    setEmailRecipient(null);
+                  }}
+                >
+                  <X size={24} color={colors.textSecondary} />
+                </Pressable>
+              </View>
+              <Text className="text-sm mb-4" style={{ color: colors.textSecondary }}>
+                To: {emailRecipient.email}
+              </Text>
+              <TextInput
+                value={emailSubject}
+                onChangeText={setEmailSubject}
+                placeholder="Subject"
+                placeholderTextColor={colors.textTertiary}
+                className="py-3 px-4 rounded-xl mb-4"
+                style={{
+                  backgroundColor: "rgba(255, 255, 255, 0.1)",
+                  borderWidth: 1,
+                  borderColor: "rgba(255, 255, 255, 0.2)",
+                  color: colors.text,
+                }}
+              />
+              <TextInput
+                value={emailBody}
+                onChangeText={setEmailBody}
+                placeholder="Email body (HTML supported)"
+                placeholderTextColor={colors.textTertiary}
+                multiline
+                numberOfLines={10}
+                textAlignVertical="top"
+                className="py-3 px-4 rounded-xl mb-4"
+                style={{
+                  backgroundColor: "rgba(255, 255, 255, 0.1)",
+                  borderWidth: 1,
+                  borderColor: "rgba(255, 255, 255, 0.2)",
+                  color: colors.text,
+                  minHeight: 200,
+                }}
+              />
+              <Pressable
+                onPress={() => {
+                  if (emailSubject.trim() && emailBody.trim()) {
+                    sendEmailMutation.mutate({
+                      userId: emailRecipient.id,
+                      subject: emailSubject.trim(),
+                      html: emailBody.trim(),
+                    });
+                  } else {
+                    Alert.alert("Error", "Please fill in both subject and body");
+                  }
+                }}
+                disabled={sendEmailMutation.isPending || !emailSubject.trim() || !emailBody.trim()}
+                className="py-3 px-4 rounded-xl items-center"
+                style={{
+                  backgroundColor: "#7E3FE4",
+                  opacity: sendEmailMutation.isPending || !emailSubject.trim() || !emailBody.trim() ? 0.5 : 1,
+                }}
+              >
+                {sendEmailMutation.isPending ? (
+                  <ActivityIndicator size="small" color="white" />
+                ) : (
+                  <Text className="text-white font-semibold">Send Email</Text>
+                )}
+              </Pressable>
+            </View>
+          </View>
+        )}
 
         {/* Subscription Management Modal */}
         {selectedUser && (

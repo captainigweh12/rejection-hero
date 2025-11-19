@@ -408,7 +408,7 @@ export default function CreateQuestScreen({ navigation }: Props) {
               {/* Create Custom Quest Card - 3D Glassmorphism */}
               <View style={{ paddingHorizontal: 24, marginBottom: 20 }}>
                 <Pressable
-                  onPress={() => setShowCustomForm(true)}
+                  onPress={() => navigation.navigate("CreateCustomQuest")}
                     style={{
                       backgroundColor: colors.card,
                       borderRadius: 24,

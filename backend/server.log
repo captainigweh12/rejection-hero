@@ -585,3 +585,166 @@ Use `await constructEventAsync(...)` instead of `constructEvent(...)`
 <-- GET /api/payments/subscription
 🔐 [Auth Middleware] GET /api/payments/subscription - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
 --> GET /api/payments/subscription [32m200[0m 2ms
+<-- GET /api/challenges/active
+🔐 [Auth Middleware] GET /api/challenges/active - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+--> GET /api/challenges/active [32m200[0m 3ms
+<-- GET /api/auth/get-session
+--> GET /api/auth/get-session [32m200[0m 1ms
+<-- GET /api/profile
+🔐 [Auth Middleware] GET /api/profile - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+👤 [Profile] GET request - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+🔍 [Profile] Fetching profile for user 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+✅ [Profile] Successfully fetched profile for user 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+--> GET /api/profile [32m200[0m 4ms
+<-- GET /api/challenges/active
+<-- GET /api/stats/reflection-prompt
+<-- GET /api/stats/weekly-forecast
+<-- GET /api/quests
+<-- GET /api/stats
+🔐 [Auth Middleware] GET /api/challenges/active - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+🔐 [Auth Middleware] GET /api/stats/reflection-prompt - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+--> GET /api/stats/reflection-prompt [32m200[0m 3ms
+🔐 [Auth Middleware] GET /api/stats - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+🔐 [Auth Middleware] GET /api/quests - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+🔐 [Auth Middleware] GET /api/stats/weekly-forecast - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+--> GET /api/challenges/active [32m200[0m 6ms
+--> GET /api/stats [32m200[0m 5ms
+--> GET /api/quests [32m200[0m 5ms
+<-- GET /api/admin/users
+<-- GET /api/profile
+🔐 [Auth Middleware] GET /api/admin/users - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+🔐 [Auth Middleware] GET /api/profile - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+👤 [Profile] GET request - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+🔍 [Profile] Fetching profile for user 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+✅ [Profile] Successfully fetched profile for user 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+--> GET /api/profile [32m200[0m 3ms
+--> GET /api/admin/users [32m200[0m 4ms
+--> GET /api/stats/weekly-forecast [32m200[0m 4s
+<-- GET /api/payments/subscription
+🔐 [Auth Middleware] GET /api/payments/subscription - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+--> GET /api/payments/subscription [32m200[0m 2ms
+<-- GET /api/profile
+🔐 [Auth Middleware] GET /api/profile - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+👤 [Profile] GET request - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+🔍 [Profile] Fetching profile for user 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+✅ [Profile] Successfully fetched profile for user 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+--> GET /api/profile [32m200[0m 3ms
+<-- GET /api/posts/feed
+🔐 [Auth Middleware] GET /api/posts/feed - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+--> GET /api/posts/feed [32m200[0m 2ms
+<-- GET /api/moments
+🔐 [Auth Middleware] GET /api/moments - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+--> GET /api/moments [32m200[0m 2ms
+<-- GET /api/messages/conversations
+🔐 [Auth Middleware] GET /api/messages/conversations - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+<-- GET /api/friends/requests
+<-- GET /api/friends
+--> GET /api/messages/conversations [32m200[0m 2ms
+🔐 [Auth Middleware] GET /api/friends/requests - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+🔐 [Auth Middleware] GET /api/friends - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+<-- GET /api/groups
+--> GET /api/friends [32m200[0m 2ms
+--> GET /api/friends/requests [32m200[0m 3ms
+<-- GET /api/notifications/unread-count
+🔐 [Auth Middleware] GET /api/groups - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+🔐 [Auth Middleware] GET /api/notifications/unread-count - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+--> GET /api/notifications/unread-count [32m200[0m 1ms
+--> GET /api/groups [32m200[0m 3ms
+<-- GET /api/moments
+🔐 [Auth Middleware] GET /api/moments - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+--> GET /api/moments [32m200[0m 3ms
+<-- GET /api/notifications/unread-count
+🔐 [Auth Middleware] GET /api/notifications/unread-count - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+--> GET /api/notifications/unread-count [32m200[0m 3ms
+<-- GET /api/challenges/active
+🔐 [Auth Middleware] GET /api/challenges/active - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+--> GET /api/challenges/active [32m200[0m 1ms
+<-- GET /api/notifications/unread-count
+🔐 [Auth Middleware] GET /api/notifications/unread-count - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+--> GET /api/notifications/unread-count [32m200[0m 1ms
+<-- GET /api/notifications/unread-count
+🔐 [Auth Middleware] GET /api/notifications/unread-count - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+--> GET /api/notifications/unread-count [32m200[0m 1ms
+<-- GET /api/challenges/active
+🔐 [Auth Middleware] GET /api/challenges/active - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+--> GET /api/challenges/active [32m200[0m 2ms
+<-- GET /api/notifications/unread-count
+🔐 [Auth Middleware] GET /api/notifications/unread-count - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+--> GET /api/notifications/unread-count [32m200[0m 3ms
+<-- GET /api/notifications/unread-count
+🔐 [Auth Middleware] GET /api/notifications/unread-count - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+--> GET /api/notifications/unread-count [32m200[0m 1ms
+<-- GET /api/challenges/active
+🔐 [Auth Middleware] GET /api/challenges/active - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+--> GET /api/challenges/active [32m200[0m 2ms
+<-- GET /api/notifications/unread-count
+🔐 [Auth Middleware] GET /api/notifications/unread-count - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+--> GET /api/notifications/unread-count [32m200[0m 1ms
+<-- GET /api/notifications/unread-count
+🔐 [Auth Middleware] GET /api/notifications/unread-count - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+--> GET /api/notifications/unread-count [32m200[0m 2ms
+<-- GET /api/challenges/active
+🔐 [Auth Middleware] GET /api/challenges/active - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+--> GET /api/challenges/active [32m200[0m 2ms
+<-- GET /api/notifications/unread-count
+🔐 [Auth Middleware] GET /api/notifications/unread-count - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+--> GET /api/notifications/unread-count [32m200[0m 2ms
+<-- GET /api/profile
+<-- GET /api/stats
+🔐 [Auth Middleware] GET /api/profile - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+👤 [Profile] GET request - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+🔍 [Profile] Fetching profile for user 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+🔐 [Auth Middleware] GET /api/stats - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+--> GET /api/stats [32m200[0m 2ms
+✅ [Profile] Successfully fetched profile for user 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+--> GET /api/profile [32m200[0m 3ms
+<-- GET /api/moments
+🔐 [Auth Middleware] GET /api/moments - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+--> GET /api/moments [32m200[0m 2ms
+<-- GET /api/notifications/unread-count
+🔐 [Auth Middleware] GET /api/notifications/unread-count - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+--> GET /api/notifications/unread-count [32m200[0m 1ms
+<-- GET /api/challenges/active
+🔐 [Auth Middleware] GET /api/challenges/active - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+--> GET /api/challenges/active [32m200[0m 2ms
+<-- GET /api/notifications/unread-count
+🔐 [Auth Middleware] GET /api/notifications/unread-count - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+--> GET /api/notifications/unread-count [32m200[0m 3ms
+<-- GET /api/notifications/unread-count
+🔐 [Auth Middleware] GET /api/notifications/unread-count - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+--> GET /api/notifications/unread-count [32m200[0m 2ms
+<-- GET /api/challenges/active
+🔐 [Auth Middleware] GET /api/challenges/active - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+--> GET /api/challenges/active [32m200[0m 2ms
+<-- GET /api/notifications/unread-count
+🔐 [Auth Middleware] GET /api/notifications/unread-count - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+--> GET /api/notifications/unread-count [32m200[0m 2ms
+<-- GET /api/notifications/unread-count
+🔐 [Auth Middleware] GET /api/notifications/unread-count - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+--> GET /api/notifications/unread-count [32m200[0m 2ms
+<-- GET /api/auth/get-session
+--> GET /api/auth/get-session [32m200[0m 2ms
+<-- GET /api/quests
+🔐 [Auth Middleware] GET /api/quests - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+--> GET /api/quests [32m200[0m 2ms
+<-- GET /api/stats/weekly-forecast
+<-- GET /api/profile
+🔐 [Auth Middleware] GET /api/stats/weekly-forecast - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+🔐 [Auth Middleware] GET /api/profile - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+👤 [Profile] GET request - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+🔍 [Profile] Fetching profile for user 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+<-- GET /api/stats/reflection-prompt
+<-- GET /api/stats
+<-- GET /api/challenges/active
+🔐 [Auth Middleware] GET /api/stats/reflection-prompt - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+--> GET /api/stats/reflection-prompt [32m200[0m 2ms
+🔐 [Auth Middleware] GET /api/challenges/active - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+🔐 [Auth Middleware] GET /api/stats - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+✅ [Profile] Successfully fetched profile for user 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+--> GET /api/profile [32m200[0m 4ms
+--> GET /api/challenges/active [32m200[0m 2ms
+--> GET /api/stats [32m200[0m 4ms
+--> GET /api/stats/weekly-forecast [32m200[0m 4s
+<-- GET /api/challenges/active
+🔐 [Auth Middleware] GET /api/challenges/active - User: 0CpNEWD3oxiJzmebIkPrQPniUXGiX2OC
+--> GET /api/challenges/active [32m200[0m 2ms
