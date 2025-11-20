@@ -1,5 +1,12 @@
-import * as InAppPurchases from 'expo-in-app-purchases';
 import { Platform, Linking, Alert } from 'react-native';
+
+// Conditionally import InAppPurchases only if available
+let InAppPurchases: any = null;
+try {
+  InAppPurchases = require('expo-in-app-purchases');
+} catch (error) {
+  console.log('⚠️ [IAP] expo-in-app-purchases not available in this build');
+}
 
 // Product IDs for your in-app purchases
 // These should match what you configure in App Store Connect and Google Play Console
@@ -17,10 +24,22 @@ export const PRODUCT_IDS = {
 let isInitialized = false;
 
 /**
+ * Check if IAP is available in this build
+ */
+export const isIAPAvailable = (): boolean => {
+  return InAppPurchases !== null;
+};
+
+/**
  * Initialize the in-app purchase connection
  */
 export const initializeIAP = async (): Promise<boolean> => {
   try {
+    if (!isIAPAvailable()) {
+      console.log('⚠️ [IAP] Not available - requires native build with expo-in-app-purchases');
+      return false;
+    }
+
     if (isInitialized) {
       return true;
     }
@@ -33,9 +52,9 @@ export const initializeIAP = async (): Promise<boolean> => {
       isInitialized = true;
 
       // Set up purchase listener
-      InAppPurchases.setPurchaseListener(({ responseCode, results, errorCode }) => {
+      InAppPurchases.setPurchaseListener(({ responseCode, results, errorCode }: any) => {
         if (responseCode === InAppPurchases.IAPResponseCode.OK) {
-          results?.forEach((purchase) => {
+          results?.forEach((purchase: any) => {
             if (!purchase.acknowledged) {
               console.log('✅ [IAP] Purchase successful:', purchase.productId);
               // Here you would verify the purchase with your backend
@@ -68,6 +87,10 @@ export const initializeIAP = async (): Promise<boolean> => {
  */
 export const getProducts = async () => {
   try {
+    if (!isIAPAvailable()) {
+      return [];
+    }
+
     const { responseCode, results } = await InAppPurchases.getProductsAsync(
       Object.values(PRODUCT_IDS)
     );
@@ -90,6 +113,10 @@ export const getProducts = async () => {
  */
 export const purchaseProduct = async (productId: string) => {
   try {
+    if (!isIAPAvailable()) {
+      return false;
+    }
+
     await InAppPurchases.purchaseItemAsync(productId);
     console.log('✅ [IAP] Purchase initiated for:', productId);
     return true;
@@ -102,8 +129,12 @@ export const purchaseProduct = async (productId: string) => {
 /**
  * Finish/acknowledge a purchase
  */
-export const finishPurchase = async (purchase: InAppPurchases.InAppPurchase) => {
+export const finishPurchase = async (purchase: any) => {
   try {
+    if (!isIAPAvailable()) {
+      return;
+    }
+
     await InAppPurchases.finishTransactionAsync(purchase, true);
     console.log('✅ [IAP] Purchase finished:', purchase.productId);
   } catch (error) {
@@ -116,6 +147,10 @@ export const finishPurchase = async (purchase: InAppPurchases.InAppPurchase) => 
  */
 export const restorePurchases = async () => {
   try {
+    if (!isIAPAvailable()) {
+      return [];
+    }
+
     const { responseCode, results } = await InAppPurchases.getPurchaseHistoryAsync();
 
     if (responseCode === InAppPurchases.IAPResponseCode.OK) {
@@ -148,6 +183,16 @@ export const showUpgradeDialog = (onUpgrade?: () => void) => {
         style: "default",
         onPress: async () => {
           if (Platform.OS === 'ios' || Platform.OS === 'android') {
+            // Check if IAP is available in this build
+            if (!isIAPAvailable()) {
+              Alert.alert(
+                "Build Required",
+                "In-app purchases require a production build with native modules. For now, please contact support to upgrade your account.",
+                [{ text: "OK", style: "cancel" }]
+              );
+              return;
+            }
+
             // Mobile: Use in-app purchases
             const initialized = await initializeIAP();
 
@@ -164,7 +209,7 @@ export const showUpgradeDialog = (onUpgrade?: () => void) => {
                       text: "Cancel",
                       style: "cancel",
                     },
-                    ...products.map((product) => ({
+                    ...products.map((product: any) => ({
                       text: `${product.title} - ${product.price}`,
                       onPress: async () => {
                         const success = await purchaseProduct(product.productId);
