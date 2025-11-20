@@ -114,11 +114,12 @@ const fetchFn = async <T>(path: string, options: FetchOptions): Promise<T> => {
     // The response is cast to the expected type T for type safety
     return response.json() as Promise<T>;
   } catch (error: any) {
-    // Enhanced error logging for debugging - but skip 400/500 errors (validation/safety/server errors)
+    // Enhanced error logging for debugging - but skip 400/403/500 errors (validation/subscription/server errors)
     // These are handled gracefully by the app, so we don't want red error screens
     const is400Error = error.status === 400;
+    const is403Error = error.status === 403;
     const is500Error = error.status === 500;
-    if (!is400Error && !is500Error) {
+    if (!is400Error && !is403Error && !is500Error) {
       console.error(`[API Error] ${method} ${path}:`, error);
     } else {
       // Log non-disruptively for debugging
