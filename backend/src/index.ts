@@ -286,7 +286,7 @@ serve({ fetch: app.fetch, port: Number(env.PORT) }, () => {
   console.log("  🔐 Auth:         /api/auth/*");
   console.log("  📤 Upload:       POST /api/upload/image");
   console.log("  📝 Sample:       GET/POST /api/sample");
-  console.log("  👤 Profile:      GET/POST /api/profile");
+  console.log("  👤 profile:      GET/POST /api/profile");
   console.log("  🔍 Discover:     GET /api/discover");
   console.log("  👆 Swipe:        POST /api/swipe");
   console.log("  💕 Matches:      GET /api/matches");

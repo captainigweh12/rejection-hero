@@ -55,7 +55,7 @@ postsRouter.post("/", zValidator("json", createPostRequestSchema), async (c) => 
       include: {
         user: {
           include: {
-            Profile: true,
+            profile: true,
           },
         },
       },
@@ -174,7 +174,7 @@ postsRouter.get("/feed", async (c) => {
       include: {
         user: {
           include: {
-            Profile: true,
+            profile: true,
           },
         },
         group: {
@@ -199,7 +199,7 @@ postsRouter.get("/feed", async (c) => {
           include: {
             user: {
               include: {
-                Profile: true,
+                profile: true,
               },
             },
           },
@@ -384,7 +384,7 @@ postsRouter.post("/:id/comment", zValidator("json", addCommentRequestSchema), as
       include: {
         user: {
           include: {
-            Profile: true,
+            profile: true,
           },
         },
       },
@@ -447,7 +447,7 @@ postsRouter.put("/:id", async (c) => {
       include: {
         user: {
           include: {
-            Profile: true,
+            profile: true,
           },
         },
       },

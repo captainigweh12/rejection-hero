@@ -141,7 +141,7 @@ moderationRouter.get("/blocked", async (c) => {
     include: {
       blocked: {
         include: {
-          Profile: true,
+          profile: true,
         },
       },
     },
@@ -400,7 +400,7 @@ moderationRouter.get("/chat/reports", async (c) => {
     include: {
       reporter: {
         include: {
-          Profile: true,
+          profile: true,
         },
       },
     },

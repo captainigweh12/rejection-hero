@@ -39,19 +39,19 @@ groupQuestsRouter.get("/:groupId", async (c) => {
     include: {
       quest: true,
       creator: {
-        include: { Profile: true },
+        include: { profile: true },
       },
       participants: {
         include: {
           user: {
-            include: { Profile: true },
+            include: { profile: true },
           },
         },
       },
       assignments: {
         include: {
           user: {
-            include: { Profile: true },
+            include: { profile: true },
           },
         },
       },

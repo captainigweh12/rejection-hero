@@ -144,14 +144,14 @@ questVerificationRouter.get("/requests", async (c) => {
           quest: true,
           user: {
             include: {
-              Profile: true,
+              profile: true,
             },
           },
         },
       },
       sender: {
         include: {
-          Profile: true,
+          profile: true,
         },
       },
     },
@@ -406,7 +406,7 @@ questVerificationRouter.get("/:userQuestId/status", async (c) => {
     include: {
       verifier: {
         include: {
-          Profile: true,
+          profile: true,
         },
       },
     },

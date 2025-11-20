@@ -41,7 +41,7 @@ groupLiveRouter.get("/:groupId", async (c) => {
     include: {
       user: {
         include: {
-          Profile: true,
+          profile: true,
         },
       },
       user_quest: {

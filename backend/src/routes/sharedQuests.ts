@@ -307,7 +307,7 @@ sharedQuestsRouter.get("/", async (c) => {
     },
     include: {
       sender: {
-        include: { Profile: true },
+        include: { profile: true },
       },
       quest: true,
     },

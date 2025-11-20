@@ -111,7 +111,7 @@ momentsRouter.get("/", async (c) => {
             id: true,
             name: true,
             image: true,
-            Profile: {
+            profile: {
               select: {
                 displayName: true,
                 avatar: true,

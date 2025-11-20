@@ -3,6 +3,7 @@ import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
 import type { AppType } from "../index";
 import { db } from "../db";
+import { randomUUID } from "crypto";
 import {
   startLiveStreamRequestSchema,
   startLiveStreamResponseSchema,
@@ -132,6 +133,7 @@ live.post("/start", async (c) => {
     // Create live stream in database
     const liveStream = await db.live_stream.create({
       data: {
+        id: randomUUID(),
         userId: user.id,
         roomUrl,
         roomName,

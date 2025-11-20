@@ -21,7 +21,7 @@ notificationsRouter.get("/", async (c) => {
     include: {
       sender: {
         include: {
-          Profile: true,
+          profile: true,
         },
       },
     },

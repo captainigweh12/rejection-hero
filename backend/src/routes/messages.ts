@@ -35,10 +35,10 @@ messagesRouter.get("/conversations", async (c) => {
     },
     include: {
       sender: {
-        include: { Profile: true },
+        include: { profile: true },
       },
       receiver: {
-        include: { Profile: true },
+        include: { profile: true },
       },
     },
     orderBy: {
@@ -106,7 +106,7 @@ messagesRouter.get("/:userId", async (c) => {
     },
     include: {
       sender: {
-        include: { Profile: true },
+        include: { profile: true },
       },
     },
     orderBy: {

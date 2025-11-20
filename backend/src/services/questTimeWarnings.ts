@@ -20,7 +20,7 @@ export async function checkQuestTimeWarnings(): Promise<{ warningsSent: number }
         quest: true,
         user: {
           include: {
-            Profile: true,
+            profile: true,
           },
         },
       },
@@ -183,7 +183,7 @@ export async function sendQuestReminders(): Promise<{ remindersSent: number }> {
         quest: true,
         user: {
           include: {
-            Profile: true,
+            profile: true,
           },
         },
       },

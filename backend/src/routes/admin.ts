@@ -50,7 +50,7 @@ adminRouter.get("/users", async (c) => {
     db.user.findMany({
       where,
       include: {
-        Profile: {
+        profile: {
           select: {
             displayName: true,
             username: true,
@@ -124,7 +124,7 @@ adminRouter.get("/users/:id", async (c) => {
   const user = await db.user.findUnique({
     where: { id: userId },
     include: {
-      Profile: true,
+      profile: true,
       Subscription: true,
       UserStats: true,
       UserQuests: {

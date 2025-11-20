@@ -23,12 +23,12 @@ matchesRouter.get("/", async (c) => {
     include: {
       user1: {
         include: {
-          Profile: true,
+          profile: true,
         },
       },
       user2: {
         include: {
-          Profile: true,
+          profile: true,
         },
       },
     },

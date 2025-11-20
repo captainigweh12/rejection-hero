@@ -35,12 +35,12 @@ friendsRouter.get("/", async (c) => {
     include: {
       initiator: {
         include: {
-          Profile: true,
+          profile: true,
         },
       },
       receiver: {
         include: {
-          Profile: true,
+          profile: true,
         },
       },
     },
@@ -84,7 +84,7 @@ friendsRouter.get("/requests", async (c) => {
     include: {
       initiator: {
         include: {
-          Profile: true,
+          profile: true,
         },
       },
     },

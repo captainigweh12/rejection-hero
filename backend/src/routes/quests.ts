@@ -20,6 +20,7 @@ import {
 } from "@/shared/contracts";
 import { type AppType } from "../types";
 import { db } from "../db";
+import { randomUUID } from "crypto";
 import { checkFullQuestSafety, checkQuestSafetyWithAI } from "../utils/safetyFilter";
 
 const questsRouter = new Hono<AppType>();
@@ -286,6 +287,7 @@ questsRouter.post("/generate", zValidator("json", generateQuestRequestSchema), a
   // Create quest in database
   const quest = await db.quest.create({
     data: {
+      id: randomUUID(),
       title: questData.title,
       description: finalDescription,
       category: questData.category,
@@ -383,6 +385,7 @@ questsRouter.post("/refresh-all", zValidator("json", refreshAllQuestsRequestSche
       // Create quest in database
       const quest = await db.quest.create({
         data: {
+      id: randomUUID(),
           title: questData.title,
           description: questData.description,
           category: questData.category,
@@ -403,6 +406,7 @@ questsRouter.post("/refresh-all", zValidator("json", refreshAllQuestsRequestSche
       // Create user quest
       const userQuest = await db.user_quest.create({
         data: {
+      id: randomUUID(),
           userId: user.id,
           questId: quest.id,
           status: "QUEUED",
@@ -500,7 +504,7 @@ questsRouter.post("/:id/start", async (c) => {
       quest: true,
       user: {
         include: {
-          Profile: true,
+          profile: true,
         },
       },
     },
@@ -622,7 +626,7 @@ questsRouter.get("/friend/:userQuestId", async (c) => {
       quest: true,
       user: {
         include: {
-          Profile: true,
+          profile: true,
         },
       },
     },
@@ -671,7 +675,7 @@ questsRouter.get("/friend/:userQuestId", async (c) => {
       id: userQuest.user.id,
       name: userQuest.user.name,
       email: userQuest.user.email,
-      Profile: userQuest.user.Profile
+      profile: userQuest.user.Profile
         ? {
             displayName: userQuest.user.Profile.displayName,
             avatar: userQuest.user.Profile.avatar,
@@ -1638,6 +1642,7 @@ async function generateAISeries(userId: string, previousSeriesId?: string) {
         // Create quest in database
         const quest = await db.quest.create({
           data: {
+        id: randomUUID(),
             title: questData.title,
             description: finalDescription,
             category: questData.category,
@@ -1656,6 +1661,7 @@ async function generateAISeries(userId: string, previousSeriesId?: string) {
         // Create user quest (only the first one is active, others are queued)
         const userQuest = await db.user_quest.create({
           data: {
+        id: randomUUID(),
             userId,
             questId: quest.id,
             status: i === 0 ? "ACTIVE" : "QUEUED", // First quest is active, others queued
@@ -2206,6 +2212,7 @@ questsRouter.post("/generate-map-quests", zValidator("json", generateMapQuestsRe
         // Create the quest in the database (but don't assign to user yet)
         const quest = await db.quest.create({
           data: {
+        id: randomUUID(),
             title: questData.title,
             description: questData.description,
             category: questData.category,
@@ -2304,7 +2311,7 @@ questsRouter.get("/:questId/friends", async (c) => {
     include: {
       user: {
         include: {
-          Profile: true,
+          profile: true,
         },
       },
     },

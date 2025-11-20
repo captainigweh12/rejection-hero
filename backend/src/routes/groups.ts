@@ -23,7 +23,7 @@ groupsRouter.get("/", async (c) => {
       group: {
         include: {
           creator: {
-            include: { Profile: true },
+            include: { profile: true },
           },
           members: true,
         },
@@ -57,7 +57,7 @@ groupsRouter.get("/", async (c) => {
     },
     include: {
       creator: {
-        include: { Profile: true },
+        include: { profile: true },
       },
       members: true,
     },
@@ -98,12 +98,12 @@ groupsRouter.get("/:groupId", async (c) => {
     where: { id: groupId },
     include: {
       creator: {
-        include: { Profile: true },
+        include: { profile: true },
       },
       members: {
         include: {
           user: {
-            include: { Profile: true },
+            include: { profile: true },
           },
         },
       },
@@ -516,7 +516,7 @@ groupsRouter.post("/:groupId/invite-user", zValidator("json", inviteUserSchema),
   // Check if user to invite exists
   const userToInvite = await db.user.findUnique({
     where: { id: userId },
-    include: { Profile: true },
+    include: { profile: true },
   });
 
   if (!userToInvite) {
@@ -704,7 +704,7 @@ groupsRouter.get("/:groupId/moments", async (c) => {
     include: {
       user: {
         include: {
-          Profile: true,
+          profile: true,
         },
       },
     },
