@@ -10,6 +10,19 @@ export async function checkQuestTimeWarnings(): Promise<{ warningsSent: number }
     const now = new Date();
     let warningsSent = 0;
 
+    // Check if tables exist before querying
+    try {
+      // Test if user_quest table exists by checking a simple query
+      await db.$queryRawUnsafe("SELECT 1 FROM user_quest LIMIT 1");
+    } catch (error: any) {
+      // If table doesn't exist (P2021), skip this check
+      if (error?.code === "P2021" || error?.message?.includes("does not exist")) {
+        console.log("⚠️  [Quest Time Warnings] Tables not yet initialized, skipping...");
+        return { warningsSent: 0 };
+      }
+      throw error; // Re-throw other errors
+    }
+
     // Get all active quests with their start times
     const activeQuests = await db.user_quest.findMany({
       where: {
@@ -170,6 +183,17 @@ export async function checkQuestTimeWarnings(): Promise<{ warningsSent: number }
 export async function sendQuestReminders(): Promise<{ remindersSent: number }> {
   try {
     let remindersSent = 0;
+
+    // Check if tables exist before querying
+    try {
+      await db.$queryRawUnsafe("SELECT 1 FROM user_quest LIMIT 1");
+    } catch (error: any) {
+      if (error?.code === "P2021" || error?.message?.includes("does not exist")) {
+        console.log("⚠️  [Quest Reminders] Tables not yet initialized, skipping...");
+        return { remindersSent: 0 };
+      }
+      throw error;
+    }
 
     // Get all active quests that started more than 5 minutes ago
     const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
