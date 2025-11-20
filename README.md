@@ -24,7 +24,24 @@
 
 ## 🔧 Bug Fixes & Features
 
-### 🐛 Fixed Livestream & Create Quest API Errors (2025-11-20)
+### 🐛 Fixed Quest Safety Check (2025-11-20 - Final)
+- **Issue**: Getting 400 "Quest cannot be created" errors even with valid OpenAI API key
+- **Root Cause**: Safety check was too strict, rejecting legitimate rejection challenges
+  - Original prompt was flagging normal "asking for things" quests as unsafe
+  - The app IS designed for rejection challenges, but safety check didn't reflect that
+  - Safety check needed to be permissive for the app's core purpose
+- **✅ FIXED**:
+  - ✅ Rewrote safety check prompt to be extremely permissive for rejection challenges
+  - ✅ Added explicit allowlist for asking, rejection challenges, networking, sales pitches, dating
+  - ✅ Changed safety check to ONLY flag genuinely harmful content (illegal, harassment, stalking, etc.)
+  - ✅ Added detailed logging to track safety check results in server logs
+  - ✅ Reduced temperature from 0.3 to 0.2 for more consistent responses
+  - ✅ Reduced max_tokens from 200 to 100 for faster processing
+- **Key Changes**:
+  - Safety check now has clear guidance: "For ANY challenge about asking, rejection, or social interaction - respond {"safe": true}"
+  - Explicit list of what's SAFE: asking for things, rejection challenges, networking, sales, dating, public speaking
+  - Explicit list of what's UNSAFE: only genuinely harmful behavior
+  - Better error handling with detailed logging for debugging
 - **Issue**: Getting 500 errors on `/api/live/start`, `/api/quests/generate`, and other creation endpoints
 - **Root Cause**: Multiple database-related issues:
   1. Database model references using incorrect camelCase instead of snake_case

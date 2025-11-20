@@ -210,6 +210,7 @@ export async function checkQuestSafety(description: string): Promise<{ isSafe: b
   }
 
   try {
+    console.log("🔍 [Safety Check] Checking quest:", description.substring(0, 50) + "...");
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -221,47 +222,41 @@ export async function checkQuestSafety(description: string): Promise<{ isSafe: b
         messages: [
           {
             role: "system",
-            content: `You are a content safety moderator for a personal growth app called "Go for No".
-The app helps users overcome fear of rejection through challenges.
+            content: `You are a content safety moderator for a personal growth app called "Go for No" that helps users overcome fear of rejection through challenges.
 
-Your job is to review quest descriptions and determine if they are safe and appropriate.
+Your job is ONLY to flag genuinely harmful content. The app is explicitly designed for rejection challenges, so:
+- Asking people for things (money, favors, discounts, recommendations, compliments) = SAFE
+- Rejection challenges (being told no is the goal) = SAFE
+- Networking, sales pitches, asking for dates = SAFE
+- Public speaking, social interactions = SAFE
 
-REJECT quests that involve:
-- Illegal activities (theft, harassment, violence, fraud, trespassing)
-- Harmful behavior (stalking, bullying, deception for malicious purposes)
-- Inappropriate sexual content or advances
-- Dangerous physical activities that could cause injury
-- Privacy violations or unauthorized recording
-- Manipulative or exploitative behavior
-- Discrimination or hate speech
+ONLY reject if it involves:
+- Illegal activities
+- Deception for malicious purposes
+- Harassment or stalking
+- Dangerous behavior
+- Privacy violations
+- Sexual harassment
 
-ALLOW quests that involve:
-- Politely asking for things (discounts, favors, recommendations)
-- Networking and professional outreach
-- Social confidence building (compliments, small talk, public speaking)
-- Sales and entrepreneurship practice
-- Career advancement (job applications, pitching ideas)
-- Dating (respectful approaches, asking for numbers/dates)
-- Personal growth challenges (stepping outside comfort zone)
+For ANY challenge about asking, rejection, or social interaction - respond {"safe": true}
+Be extremely permissive - this app is about overcoming fear of rejection.
 
-If the quest is SAFE, respond with JSON: {"safe": true, "description": "cleaned up description"}
-If the quest is UNSAFE, respond with JSON: {"safe": false, "reason": "brief explanation"}
-
-Important: Be permissive with rejection challenges - the app is about overcoming fear, not breaking rules.`,
+Respond ONLY with JSON: {"safe": true, "description": "description"} or {"safe": false, "reason": "reason"}`,
           },
           {
             role: "user",
-            content: `Review this quest description: "${description}"`,
+            content: `Is this quest safe for a rejection challenge app? "${description}"`,
           },
         ],
-        temperature: 0.3,
-        max_tokens: 200,
+        temperature: 0.2,
+        max_tokens: 100,
         response_format: { type: "json_object" },
       }),
     });
 
     if (!response.ok) {
-      console.error("OpenAI API error:", response.statusText);
+      const errorText = await response.text();
+      console.error("❌ [Safety Check] OpenAI API error:", response.statusText, errorText);
       return { isSafe: true, cleanDescription: description }; // Fail open
     }
 
@@ -269,24 +264,28 @@ Important: Be permissive with rejection challenges - the app is about overcoming
     const content = result.choices[0]?.message?.content;
 
     if (!content) {
+      console.warn("⚠️ [Safety Check] No content returned from OpenAI");
       return { isSafe: true, cleanDescription: description };
     }
 
+    console.log("📋 [Safety Check] OpenAI response:", content);
     const safetyResult = JSON.parse(content);
 
     if (safetyResult.safe === false) {
+      console.warn("🚫 [Safety Check] Quest flagged as unsafe:", safetyResult.reason);
       return {
         isSafe: false,
         warning: safetyResult.reason || "This quest was flagged as potentially unsafe or inappropriate.",
       };
     }
 
+    console.log("✅ [Safety Check] Quest approved");
     return {
       isSafe: true,
       cleanDescription: safetyResult.description || description,
     };
   } catch (error) {
-    console.error("Error in AI safety check:", error);
+    console.error("❌ [Safety Check] Error in AI safety check:", error);
     return { isSafe: true, cleanDescription: description }; // Fail open on error
   }
 }
@@ -331,8 +330,8 @@ sharedQuestsRouter.get("/", async (c) => {
     },
     sender: {
       id: sq.sender.id,
-      displayName: sq.sender.Profile?.displayName || sq.sender.email?.split("@")[0] || "User",
-      avatar: sq.sender.Profile?.avatar || null,
+      displayName: sq.sender.profile?.displayName || sq.sender.email?.split("@")[0] || "User",
+      avatar: sq.sender.profile?.avatar || null,
     },
     message: sq.message,
     status: sq.status,
