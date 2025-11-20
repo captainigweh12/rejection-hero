@@ -8,10 +8,14 @@ node_modules/
 npm-debug.log
 yarn-error.log
 
-# Environment variables
+# Environment variables - CRITICAL!
 .env
 .env.local
 .env.production
+.env.development
+backend/.env
+backend/.env.local
+backend/.env.production
 
 # Keystore files (NEVER commit these!)
 *.keystore
@@ -31,6 +35,7 @@ secrets/
 !tsconfig.json
 !eas.json
 !app.json
+!railway.json
 
 # EAS
 .eas/
@@ -49,6 +54,8 @@ eas-builds/
 # Logs
 *.log
 logs/
+expo.log
+backend/server.log
 
 # Build outputs
 *.apk
@@ -58,3 +65,19 @@ logs/
 # Temporary files
 *.tmp
 *.temp
+
+# Database files (SQLite)
+*.db
+*.db-shm
+*.db-wal
+backend/prisma/dev.db*
+
+# Backend generated files
+backend/generated/
+
+# Uploads (user content)
+backend/uploads/
+
+# Bun
+bun.lockb
+
