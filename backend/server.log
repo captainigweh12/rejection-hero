@@ -7,14 +7,14 @@ $ prisma generate
 Environment variables loaded from .env
 Prisma schema loaded from prisma/schema.prisma
 
-✔ Generated Prisma Client (v6.17.1) to ./generated/prisma in 370ms
+✔ Generated Prisma Client (v6.17.1) to ./generated/prisma in 371ms
 
 Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
 
 Tip: Need your database queries to be 1000x faster? Accelerate offers you that and more: https://pris.ly/tip-2-accelerate
 
 
-Checked 778 installs across 720 packages (no changes) [1.86s]
+Checked 778 installs across 720 packages (no changes) [2.06s]
 Starting server in dev mode with hot reload...
 $ NODE_ENV=development bun run --hot src/index.ts
 Failed to find Response internal state key
@@ -97,6 +97,9 @@ Failed to find Response internal state key
 ⏰ Challenge Scheduler: Active (Daily at 9 AM & 2 PM UTC)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 47ms
 Failed to find Response internal state key
 ✅ Environment variables validated successfully
 🔍 OPENAI_API_KEY from process.env: EXISTS
@@ -177,281 +180,699 @@ Failed to find Response internal state key
 ⏰ Challenge Scheduler: Active (Daily at 9 AM & 2 PM UTC)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+<-- GET /api/challenges/active
+🔐 [Auth Middleware] GET /api/challenges/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/challenges/active [32m200[0m 5ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 5ms
 <-- GET /api/auth/get-session
---> GET /api/auth/get-session [32m200[0m 7ms
+--> GET /api/auth/get-session [32m200[0m 5ms
 <-- GET /api/profile
 🔐 [Auth Middleware] GET /api/profile - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
 👤 [Profile] GET request - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
 🔍 [Profile] Fetching profile for user N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
 ✅ [Profile] Successfully fetched profile for user N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/profile [32m200[0m 5ms
-<-- GET /api/stats/reflection-prompt
-🔐 [Auth Middleware] GET /api/stats/reflection-prompt - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/stats/reflection-prompt [32m200[0m 4ms
-<-- GET /api/stats
-<-- GET /api/quests
-🔐 [Auth Middleware] GET /api/stats - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
-🔐 [Auth Middleware] GET /api/quests - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/stats [32m200[0m 3ms
-<-- GET /api/challenges/active
-🔐 [Auth Middleware] GET /api/challenges/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/profile [32m200[0m 3ms
 <-- GET /api/stats/weekly-forecast
+<-- GET /api/challenges/active
 🔐 [Auth Middleware] GET /api/stats/weekly-forecast - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+🔐 [Auth Middleware] GET /api/challenges/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+<-- GET /api/quests
+--> GET /api/challenges/active [32m200[0m 5ms
+🔐 [Auth Middleware] GET /api/quests - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+<-- GET /api/stats/reflection-prompt
+<-- GET /api/stats
 --> GET /api/quests [32m200[0m 7ms
---> GET /api/challenges/active [32m200[0m 4ms
---> GET /api/stats/weekly-forecast [32m200[0m 4s
+🔐 [Auth Middleware] GET /api/stats/reflection-prompt - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/stats/reflection-prompt [32m200[0m 5ms
+🔐 [Auth Middleware] GET /api/stats - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/stats [32m200[0m 7ms
+--> GET /api/stats/weekly-forecast [32m200[0m 5s
 <-- GET /api/auth/get-session
 --> GET /api/auth/get-session [32m200[0m 2ms
-<-- GET /api/quests
-🔐 [Auth Middleware] GET /api/quests - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/quests [32m200[0m 4ms
-<-- GET /api/stats/reflection-prompt
 <-- GET /api/stats
-🔐 [Auth Middleware] GET /api/stats/reflection-prompt - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/stats/reflection-prompt [32m200[0m 1ms
 🔐 [Auth Middleware] GET /api/stats - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/stats [32m200[0m 2ms
-<-- GET /api/stats/weekly-forecast
+--> GET /api/stats [32m200[0m 3ms
 <-- GET /api/profile
-<-- GET /api/challenges/active
-🔐 [Auth Middleware] GET /api/stats/weekly-forecast - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
 🔐 [Auth Middleware] GET /api/profile - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
 👤 [Profile] GET request - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
 🔍 [Profile] Fetching profile for user N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
-🔐 [Auth Middleware] GET /api/challenges/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/challenges/active [32m200[0m 3ms
 ✅ [Profile] Successfully fetched profile for user N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/profile [32m200[0m 4ms
+--> GET /api/profile [32m200[0m 3ms
+<-- GET /api/stats/weekly-forecast
+🔐 [Auth Middleware] GET /api/stats/weekly-forecast - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+<-- GET /api/challenges/active
+<-- GET /api/stats/reflection-prompt
+<-- GET /api/quests
+🔐 [Auth Middleware] GET /api/challenges/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+🔐 [Auth Middleware] GET /api/quests - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+🔐 [Auth Middleware] GET /api/stats/reflection-prompt - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/stats/reflection-prompt [32m200[0m 1ms
+--> GET /api/quests [32m200[0m 4ms
+--> GET /api/challenges/active [32m200[0m 6ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
 <-- GET /api/stats
+--> GET /api/live/active [32m200[0m 2ms
 🔐 [Auth Middleware] GET /api/stats - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/stats [32m200[0m 2ms
-<-- GET /api/live/active
-🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/live/active [32m200[0m 2ms
+--> GET /api/stats [32m200[0m 1ms
 <-- POST /api/live/start
 🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
-[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
---> POST /api/live/start [32m200[0m 7ms
-<-- GET /api/live/active
-🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/live/active [32m200[0m 2ms
-<-- POST /api/live/start
-🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
-[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
---> POST /api/live/start [32m200[0m 2ms
-<-- GET /api/live/active
-🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/live/active [32m200[0m 2ms
---> GET /api/stats/weekly-forecast [32m200[0m 6s
-<-- POST /api/live/start
-🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
-[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
---> POST /api/live/start [32m200[0m 2ms
-<-- GET /api/live/active
-🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/live/active [32m200[0m 1ms
-<-- GET /api/live/active
-🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/live/active [32m200[0m 2ms
-<-- POST /api/live/start
-🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
-[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
---> POST /api/live/start [32m200[0m 23ms
-<-- GET /api/live/active
-🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/live/active [32m200[0m 1ms
-<-- POST /api/live/start
-🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
-[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
---> POST /api/live/start [32m200[0m 5ms
-<-- POST /api/live/start
-🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
-[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
---> POST /api/live/start [32m200[0m 4ms
-<-- GET /api/live/active
-🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/live/active [32m200[0m 2ms
-<-- GET /api/live/active
-🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/live/active [32m200[0m 1ms
-<-- POST /api/live/start
-🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
-[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
---> POST /api/live/start [32m200[0m 4ms
-<-- GET /api/live/active
-🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/live/active [32m200[0m 2ms
-<-- POST /api/live/start
-🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
-[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
---> POST /api/live/start [32m200[0m 10ms
-<-- GET /api/live/active
-🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/live/active [32m200[0m 2ms
-<-- POST /api/live/start
-🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
-[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
---> POST /api/live/start [32m200[0m 7ms
-<-- GET /api/live/active
-🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/live/active [32m200[0m 2ms
-<-- POST /api/live/start
-🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
-[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
---> POST /api/live/start [32m200[0m 2ms
-<-- GET /api/live/active
-🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/live/active [32m200[0m 2ms
-<-- POST /api/live/start
-🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
-[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
---> POST /api/live/start [32m200[0m 8ms
-<-- GET /api/live/active
-🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/live/active [32m200[0m 1ms
-<-- GET /api/live/3989ec15-1ee9-4fea-88bf-b184d71b632a/comments
-🔐 [Auth Middleware] GET /api/live/3989ec15-1ee9-4fea-88bf-b184d71b632a/comments - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/live/3989ec15-1ee9-4fea-88bf-b184d71b632a/comments [32m200[0m 1ms
-<-- POST /api/live/start
-🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
-[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
---> POST /api/live/start [32m200[0m 3ms
+[Live] Created Daily.co room: https://rejectionhero.daily.co/quest-live-N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI-1763645430827
+--> POST /api/live/start [32m200[0m 163ms
 <-- GET /api/live/active
 🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
 --> GET /api/live/active [32m200[0m 3ms
-<-- POST /api/live/start
-🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
-[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
---> POST /api/live/start [32m200[0m 9ms
-<-- GET /api/live/active
-🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/live/active [32m200[0m 2ms
-<-- POST /api/live/start
-🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
-[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
---> POST /api/live/start [32m200[0m 3ms
-<-- GET /api/live/active
-🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/live/active [32m200[0m 2ms
-<-- POST /api/live/start
-🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
-[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
---> POST /api/live/start [32m200[0m 9ms
-<-- GET /api/live/active
-🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/live/active [32m200[0m 2ms
-<-- POST /api/live/start
-🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
-[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
---> POST /api/live/start [32m200[0m 2ms
-<-- GET /api/live/active
-🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/live/active [32m200[0m 3ms
-<-- POST /api/live/start
-🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
-[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
---> POST /api/live/start [32m200[0m 2ms
-<-- GET /api/live/active
-🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/live/active [32m200[0m 2ms
-<-- POST /api/live/start
-🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
-[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
---> POST /api/live/start [32m200[0m 2ms
-<-- GET /api/live/active
-🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/live/active [32m200[0m 2ms
-<-- POST /api/live/start
-🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
-[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
---> POST /api/live/start [32m200[0m 6ms
-<-- GET /api/live/active
-🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/live/active [32m200[0m 1ms
-<-- POST /api/live/start
-🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
-[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
---> POST /api/live/start [32m200[0m 2ms
-<-- GET /api/live/active
-🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/live/active [32m200[0m 2ms
-<-- POST /api/live/start
-🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
-[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
---> POST /api/live/start [32m200[0m 2ms
-<-- GET /api/live/active
-🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/live/active [32m200[0m 1ms
-<-- POST /api/live/start
-🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
-[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
---> POST /api/live/start [32m200[0m 2ms
-<-- GET /api/live/active
-🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/live/active [32m200[0m 1ms
-<-- POST /api/live/start
-🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
-[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
---> POST /api/live/start [32m200[0m 2ms
-<-- GET /api/live/active
-🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/live/active [32m200[0m 2ms
-<-- POST /api/live/start
-🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
-[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
---> POST /api/live/start [32m200[0m 3ms
-<-- GET /api/live/active
-🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/live/active [32m200[0m 2ms
-<-- POST /api/live/start
-🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
-[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
---> POST /api/live/start [32m200[0m 2ms
-<-- GET /api/live/active
-🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/live/active [32m200[0m 2ms
-<-- POST /api/live/start
-🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
-[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
---> POST /api/live/start [32m200[0m 8ms
-<-- GET /api/live/active
-🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/live/active [32m200[0m 2ms
-<-- POST /api/live/start
-🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
-[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
---> POST /api/live/start [32m200[0m 1ms
-<-- GET /api/live/active
-🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/live/active [32m200[0m 2ms
-<-- POST /api/live/start
-🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
-[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
---> POST /api/live/start [32m200[0m 7ms
-<-- GET /api/live/active
-🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/live/active [32m200[0m 2ms
-<-- GET /api/live/active
-🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/live/active [32m200[0m 2ms
-<-- GET /api/live/active
-🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/live/active [32m200[0m 2ms
-<-- GET /api/live/active
-🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/live/active [32m200[0m 1ms
-<-- GET /api/live/active
-🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/live/active [32m200[0m 2ms
-<-- GET /api/live/active
-🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/live/active [32m200[0m 1ms
-<-- GET /api/live/active
-🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/live/active [32m200[0m 1ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments [32m200[0m 1ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+[Live] Quest suggestion table not yet created: 534 |       return c.json({ error: "Unauthorized - not your stream" }, 403);
+535 |     }
+536 | 
+537 |     try {
+538 |       // Get pending suggestions sorted by boost amount (highest first)
+539 |       const suggestions = await (db as any).questSuggestion.findMany({
+                                                  ^
+TypeError: undefined is not an object (evaluating 'db.questSuggestion.findMany')
+      at <anonymous> (/home/user/workspace/backend/src/routes/live.ts:539:45)
+
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions [32m200[0m 2ms
+<-- GET /api/payments/subscription
+🔐 [Auth Middleware] GET /api/payments/subscription - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/payments/subscription [32m200[0m 2ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments [32m200[0m 2ms
+--> GET /api/stats/weekly-forecast [32m200[0m 7s
 <-- GET /api/live/active
 🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
 --> GET /api/live/active [32m200[0m 3ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+[Live] Quest suggestion table not yet created: 534 |       return c.json({ error: "Unauthorized - not your stream" }, 403);
+535 |     }
+536 | 
+537 |     try {
+538 |       // Get pending suggestions sorted by boost amount (highest first)
+539 |       const suggestions = await (db as any).questSuggestion.findMany({
+                                                  ^
+TypeError: undefined is not an object (evaluating 'db.questSuggestion.findMany')
+      at <anonymous> (/home/user/workspace/backend/src/routes/live.ts:539:45)
+
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions [32m200[0m 2ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments [32m200[0m 2ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments [32m200[0m 1ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+[Live] Quest suggestion table not yet created: 534 |       return c.json({ error: "Unauthorized - not your stream" }, 403);
+535 |     }
+536 | 
+537 |     try {
+538 |       // Get pending suggestions sorted by boost amount (highest first)
+539 |       const suggestions = await (db as any).questSuggestion.findMany({
+                                                  ^
+TypeError: undefined is not an object (evaluating 'db.questSuggestion.findMany')
+      at <anonymous> (/home/user/workspace/backend/src/routes/live.ts:539:45)
+
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions [32m200[0m 2ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments [32m200[0m 2ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+[Live] Quest suggestion table not yet created: 534 |       return c.json({ error: "Unauthorized - not your stream" }, 403);
+535 |     }
+536 | 
+537 |     try {
+538 |       // Get pending suggestions sorted by boost amount (highest first)
+539 |       const suggestions = await (db as any).questSuggestion.findMany({
+                                                  ^
+TypeError: undefined is not an object (evaluating 'db.questSuggestion.findMany')
+      at <anonymous> (/home/user/workspace/backend/src/routes/live.ts:539:45)
+
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions [32m200[0m 4ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments [32m200[0m 2ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments [32m200[0m 3ms
+<-- POST /api/quests/generate
+🔐 [Auth Middleware] POST /api/quests/generate - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+🔍 [Safety Check] Checking quest: I’m looking for a girlfriend . No specific locatio...
+📋 [Safety Check] OpenAI response: {"safe": true, "description": "The challenge involves seeking a girlfriend, which is a social interaction and aligns with the goal of overcoming fear of rejection."}
+✅ [Safety Check] Quest approved
+Using OpenAI API to generate quest
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+[Live] Quest suggestion table not yet created: 534 |       return c.json({ error: "Unauthorized - not your stream" }, 403);
+535 |     }
+536 | 
+537 |     try {
+538 |       // Get pending suggestions sorted by boost amount (highest first)
+539 |       const suggestions = await (db as any).questSuggestion.findMany({
+                                                  ^
+TypeError: undefined is not an object (evaluating 'db.questSuggestion.findMany')
+      at <anonymous> (/home/user/workspace/backend/src/routes/live.ts:539:45)
+
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions [32m200[0m 2ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments [32m200[0m 1ms
+OpenAI API response: {
+  "id": "chatcmpl-Cdz2JLWoI6RDeHUHWRniNzGzsPwZD",
+  "object": "chat.completion",
+  "created": 1763645451,
+  "model": "gpt-4o-mini-2024-07-18",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "{\n  \"title\": \"Invite 5 Strangers\",\n  \"description\": \"Visit 5 local cafes and approach someone who seems approachable, asking if they would like to join you for coffee. This is a chance to practice your social skills and experience a variety of responses. It’s all about overcoming rejection and building confidence in making new connections!\",\n  \"category\": \"DATING\",\n  \"difficulty\": \"MEDIUM\",\n  \"goalType\": \"COLLECT_NOS\",\n  \"goalCount\": 5,\n  \"location\": \"local cafes\",\n  \"latitude\": 0,\n  \"longitude\": 0\n}",
+        "refusal": null,
+        "annotations": []
+      },
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 1726,
+    "completion_tokens": 128,
+    "total_tokens": 1854,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "audio_tokens": 0
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "audio_tokens": 0,
+      "accepted_prediction_tokens": 0,
+      "rejected_prediction_tokens": 0
+    }
+  },
+  "service_tier": "default",
+  "system_fingerprint": "fp_560af6e559"
+}
+[Quest Generation] Extracted number 5 from description, updating goalCount from 5 to 5
+Unsafe quest generated, rejecting: Quest contains potentially harmful content: "kill". For your safety, we cannot create quests that may cause physical harm, involve illegal activities, or endanger others.
+AI generation failed, using predefined quest: 1496 |       customPrompt || ""
+1497 |     );
+1498 | 
+1499 |     if (!safetyCheck.isSafe) {
+1500 |       console.error("Unsafe quest generated, rejecting:", safetyCheck.reason);
+1501 |       throw new Error(
+                   ^
+error: Quest contains potentially harmful content: "kill". For your safety, we cannot create quests that may cause physical harm, involve illegal activities, or endanger others.
+      at generateQuestWithAI (/home/user/workspace/backend/src/routes/quests.ts:1501:13)
+
+🔍 [Safety Check] Checking quest: Ask 3 strangers for a small favor (time, direction...
+📋 [Safety Check] OpenAI response: {"safe": true, "description": "Asking strangers for small favors is a safe rejection challenge that helps build confidence in social interactions."}
+✅ [Safety Check] Quest approved
+--> POST /api/quests/generate [32m200[0m 5s
+<-- POST /api/quests/8f3b2b51-cf71-494e-85d6-83027ae72629/start
+🔐 [Auth Middleware] POST /api/quests/8f3b2b51-cf71-494e-85d6-83027ae72629/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+📬 [Push] No push token for user N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI - in-app notification will be shown
+--> POST /api/quests/8f3b2b51-cf71-494e-85d6-83027ae72629/start [32m200[0m 13ms
+<-- GET /api/quests
+🔐 [Auth Middleware] GET /api/quests - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/quests [32m200[0m 5ms
+<-- GET /api/quests
+🔐 [Auth Middleware] GET /api/quests - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/quests [32m200[0m 2ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments [32m200[0m 2ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+[Live] Quest suggestion table not yet created: 534 |       return c.json({ error: "Unauthorized - not your stream" }, 403);
+535 |     }
+536 | 
+537 |     try {
+538 |       // Get pending suggestions sorted by boost amount (highest first)
+539 |       const suggestions = await (db as any).questSuggestion.findMany({
+                                                  ^
+TypeError: undefined is not an object (evaluating 'db.questSuggestion.findMany')
+      at <anonymous> (/home/user/workspace/backend/src/routes/live.ts:539:45)
+
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions [32m200[0m 2ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments [32m200[0m 2ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 1ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+[Live] Quest suggestion table not yet created: 534 |       return c.json({ error: "Unauthorized - not your stream" }, 403);
+535 |     }
+536 | 
+537 |     try {
+538 |       // Get pending suggestions sorted by boost amount (highest first)
+539 |       const suggestions = await (db as any).questSuggestion.findMany({
+                                                  ^
+TypeError: undefined is not an object (evaluating 'db.questSuggestion.findMany')
+      at <anonymous> (/home/user/workspace/backend/src/routes/live.ts:539:45)
+
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions [32m200[0m 2ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments [32m200[0m 1ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments [32m200[0m 1ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+[Live] Quest suggestion table not yet created: 534 |       return c.json({ error: "Unauthorized - not your stream" }, 403);
+535 |     }
+536 | 
+537 |     try {
+538 |       // Get pending suggestions sorted by boost amount (highest first)
+539 |       const suggestions = await (db as any).questSuggestion.findMany({
+                                                  ^
+TypeError: undefined is not an object (evaluating 'db.questSuggestion.findMany')
+      at <anonymous> (/home/user/workspace/backend/src/routes/live.ts:539:45)
+
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions [32m200[0m 1ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments [32m200[0m 2ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments [32m200[0m 2ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 1ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+[Live] Quest suggestion table not yet created: 534 |       return c.json({ error: "Unauthorized - not your stream" }, 403);
+535 |     }
+536 | 
+537 |     try {
+538 |       // Get pending suggestions sorted by boost amount (highest first)
+539 |       const suggestions = await (db as any).questSuggestion.findMany({
+                                                  ^
+TypeError: undefined is not an object (evaluating 'db.questSuggestion.findMany')
+      at <anonymous> (/home/user/workspace/backend/src/routes/live.ts:539:45)
+
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions [32m200[0m 1ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments [32m200[0m 1ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+[Live] Quest suggestion table not yet created: 534 |       return c.json({ error: "Unauthorized - not your stream" }, 403);
+535 |     }
+536 | 
+537 |     try {
+538 |       // Get pending suggestions sorted by boost amount (highest first)
+539 |       const suggestions = await (db as any).questSuggestion.findMany({
+                                                  ^
+TypeError: undefined is not an object (evaluating 'db.questSuggestion.findMany')
+      at <anonymous> (/home/user/workspace/backend/src/routes/live.ts:539:45)
+
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions [32m200[0m 2ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments [32m200[0m 2ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments [32m200[0m 1ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+[Live] Quest suggestion table not yet created: 534 |       return c.json({ error: "Unauthorized - not your stream" }, 403);
+535 |     }
+536 | 
+537 |     try {
+538 |       // Get pending suggestions sorted by boost amount (highest first)
+539 |       const suggestions = await (db as any).questSuggestion.findMany({
+                                                  ^
+TypeError: undefined is not an object (evaluating 'db.questSuggestion.findMany')
+      at <anonymous> (/home/user/workspace/backend/src/routes/live.ts:539:45)
+
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions [32m200[0m 2ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments [32m200[0m 3ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/challenges/active
+🔐 [Auth Middleware] GET /api/challenges/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/challenges/active [32m200[0m 2ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+[Live] Quest suggestion table not yet created: 534 |       return c.json({ error: "Unauthorized - not your stream" }, 403);
+535 |     }
+536 | 
+537 |     try {
+538 |       // Get pending suggestions sorted by boost amount (highest first)
+539 |       const suggestions = await (db as any).questSuggestion.findMany({
+                                                  ^
+TypeError: undefined is not an object (evaluating 'db.questSuggestion.findMany')
+      at <anonymous> (/home/user/workspace/backend/src/routes/live.ts:539:45)
+
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions [32m200[0m 1ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments [32m200[0m 1ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments [32m200[0m 2ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+[Live] Quest suggestion table not yet created: 534 |       return c.json({ error: "Unauthorized - not your stream" }, 403);
+535 |     }
+536 | 
+537 |     try {
+538 |       // Get pending suggestions sorted by boost amount (highest first)
+539 |       const suggestions = await (db as any).questSuggestion.findMany({
+                                                  ^
+TypeError: undefined is not an object (evaluating 'db.questSuggestion.findMany')
+      at <anonymous> (/home/user/workspace/backend/src/routes/live.ts:539:45)
+
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions [32m200[0m 2ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments [32m200[0m 2ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments [32m200[0m 1ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+[Live] Quest suggestion table not yet created: 534 |       return c.json({ error: "Unauthorized - not your stream" }, 403);
+535 |     }
+536 | 
+537 |     try {
+538 |       // Get pending suggestions sorted by boost amount (highest first)
+539 |       const suggestions = await (db as any).questSuggestion.findMany({
+                                                  ^
+TypeError: undefined is not an object (evaluating 'db.questSuggestion.findMany')
+      at <anonymous> (/home/user/workspace/backend/src/routes/live.ts:539:45)
+
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions [32m200[0m 2ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments [32m200[0m 1ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+[Live] Quest suggestion table not yet created: 534 |       return c.json({ error: "Unauthorized - not your stream" }, 403);
+535 |     }
+536 | 
+537 |     try {
+538 |       // Get pending suggestions sorted by boost amount (highest first)
+539 |       const suggestions = await (db as any).questSuggestion.findMany({
+                                                  ^
+TypeError: undefined is not an object (evaluating 'db.questSuggestion.findMany')
+      at <anonymous> (/home/user/workspace/backend/src/routes/live.ts:539:45)
+
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions [32m200[0m 2ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments [32m200[0m 2ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments [32m200[0m 2ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 1ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+[Live] Quest suggestion table not yet created: 534 |       return c.json({ error: "Unauthorized - not your stream" }, 403);
+535 |     }
+536 | 
+537 |     try {
+538 |       // Get pending suggestions sorted by boost amount (highest first)
+539 |       const suggestions = await (db as any).questSuggestion.findMany({
+                                                  ^
+TypeError: undefined is not an object (evaluating 'db.questSuggestion.findMany')
+      at <anonymous> (/home/user/workspace/backend/src/routes/live.ts:539:45)
+
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions [32m200[0m 1ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments [32m200[0m 3ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+[Live] Quest suggestion table not yet created: 534 |       return c.json({ error: "Unauthorized - not your stream" }, 403);
+535 |     }
+536 | 
+537 |     try {
+538 |       // Get pending suggestions sorted by boost amount (highest first)
+539 |       const suggestions = await (db as any).questSuggestion.findMany({
+                                                  ^
+TypeError: undefined is not an object (evaluating 'db.questSuggestion.findMany')
+      at <anonymous> (/home/user/workspace/backend/src/routes/live.ts:539:45)
+
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions [32m200[0m 2ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments [32m200[0m 0ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments [32m200[0m 1ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+[Live] Quest suggestion table not yet created: 534 |       return c.json({ error: "Unauthorized - not your stream" }, 403);
+535 |     }
+536 | 
+537 |     try {
+538 |       // Get pending suggestions sorted by boost amount (highest first)
+539 |       const suggestions = await (db as any).questSuggestion.findMany({
+                                                  ^
+TypeError: undefined is not an object (evaluating 'db.questSuggestion.findMany')
+      at <anonymous> (/home/user/workspace/backend/src/routes/live.ts:539:45)
+
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions [32m200[0m 1ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments [32m200[0m 1ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments [32m200[0m 4ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+[Live] Quest suggestion table not yet created: 534 |       return c.json({ error: "Unauthorized - not your stream" }, 403);
+535 |     }
+536 | 
+537 |     try {
+538 |       // Get pending suggestions sorted by boost amount (highest first)
+539 |       const suggestions = await (db as any).questSuggestion.findMany({
+                                                  ^
+TypeError: undefined is not an object (evaluating 'db.questSuggestion.findMany')
+      at <anonymous> (/home/user/workspace/backend/src/routes/live.ts:539:45)
+
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions [32m200[0m 1ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments [32m200[0m 1ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+[Live] Quest suggestion table not yet created: 534 |       return c.json({ error: "Unauthorized - not your stream" }, 403);
+535 |     }
+536 | 
+537 |     try {
+538 |       // Get pending suggestions sorted by boost amount (highest first)
+539 |       const suggestions = await (db as any).questSuggestion.findMany({
+                                                  ^
+TypeError: undefined is not an object (evaluating 'db.questSuggestion.findMany')
+      at <anonymous> (/home/user/workspace/backend/src/routes/live.ts:539:45)
+
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions [32m200[0m 2ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments [32m200[0m 2ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments [32m200[0m 2ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+[Live] Quest suggestion table not yet created: 534 |       return c.json({ error: "Unauthorized - not your stream" }, 403);
+535 |     }
+536 | 
+537 |     try {
+538 |       // Get pending suggestions sorted by boost amount (highest first)
+539 |       const suggestions = await (db as any).questSuggestion.findMany({
+                                                  ^
+TypeError: undefined is not an object (evaluating 'db.questSuggestion.findMany')
+      at <anonymous> (/home/user/workspace/backend/src/routes/live.ts:539:45)
+
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions [32m200[0m 1ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments [32m200[0m 2ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments [32m200[0m 2ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+[Live] Quest suggestion table not yet created: 534 |       return c.json({ error: "Unauthorized - not your stream" }, 403);
+535 |     }
+536 | 
+537 |     try {
+538 |       // Get pending suggestions sorted by boost amount (highest first)
+539 |       const suggestions = await (db as any).questSuggestion.findMany({
+                                                  ^
+TypeError: undefined is not an object (evaluating 'db.questSuggestion.findMany')
+      at <anonymous> (/home/user/workspace/backend/src/routes/live.ts:539:45)
+
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions [32m200[0m 2ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 1ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments [32m200[0m 1ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+[Live] Quest suggestion table not yet created: 534 |       return c.json({ error: "Unauthorized - not your stream" }, 403);
+535 |     }
+536 | 
+537 |     try {
+538 |       // Get pending suggestions sorted by boost amount (highest first)
+539 |       const suggestions = await (db as any).questSuggestion.findMany({
+                                                  ^
+TypeError: undefined is not an object (evaluating 'db.questSuggestion.findMany')
+      at <anonymous> (/home/user/workspace/backend/src/routes/live.ts:539:45)
+
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions [32m200[0m 2ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 1ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments [32m200[0m 1ms
+<-- GET /api/challenges/active
+🔐 [Auth Middleware] GET /api/challenges/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/challenges/active [32m200[0m 1ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments [32m200[0m 1ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+[Live] Quest suggestion table not yet created: 534 |       return c.json({ error: "Unauthorized - not your stream" }, 403);
+535 |     }
+536 | 
+537 |     try {
+538 |       // Get pending suggestions sorted by boost amount (highest first)
+539 |       const suggestions = await (db as any).questSuggestion.findMany({
+                                                  ^
+TypeError: undefined is not an object (evaluating 'db.questSuggestion.findMany')
+      at <anonymous> (/home/user/workspace/backend/src/routes/live.ts:539:45)
+
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions [32m200[0m 3ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 1ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments [32m200[0m 1ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+[Live] Quest suggestion table not yet created: 534 |       return c.json({ error: "Unauthorized - not your stream" }, 403);
+535 |     }
+536 | 
+537 |     try {
+538 |       // Get pending suggestions sorted by boost amount (highest first)
+539 |       const suggestions = await (db as any).questSuggestion.findMany({
+                                                  ^
+TypeError: undefined is not an object (evaluating 'db.questSuggestion.findMany')
+      at <anonymous> (/home/user/workspace/backend/src/routes/live.ts:539:45)
+
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions [32m200[0m 2ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 1ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments [32m200[0m 2ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments [32m200[0m 1ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+[Live] Quest suggestion table not yet created: 534 |       return c.json({ error: "Unauthorized - not your stream" }, 403);
+535 |     }
+536 | 
+537 |     try {
+538 |       // Get pending suggestions sorted by boost amount (highest first)
+539 |       const suggestions = await (db as any).questSuggestion.findMany({
+                                                  ^
+TypeError: undefined is not an object (evaluating 'db.questSuggestion.findMany')
+      at <anonymous> (/home/user/workspace/backend/src/routes/live.ts:539:45)
+
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/quest-suggestions [32m200[0m 11ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 3ms
+<-- GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments
+🔐 [Auth Middleware] GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/987809a9-0618-40d5-987d-fe130a5ad1c1/comments [32m200[0m 3ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 1ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 2ms
 <-- GET /api/challenges/active
 🔐 [Auth Middleware] GET /api/challenges/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
 --> GET /api/challenges/active [32m200[0m 2ms
@@ -460,108 +881,28 @@ Failed to find Response internal state key
 --> GET /api/live/active [32m200[0m 2ms
 <-- GET /api/live/active
 🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/live/active [32m200[0m 1ms
+--> GET /api/live/active [32m200[0m 2ms
 <-- GET /api/live/active
 🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
 --> GET /api/live/active [32m200[0m 3ms
-Failed to find Response internal state key
-✅ Environment variables validated successfully
-🔍 OPENAI_API_KEY from process.env: EXISTS
-🔍 OPENAI_API_KEY in parsed: EXISTS
-🔐 [Auth] Initializing Better Auth...
-✅ [Auth] Google OAuth credentials configured
-🔑 [Auth] Google Client ID: 94427138884-cc2db90q...
-✅ [Auth] Better Auth initialized
-🔗 [Auth] Base URL: https://preview-nagkkyofmizn.share.sandbox.dev
-🌐 [Auth] Trusted origins: vibecode://, http://localhost:3000, http://localhost:8081, https://preview-nagkkyofmizn.share.sandbox.dev
-🔑 [Auth] Google OAuth: Enabled ✅
-🔐 [Auth] Session expires in: 7 days
-📁 [Upload] Uploads directory exists: /home/user/workspace/backend/uploads
-📜 [Policies] Router initialized. __dirname: /home/user/workspace/backend/src/routes
-🔧 Initializing Hono application...
-🔐 Mounting custom password reset routes at /api/auth
-🔐 Mounting Better Auth handler at /api/auth/*
-📁 Serving static files from uploads/ directory
-📤 Mounting upload routes at /api/upload
-📝 Mounting sample routes at /api/sample
-👤 Mounting profile routes at /api/profile
-🔍 Mounting discover routes at /api/discover
-👆 Mounting swipe routes at /api/swipe
-💕 Mounting matches routes at /api/matches
-🎯 Mounting quests routes at /api/quests
-🏆 Mounting challenges routes at /api/challenges
-📊 Mounting stats routes at /api/stats
-📹 Mounting live routes at /api/live
-👥 Mounting friends routes at /api/friends
-💬 Mounting messages routes at /api/messages
-🏘️  Mounting groups routes at /api/groups
-🎯 Mounting group quests routes at /api/group-quests
-📹 Mounting group live routes at /api/group-live
-🎁 Mounting shared quests routes at /api/shared-quests
-✅ Mounting quest verification routes at /api/quest-verification
-🛡️ Mounting moderation routes at /api/moderation
-📓 Mounting journal routes at /api/journal
-📝 Mounting posts routes at /api/posts
-⏰ Mounting moments routes at /api/moments
-🔔 Mounting notifications routes at /api/notifications
-📧 Mounting GoHighLevel routes at /api/gohighlevel
-🎫 Mounting support routes at /api/support
-📁 Mounting categories routes at /api/categories
-🎤 Mounting audio routes at /api/audio
-💳 Mounting payments routes at /api/payments
-💳 Mounting payment redirect routes at root level
-📜 Mounting policies routes at /api/policies
-👑 Mounting admin routes at /api/admin
-🐛 Mounting bug report routes at /api/bug-reports
-🌐 Mounting web redirect routes
-⚙️  Starting server...
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📍 Environment: development
-🚀 Server is running on port 3000
-🔗 Base URL: http://localhost:3000
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-📚 Available endpoints:
-  🔐 Auth:         /api/auth/*
-  📤 Upload:       POST /api/upload/image
-  📝 Sample:       GET/POST /api/sample
-  👤 profile:      GET/POST /api/profile
-  🔍 Discover:     GET /api/discover
-  👆 Swipe:        POST /api/swipe
-  💕 Matches:      GET /api/matches
-  🎯 Quests:       GET/POST /api/quests
-  🏆 Challenges:   GET/POST /api/challenges
-  📊 Stats:        GET /api/stats
-  📹 Live:        GET/POST /api/live
-  👥 Friends:      GET/POST /api/friends
-  💬 Messages:     GET/POST /api/messages
-  🏘️  Groups:       GET/POST /api/groups
-  🎁 SharedQuests: GET/POST /api/shared-quests
-  📓 Journal:      GET/POST /api/journal
-  🔔 Notifications: GET /api/notifications
-  💚 Health:       GET /health
-
-⏰ Challenge Scheduler: Active (Daily at 9 AM & 2 PM UTC)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
 <-- GET /api/live/active
 🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/live/active [32m200[0m 12ms
-<-- GET /api/live/active
-🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/live/active [32m200[0m 4ms
-<-- GET /api/live/active
-🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/live/active [32m200[0m 7ms
+--> GET /api/live/active [32m200[0m 5ms
+<-- GET /api/challenges/active
+🔐 [Auth Middleware] GET /api/challenges/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/challenges/active [32m200[0m 1ms
 <-- GET /api/live/active
 🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
 --> GET /api/live/active [32m200[0m 2ms
 <-- GET /api/live/active
 🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/live/active [32m200[0m 2ms
+--> GET /api/live/active [32m200[0m 3ms
 <-- GET /api/live/active
 🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/live/active [32m200[0m 2ms
+--> GET /api/live/active [32m200[0m 3ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 3ms
 <-- GET /api/live/active
 🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
 --> GET /api/live/active [32m200[0m 2ms

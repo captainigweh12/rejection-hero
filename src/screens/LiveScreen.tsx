@@ -55,6 +55,7 @@ export default function LiveScreen({ navigation }: Props) {
   const [viewingStreamId, setViewingStreamId] = useState<string | null>(null);
   const [facing, setFacing] = useState<"front" | "back">("front");
   const [permission, requestPermission] = useCameraPermissions();
+  const [showQuestCardOnStream, setShowQuestCardOnStream] = useState(false);
 
   // Check if live streaming is disabled by parental guidance
   useEffect(() => {
@@ -227,6 +228,23 @@ export default function LiveScreen({ navigation }: Props) {
     onSuccess: () => {
       refetchStreams();
       queryClient.invalidateQueries({ queryKey: ["liveStreams"] });
+    },
+    onError: (error: any) => {
+      Alert.alert("Error", error.message || "Failed to record action");
+    },
+  });
+
+  // Record streamer's own quest action
+  const recordStreamerQuestMutation = useMutation({
+    mutationFn: async (data: { action: "YES" | "NO" | "ACTION" }) => {
+      if (!activeQuest) return;
+      return api.post(`/api/quests/${activeQuest.id}/record`, {
+        action: data.action,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["quests"] });
+      refetchStreams();
     },
     onError: (error: any) => {
       Alert.alert("Error", error.message || "Failed to record action");
@@ -979,17 +997,33 @@ export default function LiveScreen({ navigation }: Props) {
           >
             {isVideoOff ? <VideoOff size={24} color="white" /> : <VideoIcon size={24} color="white" />}
           </Pressable>
+
+          {/* Quest Card Toggle Button */}
+          {activeQuest && (
+            <Pressable
+              onPress={() => setShowQuestCardOnStream(!showQuestCardOnStream)}
+              style={{
+                width: 48,
+                height: 48,
+                borderRadius: 24,
+                backgroundColor: showQuestCardOnStream ? "rgba(255, 107, 53, 0.8)" : "rgba(255, 255, 255, 0.2)",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Sparkles size={24} color="white" />
+            </Pressable>
+          )}
         </View>
 
         {/* Modern Quest Card Overlay - Interactive */}
-        {activeQuest && (
-          <Pressable
-            onPress={() => navigation.navigate("QuestDetail", { userQuestId: activeQuest.id })}
+        {activeQuest && showQuestCardOnStream && (
+          <View
             style={{
               position: "absolute",
               bottom: 240,
               left: 20,
-              right: 80,
+              right: 20,
               backgroundColor: "rgba(255, 107, 53, 0.95)",
               borderRadius: 16,
               padding: 16,
@@ -1028,42 +1062,48 @@ export default function LiveScreen({ navigation }: Props) {
               {activeQuest.quest.description}
             </Text>
 
-            {/* Interactive Quest Buttons */}
+            {/* Interactive Yes/No Buttons */}
             <View style={{ flexDirection: "row", gap: 8, marginTop: 12 }}>
               <Pressable
                 onPress={(e) => {
                   e.stopPropagation();
-                  navigation.navigate("QuestDetail", { userQuestId: activeQuest.id });
+                  recordStreamerQuestMutation.mutate({ action: "NO" });
                 }}
+                disabled={recordStreamerQuestMutation.isPending}
                 style={{
                   flex: 1,
-                  backgroundColor: "rgba(255, 255, 255, 0.2)",
-                  paddingVertical: 8,
+                  backgroundColor: "rgba(220, 38, 38, 0.8)",
+                  paddingVertical: 10,
                   borderRadius: 8,
                   alignItems: "center",
+                  opacity: recordStreamerQuestMutation.isPending ? 0.6 : 1,
                 }}
               >
-                <Text style={{ color: "white", fontSize: 12, fontWeight: "600" }}>Track Progress</Text>
+                <Text style={{ color: "white", fontSize: 14, fontWeight: "bold" }}>
+                  {recordStreamerQuestMutation.isPending ? "Recording..." : "NO"}
+                </Text>
               </Pressable>
               <Pressable
                 onPress={(e) => {
                   e.stopPropagation();
-                  // Share quest on live - quest is already linked to stream
-                  Alert.alert("Quest Shared", "Your quest is visible to all viewers!");
+                  recordStreamerQuestMutation.mutate({ action: "YES" });
                 }}
+                disabled={recordStreamerQuestMutation.isPending}
                 style={{
-                  backgroundColor: "rgba(126, 63, 228, 0.3)",
-                  paddingVertical: 8,
-                  paddingHorizontal: 12,
+                  flex: 1,
+                  backgroundColor: "rgba(34, 197, 94, 0.8)",
+                  paddingVertical: 10,
                   borderRadius: 8,
                   alignItems: "center",
-                  justifyContent: "center",
+                  opacity: recordStreamerQuestMutation.isPending ? 0.6 : 1,
                 }}
               >
-                <Share2 size={16} color="white" />
+                <Text style={{ color: "white", fontSize: 14, fontWeight: "bold" }}>
+                  {recordStreamerQuestMutation.isPending ? "Recording..." : "YES"}
+                </Text>
               </Pressable>
             </View>
-          </Pressable>
+          </View>
         )}
 
         {/* Create Quest Button - Show when streaming without active quest */}
