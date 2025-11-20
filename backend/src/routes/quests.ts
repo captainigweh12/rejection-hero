@@ -951,11 +951,13 @@ questsRouter.post("/:id/record", zValidator("json", recordQuestActionRequestSche
         // Create token transaction record
         await db.token_transaction.create({
           data: {
+            id: crypto.randomUUID(),
             userId: user.id,
             type: "earned",
             amount: tokensEarned,
             description: `Earned ${tokensEarned} token${tokensEarned > 1 ? "s" : ""} from completing quest: ${userQuest.quest.title}`,
             questId: userQuest.quest.id,
+            updatedAt: new Date(),
           },
         });
 
