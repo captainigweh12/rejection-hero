@@ -2,7 +2,7 @@ FROM oven/bun:1.2.10-debian
 
 WORKDIR /app
 
-# Install OpenSSL 3.0 and other dependencies
+# Install OpenSSL 3.0 and other dependencies for Prisma
 RUN apt-get update && \
     apt-get install -y \
     openssl \
@@ -10,7 +10,7 @@ RUN apt-get update && \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy backend files
+# Copy backend package.json and prisma schema
 COPY backend/package.json ./backend/
 COPY backend/prisma ./backend/prisma
 
