@@ -26,7 +26,30 @@
 
 ## 🔧 Recent Updates
 
-### 🔐 Google OAuth Sign-In Fix (Latest)
+### 🚀 Railway Production Deployment Ready (Latest)
+- **Status**: Backend is prepared for Railway deployment to get production URL
+- **Why**: To replace "sandbox.dev" in Google OAuth popup with your actual domain
+- **What's Ready**:
+  - ✅ Backend code optimized for Railway
+  - ✅ Package.json updated with correct start script
+  - ✅ Railway configuration files created
+  - ✅ Environment variables template prepared
+  - ✅ PostgreSQL migration scripts ready
+  - ✅ Complete deployment guide created
+- **Deployment Guides**:
+  - 📄 `RAILWAY_DEPLOY_GUIDE.md` - Step-by-step web deployment (no CLI needed)
+  - 📄 `RAILWAY_ENV_TEMPLATE.md` - Copy-paste environment variables
+  - 📄 `GOOGLE_OAUTH_SETUP.md` - Google Cloud Console setup
+- **Next Steps**:
+  1. Go to https://railway.app and sign up with GitHub
+  2. Deploy backend from GitHub (automatic)
+  3. Add PostgreSQL database (one click)
+  4. Set environment variables (copy from template)
+  5. Update Google OAuth redirect URIs
+  6. Update Vibecode env variable with Railway URL
+  7. **Google OAuth will show your domain instead of sandbox.dev!**
+
+### 🔐 Google OAuth Sign-In Fix
 - **Issue**: Google OAuth sign-in was not completing - logs showed "Starting Google sign-in..." but no callback
 - **Root Cause**:
   - Missing deep link handler in app navigation for OAuth callback path `vibecode://auth/callback`
