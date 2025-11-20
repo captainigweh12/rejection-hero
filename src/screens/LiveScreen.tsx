@@ -998,22 +998,39 @@ export default function LiveScreen({ navigation }: Props) {
             {isVideoOff ? <VideoOff size={24} color="white" /> : <VideoIcon size={24} color="white" />}
           </Pressable>
 
-          {/* Quest Card Toggle Button */}
-          {activeQuest && (
-            <Pressable
-              onPress={() => setShowQuestCardOnStream(!showQuestCardOnStream)}
-              style={{
-                width: 48,
-                height: 48,
-                borderRadius: 24,
-                backgroundColor: showQuestCardOnStream ? "rgba(255, 107, 53, 0.8)" : "rgba(255, 255, 255, 0.2)",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <Sparkles size={24} color="white" />
-            </Pressable>
-          )}
+          {/* Quest Card Toggle Button - Always show when streaming */}
+          <Pressable
+            onPress={() => {
+              if (!activeQuest) {
+                Alert.alert(
+                  "No Active Quest",
+                  "Start a live stream with a linked quest to track your progress live!",
+                  [
+                    {
+                      text: "OK",
+                      style: "cancel",
+                    },
+                    {
+                      text: "Create Quest",
+                      onPress: () => navigation.navigate("CreateQuest"),
+                    },
+                  ]
+                );
+              } else {
+                setShowQuestCardOnStream(!showQuestCardOnStream);
+              }
+            }}
+            style={{
+              width: 48,
+              height: 48,
+              borderRadius: 24,
+              backgroundColor: activeQuest && showQuestCardOnStream ? "rgba(255, 107, 53, 0.8)" : "rgba(255, 255, 255, 0.2)",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Sparkles size={24} color="white" />
+          </Pressable>
         </View>
 
         {/* Modern Quest Card Overlay - Interactive */}
