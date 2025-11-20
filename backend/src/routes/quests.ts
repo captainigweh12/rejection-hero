@@ -327,6 +327,7 @@ questsRouter.post("/generate", zValidator("json", generateQuestRequestSchema), a
   // Create user quest (normal quest-by-quest mode)
   const userQuest = await db.user_quest.create({
     data: {
+      id: crypto.randomUUID(),
       userId: user.id,
       questId: quest.id,
       status: "QUEUED",

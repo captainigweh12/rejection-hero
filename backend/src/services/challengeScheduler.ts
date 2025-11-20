@@ -111,10 +111,12 @@ export async function generateDailyChallengesForAllUsers() {
         // Create user quest and auto-start it
         const userQuest = await db.user_quest.create({
           data: {
+            id: crypto.randomUUID(),
             userId: challenge.userId,
             questId: quest.id,
             status: "ACTIVE",
             startedAt: new Date(),
+            updatedAt: new Date(),
           },
         });
 

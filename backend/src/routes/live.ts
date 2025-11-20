@@ -663,10 +663,12 @@ live.post("/:id/respond-to-suggestion", async (c) => {
         // Create UserQuest
         const userQuest = await db.user_quest.create({
           data: {
+            id: crypto.randomUUID(),
             userId: user.id,
             questId: suggestion.questId,
             status: "active",
             startedAt: new Date(),
+            updatedAt: new Date(),
           },
         });
 

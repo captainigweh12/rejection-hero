@@ -494,12 +494,14 @@ sharedQuestsRouter.post("/:id/accept", async (c) => {
   // Create user quest marked as from friend
   await db.user_quest.create({
     data: {
+      id: crypto.randomUUID(),
       userId: user.id,
       questId: sharedQuest.questId,
       status,
       startedAt: status === "ACTIVE" ? new Date() : null,
       isFromFriend: true, // Mark as friend quest
       sharedById: sharedQuest.senderId, // Track who shared it
+      updatedAt: new Date(),
     },
   });
 
@@ -805,6 +807,7 @@ sharedQuestsRouter.post("/create-custom", zValidator("json", createCustomQuestSc
     // Create a UserQuest for the user (personal quest)
     const userQuest = await db.user_quest.create({
       data: {
+        id: crypto.randomUUID(),
         userId: user.id,
         questId: quest.id,
         status: "ACTIVE",
@@ -812,6 +815,7 @@ sharedQuestsRouter.post("/create-custom", zValidator("json", createCustomQuestSc
         noCount: 0,
         yesCount: 0,
         actionCount: 0,
+        updatedAt: new Date(),
       },
     });
 
