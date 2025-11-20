@@ -55,25 +55,29 @@ function validateEnv() {
   try {
     const parsed = envSchema.parse(process.env);
 
-    // CRITICAL: Override BACKEND_URL with Railway domain if available
-    // This ensures OAuth always uses the correct Railway URL, even if BACKEND_URL is set incorrectly
-    if (process.env.RAILWAY_PUBLIC_DOMAIN) {
-      const railwayUrl = `https://${process.env.RAILWAY_PUBLIC_DOMAIN}`;
-      const originalBackendUrl = parsed.BACKEND_URL;
-
-      // Always use Railway URL when available (override any BACKEND_URL value)
-      parsed.BACKEND_URL = railwayUrl;
-
-      console.log(`🚂 [ENV] Railway Public Domain detected: ${process.env.RAILWAY_PUBLIC_DOMAIN}`);
-
-      if (originalBackendUrl && originalBackendUrl !== railwayUrl) {
-        if (originalBackendUrl.includes("sandbox.dev")) {
-          console.warn(`⚠️  [ENV] BACKEND_URL was set to sandbox URL: ${originalBackendUrl}`);
-          console.warn(`⚠️  [ENV] Overriding with Railway URL: ${railwayUrl}`);
-        } else {
-          console.log(`ℹ️  [ENV] BACKEND_URL was ${originalBackendUrl}, using Railway URL: ${railwayUrl}`);
+    // CRITICAL: Prefer explicitly set BACKEND_URL, then Railway domain, then localhost
+    // If BACKEND_URL is explicitly set (e.g., https://api.rejectionhero.com), use it
+    // Otherwise, auto-detect Railway domain
+    const explicitlySet = parsed.BACKEND_URL && parsed.BACKEND_URL !== "http://localhost:3000";
+    
+    if (explicitlySet) {
+      // BACKEND_URL is explicitly set (e.g., custom domain like api.rejectionhero.com)
+      console.log(`🌐 [ENV] Using explicitly set BACKEND_URL: ${parsed.BACKEND_URL}`);
+      
+      // Warn if it's a sandbox URL
+      if (parsed.BACKEND_URL.includes("sandbox.dev")) {
+        console.warn(`⚠️  [ENV] WARNING: BACKEND_URL is set to sandbox URL: ${parsed.BACKEND_URL}`);
+        console.warn(`⚠️  [ENV] This may cause OAuth redirect_uri_mismatch errors!`);
+        if (process.env.RAILWAY_PUBLIC_DOMAIN) {
+          const railwayUrl = `https://${process.env.RAILWAY_PUBLIC_DOMAIN}`;
+          console.warn(`⚠️  [ENV] Consider using Railway URL: ${railwayUrl}`);
         }
       }
+    } else if (process.env.RAILWAY_PUBLIC_DOMAIN) {
+      // No explicit BACKEND_URL, but Railway domain is available
+      const railwayUrl = `https://${process.env.RAILWAY_PUBLIC_DOMAIN}`;
+      parsed.BACKEND_URL = railwayUrl;
+      console.log(`🚂 [ENV] Railway Public Domain detected: ${process.env.RAILWAY_PUBLIC_DOMAIN}`);
       console.log(`✅ [ENV] BACKEND_URL set to Railway domain: ${parsed.BACKEND_URL}`);
     } else if (!parsed.BACKEND_URL || parsed.BACKEND_URL === "http://localhost:3000") {
       // Fallback to localhost if not in Railway and no BACKEND_URL set
