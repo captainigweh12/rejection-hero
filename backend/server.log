@@ -1,20 +1,20 @@
 + exec gosu vibecode scripts/start --hot
 Installing dependencies and generating Prisma client...
-[0.07ms] ".env"
+[0.04ms] ".env"
 bun install v1.2.19 (aad3abea)
 
 $ prisma generate
 Environment variables loaded from .env
 Prisma schema loaded from prisma/schema.prisma
 
-✔ Generated Prisma Client (v6.17.1) to ./generated/prisma in 452ms
+✔ Generated Prisma Client (v6.17.1) to ./generated/prisma in 370ms
 
 Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
 
-Tip: Want to turn off tips and other hints? https://pris.ly/tip-4-nohints
+Tip: Need your database queries to be 1000x faster? Accelerate offers you that and more: https://pris.ly/tip-2-accelerate
 
 
-Checked 778 installs across 720 packages (no changes) [2.11s]
+Checked 778 installs across 720 packages (no changes) [1.86s]
 Starting server in dev mode with hot reload...
 $ NODE_ENV=development bun run --hot src/index.ts
 Failed to find Response internal state key
@@ -177,668 +177,293 @@ Failed to find Response internal state key
 ⏰ Challenge Scheduler: Active (Daily at 9 AM & 2 PM UTC)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-<-- GET /api/live/active
-<-- GET /api/challenges/active
-🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
-🔐 [Auth Middleware] GET /api/challenges/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/live/active [32m200[0m 7ms
---> GET /api/challenges/active [32m200[0m 7ms
 <-- GET /api/auth/get-session
---> GET /api/auth/get-session [32m200[0m 5ms
+--> GET /api/auth/get-session [32m200[0m 7ms
 <-- GET /api/profile
-<-- GET /api/quests
 🔐 [Auth Middleware] GET /api/profile - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
 👤 [Profile] GET request - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
 🔍 [Profile] Fetching profile for user N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
-🔐 [Auth Middleware] GET /api/quests - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/quests [32m200[0m 4ms
 ✅ [Profile] Successfully fetched profile for user N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
 --> GET /api/profile [32m200[0m 5ms
-<-- GET /api/stats/weekly-forecast
-🔐 [Auth Middleware] GET /api/stats/weekly-forecast - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
-<-- GET /api/challenges/active
-<-- GET /api/stats
-🔐 [Auth Middleware] GET /api/challenges/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
-🔐 [Auth Middleware] GET /api/stats - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/challenges/active [32m200[0m 3ms
---> GET /api/stats [32m200[0m 3ms
 <-- GET /api/stats/reflection-prompt
 🔐 [Auth Middleware] GET /api/stats/reflection-prompt - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/stats/reflection-prompt [32m200[0m 1ms
---> GET /api/stats/weekly-forecast [32m200[0m 7s
-<-- GET /api/auth/get-session
---> GET /api/auth/get-session [32m200[0m 2ms
+--> GET /api/stats/reflection-prompt [32m200[0m 4ms
 <-- GET /api/stats
 <-- GET /api/quests
 🔐 [Auth Middleware] GET /api/stats - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
 🔐 [Auth Middleware] GET /api/quests - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
 --> GET /api/stats [32m200[0m 3ms
---> GET /api/quests [32m200[0m 3ms
 <-- GET /api/challenges/active
-<-- GET /api/stats/reflection-prompt
-<-- GET /api/profile
-<-- GET /api/stats/weekly-forecast
 🔐 [Auth Middleware] GET /api/challenges/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/challenges/active [32m200[0m 2ms
+<-- GET /api/stats/weekly-forecast
+🔐 [Auth Middleware] GET /api/stats/weekly-forecast - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/quests [32m200[0m 7ms
+--> GET /api/challenges/active [32m200[0m 4ms
+--> GET /api/stats/weekly-forecast [32m200[0m 4s
+<-- GET /api/auth/get-session
+--> GET /api/auth/get-session [32m200[0m 2ms
+<-- GET /api/quests
+🔐 [Auth Middleware] GET /api/quests - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/quests [32m200[0m 4ms
+<-- GET /api/stats/reflection-prompt
+<-- GET /api/stats
 🔐 [Auth Middleware] GET /api/stats/reflection-prompt - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/stats/reflection-prompt [32m200[0m 3ms
+--> GET /api/stats/reflection-prompt [32m200[0m 1ms
+🔐 [Auth Middleware] GET /api/stats - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/stats [32m200[0m 2ms
+<-- GET /api/stats/weekly-forecast
+<-- GET /api/profile
+<-- GET /api/challenges/active
+🔐 [Auth Middleware] GET /api/stats/weekly-forecast - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
 🔐 [Auth Middleware] GET /api/profile - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
 👤 [Profile] GET request - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
 🔍 [Profile] Fetching profile for user N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
-🔐 [Auth Middleware] GET /api/stats/weekly-forecast - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+🔐 [Auth Middleware] GET /api/challenges/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/challenges/active [32m200[0m 3ms
 ✅ [Profile] Successfully fetched profile for user N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
 --> GET /api/profile [32m200[0m 4ms
-<-- GET /api/stats/leaderboard
-🔐 [Auth Middleware] GET /api/stats/leaderboard - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/stats/leaderboard [32m200[0m 3ms
-<-- POST /api/quests/aaa3c2ee-2c81-47c7-89a2-5ef467888b86/record
-🔐 [Auth Middleware] POST /api/quests/aaa3c2ee-2c81-47c7-89a2-5ef467888b86/record - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> POST /api/quests/aaa3c2ee-2c81-47c7-89a2-5ef467888b86/record [32m200[0m 21ms
-<-- GET /api/quests
-🔐 [Auth Middleware] GET /api/quests - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/quests [32m200[0m 3ms
 <-- GET /api/stats
 🔐 [Auth Middleware] GET /api/stats - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
 --> GET /api/stats [32m200[0m 2ms
-<-- POST /api/quests/aaa3c2ee-2c81-47c7-89a2-5ef467888b86/record
-🔐 [Auth Middleware] POST /api/quests/aaa3c2ee-2c81-47c7-89a2-5ef467888b86/record - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> POST /api/quests/aaa3c2ee-2c81-47c7-89a2-5ef467888b86/record [32m200[0m 19ms
-<-- GET /api/quests
-🔐 [Auth Middleware] GET /api/quests - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/quests [32m200[0m 2ms
-<-- GET /api/stats
-🔐 [Auth Middleware] GET /api/stats - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/stats [32m200[0m 1ms
-<-- POST /api/quests/aaa3c2ee-2c81-47c7-89a2-5ef467888b86/record
-🔐 [Auth Middleware] POST /api/quests/aaa3c2ee-2c81-47c7-89a2-5ef467888b86/record - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
-⚠️ [Quest Integrity] FLAGGED activity for quest aaa3c2ee-2c81-47c7-89a2-5ef467888b86: [
-  "Actions recorded quickly: 1.0s between actions. Average interval: 1.0s"
-]
-📬 [Push] No push token for user N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI - in-app notification will be shown
---> POST /api/quests/aaa3c2ee-2c81-47c7-89a2-5ef467888b86/record [32m200[0m 12ms
-<-- GET /api/quests
-🔐 [Auth Middleware] GET /api/quests - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/quests [32m200[0m 2ms
-<-- GET /api/stats
-🔐 [Auth Middleware] GET /api/stats - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/stats [32m200[0m 2ms
-<-- POST /api/quests/aaa3c2ee-2c81-47c7-89a2-5ef467888b86/record
-🔐 [Auth Middleware] POST /api/quests/aaa3c2ee-2c81-47c7-89a2-5ef467888b86/record - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
-⚠️ [Quest Integrity] FLAGGED activity for quest aaa3c2ee-2c81-47c7-89a2-5ef467888b86: [
-  "Actions recorded quickly: 0.6s between actions. Average interval: 0.8s"
-]
-📬 [Push] No push token for user N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI - in-app notification will be shown
---> POST /api/quests/aaa3c2ee-2c81-47c7-89a2-5ef467888b86/record [32m200[0m 16ms
-<-- GET /api/quests
-🔐 [Auth Middleware] GET /api/quests - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/quests [32m200[0m 3ms
-<-- GET /api/stats
-🔐 [Auth Middleware] GET /api/stats - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/stats [32m200[0m 1ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 2ms
+<-- POST /api/live/start
+🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
+--> POST /api/live/start [32m200[0m 7ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 2ms
+<-- POST /api/live/start
+🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
+--> POST /api/live/start [32m200[0m 2ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 2ms
 --> GET /api/stats/weekly-forecast [32m200[0m 6s
-<-- POST /api/quests/aaa3c2ee-2c81-47c7-89a2-5ef467888b86/record
-🔐 [Auth Middleware] POST /api/quests/aaa3c2ee-2c81-47c7-89a2-5ef467888b86/record - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
-⚠️ [Quest Integrity] FLAGGED activity for quest aaa3c2ee-2c81-47c7-89a2-5ef467888b86: [
-  "Actions recorded quickly: 0.6s between actions. Average interval: 0.8s"
-]
-📬 [Push] No push token for user N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI - in-app notification will be shown
-19 | `)}
-20 | 
-21 | We suggest to move the contents of ${Y(l)} to ${Y(a)} to consolidate your env vars.
-22 | `;throw new Error(u)}else if(t==="warn"){let u=`Conflict for env var${s.length>1?"s":""} ${s.map(c=>W(c)).join(", ")} in ${Y(a)} and ${Y(l)}
-23 | Env vars from ${Y(l)} overwrite the ones from ${Y(a)}
-24 |       `;console.warn(`${Ie("warn(prisma)")} ${u}`)}}}}function Is(e){if(yp(e)){$i(`Environment variables loaded from ${e}`);let r=qi.default.config({path:e,debug:process.env.DOTENV_CONFIG_DEBUG?!0:void 0});return{dotenvResult:Cs(r),message:Ce(`Environment variables loaded from ${xr.default.relative(process.cwd(),e)}`),path:e}}else $i(`Environment variables not found at ${e}`);return null}function Ds(e,r){return e&&r&&xr.default.resolve(e)===xr.default.resolve(r)}function yp(e){return!!(e&&un.default.existsSync(e))}function Vi(e,r){return Object.prototype.hasOwnProperty.call(e,r)}function pn(e,r){let t={};for(let n of Object.keys(e))t[n]=r(e[n],n);return t}function ji(e,r){if(e.length===0)return;let t=e[0];for(let n=1;n<e.length;n++)r(t,e[n])<0&&(t=e[n]);return t}function x(e,r){Object.defineProperty(e,"name",{value:r,configurable:!0})}var ks=new Set,at=(e,r,...t)=>{ks.has(e)||(ks.add(e),_i(r,...t))};var P=class e extends Error{clientVersion;errorCode;retryable;constructor(r,t,n){super(r),this.name="PrismaClie
-
-PrismaClientValidationError: 
-Invalid `db.user_stats.upsert()` invocation in
-/home/user/workspace/backend/src/routes/quests.ts:1857:23
-
-  1854 // Calculate confidence meter for create case (use existing difficultyMultiplier above)
-  1855 const initialConfidence = difficultyMultiplier[difficulty?.toLowerCase() || "medium"] || 10;
-  1856 
-→ 1857 await db.user_stats.upsert({
-         where: {
-           userId: "N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI"
-         },
-         create: {
-           userId: "N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI",
-           totalXP: 125,
-           totalPoints: 250,
-           currentStreak: 1,
-           longestStreak: 1,
-           trophies: 0,
-           diamonds: 0,
-           lastActiveAt: new Date("2025-11-20T13:25:51.298Z"),
-           lastQuestCompletedAt: new Date("2025-11-20T13:25:51.298Z"),
-           dailyConfidenceMeter: 10,
-           lastConfidenceDecayAt: new Date("2025-11-20T13:25:51.298Z"),
-           easyZoneCount: 0,
-           growthZoneCount: 1,
-           fearZoneCount: 0,
-       +   id: String
-         },
-         update: {
-           totalXP: {
-             increment: 125
-           },
-           totalPoints: {
-             increment: 250
-           },
-           currentStreak: 1,
-           longestStreak: 1,
-           lastActiveAt: new Date("2025-11-20T13:25:51.298Z"),
-           lastQuestCompletedAt: new Date("2025-11-20T13:25:51.298Z"),
-           dailyConfidenceMeter: 25,
-           lastConfidenceDecayAt: new Date("2025-11-20T13:25:51.298Z"),
-           growthZoneCount: {
-             increment: 1
-           }
-         }
-       })
-
-Argument `id` is missing.
- clientVersion: "6.17.1",
-
-      at new PrismaClientValidationError (/home/user/workspace/backend/generated/prisma/runtime/library.js:24:2335)
-      at Nn (/home/user/workspace/backend/generated/prisma/runtime/library.js:32:1363)
-      at handleRequestError (/home/user/workspace/backend/generated/prisma/runtime/library.js:124:6911)
-      at handleAndLogRequestError (/home/user/workspace/backend/generated/prisma/runtime/library.js:124:6593)
-      at request (/home/user/workspace/backend/generated/prisma/runtime/library.js:124:6300)
-
---> POST /api/quests/aaa3c2ee-2c81-47c7-89a2-5ef467888b86/record [31m500[0m 26ms
-<-- POST /api/quests/aaa3c2ee-2c81-47c7-89a2-5ef467888b86/record
-🔐 [Auth Middleware] POST /api/quests/aaa3c2ee-2c81-47c7-89a2-5ef467888b86/record - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
-⚠️ [Quest Integrity] FLAGGED activity for quest aaa3c2ee-2c81-47c7-89a2-5ef467888b86: [
-  "Actions recorded quickly: 0.6s between actions. Average interval: 1.1s"
-]
-📬 [Push] No push token for user N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI - in-app notification will be shown
-19 | `)}
-20 | 
-21 | We suggest to move the contents of ${Y(l)} to ${Y(a)} to consolidate your env vars.
-22 | `;throw new Error(u)}else if(t==="warn"){let u=`Conflict for env var${s.length>1?"s":""} ${s.map(c=>W(c)).join(", ")} in ${Y(a)} and ${Y(l)}
-23 | Env vars from ${Y(l)} overwrite the ones from ${Y(a)}
-24 |       `;console.warn(`${Ie("warn(prisma)")} ${u}`)}}}}function Is(e){if(yp(e)){$i(`Environment variables loaded from ${e}`);let r=qi.default.config({path:e,debug:process.env.DOTENV_CONFIG_DEBUG?!0:void 0});return{dotenvResult:Cs(r),message:Ce(`Environment variables loaded from ${xr.default.relative(process.cwd(),e)}`),path:e}}else $i(`Environment variables not found at ${e}`);return null}function Ds(e,r){return e&&r&&xr.default.resolve(e)===xr.default.resolve(r)}function yp(e){return!!(e&&un.default.existsSync(e))}function Vi(e,r){return Object.prototype.hasOwnProperty.call(e,r)}function pn(e,r){let t={};for(let n of Object.keys(e))t[n]=r(e[n],n);return t}function ji(e,r){if(e.length===0)return;let t=e[0];for(let n=1;n<e.length;n++)r(t,e[n])<0&&(t=e[n]);return t}function x(e,r){Object.defineProperty(e,"name",{value:r,configurable:!0})}var ks=new Set,at=(e,r,...t)=>{ks.has(e)||(ks.add(e),_i(r,...t))};var P=class e extends Error{clientVersion;errorCode;retryable;constructor(r,t,n){super(r),this.name="PrismaClie
-
-PrismaClientValidationError: 
-Invalid `db.user_stats.upsert()` invocation in
-/home/user/workspace/backend/src/routes/quests.ts:1857:23
-
-  1854 // Calculate confidence meter for create case (use existing difficultyMultiplier above)
-  1855 const initialConfidence = difficultyMultiplier[difficulty?.toLowerCase() || "medium"] || 10;
-  1856 
-→ 1857 await db.user_stats.upsert({
-         where: {
-           userId: "N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI"
-         },
-         create: {
-           userId: "N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI",
-           totalXP: 125,
-           totalPoints: 250,
-           currentStreak: 1,
-           longestStreak: 1,
-           trophies: 0,
-           diamonds: 0,
-           lastActiveAt: new Date("2025-11-20T13:25:52.486Z"),
-           lastQuestCompletedAt: new Date("2025-11-20T13:25:52.486Z"),
-           dailyConfidenceMeter: 10,
-           lastConfidenceDecayAt: new Date("2025-11-20T13:25:52.486Z"),
-           easyZoneCount: 0,
-           growthZoneCount: 1,
-           fearZoneCount: 0,
-       +   id: String
-         },
-         update: {
-           totalXP: {
-             increment: 125
-           },
-           totalPoints: {
-             increment: 250
-           },
-           currentStreak: 1,
-           longestStreak: 1,
-           lastActiveAt: new Date("2025-11-20T13:25:52.486Z"),
-           lastQuestCompletedAt: new Date("2025-11-20T13:25:52.486Z"),
-           dailyConfidenceMeter: 25,
-           lastConfidenceDecayAt: new Date("2025-11-20T13:25:52.486Z"),
-           growthZoneCount: {
-             increment: 1
-           }
-         }
-       })
-
-Argument `id` is missing.
- clientVersion: "6.17.1",
-
-      at new PrismaClientValidationError (/home/user/workspace/backend/generated/prisma/runtime/library.js:24:2335)
-      at Nn (/home/user/workspace/backend/generated/prisma/runtime/library.js:32:1363)
-      at handleRequestError (/home/user/workspace/backend/generated/prisma/runtime/library.js:124:6911)
-      at handleAndLogRequestError (/home/user/workspace/backend/generated/prisma/runtime/library.js:124:6593)
-      at request (/home/user/workspace/backend/generated/prisma/runtime/library.js:124:6300)
-
---> POST /api/quests/aaa3c2ee-2c81-47c7-89a2-5ef467888b86/record [31m500[0m 23ms
-<-- POST /api/quests/aaa3c2ee-2c81-47c7-89a2-5ef467888b86/record
-🔐 [Auth Middleware] POST /api/quests/aaa3c2ee-2c81-47c7-89a2-5ef467888b86/record - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
-⚠️ [Quest Integrity] FLAGGED activity for quest aaa3c2ee-2c81-47c7-89a2-5ef467888b86: [
-  "Actions recorded quickly: 0.6s between actions. Average interval: 1.2s"
-]
-📬 [Push] No push token for user N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI - in-app notification will be shown
-19 | `)}
-20 | 
-21 | We suggest to move the contents of ${Y(l)} to ${Y(a)} to consolidate your env vars.
-22 | `;throw new Error(u)}else if(t==="warn"){let u=`Conflict for env var${s.length>1?"s":""} ${s.map(c=>W(c)).join(", ")} in ${Y(a)} and ${Y(l)}
-23 | Env vars from ${Y(l)} overwrite the ones from ${Y(a)}
-24 |       `;console.warn(`${Ie("warn(prisma)")} ${u}`)}}}}function Is(e){if(yp(e)){$i(`Environment variables loaded from ${e}`);let r=qi.default.config({path:e,debug:process.env.DOTENV_CONFIG_DEBUG?!0:void 0});return{dotenvResult:Cs(r),message:Ce(`Environment variables loaded from ${xr.default.relative(process.cwd(),e)}`),path:e}}else $i(`Environment variables not found at ${e}`);return null}function Ds(e,r){return e&&r&&xr.default.resolve(e)===xr.default.resolve(r)}function yp(e){return!!(e&&un.default.existsSync(e))}function Vi(e,r){return Object.prototype.hasOwnProperty.call(e,r)}function pn(e,r){let t={};for(let n of Object.keys(e))t[n]=r(e[n],n);return t}function ji(e,r){if(e.length===0)return;let t=e[0];for(let n=1;n<e.length;n++)r(t,e[n])<0&&(t=e[n]);return t}function x(e,r){Object.defineProperty(e,"name",{value:r,configurable:!0})}var ks=new Set,at=(e,r,...t)=>{ks.has(e)||(ks.add(e),_i(r,...t))};var P=class e extends Error{clientVersion;errorCode;retryable;constructor(r,t,n){super(r),this.name="PrismaClie
-
-PrismaClientValidationError: 
-Invalid `db.user_stats.upsert()` invocation in
-/home/user/workspace/backend/src/routes/quests.ts:1857:23
-
-  1854 // Calculate confidence meter for create case (use existing difficultyMultiplier above)
-  1855 const initialConfidence = difficultyMultiplier[difficulty?.toLowerCase() || "medium"] || 10;
-  1856 
-→ 1857 await db.user_stats.upsert({
-         where: {
-           userId: "N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI"
-         },
-         create: {
-           userId: "N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI",
-           totalXP: 125,
-           totalPoints: 250,
-           currentStreak: 1,
-           longestStreak: 1,
-           trophies: 0,
-           diamonds: 0,
-           lastActiveAt: new Date("2025-11-20T13:25:55.442Z"),
-           lastQuestCompletedAt: new Date("2025-11-20T13:25:55.442Z"),
-           dailyConfidenceMeter: 10,
-           lastConfidenceDecayAt: new Date("2025-11-20T13:25:55.442Z"),
-           easyZoneCount: 0,
-           growthZoneCount: 1,
-           fearZoneCount: 0,
-       +   id: String
-         },
-         update: {
-           totalXP: {
-             increment: 125
-           },
-           totalPoints: {
-             increment: 250
-           },
-           currentStreak: 1,
-           longestStreak: 1,
-           lastActiveAt: new Date("2025-11-20T13:25:55.442Z"),
-           lastQuestCompletedAt: new Date("2025-11-20T13:25:55.442Z"),
-           dailyConfidenceMeter: 25,
-           lastConfidenceDecayAt: new Date("2025-11-20T13:25:55.442Z"),
-           growthZoneCount: {
-             increment: 1
-           }
-         }
-       })
-
-Argument `id` is missing.
- clientVersion: "6.17.1",
-
-      at new PrismaClientValidationError (/home/user/workspace/backend/generated/prisma/runtime/library.js:24:2335)
-      at Nn (/home/user/workspace/backend/generated/prisma/runtime/library.js:32:1363)
-      at handleRequestError (/home/user/workspace/backend/generated/prisma/runtime/library.js:124:6911)
-      at handleAndLogRequestError (/home/user/workspace/backend/generated/prisma/runtime/library.js:124:6593)
-      at request (/home/user/workspace/backend/generated/prisma/runtime/library.js:124:6300)
-
---> POST /api/quests/aaa3c2ee-2c81-47c7-89a2-5ef467888b86/record [31m500[0m 17ms
-<-- POST /api/quests/aaa3c2ee-2c81-47c7-89a2-5ef467888b86/record
-🔐 [Auth Middleware] POST /api/quests/aaa3c2ee-2c81-47c7-89a2-5ef467888b86/record - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
-⚠️ [Quest Integrity] FLAGGED activity for quest aaa3c2ee-2c81-47c7-89a2-5ef467888b86: [
-  "Actions recorded quickly: 0.7s between actions. Average interval: 1.7s"
-]
-📬 [Push] No push token for user N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI - in-app notification will be shown
-19 | `)}
-20 | 
-21 | We suggest to move the contents of ${Y(l)} to ${Y(a)} to consolidate your env vars.
-22 | `;throw new Error(u)}else if(t==="warn"){let u=`Conflict for env var${s.length>1?"s":""} ${s.map(c=>W(c)).join(", ")} in ${Y(a)} and ${Y(l)}
-23 | Env vars from ${Y(l)} overwrite the ones from ${Y(a)}
-24 |       `;console.warn(`${Ie("warn(prisma)")} ${u}`)}}}}function Is(e){if(yp(e)){$i(`Environment variables loaded from ${e}`);let r=qi.default.config({path:e,debug:process.env.DOTENV_CONFIG_DEBUG?!0:void 0});return{dotenvResult:Cs(r),message:Ce(`Environment variables loaded from ${xr.default.relative(process.cwd(),e)}`),path:e}}else $i(`Environment variables not found at ${e}`);return null}function Ds(e,r){return e&&r&&xr.default.resolve(e)===xr.default.resolve(r)}function yp(e){return!!(e&&un.default.existsSync(e))}function Vi(e,r){return Object.prototype.hasOwnProperty.call(e,r)}function pn(e,r){let t={};for(let n of Object.keys(e))t[n]=r(e[n],n);return t}function ji(e,r){if(e.length===0)return;let t=e[0];for(let n=1;n<e.length;n++)r(t,e[n])<0&&(t=e[n]);return t}function x(e,r){Object.defineProperty(e,"name",{value:r,configurable:!0})}var ks=new Set,at=(e,r,...t)=>{ks.has(e)||(ks.add(e),_i(r,...t))};var P=class e extends Error{clientVersion;errorCode;retryable;constructor(r,t,n){super(r),this.name="PrismaClie
-
-PrismaClientValidationError: 
-Invalid `db.user_stats.upsert()` invocation in
-/home/user/workspace/backend/src/routes/quests.ts:1857:23
-
-  1854 // Calculate confidence meter for create case (use existing difficultyMultiplier above)
-  1855 const initialConfidence = difficultyMultiplier[difficulty?.toLowerCase() || "medium"] || 10;
-  1856 
-→ 1857 await db.user_stats.upsert({
-         where: {
-           userId: "N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI"
-         },
-         create: {
-           userId: "N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI",
-           totalXP: 125,
-           totalPoints: 250,
-           currentStreak: 1,
-           longestStreak: 1,
-           trophies: 0,
-           diamonds: 0,
-           lastActiveAt: new Date("2025-11-20T13:25:56.652Z"),
-           lastQuestCompletedAt: new Date("2025-11-20T13:25:56.652Z"),
-           dailyConfidenceMeter: 10,
-           lastConfidenceDecayAt: new Date("2025-11-20T13:25:56.652Z"),
-           easyZoneCount: 0,
-           growthZoneCount: 1,
-           fearZoneCount: 0,
-       +   id: String
-         },
-         update: {
-           totalXP: {
-             increment: 125
-           },
-           totalPoints: {
-             increment: 250
-           },
-           currentStreak: 1,
-           longestStreak: 1,
-           lastActiveAt: new Date("2025-11-20T13:25:56.652Z"),
-           lastQuestCompletedAt: new Date("2025-11-20T13:25:56.652Z"),
-           dailyConfidenceMeter: 25,
-           lastConfidenceDecayAt: new Date("2025-11-20T13:25:56.652Z"),
-           growthZoneCount: {
-             increment: 1
-           }
-         }
-       })
-
-Argument `id` is missing.
- clientVersion: "6.17.1",
-
-      at new PrismaClientValidationError (/home/user/workspace/backend/generated/prisma/runtime/library.js:24:2335)
-      at Nn (/home/user/workspace/backend/generated/prisma/runtime/library.js:32:1363)
-      at handleRequestError (/home/user/workspace/backend/generated/prisma/runtime/library.js:124:6911)
-      at handleAndLogRequestError (/home/user/workspace/backend/generated/prisma/runtime/library.js:124:6593)
-      at request (/home/user/workspace/backend/generated/prisma/runtime/library.js:124:6300)
-
---> POST /api/quests/aaa3c2ee-2c81-47c7-89a2-5ef467888b86/record [31m500[0m 21ms
-<-- POST /api/quests/aaa3c2ee-2c81-47c7-89a2-5ef467888b86/record
-🔐 [Auth Middleware] POST /api/quests/aaa3c2ee-2c81-47c7-89a2-5ef467888b86/record - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
-⚠️ [Quest Integrity] FLAGGED activity for quest aaa3c2ee-2c81-47c7-89a2-5ef467888b86: [
-  "High activity rate: 9 actions in the last 5 minutes", "Actions recorded quickly: 1.2s between actions. Average interval: 1.9s"
-]
-📬 [Push] No push token for user N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI - in-app notification will be shown
-19 | `)}
-20 | 
-21 | We suggest to move the contents of ${Y(l)} to ${Y(a)} to consolidate your env vars.
-22 | `;throw new Error(u)}else if(t==="warn"){let u=`Conflict for env var${s.length>1?"s":""} ${s.map(c=>W(c)).join(", ")} in ${Y(a)} and ${Y(l)}
-23 | Env vars from ${Y(l)} overwrite the ones from ${Y(a)}
-24 |       `;console.warn(`${Ie("warn(prisma)")} ${u}`)}}}}function Is(e){if(yp(e)){$i(`Environment variables loaded from ${e}`);let r=qi.default.config({path:e,debug:process.env.DOTENV_CONFIG_DEBUG?!0:void 0});return{dotenvResult:Cs(r),message:Ce(`Environment variables loaded from ${xr.default.relative(process.cwd(),e)}`),path:e}}else $i(`Environment variables not found at ${e}`);return null}function Ds(e,r){return e&&r&&xr.default.resolve(e)===xr.default.resolve(r)}function yp(e){return!!(e&&un.default.existsSync(e))}function Vi(e,r){return Object.prototype.hasOwnProperty.call(e,r)}function pn(e,r){let t={};for(let n of Object.keys(e))t[n]=r(e[n],n);return t}function ji(e,r){if(e.length===0)return;let t=e[0];for(let n=1;n<e.length;n++)r(t,e[n])<0&&(t=e[n]);return t}function x(e,r){Object.defineProperty(e,"name",{value:r,configurable:!0})}var ks=new Set,at=(e,r,...t)=>{ks.has(e)||(ks.add(e),_i(r,...t))};var P=class e extends Error{clientVersion;errorCode;retryable;constructor(r,t,n){super(r),this.name="PrismaClie
-
-PrismaClientValidationError: 
-Invalid `db.user_stats.upsert()` invocation in
-/home/user/workspace/backend/src/routes/quests.ts:1857:23
-
-  1854 // Calculate confidence meter for create case (use existing difficultyMultiplier above)
-  1855 const initialConfidence = difficultyMultiplier[difficulty?.toLowerCase() || "medium"] || 10;
-  1856 
-→ 1857 await db.user_stats.upsert({
-         where: {
-           userId: "N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI"
-         },
-         create: {
-           userId: "N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI",
-           totalXP: 125,
-           totalPoints: 250,
-           currentStreak: 1,
-           longestStreak: 1,
-           trophies: 0,
-           diamonds: 0,
-           lastActiveAt: new Date("2025-11-20T13:25:57.627Z"),
-           lastQuestCompletedAt: new Date("2025-11-20T13:25:57.627Z"),
-           dailyConfidenceMeter: 10,
-           lastConfidenceDecayAt: new Date("2025-11-20T13:25:57.627Z"),
-           easyZoneCount: 0,
-           growthZoneCount: 1,
-           fearZoneCount: 0,
-       +   id: String
-         },
-         update: {
-           totalXP: {
-             increment: 125
-           },
-           totalPoints: {
-             increment: 250
-           },
-           currentStreak: 1,
-           longestStreak: 1,
-           lastActiveAt: new Date("2025-11-20T13:25:57.627Z"),
-           lastQuestCompletedAt: new Date("2025-11-20T13:25:57.627Z"),
-           dailyConfidenceMeter: 25,
-           lastConfidenceDecayAt: new Date("2025-11-20T13:25:57.627Z"),
-           growthZoneCount: {
-             increment: 1
-           }
-         }
-       })
-
-Argument `id` is missing.
- clientVersion: "6.17.1",
-
-      at new PrismaClientValidationError (/home/user/workspace/backend/generated/prisma/runtime/library.js:24:2335)
-      at Nn (/home/user/workspace/backend/generated/prisma/runtime/library.js:32:1363)
-      at handleRequestError (/home/user/workspace/backend/generated/prisma/runtime/library.js:124:6911)
-      at handleAndLogRequestError (/home/user/workspace/backend/generated/prisma/runtime/library.js:124:6593)
-      at request (/home/user/workspace/backend/generated/prisma/runtime/library.js:124:6300)
-
---> POST /api/quests/aaa3c2ee-2c81-47c7-89a2-5ef467888b86/record [31m500[0m 21ms
-<-- POST /api/quests/aaa3c2ee-2c81-47c7-89a2-5ef467888b86/record
-🔐 [Auth Middleware] POST /api/quests/aaa3c2ee-2c81-47c7-89a2-5ef467888b86/record - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
-⚠️ [Quest Integrity] FLAGGED activity for quest aaa3c2ee-2c81-47c7-89a2-5ef467888b86: [
-  "High activity rate: 10 actions in the last 5 minutes", "Actions recorded quickly: 1.0s between actions. Average interval: 1.6s"
-]
-📬 [Push] No push token for user N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI - in-app notification will be shown
-19 | `)}
-20 | 
-21 | We suggest to move the contents of ${Y(l)} to ${Y(a)} to consolidate your env vars.
-22 | `;throw new Error(u)}else if(t==="warn"){let u=`Conflict for env var${s.length>1?"s":""} ${s.map(c=>W(c)).join(", ")} in ${Y(a)} and ${Y(l)}
-23 | Env vars from ${Y(l)} overwrite the ones from ${Y(a)}
-24 |       `;console.warn(`${Ie("warn(prisma)")} ${u}`)}}}}function Is(e){if(yp(e)){$i(`Environment variables loaded from ${e}`);let r=qi.default.config({path:e,debug:process.env.DOTENV_CONFIG_DEBUG?!0:void 0});return{dotenvResult:Cs(r),message:Ce(`Environment variables loaded from ${xr.default.relative(process.cwd(),e)}`),path:e}}else $i(`Environment variables not found at ${e}`);return null}function Ds(e,r){return e&&r&&xr.default.resolve(e)===xr.default.resolve(r)}function yp(e){return!!(e&&un.default.existsSync(e))}function Vi(e,r){return Object.prototype.hasOwnProperty.call(e,r)}function pn(e,r){let t={};for(let n of Object.keys(e))t[n]=r(e[n],n);return t}function ji(e,r){if(e.length===0)return;let t=e[0];for(let n=1;n<e.length;n++)r(t,e[n])<0&&(t=e[n]);return t}function x(e,r){Object.defineProperty(e,"name",{value:r,configurable:!0})}var ks=new Set,at=(e,r,...t)=>{ks.has(e)||(ks.add(e),_i(r,...t))};var P=class e extends Error{clientVersion;errorCode;retryable;constructor(r,t,n){super(r),this.name="PrismaClie
-
-PrismaClientValidationError: 
-Invalid `db.user_stats.upsert()` invocation in
-/home/user/workspace/backend/src/routes/quests.ts:1857:23
-
-  1854 // Calculate confidence meter for create case (use existing difficultyMultiplier above)
-  1855 const initialConfidence = difficultyMultiplier[difficulty?.toLowerCase() || "medium"] || 10;
-  1856 
-→ 1857 await db.user_stats.upsert({
-         where: {
-           userId: "N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI"
-         },
-         create: {
-           userId: "N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI",
-           totalXP: 125,
-           totalPoints: 250,
-           currentStreak: 1,
-           longestStreak: 1,
-           trophies: 0,
-           diamonds: 0,
-           lastActiveAt: new Date("2025-11-20T13:25:58.803Z"),
-           lastQuestCompletedAt: new Date("2025-11-20T13:25:58.803Z"),
-           dailyConfidenceMeter: 10,
-           lastConfidenceDecayAt: new Date("2025-11-20T13:25:58.803Z"),
-           easyZoneCount: 0,
-           growthZoneCount: 1,
-           fearZoneCount: 0,
-       +   id: String
-         },
-         update: {
-           totalXP: {
-             increment: 125
-           },
-           totalPoints: {
-             increment: 250
-           },
-           currentStreak: 1,
-           longestStreak: 1,
-           lastActiveAt: new Date("2025-11-20T13:25:58.803Z"),
-           lastQuestCompletedAt: new Date("2025-11-20T13:25:58.803Z"),
-           dailyConfidenceMeter: 25,
-           lastConfidenceDecayAt: new Date("2025-11-20T13:25:58.803Z"),
-           growthZoneCount: {
-             increment: 1
-           }
-         }
-       })
-
-Argument `id` is missing.
- clientVersion: "6.17.1",
-
-      at new PrismaClientValidationError (/home/user/workspace/backend/generated/prisma/runtime/library.js:24:2335)
-      at Nn (/home/user/workspace/backend/generated/prisma/runtime/library.js:32:1363)
-      at handleRequestError (/home/user/workspace/backend/generated/prisma/runtime/library.js:124:6911)
-      at handleAndLogRequestError (/home/user/workspace/backend/generated/prisma/runtime/library.js:124:6593)
-      at request (/home/user/workspace/backend/generated/prisma/runtime/library.js:124:6300)
-
---> POST /api/quests/aaa3c2ee-2c81-47c7-89a2-5ef467888b86/record [31m500[0m 22ms
-<-- POST /api/quests/aaa3c2ee-2c81-47c7-89a2-5ef467888b86/record
-🔐 [Auth Middleware] POST /api/quests/aaa3c2ee-2c81-47c7-89a2-5ef467888b86/record - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
-⚠️ [Quest Integrity] FLAGGED activity for quest aaa3c2ee-2c81-47c7-89a2-5ef467888b86: [
-  "High activity rate: 11 actions in the last 5 minutes", "Actions recorded quickly: 1.0s between actions. Average interval: 1.6s"
-]
-📬 [Push] No push token for user N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI - in-app notification will be shown
-19 | `)}
-20 | 
-21 | We suggest to move the contents of ${Y(l)} to ${Y(a)} to consolidate your env vars.
-22 | `;throw new Error(u)}else if(t==="warn"){let u=`Conflict for env var${s.length>1?"s":""} ${s.map(c=>W(c)).join(", ")} in ${Y(a)} and ${Y(l)}
-23 | Env vars from ${Y(l)} overwrite the ones from ${Y(a)}
-24 |       `;console.warn(`${Ie("warn(prisma)")} ${u}`)}}}}function Is(e){if(yp(e)){$i(`Environment variables loaded from ${e}`);let r=qi.default.config({path:e,debug:process.env.DOTENV_CONFIG_DEBUG?!0:void 0});return{dotenvResult:Cs(r),message:Ce(`Environment variables loaded from ${xr.default.relative(process.cwd(),e)}`),path:e}}else $i(`Environment variables not found at ${e}`);return null}function Ds(e,r){return e&&r&&xr.default.resolve(e)===xr.default.resolve(r)}function yp(e){return!!(e&&un.default.existsSync(e))}function Vi(e,r){return Object.prototype.hasOwnProperty.call(e,r)}function pn(e,r){let t={};for(let n of Object.keys(e))t[n]=r(e[n],n);return t}function ji(e,r){if(e.length===0)return;let t=e[0];for(let n=1;n<e.length;n++)r(t,e[n])<0&&(t=e[n]);return t}function x(e,r){Object.defineProperty(e,"name",{value:r,configurable:!0})}var ks=new Set,at=(e,r,...t)=>{ks.has(e)||(ks.add(e),_i(r,...t))};var P=class e extends Error{clientVersion;errorCode;retryable;constructor(r,t,n){super(r),this.name="PrismaClie
-
-PrismaClientValidationError: 
-Invalid `db.user_stats.upsert()` invocation in
-/home/user/workspace/backend/src/routes/quests.ts:1857:23
-
-  1854 // Calculate confidence meter for create case (use existing difficultyMultiplier above)
-  1855 const initialConfidence = difficultyMultiplier[difficulty?.toLowerCase() || "medium"] || 10;
-  1856 
-→ 1857 await db.user_stats.upsert({
-         where: {
-           userId: "N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI"
-         },
-         create: {
-           userId: "N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI",
-           totalXP: 125,
-           totalPoints: 250,
-           currentStreak: 1,
-           longestStreak: 1,
-           trophies: 0,
-           diamonds: 0,
-           lastActiveAt: new Date("2025-11-20T13:26:01.282Z"),
-           lastQuestCompletedAt: new Date("2025-11-20T13:26:01.282Z"),
-           dailyConfidenceMeter: 10,
-           lastConfidenceDecayAt: new Date("2025-11-20T13:26:01.282Z"),
-           easyZoneCount: 0,
-           growthZoneCount: 1,
-           fearZoneCount: 0,
-       +   id: String
-         },
-         update: {
-           totalXP: {
-             increment: 125
-           },
-           totalPoints: {
-             increment: 250
-           },
-           currentStreak: 1,
-           longestStreak: 1,
-           lastActiveAt: new Date("2025-11-20T13:26:01.282Z"),
-           lastQuestCompletedAt: new Date("2025-11-20T13:26:01.282Z"),
-           dailyConfidenceMeter: 25,
-           lastConfidenceDecayAt: new Date("2025-11-20T13:26:01.282Z"),
-           growthZoneCount: {
-             increment: 1
-           }
-         }
-       })
-
-Argument `id` is missing.
- clientVersion: "6.17.1",
-
-      at new PrismaClientValidationError (/home/user/workspace/backend/generated/prisma/runtime/library.js:24:2335)
-      at Nn (/home/user/workspace/backend/generated/prisma/runtime/library.js:32:1363)
-      at handleRequestError (/home/user/workspace/backend/generated/prisma/runtime/library.js:124:6911)
-      at handleAndLogRequestError (/home/user/workspace/backend/generated/prisma/runtime/library.js:124:6593)
-      at request (/home/user/workspace/backend/generated/prisma/runtime/library.js:124:6300)
-
---> POST /api/quests/aaa3c2ee-2c81-47c7-89a2-5ef467888b86/record [31m500[0m 20ms
-<-- POST /api/quests/aaa3c2ee-2c81-47c7-89a2-5ef467888b86/record
-🔐 [Auth Middleware] POST /api/quests/aaa3c2ee-2c81-47c7-89a2-5ef467888b86/record - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
-⚠️ [Quest Integrity] FLAGGED activity for quest aaa3c2ee-2c81-47c7-89a2-5ef467888b86: [
-  "High activity rate: 12 actions in the last 5 minutes", "Actions recorded quickly: 1.0s between actions. Average interval: 1.5s"
-]
-📬 [Push] No push token for user N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI - in-app notification will be shown
-19 | `)}
-20 | 
-21 | We suggest to move the contents of ${Y(l)} to ${Y(a)} to consolidate your env vars.
-22 | `;throw new Error(u)}else if(t==="warn"){let u=`Conflict for env var${s.length>1?"s":""} ${s.map(c=>W(c)).join(", ")} in ${Y(a)} and ${Y(l)}
-23 | Env vars from ${Y(l)} overwrite the ones from ${Y(a)}
-24 |       `;console.warn(`${Ie("warn(prisma)")} ${u}`)}}}}function Is(e){if(yp(e)){$i(`Environment variables loaded from ${e}`);let r=qi.default.config({path:e,debug:process.env.DOTENV_CONFIG_DEBUG?!0:void 0});return{dotenvResult:Cs(r),message:Ce(`Environment variables loaded from ${xr.default.relative(process.cwd(),e)}`),path:e}}else $i(`Environment variables not found at ${e}`);return null}function Ds(e,r){return e&&r&&xr.default.resolve(e)===xr.default.resolve(r)}function yp(e){return!!(e&&un.default.existsSync(e))}function Vi(e,r){return Object.prototype.hasOwnProperty.call(e,r)}function pn(e,r){let t={};for(let n of Object.keys(e))t[n]=r(e[n],n);return t}function ji(e,r){if(e.length===0)return;let t=e[0];for(let n=1;n<e.length;n++)r(t,e[n])<0&&(t=e[n]);return t}function x(e,r){Object.defineProperty(e,"name",{value:r,configurable:!0})}var ks=new Set,at=(e,r,...t)=>{ks.has(e)||(ks.add(e),_i(r,...t))};var P=class e extends Error{clientVersion;errorCode;retryable;constructor(r,t,n){super(r),this.name="PrismaClie
-
-PrismaClientValidationError: 
-Invalid `db.user_stats.upsert()` invocation in
-/home/user/workspace/backend/src/routes/quests.ts:1857:23
-
-  1854 // Calculate confidence meter for create case (use existing difficultyMultiplier above)
-  1855 const initialConfidence = difficultyMultiplier[difficulty?.toLowerCase() || "medium"] || 10;
-  1856 
-→ 1857 await db.user_stats.upsert({
-         where: {
-           userId: "N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI"
-         },
-         create: {
-           userId: "N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI",
-           totalXP: 125,
-           totalPoints: 250,
-           currentStreak: 1,
-           longestStreak: 1,
-           trophies: 0,
-           diamonds: 0,
-           lastActiveAt: new Date("2025-11-20T13:26:02.452Z"),
-           lastQuestCompletedAt: new Date("2025-11-20T13:26:02.452Z"),
-           dailyConfidenceMeter: 10,
-           lastConfidenceDecayAt: new Date("2025-11-20T13:26:02.452Z"),
-           easyZoneCount: 0,
-           growthZoneCount: 1,
-           fearZoneCount: 0,
-       +   id: String
-         },
-         update: {
-           totalXP: {
-             increment: 125
-           },
-           totalPoints: {
-             increment: 250
-           },
-           currentStreak: 1,
-           longestStreak: 1,
-           lastActiveAt: new Date("2025-11-20T13:26:02.452Z"),
-           lastQuestCompletedAt: new Date("2025-11-20T13:26:02.452Z"),
-           dailyConfidenceMeter: 25,
-           lastConfidenceDecayAt: new Date("2025-11-20T13:26:02.452Z"),
-           growthZoneCount: {
-             increment: 1
-           }
-         }
-       })
-
-Argument `id` is missing.
- clientVersion: "6.17.1",
-
-      at new PrismaClientValidationError (/home/user/workspace/backend/generated/prisma/runtime/library.js:24:2335)
-      at Nn (/home/user/workspace/backend/generated/prisma/runtime/library.js:32:1363)
-      at handleRequestError (/home/user/workspace/backend/generated/prisma/runtime/library.js:124:6911)
-      at handleAndLogRequestError (/home/user/workspace/backend/generated/prisma/runtime/library.js:124:6593)
-      at request (/home/user/workspace/backend/generated/prisma/runtime/library.js:124:6300)
-
---> POST /api/quests/aaa3c2ee-2c81-47c7-89a2-5ef467888b86/record [31m500[0m 14ms
-<-- GET /api/quests
-🔐 [Auth Middleware] GET /api/quests - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/quests [32m200[0m 2ms
+<-- POST /api/live/start
+🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
+--> POST /api/live/start [32m200[0m 2ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 1ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 2ms
+<-- POST /api/live/start
+🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
+--> POST /api/live/start [32m200[0m 23ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 1ms
+<-- POST /api/live/start
+🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
+--> POST /api/live/start [32m200[0m 5ms
+<-- POST /api/live/start
+🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
+--> POST /api/live/start [32m200[0m 4ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 1ms
+<-- POST /api/live/start
+🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
+--> POST /api/live/start [32m200[0m 4ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 2ms
+<-- POST /api/live/start
+🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
+--> POST /api/live/start [32m200[0m 10ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 2ms
+<-- POST /api/live/start
+🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
+--> POST /api/live/start [32m200[0m 7ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 2ms
+<-- POST /api/live/start
+🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
+--> POST /api/live/start [32m200[0m 2ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 2ms
+<-- POST /api/live/start
+🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
+--> POST /api/live/start [32m200[0m 8ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 1ms
+<-- GET /api/live/3989ec15-1ee9-4fea-88bf-b184d71b632a/comments
+🔐 [Auth Middleware] GET /api/live/3989ec15-1ee9-4fea-88bf-b184d71b632a/comments - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/3989ec15-1ee9-4fea-88bf-b184d71b632a/comments [32m200[0m 1ms
+<-- POST /api/live/start
+🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
+--> POST /api/live/start [32m200[0m 3ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 3ms
+<-- POST /api/live/start
+🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
+--> POST /api/live/start [32m200[0m 9ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 2ms
+<-- POST /api/live/start
+🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
+--> POST /api/live/start [32m200[0m 3ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 2ms
+<-- POST /api/live/start
+🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
+--> POST /api/live/start [32m200[0m 9ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 2ms
+<-- POST /api/live/start
+🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
+--> POST /api/live/start [32m200[0m 2ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 3ms
+<-- POST /api/live/start
+🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
+--> POST /api/live/start [32m200[0m 2ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 2ms
+<-- POST /api/live/start
+🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
+--> POST /api/live/start [32m200[0m 2ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 2ms
+<-- POST /api/live/start
+🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
+--> POST /api/live/start [32m200[0m 6ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 1ms
+<-- POST /api/live/start
+🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
+--> POST /api/live/start [32m200[0m 2ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 2ms
+<-- POST /api/live/start
+🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
+--> POST /api/live/start [32m200[0m 2ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 1ms
+<-- POST /api/live/start
+🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
+--> POST /api/live/start [32m200[0m 2ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 1ms
+<-- POST /api/live/start
+🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
+--> POST /api/live/start [32m200[0m 2ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 2ms
+<-- POST /api/live/start
+🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
+--> POST /api/live/start [32m200[0m 3ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 2ms
+<-- POST /api/live/start
+🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
+--> POST /api/live/start [32m200[0m 2ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 2ms
+<-- POST /api/live/start
+🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
+--> POST /api/live/start [32m200[0m 8ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 2ms
+<-- POST /api/live/start
+🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
+--> POST /api/live/start [32m200[0m 1ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 2ms
+<-- POST /api/live/start
+🔐 [Auth Middleware] POST /api/live/start - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+[Live] User N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI already has active stream 3989ec15-1ee9-4fea-88bf-b184d71b632a, returning it
+--> POST /api/live/start [32m200[0m 7ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 1ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 1ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 1ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 3ms
+<-- GET /api/challenges/active
+🔐 [Auth Middleware] GET /api/challenges/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/challenges/active [32m200[0m 2ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 1ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 3ms
 Failed to find Response internal state key
 ✅ Environment variables validated successfully
 🔍 OPENAI_API_KEY from process.env: EXISTS
@@ -919,6 +544,24 @@ Failed to find Response internal state key
 ⏰ Challenge Scheduler: Active (Daily at 9 AM & 2 PM UTC)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-<-- GET /api/challenges/active
-🔐 [Auth Middleware] GET /api/challenges/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
---> GET /api/challenges/active [32m200[0m 12ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 12ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 4ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 7ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 2ms
+<-- GET /api/live/active
+🔐 [Auth Middleware] GET /api/live/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+--> GET /api/live/active [32m200[0m 2ms

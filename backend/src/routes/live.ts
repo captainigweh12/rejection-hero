@@ -46,15 +46,9 @@ live.post("/start", async (c) => {
 
       return c.json({
         success: true,
-        stream: {
-          id: existingStream.id,
-          roomUrl: existingStream.roomUrl,
-          roomName: existingStream.roomName,
-          userQuestId: existingStream.userQuestId,
-          isActive: existingStream.isActive,
-          viewerCount: existingStream.viewerCount,
-          startedAt: existingStream.startedAt.toISOString(),
-        },
+        liveStreamId: existingStream.id,
+        roomUrl: existingStream.roomUrl,
+        roomName: existingStream.roomName,
         token: "existing-stream-token",
       } satisfies z.infer<typeof startLiveStreamResponseSchema>);
     }
