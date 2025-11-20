@@ -169,6 +169,7 @@ friendsRouter.post("/request", zValidator("json", sendRequestSchema), async (c) 
   // Create notification for the receiver and send push notification
   const notification = await db.notification.create({
     data: {
+      id: crypto.randomUUID(),
       userId: userId,
       senderId: user.id,
       type: "FRIEND_REQUEST",
@@ -235,6 +236,7 @@ friendsRouter.post("/accept/:id", async (c) => {
   // Create notification for the initiator and send push notification
   const notification = await db.notification.create({
     data: {
+      id: crypto.randomUUID(),
       userId: friendship.initiatorId,
       senderId: user.id,
       type: "FRIEND_ACCEPTED",

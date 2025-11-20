@@ -65,6 +65,7 @@ export async function decayConfidenceMeters() {
           // Create notification
           const notification = await db.notification.create({
             data: {
+              id: crypto.randomUUID(),
               userId: stats.userId,
               type: "CONFIDENCE_LOW",
               title: "Your Confidence Meter is Low! 💪",

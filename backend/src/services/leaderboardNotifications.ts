@@ -145,6 +145,7 @@ export async function checkLeaderboardFallBehind() {
             // Create notification with push notification
             const notification = await db.notification.create({
               data: {
+                id: crypto.randomUUID(),
                 userId: userRanking.userId,
                 type: "LEADERBOARD_FALL_BEHIND",
                 title: "📉 You're Falling Behind!",

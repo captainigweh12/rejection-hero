@@ -327,6 +327,7 @@ moderationRouter.post("/chat/moderate", zValidator("json", moderateMessageSchema
   if (action === "delete" || action === "hide") {
     await db.notification.create({
       data: {
+        id: crypto.randomUUID(),
         userId: message.senderId,
         type: "CONTENT_MODERATED",
         title: "Message Moderated",

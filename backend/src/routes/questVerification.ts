@@ -88,6 +88,7 @@ questVerificationRouter.post(
     for (const request of requests) {
       const notification = await db.notification.create({
         data: {
+          id: crypto.randomUUID(),
           userId: request.receiverId,
           senderId: user.id,
           type: "QUEST_VERIFICATION_REQUEST",
@@ -276,6 +277,7 @@ questVerificationRouter.post("/:requestId/verify", async (c) => {
   // Send notification to quest owner
   const notification = await db.notification.create({
     data: {
+      id: crypto.randomUUID(),
       userId: verificationRequest.user_quest.userId,
       senderId: user.id,
       type: "QUEST_VERIFIED",
@@ -315,6 +317,7 @@ questVerificationRouter.post("/:requestId/verify", async (c) => {
     if (verificationCount === 2) {
       const badgeNotification = await db.notification.create({
         data: {
+          id: crypto.randomUUID(),
           userId: verificationRequest.user_quest.userId,
           type: "QUEST_VERIFICATION_BADGE",
           title: "🏆 Verification Badge Earned!",

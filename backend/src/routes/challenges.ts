@@ -59,6 +59,7 @@ challengesRouter.post("/enroll", zValidator("json", enrollChallengeSchema), asyn
     // Send welcome notification
     await db.notification.create({
       data: {
+        id: crypto.randomUUID(),
         userId: user.id,
         type: "CHALLENGE_STARTED",
         title: "🎯 100 Day Challenge Started!",
@@ -217,6 +218,7 @@ challengesRouter.post("/generate-daily", async (c) => {
     const motivationMessages = getMotivationMessage(currentDay, challenge.category);
     await db.notification.create({
       data: {
+        id: crypto.randomUUID(),
         userId: user.id,
         type: "DAILY_CHALLENGE",
         title: `Day ${currentDay} Challenge Ready!`,

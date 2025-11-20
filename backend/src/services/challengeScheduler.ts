@@ -133,6 +133,7 @@ export async function generateDailyChallengesForAllUsers() {
         const motivationMessages = getMotivationMessage(currentDay, challenge.category);
         const notification = await db.notification.create({
           data: {
+            id: crypto.randomUUID(),
             userId: challenge.userId,
             type: "DAILY_CHALLENGE",
             title: `Day ${currentDay} Challenge Ready! 🎯`,
@@ -160,6 +161,7 @@ export async function generateDailyChallengesForAllUsers() {
           // 30% chance to send extra motivation
           const motivationNotification = await db.notification.create({
             data: {
+              id: crypto.randomUUID(),
               userId: challenge.userId,
               type: "CHALLENGE_MOTIVATION",
               title: "💪 Keep Going!",
@@ -223,6 +225,7 @@ export async function sendMotivationalNotifications() {
           const motivationMessages = getMotivationMessage(currentDay, challenge.category);
           await db.notification.create({
             data: {
+              id: crypto.randomUUID(),
               userId: challenge.userId,
               type: "CHALLENGE_MOTIVATION",
               title: `🎉 Day ${currentDay} Milestone!`,

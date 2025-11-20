@@ -163,6 +163,7 @@ live.post("/start", async (c) => {
         liveViewers: 0,
       },
       create: {
+        id: crypto.randomUUID(),
         userId: user.id,
         displayName: user.name || user.email || "User",
         isLive: true,

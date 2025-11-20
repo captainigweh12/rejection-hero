@@ -70,6 +70,7 @@ export async function checkQuestTimeWarnings(): Promise<{ warningsSent: number }
         if (!existingWarning) {
           await db.notification.create({
             data: {
+              id: crypto.randomUUID(),
               userId: userQuest.userId,
               type: "QUEST_TIME_WARNING_5MIN",
               title: "⏰ Quest Time Warning",
@@ -124,6 +125,7 @@ export async function checkQuestTimeWarnings(): Promise<{ warningsSent: number }
         if (!existingWarning) {
           await db.notification.create({
             data: {
+              id: crypto.randomUUID(),
               userId: userQuest.userId,
               type: "QUEST_TIME_WARNING_1MIN",
               title: "🚨 Final Warning!",
@@ -220,6 +222,7 @@ export async function sendQuestReminders(): Promise<{ remindersSent: number }> {
 
         await db.notification.create({
           data: {
+            id: crypto.randomUUID(),
             userId: userQuest.userId,
             type: "QUEST_REMINDER",
             title: "📋 Quest Reminder",

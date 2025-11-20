@@ -290,6 +290,7 @@ export async function createNotificationWithPush(
     // Create the notification in the database
     await db.notification.create({
       data: {
+        id: crypto.randomUUID(),
         userId,
         senderId,
         type,

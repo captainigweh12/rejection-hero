@@ -549,6 +549,7 @@ groupsRouter.post("/:groupId/invite-user", zValidator("json", inviteUserSchema),
   // Create notification
   await db.notification.create({
     data: {
+      id: crypto.randomUUID(),
       userId,
       senderId: user.id,
       type: "GROUP_INVITE",

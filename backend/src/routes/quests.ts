@@ -519,6 +519,7 @@ questsRouter.post("/:id/start", async (c) => {
     const { sendPushNotificationForNotification } = await import("../services/pushNotifications");
     const questStartedNotification = await db.notification.create({
       data: {
+        id: crypto.randomUUID(),
         userId: user.id,
         type: "QUEST_STARTED_REMINDER",
         title: "🎯 Quest Started!",
@@ -818,8 +819,9 @@ questsRouter.post("/:id/record", zValidator("json", recordQuestActionRequestSche
     (userQuest.quest.goalType === "TAKE_ACTION" && newActionCount >= userQuest.quest.goalCount);
 
   // Log the action for integrity tracking
-  await db.questActionLog.create({
+  await db.quest_action_log.create({
     data: {
+      id: crypto.randomUUID(),
       userQuestId: userQuestId,
       action: action,
     },
@@ -856,6 +858,7 @@ questsRouter.post("/:id/record", zValidator("json", recordQuestActionRequestSche
       const { sendPushNotificationForNotification } = await import("../services/pushNotifications");
       const notification = await db.notification.create({
         data: {
+          id: crypto.randomUUID(),
           userId: user.id,
           type: "QUEST_INTEGRITY_TIP",
           title: "💡 Quest Authenticity Tip",
@@ -891,6 +894,7 @@ questsRouter.post("/:id/record", zValidator("json", recordQuestActionRequestSche
         const { sendPushNotificationForNotification } = await import("../services/pushNotifications");
         const notification = await db.notification.create({
           data: {
+            id: crypto.randomUUID(),
             userId: user.id,
             type: "QUEST_COMPLETED",
             title: "🎉 Quest Completed!",
@@ -988,6 +992,7 @@ questsRouter.post("/:id/record", zValidator("json", recordQuestActionRequestSche
       // Send completion notification with push notification
       const challengeNotification = await db.notification.create({
         data: {
+          id: crypto.randomUUID(),
           userId: user.id,
           type: "CHALLENGE_DAY_COMPLETED",
           title: `🎉 Day ${challengeDailyQuest.day} Complete!`,
@@ -1687,6 +1692,7 @@ async function generateAISeries(userId: string, previousSeriesId?: string) {
       // Send notification about new series with push notification
       const notification = await db.notification.create({
         data: {
+          id: crypto.randomUUID(),
           userId,
           type: "AI_SERIES_GENERATED",
           title: "🎯 New Quest Series Ready!",
@@ -1778,6 +1784,7 @@ export async function updateUserStats(userId: string, xpReward: number, pointRew
           try {
             const notification = await db.notification.create({
               data: {
+                id: crypto.randomUUID(),
                 userId,
                 type: "STREAK_MILESTONE",
                 title: `🔥 ${newCurrentStreak} Day Streak!`,
