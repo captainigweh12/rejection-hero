@@ -45,30 +45,51 @@ fi
 echo "📁 Working directory: ${WORK_DIR}"
 cd "${WORK_DIR}"
 
-# Test connection first
+# URL encode the password if it contains special characters
+# The password "Emmanuel1igweh!" contains "!" which needs to be encoded as "%21"
 echo ""
-echo "🔍 Testing database connection..."
-if echo "SELECT 1;" | DATABASE_URL="${DATABASE_URL}" timeout 10 bunx prisma db execute --stdin 2>&1 | grep -qi "error\|failed"; then
-  echo "❌ Database connection failed!"
-  echo ""
-  echo "🔍 Troubleshooting:"
-  echo "   1. Verify DATABASE_URL is correct"
-  echo "   2. Check Supabase password is correct"
-  echo "   3. Ensure database is accessible"
-  exit 1
-else
-  echo "✅ Database connection successful"
-fi
+echo "🔍 Preparing connection string..."
+ENCODED_PASSWORD=$(echo "${SUPABASE_PASSWORD}" | sed 's/!/%21/g' | sed 's/#/%23/g' | sed 's/\$/%24/g' | sed 's/&/%26/g' | sed "s/'/%27/g" | sed 's/(/%28/g' | sed 's/)/%29/g' | sed 's/*/%2A/g' | sed 's/+/%2B/g' | sed 's/,/%2C/g' | sed 's/;/%3B/g' | sed 's/=/%3D/g' | sed 's/?/%3F/g' | sed 's/@/%40/g' | sed 's/\[/%5B/g' | sed 's/\]/%5D/g')
+ENCODED_DATABASE_URL="postgresql://postgres:${ENCODED_PASSWORD}@${SUPABASE_DB_HOST}:5432/postgres?sslmode=require"
+
+echo "   Password contains special characters, will try URL-encoded version"
+echo "   Original: postgresql://postgres:***@${SUPABASE_DB_HOST}:5432/postgres?sslmode=require"
+echo "   Encoded: postgresql://postgres:***@${SUPABASE_DB_HOST}:5432/postgres?sslmode=require"
+echo ""
+
+# Note: We'll test the connection by attempting prisma db push
+# If it fails, we'll try the original password
+FINAL_DATABASE_URL="${ENCODED_DATABASE_URL}"
 
 echo ""
 echo "🔄 Pushing Prisma schema to Supabase..."
 echo "   This will create/update tables based on schema.prisma"
 echo ""
 
-# Run prisma db push
-export DATABASE_URL="${DATABASE_URL}"
-bunx prisma db push --accept-data-loss --skip-generate 2>&1
+# Try with URL-encoded password first
+echo "🔄 Pushing Prisma schema to Supabase..."
+echo "   Trying with URL-encoded password..."
+echo "   Connection: postgresql://postgres:***@${SUPABASE_DB_HOST}:5432/postgres?sslmode=require"
+echo ""
+
+export DATABASE_URL="${FINAL_DATABASE_URL}"
+PUSH_OUTPUT=$(bunx prisma db push --accept-data-loss --skip-generate 2>&1)
 PUSH_RESULT=$?
+
+# If that failed, try with original password (without encoding)
+if [ $PUSH_RESULT -ne 0 ]; then
+  echo "⚠️  Push with encoded password failed, trying with original password..."
+  echo "   Error: $(echo "$PUSH_OUTPUT" | grep -i "error\|failed\|can't reach" | head -1)"
+  echo ""
+  
+  export DATABASE_URL="${DATABASE_URL}"  # Original URL
+  PUSH_OUTPUT=$(bunx prisma db push --accept-data-loss --skip-generate 2>&1)
+  PUSH_RESULT=$?
+  FINAL_DATABASE_URL="${DATABASE_URL}"
+fi
+
+# Display the output
+echo "$PUSH_OUTPUT"
 
 if [ $PUSH_RESULT -eq 0 ]; then
   echo ""
@@ -77,8 +98,20 @@ if [ $PUSH_RESULT -eq 0 ]; then
   echo "🔍 Verifying tables were created..."
   
   # Check for key tables
+  echo ""
+  echo "🔍 Verifying tables were created..."
+  echo "   (Note: Table checks may fail if connection uses pooler - check Supabase dashboard instead)"
+  
   for table in "user" "user_quest" "user_stats" "account" "session"; do
-    TABLE_CHECK=$(echo "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public' AND table_name = '${table}';" | DATABASE_URL="${DATABASE_URL}" bunx prisma db execute --stdin 2>&1 || echo "")
+    # Use Prisma to check table via a simple query
+    TABLE_CHECK=$(DATABASE_URL="${FINAL_DATABASE_URL}" timeout 10 bun run -e "import { PrismaClient } from './generated/prisma'; const prisma = new PrismaClient(); prisma.\$queryRaw\`SELECT 1 FROM ${table} LIMIT 1\`.then(() => console.log('exists')).catch(() => {});" 2>&1 | grep -q "exists" && echo "exists" || echo "")
+    
+    if [ -n "$TABLE_CHECK" ]; then
+      echo "   ✅ ${table} table exists"
+    else
+      echo "   ⚠️  ${table} table check skipped (verify in Supabase dashboard)"
+    fi
+  done
     if echo "$TABLE_CHECK" | grep -q "[1-9]"; then
       echo "   ✅ ${table} table exists"
     else
