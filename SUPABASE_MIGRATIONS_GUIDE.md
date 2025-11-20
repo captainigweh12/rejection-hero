@@ -44,7 +44,7 @@ If you prefer to run manually:
 cd backend
 
 # Set DATABASE_URL with Supabase connection
-export DATABASE_URL="postgresql://postgres:Goomy5555@db.vtevcjqigebtxmkjzdjq.supabase.co:5432/postgres?sslmode=require"
+export DATABASE_URL="postgresql://postgres:Emmanuel1igweh!@db.vtevcjqigebtxmkjzdjq.supabase.co:5432/postgres?sslmode=require"
 
 # Push schema to Supabase
 bunx prisma db push --accept-data-loss --skip-generate
@@ -80,7 +80,7 @@ The Dockerfile automatically runs `prisma db push` on every deployment:
 ./sync-supabase-schema.sh
 
 # Or manually
-export DATABASE_URL="postgresql://postgres:Goomy5555@db.vtevcjqigebtxmkjzdjq.supabase.co:5432/postgres?sslmode=require"
+export DATABASE_URL="postgresql://postgres:Emmanuel1igweh!@db.vtevcjqigebtxmkjzdjq.supabase.co:5432/postgres?sslmode=require"
 cd backend
 bunx prisma db push
 ```
@@ -139,7 +139,7 @@ supabase db push
 
 In Railway → Variables:
 ```
-DATABASE_URL=postgresql://postgres:Goomy5555@db.vtevcjqigebtxmkjzdjq.supabase.co:5432/postgres?sslmode=require
+DATABASE_URL=postgresql://postgres:Emmanuel1igweh!@db.vtevcjqigebtxmkjzdjq.supabase.co:5432/postgres?sslmode=require
 ```
 
 ### Sync Schema Locally

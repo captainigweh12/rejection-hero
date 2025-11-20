@@ -59,7 +59,7 @@ In Railway → Backend Service → Variables:
 
 **For Schema Migrations (non-pooler):**
 ```
-DATABASE_URL=postgresql://postgres:Goomy5555@db.vtevcjqigebtxmkjzdjq.supabase.co:5432/postgres
+DATABASE_URL=postgresql://postgres:Emmanuel1igweh!@db.vtevcjqigebtxmkjzdjq.supabase.co:5432/postgres?sslmode=require
 ```
 
 **Important Notes:**
@@ -71,7 +71,7 @@ DATABASE_URL=postgresql://postgres:Goomy5555@db.vtevcjqigebtxmkjzdjq.supabase.co
 
 **For Regular Queries (pooler OK):**
 ```
-DIRECT_URL=postgresql://postgres.vtevcjqigebtxmkjzdjq:Goomy5555@aws-1-us-east-2.pooler.supabase.com:5432/postgres
+DIRECT_URL=postgresql://postgres.vtevcjqigebtxmkjzdjq:Emmanuel1igweh!@aws-1-us-east-2.pooler.supabase.com:5432/postgres?pgbouncer=true&sslmode=require
 ```
 
 - This is optional
@@ -110,7 +110,7 @@ postgresql://postgres.PROJECT_ID:PASSWORD@aws-1-us-east-2.pooler.supabase.com:54
 ```
 
 **Your Project ID:** `vtevcjqigebtxmkjzdjq`
-**Your Password:** `Goomy5555`
+**Your Password:** `Emmanuel1igweh!`
 
 ## Verification Steps
 
@@ -121,7 +121,7 @@ postgresql://postgres.PROJECT_ID:PASSWORD@aws-1-us-east-2.pooler.supabase.com:54
 
 2. **Test Connection Locally (optional):**
    ```bash
-   export DATABASE_URL="postgresql://postgres:Goomy5555@db.vtevcjqigebtxmkjzdjq.supabase.co:5432/postgres"
+   export DATABASE_URL="postgresql://postgres:Emmanuel1igweh!@db.vtevcjqigebtxmkjzdjq.supabase.co:5432/postgres?sslmode=require"
    cd backend
    bunx prisma db push --skip-generate
    ```

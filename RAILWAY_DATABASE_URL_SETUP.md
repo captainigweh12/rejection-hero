@@ -25,7 +25,7 @@ postgresql://postgres:[YOUR-PASSWORD]@db.vtevcjqigebtxmkjzdjq.supabase.co:5432/p
 **For your project, it should be:**
 
 ```
-postgresql://postgres:Goomy5555@db.vtevcjqigebtxmkjzdjq.supabase.co:5432/postgres?sslmode=require
+postgresql://postgres:Emmanuel1igweh!@db.vtevcjqigebtxmkjzdjq.supabase.co:5432/postgres?sslmode=require
 ```
 
 **⚠️ CRITICAL:** Make sure it includes `?sslmode=require` at the end!
@@ -37,14 +37,14 @@ postgresql://postgres:Goomy5555@db.vtevcjqigebtxmkjzdjq.supabase.co:5432/postgre
 3. Set `DATABASE_URL` to:
 
 ```env
-DATABASE_URL=postgresql://postgres:Goomy5555@db.vtevcjqigebtxmkjzdjq.supabase.co:5432/postgres?sslmode=require
+DATABASE_URL=postgresql://postgres:Emmanuel1igweh!@db.vtevcjqigebtxmkjzdjq.supabase.co:5432/postgres?sslmode=require
 ```
 
 **Important:**
 - ✅ Use the **direct connection** (starts with `db.`, not `aws-1-us-east-2.pooler`)
 - ✅ **MUST include** `?sslmode=require` for Supabase SSL
 - ✅ Copy exactly, no extra spaces or quotes
-- ✅ Verify password is correct (`Goomy5555`)
+- ✅ Verify password is correct (`Emmanuel1igweh!`)
 
 ### Step 3: Remove Conflicting Variables
 
@@ -75,7 +75,7 @@ DATABASE_PROVIDER=postgresql
 If you want to use pooler for regular queries (better performance):
 
 ```env
-DIRECT_URL=postgresql://postgres.vtevcjqigebtxmkjzdjq:Goomy5555@aws-1-us-east-2.pooler.supabase.com:5432/postgres?pgbouncer=true&sslmode=require
+DIRECT_URL=postgresql://postgres.vtevcjqigebtxmkjzdjq:Emmanuel1igweh!@aws-1-us-east-2.pooler.supabase.com:5432/postgres?pgbouncer=true&sslmode=require
 ```
 
 This is **optional**. If not set, Prisma Client will use `DATABASE_URL`.
@@ -83,9 +83,9 @@ This is **optional**. If not set, Prisma Client will use `DATABASE_URL`.
 ## 📋 Complete Railway Variables Checklist
 
 ```
-✅ DATABASE_URL=postgresql://postgres:Goomy5555@db.vtevcjqigebtxmkjzdjq.supabase.co:5432/postgres?sslmode=require
+✅ DATABASE_URL=postgresql://postgres:Emmanuel1igweh!@db.vtevcjqigebtxmkjzdjq.supabase.co:5432/postgres?sslmode=require
 ✅ DATABASE_PROVIDER=postgresql
-✅ DIRECT_URL=postgresql://postgres.vtevcjqigebtxmkjzdjq:Goomy5555@aws-1-us-east-2.pooler.supabase.com:5432/postgres?pgbouncer=true&sslmode=require (optional)
+✅ DIRECT_URL=postgresql://postgres.vtevcjqigebtxmkjzdjq:Emmanuel1igweh!@aws-1-us-east-2.pooler.supabase.com:5432/postgres?pgbouncer=true&sslmode=require (optional)
 ✅ BETTER_AUTH_SECRET=<your-secret>
 ✅ BACKEND_URL=<your-railway-url>
 ... (other variables)

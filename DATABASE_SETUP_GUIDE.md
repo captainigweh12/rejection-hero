@@ -22,7 +22,7 @@ In Railway → Your Backend Service → Variables / Environment:
 
 1. **`DATABASE_URL`** (for schema migrations - use NON-POOLER)
    ```
-   postgresql://postgres:Goomy5555@db.vtevcjqigebtxmkjzdjq.supabase.co:5432/postgres
+   postgresql://postgres:Emmanuel1igweh!@db.vtevcjqigebtxmkjzdjq.supabase.co:5432/postgres?sslmode=require
    ```
    - ⚠️ **IMPORTANT:** Use the **non-pooler** connection (starts with `db.`)
    - This is used for `prisma db push` (schema operations)
@@ -30,7 +30,7 @@ In Railway → Your Backend Service → Variables / Environment:
 
 2. **`DIRECT_URL`** (optional, for Prisma Client - can use pooler)
    ```
-   postgresql://postgres.vtevcjqigebtxmkjzdjq:Goomy5555@aws-1-us-east-2.pooler.supabase.com:5432/postgres?pgbouncer=true
+   postgresql://postgres.vtevcjqigebtxmkjzdjq:Emmanuel1igweh!@aws-1-us-east-2.pooler.supabase.com:5432/postgres?pgbouncer=true&sslmode=require
    ```
    - This is used by Prisma Client for regular queries
    - Pooler is fine here (better for connection pooling)
@@ -140,7 +140,7 @@ If automatic sync fails, you can manually run:
 
 ```bash
 # From your local machine (temporarily)
-export DATABASE_URL="postgresql://postgres:Goomy5555@db.vtevcjqigebtxmkjzdjq.supabase.co:5432/postgres"
+export DATABASE_URL="postgresql://postgres:Emmanuel1igweh!@db.vtevcjqigebtxmkjzdjq.supabase.co:5432/postgres?sslmode=require"
 cd backend
 bunx prisma db push --accept-data-loss --skip-generate
 ```

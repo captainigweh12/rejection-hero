@@ -9,7 +9,7 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 
 # Project configuration
 PROJECT_REF="vtevcjqigebtxmkjzdjq"
-SUPABASE_PASSWORD="Goomy5555"
+SUPABASE_PASSWORD="Emmanuel1igweh!"
 SUPABASE_DB_HOST="db.vtevcjqigebtxmkjzdjq.supabase.co"
 
 # Construct connection string with SSL
