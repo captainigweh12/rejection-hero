@@ -19,10 +19,18 @@ import { authClient } from "./authClient";
  * Format: https://[UNIQUE_ID].share.sandbox.dev/
  * This allows the app to connect to different backend instances without code changes.
  */
-const BACKEND_URL = process.env.EXPO_PUBLIC_VIBECODE_BACKEND_URL;
+// Get backend URL with fallback for development/Expo Go
+const BACKEND_URL = process.env.EXPO_PUBLIC_VIBECODE_BACKEND_URL || 
+  (__DEV__ ? "http://localhost:3000" : null);
+
 if (!BACKEND_URL) {
   console.error("❌ BACKEND_URL is not set. Available env vars:", Object.keys(process.env).filter(k => k.includes("BACKEND")));
-  throw new Error("Backend URL setup has failed. Please contact support@vibecodeapp.com for help.");
+  // Don't throw in development - show warning instead
+  if (__DEV__) {
+    console.warn("⚠️ Running in development mode without BACKEND_URL. Some features may not work.");
+  } else {
+    throw new Error("Backend URL setup has failed. Please contact support@vibecodeapp.com for help.");
+  }
 }
 console.log("✅ API Client initialized with backend URL:", BACKEND_URL);
 

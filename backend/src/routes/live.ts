@@ -92,10 +92,14 @@ live.post("/start", async (c) => {
         });
 
         if (!roomResponse.ok) {
-          throw new Error(`Daily.co room creation failed: ${roomResponse.statusText}`);
+          const errorText = await roomResponse.text();
+          throw new Error(`Daily.co room creation failed: ${roomResponse.status} ${roomResponse.statusText} - ${errorText}`);
         }
 
         const roomData = await roomResponse.json();
+        if (!roomData.url) {
+          throw new Error("Daily.co room creation succeeded but no URL returned");
+        }
         roomUrl = roomData.url;
 
         // Create meeting token for the host
@@ -114,17 +118,24 @@ live.post("/start", async (c) => {
         });
 
         if (!tokenResponse.ok) {
-          throw new Error(`Daily.co token creation failed: ${tokenResponse.statusText}`);
+          const errorText = await tokenResponse.text();
+          console.warn(`[Live] Daily.co token creation failed: ${tokenResponse.status} ${tokenResponse.statusText} - ${errorText}`);
+          // Continue with mock token if token creation fails
+        } else {
+          const tokenData = await tokenResponse.json();
+          if (tokenData.token) {
+            token = tokenData.token;
+          }
         }
 
-        const tokenData = await tokenResponse.json();
-        token = tokenData.token;
-
         console.log(`[Live] Created Daily.co room: ${roomUrl}`);
-      } catch (error) {
+      } catch (error: any) {
         console.error("[Live] Daily.co API error:", error);
         // Fall back to mock room if API fails
         console.log("[Live] Falling back to mock room");
+        // Ensure we have valid values even if API fails
+        roomUrl = `https://vibecode.daily.co/${roomName}`;
+        token = "mock-token";
       }
     } else {
       console.log("[Live] No DAILY_API_KEY found, using mock room");
@@ -164,7 +175,7 @@ live.post("/start", async (c) => {
       liveStreamId: liveStream.id,
       roomUrl: liveStream.roomUrl,
       roomName: liveStream.roomName,
-      token: "mock-token", // In production, return actual Daily.co token
+      token: token, // Return actual token from API or mock token
     };
 
     return c.json(response);

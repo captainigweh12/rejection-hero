@@ -16,7 +16,26 @@
     "preview": {
       "distribution": "internal",
       "android": {
-        "buildType": "apk"
+        "buildType": "apk",
+        "newArchEnabled": false
+      },
+      "ios": {
+        "simulator": false
+      }
+    },
+    "expo-go": {
+      "developmentClient": false,
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk",
+        "newArchEnabled": false
+      },
+      "ios": {
+        "simulator": true,
+        "newArchEnabled": false
+      },
+      "env": {
+        "EXPO_PUBLIC_ENABLE_EXPO_GO": "true"
       }
     },
     "production": {

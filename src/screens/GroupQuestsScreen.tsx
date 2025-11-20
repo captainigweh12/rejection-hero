@@ -91,7 +91,9 @@ function CreateGroupQuestModal({ visible, onClose, groupId, onSuccess }: CreateG
       onSuccess();
     },
     onError: (error: any) => {
-      Alert.alert("Error", error.message || "Failed to create group quest");
+      console.error("Create group quest error:", error);
+      const errorMessage = error?.message || error?.response?.data?.message || "Failed to create group quest";
+      Alert.alert("Error", errorMessage);
     },
   });
 

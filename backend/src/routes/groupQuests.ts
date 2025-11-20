@@ -123,110 +123,118 @@ const createGroupQuestSchema = z.object({
 });
 
 groupQuestsRouter.post("/create", zValidator("json", createGroupQuestSchema), async (c) => {
-  const user = c.get("user");
+  try {
+    const user = c.get("user");
 
-  if (!user) {
-    return c.json({ message: "Unauthorized" }, 401);
-  }
-
-  const { groupId, questId, customQuestDescription, questType, rejectionNos, assignmentType, assignedMemberIds } = c.req.valid("json");
-
-  // Log quest type and rejection nos
-  console.log("🎯 [Group Quest] Creating quest - Type:", questType, "Rejection Nos:", rejectionNos);
-
-  // Validate that either questId or customQuestDescription is provided
-  if (!questId && !customQuestDescription) {
-    return c.json({ message: "Either questId or customQuestDescription must be provided" }, 400);
-  }
-
-  // Check if user is a member of the group
-  const membership = await db.group_member.findUnique({
-    where: {
-      groupId_userId: {
-        groupId,
-        userId: user.id,
-      },
-    },
-  });
-
-  if (!membership) {
-    return c.json({ message: "You are not a member of this group" }, 403);
-  }
-
-  let finalQuestId = questId;
-
-  // If custom quest, create a new quest first
-  if (customQuestDescription && !questId) {
-    console.log("🔍 Creating custom group quest:", customQuestDescription);
-
-    // Safety filter check
-    const safetyCheck = checkFullQuestSafety(customQuestDescription, "Custom Group Quest");
-    if (!safetyCheck.isSafe) {
-      console.log("⚠️ Quest blocked by safety filter:", safetyCheck.reason);
-      return c.json({
-        message: `Quest blocked for safety: ${safetyCheck.reason}`,
-        isSafe: false
-      }, 400);
+    if (!user) {
+      return c.json({ message: "Unauthorized" }, 401);
     }
 
-    console.log("✅ Quest passed safety filter");
+    const { groupId, questId, customQuestDescription, questType, rejectionNos, assignmentType, assignedMemberIds } = c.req.valid("json");
 
-    // Create the custom quest
-    const customQuest = await db.quest.create({
+    // Log quest type and rejection nos
+    console.log("🎯 [Group Quest] Creating quest - Type:", questType, "Rejection Nos:", rejectionNos);
+
+    // Validate that either questId or customQuestDescription is provided
+    if (!questId && !customQuestDescription) {
+      return c.json({ message: "Either questId or customQuestDescription must be provided" }, 400);
+    }
+
+    // Check if user is a member of the group
+    const membership = await db.group_member.findUnique({
+      where: {
+        groupId_userId: {
+          groupId,
+          userId: user.id,
+        },
+      },
+    });
+
+    if (!membership) {
+      return c.json({ message: "You are not a member of this group" }, 403);
+    }
+
+    let finalQuestId = questId;
+
+    // If custom quest, create a new quest first
+    if (customQuestDescription && !questId) {
+      console.log("🔍 Creating custom group quest:", customQuestDescription);
+
+      // Safety filter check
+      const safetyCheck = checkFullQuestSafety(customQuestDescription, "Custom Group Quest");
+      if (!safetyCheck.isSafe) {
+        console.log("⚠️ Quest blocked by safety filter:", safetyCheck.reason);
+        return c.json({
+          message: `Quest blocked for safety: ${safetyCheck.reason}`,
+          isSafe: false
+        }, 400);
+      }
+
+      console.log("✅ Quest passed safety filter");
+
+      // Create the custom quest
+      const customQuest = await db.quest.create({
+        data: {
+          title: customQuestDescription.slice(0, 100), // Use first 100 chars as title
+          description: customQuestDescription,
+          category: "CUSTOM",
+          difficulty: "MEDIUM",
+          goalType: "COLLECT_NOS",
+          goalCount: 1,
+          xpReward: 50,
+          pointReward: 10,
+        },
+      });
+
+      finalQuestId = customQuest.id;
+      console.log("✅ Custom quest created:", finalQuestId);
+    }
+
+    // Verify quest exists
+    if (finalQuestId) {
+      const quest = await db.quest.findUnique({
+        where: { id: finalQuestId },
+      });
+
+      if (!quest) {
+        return c.json({ message: "Quest not found" }, 404);
+      }
+    } else {
+      return c.json({ message: "Failed to create or find quest" }, 500);
+    }
+
+    // Create the group quest
+    const groupQuest = await db.group_quest.create({
       data: {
-        title: customQuestDescription.slice(0, 100), // Use first 100 chars as title
-        description: customQuestDescription,
-        category: "CUSTOM",
-        difficulty: "MEDIUM",
-        goalType: "COLLECT_NOS",
-        goalCount: 1,
-        xpReward: 50,
-        pointReward: 10,
+        groupId,
+        questId: finalQuestId,
+        createdBy: user.id,
+        assignmentType,
       },
     });
 
-    finalQuestId = customQuest.id;
-    console.log("✅ Custom quest created:", finalQuestId);
-  }
-
-  // Verify quest exists
-  if (finalQuestId) {
-    const quest = await db.quest.findUnique({
-      where: { id: finalQuestId },
-    });
-
-    if (!quest) {
-      return c.json({ message: "Quest not found" }, 404);
+    // If assigned, create assignments
+    if (assignmentType === "assigned" && assignedMemberIds && assignedMemberIds.length > 0) {
+      await Promise.all(
+        assignedMemberIds.map((memberId) =>
+          db.group_quest_assignment.create({
+            data: {
+              groupQuestId: groupQuest.id,
+              userId: memberId,
+            },
+          })
+        )
+      );
     }
-  } else {
-    return c.json({ message: "Failed to create or find quest" }, 500);
+
+    return c.json({ success: true, groupQuestId: groupQuest.id });
+  } catch (error: any) {
+    console.error("❌ [Group Quest] Error creating group quest:", error);
+    return c.json({ 
+      message: error?.message || "Failed to create group quest",
+      success: false 
+    }, 500);
   }
-
-  // Create the group quest
-  const groupQuest = await db.group_quest.create({
-    data: {
-      groupId,
-      questId: finalQuestId,
-      createdBy: user.id,
-      assignmentType,
-    },
-  });
-
-  // If assigned, create assignments
-  if (assignmentType === "assigned" && assignedMemberIds && assignedMemberIds.length > 0) {
-    await Promise.all(
-      assignedMemberIds.map((memberId) =>
-        db.group_quest_assignment.create({
-          data: {
-            groupQuestId: groupQuest.id,
-            userId: memberId,
-          },
-        })
-      )
-    );
-  }
-
-  return c.json({ success: true, groupQuestId: groupQuest.id });
 });
 
 // ============================================
