@@ -5,16 +5,29 @@ import { db } from "../db";
  * Called periodically to decrease confidence when users are inactive
  */
 export async function decayConfidenceMeters() {
-  const now = new Date();
-  
-  // Get all user stats
-  const allStats = await db.user_stats.findMany({
-    where: {
-      dailyConfidenceMeter: {
-        gt: 0, // Only process users with confidence > 0
+  try {
+    const now = new Date();
+    
+    // Check if user_stats table exists before querying
+    try {
+      await db.$queryRawUnsafe("SELECT 1 FROM user_stats LIMIT 1");
+    } catch (error: any) {
+      // If table doesn't exist (P2021), skip this check
+      if (error?.code === "P2021" || error?.message?.includes("does not exist")) {
+        console.log("⚠️  [Confidence Decay] user_stats table does not exist yet, skipping...");
+        return { updatedCount: 0, notificationCount: 0 };
+      }
+      throw error; // Re-throw other errors
+    }
+    
+    // Get all user stats
+    const allStats = await db.user_stats.findMany({
+      where: {
+        dailyConfidenceMeter: {
+          gt: 0, // Only process users with confidence > 0
+        },
       },
-    },
-  });
+    });
 
   let updatedCount = 0;
   let notificationCount = 0;
@@ -97,8 +110,12 @@ export async function decayConfidenceMeters() {
     }
   }
 
-  console.log(`✅ [Confidence Decay] Updated ${updatedCount} users, sent ${notificationCount} low confidence notifications`);
+    console.log(`✅ [Confidence Decay] Updated ${updatedCount} users, sent ${notificationCount} low confidence notifications`);
   
-  return { updatedCount, notificationCount };
+    return { updatedCount, notificationCount };
+  } catch (error) {
+    console.error("❌ [Confidence Decay] Error:", error);
+    return { updatedCount: 0, notificationCount: 0 };
+  }
 }
 
