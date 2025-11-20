@@ -12,12 +12,22 @@ export async function decayConfidenceMeters() {
     try {
       await db.$queryRawUnsafe("SELECT 1 FROM user_stats LIMIT 1");
     } catch (error: any) {
-      // If table doesn't exist (P2021), skip this check
+      // Handle table doesn't exist error (P2021)
       if (error?.code === "P2021" || error?.message?.includes("does not exist")) {
         console.log("⚠️  [Confidence Decay] user_stats table does not exist yet, skipping...");
         return { updatedCount: 0, notificationCount: 0 };
       }
-      throw error; // Re-throw other errors
+      // Handle database connection errors gracefully
+      if (error?.name === "PrismaClientInitializationError" || 
+          error?.message?.includes("Can't reach database server") ||
+          error?.message?.includes("Can not reach database server")) {
+        console.warn("⚠️  [Confidence Decay] Database connection error, skipping...");
+        console.warn("   Error:", error.message?.substring(0, 100));
+        return { updatedCount: 0, notificationCount: 0 };
+      }
+      // Log unexpected errors but don't crash
+      console.error("❌ [Confidence Decay] Unexpected error checking tables:", error?.message || error);
+      return { updatedCount: 0, notificationCount: 0 };
     }
     
     // Get all user stats

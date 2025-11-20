@@ -15,12 +15,22 @@ export async function checkQuestTimeWarnings(): Promise<{ warningsSent: number }
       // Test if user_quest table exists by checking a simple query
       await db.$queryRawUnsafe("SELECT 1 FROM user_quest LIMIT 1");
     } catch (error: any) {
-      // If table doesn't exist (P2021), skip this check
+      // Handle table doesn't exist error (P2021)
       if (error?.code === "P2021" || error?.message?.includes("does not exist")) {
         console.log("⚠️  [Quest Time Warnings] user_quest table does not exist yet, skipping...");
         return { warningsSent: 0 };
       }
-      throw error; // Re-throw other errors
+      // Handle database connection errors gracefully
+      if (error?.name === "PrismaClientInitializationError" || 
+          error?.message?.includes("Can't reach database server") ||
+          error?.message?.includes("Can not reach database server")) {
+        console.warn("⚠️  [Quest Time Warnings] Database connection error, skipping...");
+        console.warn("   Error:", error.message?.substring(0, 100));
+        return { warningsSent: 0 };
+      }
+      // Log unexpected errors but don't crash
+      console.error("❌ [Quest Time Warnings] Unexpected error checking tables:", error?.message || error);
+      return { warningsSent: 0 };
     }
 
     // Get all active quests with their start times
@@ -188,11 +198,22 @@ export async function sendQuestReminders(): Promise<{ remindersSent: number }> {
     try {
       await db.$queryRawUnsafe("SELECT 1 FROM user_quest LIMIT 1");
     } catch (error: any) {
+      // Handle table doesn't exist error (P2021)
       if (error?.code === "P2021" || error?.message?.includes("does not exist")) {
         console.log("⚠️  [Quest Reminders] user_quest table does not exist yet, skipping...");
         return { remindersSent: 0 };
       }
-      throw error;
+      // Handle database connection errors gracefully
+      if (error?.name === "PrismaClientInitializationError" || 
+          error?.message?.includes("Can't reach database server") ||
+          error?.message?.includes("Can not reach database server")) {
+        console.warn("⚠️  [Quest Reminders] Database connection error, skipping...");
+        console.warn("   Error:", error.message?.substring(0, 100));
+        return { remindersSent: 0 };
+      }
+      // Log unexpected errors but don't crash
+      console.error("❌ [Quest Reminders] Unexpected error checking tables:", error?.message || error);
+      return { remindersSent: 0 };
     }
 
     // Get all active quests that started more than 5 minutes ago
