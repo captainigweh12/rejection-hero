@@ -1857,6 +1857,7 @@ export async function updateUserStats(userId: string, xpReward: number, pointRew
   await db.user_stats.upsert({
     where: { userId },
     create: {
+      id: crypto.randomUUID(),
       userId,
       totalXP: xpReward,
       totalPoints: pointReward,
@@ -1871,8 +1872,12 @@ export async function updateUserStats(userId: string, xpReward: number, pointRew
       easyZoneCount: difficulty?.toLowerCase() === "easy" ? 1 : 0,
       growthZoneCount: difficulty?.toLowerCase() === "medium" ? 1 : 0,
       fearZoneCount: (difficulty?.toLowerCase() === "hard" || difficulty?.toLowerCase() === "expert") ? 1 : 0,
+      updatedAt: now,
     },
-    update: updateData,
+    update: {
+      ...updateData,
+      updatedAt: now,
+    },
   });
 }
 
