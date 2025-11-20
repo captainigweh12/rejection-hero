@@ -75,7 +75,7 @@ policiesRouter.get("/", async (c) => {
 
   try {
     // Get user's accepted policies
-    const acceptances = await db.policyAcceptance.findMany({
+    const acceptances = await db.policy_acceptance.findMany({
       where: { userId: user.id },
     });
 
@@ -118,7 +118,7 @@ policiesRouter.post("/:policyType/accept", async (c) => {
     const userAgent = c.req.header("user-agent") || "unknown";
 
     // Upsert policy acceptance
-    const acceptance = await db.policyAcceptance.upsert({
+    const acceptance = await db.policy_acceptance.upsert({
       where: {
         userId_policyType: {
           userId: user.id,
@@ -149,7 +149,7 @@ policiesRouter.post("/:policyType/accept", async (c) => {
       await sendPolicyAcceptanceEmail(user.email, user.name || "User", policyType, policyName, policyContent);
       
       // Update email sent status
-      await db.policyAcceptance.update({
+      await db.policy_acceptance.update({
         where: { id: acceptance.id },
         data: {
           emailSent: true,
@@ -187,7 +187,7 @@ policiesRouter.get("/check-required", async (c) => {
   }
 
   try {
-    const acceptances = await db.policyAcceptance.findMany({
+    const acceptances = await db.policy_acceptance.findMany({
       where: { userId: user.id },
     });
 
