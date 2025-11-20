@@ -255,7 +255,10 @@ export default function LoginWithEmailPassword() {
       console.log("🔐 [Google OAuth] Starting Google sign-in...");
       console.log("🔐 [Google OAuth] Backend URL:", process.env.EXPO_PUBLIC_VIBECODE_BACKEND_URL);
       console.log("🔐 [Google OAuth] Callback URL: vibecode://auth/callback");
+      console.log("🔐 [Google OAuth] Auth Client initialized with Expo plugin");
 
+      // Call the social sign-in with explicit callback URL
+      console.log("🔐 [Google OAuth] Calling authClient.signIn.social...");
       const result = await authClient.signIn.social({
         provider: "google",
         callbackURL: "vibecode://auth/callback",
@@ -266,15 +269,17 @@ export default function LoginWithEmailPassword() {
       if (result.error) {
         console.error("🔐 [Google OAuth] Sign-in error:", result.error);
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-        
+
         // Provide more specific error messages
         let errorMessage = result.error.message || "Failed to sign in with Google";
         if (result.error.message?.includes("network") || result.error.message?.includes("fetch")) {
           errorMessage = "Network error: Please check your internet connection and try again.";
         } else if (result.error.message?.includes("cancelled") || result.error.message?.includes("canceled")) {
           errorMessage = "Sign-in was cancelled. Please try again.";
+        } else if (result.error.message?.includes("not enabled") || result.error.message?.includes("not configured")) {
+          errorMessage = "Google sign-in is not configured. Please try email sign-in instead.";
         }
-        
+
         Alert.alert("Sign In Failed", errorMessage);
         setIsLoading(false);
         return;
@@ -291,13 +296,14 @@ export default function LoginWithEmailPassword() {
 
         // Wait for session to be available (with retry logic)
         let retries = 0;
-        const maxRetries = 15; // 3 seconds total (15 * 200ms)
+        const maxRetries = 20; // 4 seconds total (20 * 200ms) - increased for OAuth flow
         while (retries < maxRetries) {
           await new Promise((resolve) => setTimeout(resolve, 200));
 
           // Check if session is now available
           if (retries % 3 === 0) {
             // Refetch every 600ms to check for session
+            console.log(`🔐 [Google OAuth] Waiting for session... (${retries}/${maxRetries})`);
             refetch();
           }
 
@@ -313,6 +319,12 @@ export default function LoginWithEmailPassword() {
       }
     } catch (error: any) {
       console.error("🔐 [Google OAuth] Unexpected error:", error);
+      console.error("🔐 [Google OAuth] Error details:", {
+        message: error?.message,
+        code: error?.code,
+        name: error?.name,
+        stack: error?.stack?.split('\n').slice(0, 3).join('\n'),
+      });
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
 
       // Provide more helpful error messages

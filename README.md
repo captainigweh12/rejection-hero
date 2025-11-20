@@ -25,7 +25,28 @@
 
 ## 🔧 Recent Updates
 
-### ✨ In-App Purchases Integration (Latest)
+### 🔐 Google OAuth Sign-In Fix (Latest)
+- **Issue**: Google OAuth sign-in was not completing - logs showed "Starting Google sign-in..." but no callback
+- **Root Cause**:
+  - Missing deep link handler in app navigation for OAuth callback path `vibecode://auth/callback`
+  - Deep linking config in `App.tsx` didn't include route for auth callbacks
+  - Better Auth's Expo plugin couldn't route back to the app after Google OAuth completes
+- **✅ FIXED**:
+  - ✅ Added `LoginModalScreen: "auth/callback"` to deep linking config in `App.tsx`
+  - ✅ Added OAuth callback path handler in deep link listener
+  - ✅ Enhanced Google sign-in logging to capture all steps of OAuth flow
+  - ✅ Increased session refetch timeout from 3s to 4s for OAuth flow
+  - ✅ Added detailed error logging for better debugging
+- **How It Works**:
+  1. User clicks "Continue with Google"
+  2. App calls `authClient.signIn.social()` with `callbackURL: "vibecode://auth/callback"`
+  3. Better Auth Expo plugin opens Google login in system browser
+  4. After Google authentication, browser calls `vibecode://auth/callback`
+  5. Deep link handler routes to `LoginModalScreen`
+  6. Session is automatically established
+  7. `AuthWrapper` detects user is logged in and navigates to main app
+
+### ✨ In-App Purchases Integration
 - **Feature**: Full in-app purchase support for iOS, Android, and Web
 - **Implementation**:
   - ✅ Installed and configured `expo-in-app-purchases` package

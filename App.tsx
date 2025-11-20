@@ -100,6 +100,8 @@ function AppContent() {
             HomeTab: "home",
           },
         },
+        // OAuth callback paths
+        LoginModalScreen: "auth/callback",
       },
     },
   };
@@ -110,8 +112,12 @@ function AppContent() {
       const { path, queryParams } = Linking.parse(event.url);
       console.log("🔗 Deep link received:", { path, queryParams });
 
-      // Handle payment success/cancel - both redirect to home
-      if (path === "payment-success") {
+      // Handle OAuth callback from Google Sign-In
+      if (path === "auth/callback") {
+        console.log("🔐 [OAuth] Auth callback received:", queryParams);
+        // The linking config will handle navigation to LoginModalScreen
+        // Better Auth will process the callback automatically
+      } else if (path === "payment-success") {
         console.log("✅ Payment success - redirecting to home");
         // The linking config will handle navigation to home
       } else if (path === "payment-cancel") {
