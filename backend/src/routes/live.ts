@@ -32,7 +32,7 @@ live.post("/start", async (c) => {
     const body = await c.req.json();
     const { userQuestId } = startLiveStreamRequestSchema.parse(body);
 
-    // Check if user already has an active live stream and end it automatically
+    // Check if user already has an active live stream and return it
     const existingStream = await db.live_stream.findFirst({
       where: {
         userId: user.id,
@@ -41,25 +41,22 @@ live.post("/start", async (c) => {
     });
 
     if (existingStream) {
-      // Automatically end the existing stream
-      await db.live_stream.update({
-        where: { id: existingStream.id },
-        data: {
-          isActive: false,
-          endedAt: new Date(),
-        },
-      });
+      // Return the existing stream instead of creating a new one
+      console.log(`[Live] User ${user.id} already has active stream ${existingStream.id}, returning it`);
 
-      // Update profile to mark user as not live
-      await db.profile.updateMany({
-        where: { userId: user.id },
-        data: {
-          isLive: false,
-          liveViewers: 0,
+      return c.json({
+        success: true,
+        stream: {
+          id: existingStream.id,
+          roomUrl: existingStream.roomUrl,
+          roomName: existingStream.roomName,
+          userQuestId: existingStream.userQuestId,
+          isActive: existingStream.isActive,
+          viewerCount: existingStream.viewerCount,
+          startedAt: existingStream.startedAt.toISOString(),
         },
-      });
-
-      console.log(`[Live] Auto-ended existing stream ${existingStream.id} for user ${user.id}`);
+        token: "existing-stream-token",
+      } satisfies z.infer<typeof startLiveStreamResponseSchema>);
     }
 
     // Generate Daily.co room

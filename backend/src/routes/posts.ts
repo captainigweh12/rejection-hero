@@ -28,7 +28,7 @@ postsRouter.post("/", zValidator("json", createPostRequestSchema), async (c) => 
       const group = await db.group.findUnique({
         where: { id: groupId },
         include: {
-          members: true,
+          group_member: true,
         },
       });
 
@@ -37,7 +37,7 @@ postsRouter.post("/", zValidator("json", createPostRequestSchema), async (c) => 
       }
 
       // Check if user is a member of the group
-      const isMember = group.members.some((m) => m.userId === user.id);
+      const isMember = group.group_member.some((m) => m.userId === user.id);
       if (!isMember && group.creatorId !== user.id) {
         return c.json({ message: "You must be a member of this group to post" }, 403);
       }
@@ -91,7 +91,7 @@ postsRouter.post("/", zValidator("json", createPostRequestSchema), async (c) => 
       user: {
         id: post.user.id,
         name: post.user.name,
-        avatar: post.user.Profile?.avatar || post.user.image || null,
+        avatar: post.user.profile?.avatar || post.user.image || null,
       },
       images,
     });
@@ -183,19 +183,19 @@ postsRouter.get("/feed", async (c) => {
             name: true,
           },
         },
-        images: {
+        post_image: {
           orderBy: {
             order: "asc",
           },
         },
-        likes: {
+        post_like: {
           select: {
             id: true,
             userId: true,
             createdAt: true,
           },
         },
-        comments: {
+        post_comment: {
           include: {
             user: {
               include: {
@@ -226,7 +226,7 @@ postsRouter.get("/feed", async (c) => {
         id: post.user.id,
         name: post.user.name,
         email: post.user.email,
-        avatar: post.user.Profile?.avatar || post.user.image || null,
+        avatar: post.user.profile?.avatar || post.user.image || null,
       },
       group: post.group,
       images: post.post_image.map((img) => ({
@@ -246,7 +246,7 @@ postsRouter.get("/feed", async (c) => {
         user: {
           id: comment.user.id,
           name: comment.user.name,
-          avatar: comment.user.Profile?.avatar || comment.user.image || null,
+          avatar: comment.user.profile?.avatar || comment.user.image || null,
         },
       })),
       likeCount: post.post_like.length,
@@ -397,7 +397,7 @@ postsRouter.post("/:id/comment", zValidator("json", addCommentRequestSchema), as
       user: {
         id: comment.user.id,
         name: comment.user.name,
-        avatar: comment.user.Profile?.avatar || comment.user.image || null,
+        avatar: comment.user.profile?.avatar || comment.user.image || null,
       },
     });
   } catch (error) {
@@ -461,7 +461,7 @@ postsRouter.put("/:id", async (c) => {
       user: {
         id: updatedPost.user.id,
         name: updatedPost.user.name,
-        avatar: updatedPost.user.Profile?.avatar || updatedPost.user.image || null,
+        avatar: updatedPost.user.profile?.avatar || updatedPost.user.image || null,
       },
     });
   } catch (error) {

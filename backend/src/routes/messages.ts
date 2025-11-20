@@ -34,10 +34,10 @@ messagesRouter.get("/conversations", async (c) => {
       isDeleted: false,
     },
     include: {
-      sender: {
+      user_message_senderIdTouser: {
         include: { profile: true },
       },
-      receiver: {
+      user_message_receiverIdTouser: {
         include: { profile: true },
       },
     },
@@ -51,7 +51,7 @@ messagesRouter.get("/conversations", async (c) => {
 
   messages.forEach((message) => {
     const partnerId = message.senderId === user.id ? message.receiverId : message.senderId;
-    const partner = message.senderId === user.id ? message.receiver : message.sender;
+    const partner = message.senderId === user.id ? message.user_message_receiverIdTouser : message.user_message_senderIdTouser;
 
     if (!conversationsMap.has(partnerId)) {
       const unreadCount = messages.filter(
@@ -61,8 +61,8 @@ messagesRouter.get("/conversations", async (c) => {
       conversationsMap.set(partnerId, {
         userId: partnerId,
         email: partner.email,
-        displayName: partner.Profile?.displayName || partner.email?.split("@")[0] || "User",
-        avatar: partner.Profile?.avatar || null,
+        displayName: partner.profile?.displayName || partner.email?.split("@")[0] || "User",
+        avatar: partner.profile?.avatar || null,
         lastMessage: message.content,
         lastMessageAt: message.createdAt,
         unreadCount,
@@ -105,7 +105,7 @@ messagesRouter.get("/:userId", async (c) => {
       isDeleted: false,
     },
     include: {
-      sender: {
+      user_message_senderIdTouser: {
         include: { profile: true },
       },
     },
@@ -132,8 +132,8 @@ messagesRouter.get("/:userId", async (c) => {
       id: message.id,
       content: message.isModerated ? "[Message removed by moderation]" : message.content,
       senderId: message.senderId,
-      senderName: message.sender.Profile?.displayName || message.sender.email?.split("@")[0] || "User",
-      senderAvatar: message.sender.Profile?.avatar || null,
+      senderName: message.user_message_senderIdTouser.profile?.displayName || message.user_message_senderIdTouser.email?.split("@")[0] || "User",
+      senderAvatar: message.user_message_senderIdTouser.profile?.avatar || null,
       createdAt: message.createdAt,
       read: message.read,
       isMine: message.senderId === user.id,

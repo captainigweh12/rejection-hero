@@ -22,10 +22,10 @@ groupsRouter.get("/", async (c) => {
     include: {
       group: {
         include: {
-          creator: {
+          user: {
             include: { profile: true },
           },
-          members: true,
+          group_member: true,
         },
       },
     },
@@ -38,8 +38,8 @@ groupsRouter.get("/", async (c) => {
     coverImage: m.group.coverImage,
     isPrivate: m.group.isPrivate,
     creatorId: m.group.creatorId,
-    creatorName: m.group.creator.Profile?.displayName || m.group.creator.email?.split("@")[0] || "User",
-    memberCount: m.group.members.length,
+    creatorName: m.group.user.profile?.displayName || m.group.user.email?.split("@")[0] || "User",
+    memberCount: m.group.group_member.length,
     role: m.role,
     joinedAt: m.joinedAt,
     createdAt: m.group.createdAt,
@@ -49,17 +49,17 @@ groupsRouter.get("/", async (c) => {
   const publicGroups = await db.group.findMany({
     where: {
       isPrivate: false,
-      members: {
+      group_member: {
         none: {
           userId: user.id,
         },
       },
     },
     include: {
-      creator: {
+      user: {
         include: { profile: true },
       },
-      members: true,
+      group_member: true,
     },
     take: 20,
     orderBy: {
@@ -74,8 +74,8 @@ groupsRouter.get("/", async (c) => {
     coverImage: group.coverImage,
     isPrivate: group.isPrivate,
     creatorId: group.creatorId,
-    creatorName: group.creator.Profile?.displayName || group.creator.email?.split("@")[0] || "User",
-    memberCount: group.members.length,
+    creatorName: group.user.profile?.displayName || group.user.email?.split("@")[0] || "User",
+    memberCount: group.group_member.length,
     createdAt: group.createdAt,
   }));
 
@@ -97,10 +97,10 @@ groupsRouter.get("/:groupId", async (c) => {
   const group = await db.group.findUnique({
     where: { id: groupId },
     include: {
-      creator: {
+      user: {
         include: { profile: true },
       },
-      members: {
+      group_member: {
         include: {
           user: {
             include: { profile: true },
@@ -115,16 +115,16 @@ groupsRouter.get("/:groupId", async (c) => {
   }
 
   // Check if user is a member
-  const membership = group.members.find((m) => m.userId === user.id);
+  const membership = group.group_member.find((m) => m.userId === user.id);
 
   if (group.isPrivate && !membership) {
     return c.json({ message: "This is a private group" }, 403);
   }
 
-  const members = group.members.map((m) => ({
+  const members = group.group_member.map((m) => ({
     id: m.userId,
-    displayName: m.user.Profile?.displayName || m.user.email?.split("@")[0] || "User",
-    avatar: m.user.Profile?.avatar || null,
+    displayName: m.user.profile?.displayName || m.user.email?.split("@")[0] || "User",
+    avatar: m.user.profile?.avatar || null,
     role: m.role,
     joinedAt: m.joinedAt,
   }));
@@ -137,7 +137,7 @@ groupsRouter.get("/:groupId", async (c) => {
       coverImage: group.coverImage,
       isPrivate: group.isPrivate,
       creatorId: group.creatorId,
-      creatorName: group.creator.Profile?.displayName || group.creator.email?.split("@")[0] || "User",
+      creatorName: group.user.profile?.displayName || group.user.email?.split("@")[0] || "User",
       memberCount: members.length,
       members,
       userRole: membership?.role || null,
@@ -349,7 +349,7 @@ groupsRouter.post(
     const group = await db.group.findUnique({
       where: { id: groupId },
       include: {
-        members: {
+        group_member: {
           where: { userId: user.id },
         },
       },
@@ -360,8 +360,8 @@ groupsRouter.post(
     }
 
     // Check if user is a member with moderator/admin role
-    const membership = group.members[0];
-    if (!membership || (membership.role !== "ADMIN" && membership.role !== "MODERATOR")) {
+    const membership = group.group_member[0];
+    if (!membership || (membership.role !== "admin" && membership.role !== "moderator")) {
       return c.json({ message: "Only admins and moderators can invite members" }, 403);
     }
 
@@ -600,17 +600,19 @@ groupsRouter.get("/:groupId/posts", async (c) => {
           name: true,
           email: true,
           image: true,
+          profile: true,
         },
       },
-      images: true,
-      likes: true,
-      comments: {
+      post_image: true,
+      post_like: true,
+      post_comment: {
         include: {
           user: {
             select: {
               id: true,
               name: true,
               image: true,
+              profile: true,
             },
           },
         },
@@ -633,7 +635,7 @@ groupsRouter.get("/:groupId/posts", async (c) => {
       id: post.user.id,
       name: post.user.name,
       email: post.user.email,
-      avatar: post.user.image,
+      avatar: post.user.profile?.avatar || post.user.image,
     },
     group: {
       id: groupId,
@@ -656,7 +658,7 @@ groupsRouter.get("/:groupId/posts", async (c) => {
       user: {
         id: comment.user.id,
         name: comment.user.name,
-        avatar: comment.user.image,
+        avatar: comment.user.profile?.avatar || comment.user.image,
       },
     })),
     likeCount: post.post_like.length,
@@ -721,8 +723,8 @@ groupsRouter.get("/:groupId/moments", async (c) => {
       if (!acc[userId]) {
         acc[userId] = {
           userId: moment.user.id,
-          userName: moment.user.Profile?.displayName || moment.user.email?.split("@")[0] || "User",
-          userAvatar: moment.user.Profile?.avatar || moment.user.image || null,
+          userName: moment.user.profile?.displayName || moment.user.email?.split("@")[0] || "User",
+          userAvatar: moment.user.profile?.avatar || moment.user.image || null,
           moments: [],
         };
       }

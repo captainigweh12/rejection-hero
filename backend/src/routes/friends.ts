@@ -33,12 +33,12 @@ friendsRouter.get("/", async (c) => {
       ],
     },
     include: {
-      initiator: {
+      user_friendship_initiatorIdTouser: {
         include: {
           profile: true,
         },
       },
-      receiver: {
+      user_friendship_receiverIdTouser: {
         include: {
           profile: true,
         },
@@ -48,8 +48,8 @@ friendsRouter.get("/", async (c) => {
 
   // Format friends list
   const friends = friendships.map((friendship) => {
-    const friend = friendship.initiatorId === user.id ? friendship.receiver : friendship.initiator;
-    const profile = friend.Profile;
+    const friend = friendship.initiatorId === user.id ? friendship.user_friendship_receiverIdTouser : friendship.user_friendship_initiatorIdTouser;
+    const profile = friend.profile;
 
     return {
       id: friend.id,
@@ -82,7 +82,7 @@ friendsRouter.get("/requests", async (c) => {
       status: "PENDING",
     },
     include: {
-      initiator: {
+      user_friendship_initiatorIdTouser: {
         include: {
           profile: true,
         },
@@ -94,12 +94,12 @@ friendsRouter.get("/requests", async (c) => {
   });
 
   const formattedRequests = requests.map((request) => {
-    const profile = request.initiator.Profile;
+    const profile = request.user_friendship_initiatorIdTouser.profile;
     return {
       id: request.id,
-      userId: request.initiator.id,
-      email: request.initiator.email,
-      displayName: profile?.displayName || request.initiator.email?.split("@")[0] || "User",
+      userId: request.user_friendship_initiatorIdTouser.id,
+      email: request.user_friendship_initiatorIdTouser.email,
+      displayName: profile?.displayName || request.user_friendship_initiatorIdTouser.email?.split("@")[0] || "User",
       avatar: profile?.avatar || null,
       bio: profile?.bio || null,
       requestedAt: request.createdAt,

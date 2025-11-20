@@ -19,7 +19,7 @@ notificationsRouter.get("/", async (c) => {
   const notifications = await db.notification.findMany({
     where: { userId: user.id },
     include: {
-      sender: {
+      user_notification_senderIdTouser: {
         include: {
           profile: true,
         },
@@ -32,7 +32,7 @@ notificationsRouter.get("/", async (c) => {
   });
 
   const formattedNotifications = notifications.map((notification) => {
-    const senderProfile = notification.sender?.Profile;
+    const senderProfile = notification.user_notification_senderIdTouser?.profile;
     return {
       id: notification.id,
       type: notification.type,
@@ -41,10 +41,10 @@ notificationsRouter.get("/", async (c) => {
       read: notification.read,
       data: notification.data ? JSON.parse(notification.data) : null,
       createdAt: notification.createdAt,
-      sender: notification.sender
+      sender: notification.user_notification_senderIdTouser
         ? {
-            id: notification.sender.id,
-            displayName: senderProfile?.displayName || notification.sender.email?.split("@")[0] || "User",
+            id: notification.user_notification_senderIdTouser.id,
+            displayName: senderProfile?.displayName || notification.user_notification_senderIdTouser.email?.split("@")[0] || "User",
             avatar: senderProfile?.avatar || null,
           }
         : null,
