@@ -28,6 +28,7 @@ import { api } from "@/lib/api";
 import { useSession } from "@/lib/useSession";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useParentalGuidance } from "@/contexts/ParentalGuidanceContext";
+import { showUpgradeDialog } from "@/services/subscriptionService";
 import type {
   GetActiveLiveStreamsResponse,
   StartLiveStreamResponse,
@@ -279,68 +280,11 @@ export default function LiveScreen({ navigation }: Props) {
     onError: (error: any) => {
       // Check if it's a subscription limit error (403 with specific message)
       if (error.status === 403 && error.message?.includes("quest limit")) {
-        Alert.alert(
-          "🚀 Upgrade to Premium",
-          "You've reached your free quest limit! Upgrade to create unlimited AI-powered quests and unlock all premium features.",
-          [
-            {
-              text: "Cancel",
-              style: "cancel",
-            },
-            {
-              text: "Upgrade Now",
-              style: "default",
-              onPress: () => {
-                // Navigate to subscription/payment screen
-                // For now, we'll use a web link until in-app purchases are set up
-                if (Platform.OS === "ios") {
-                  // TODO: Implement Apple In-App Purchase
-                  Alert.alert(
-                    "Coming Soon",
-                    "In-app purchases are coming soon! For now, please visit our website to upgrade.",
-                    [
-                      {
-                        text: "OK",
-                        style: "cancel",
-                      },
-                    ]
-                  );
-                } else if (Platform.OS === "android") {
-                  // TODO: Implement Google Play Billing
-                  Alert.alert(
-                    "Coming Soon",
-                    "In-app purchases are coming soon! For now, please visit our website to upgrade.",
-                    [
-                      {
-                        text: "OK",
-                        style: "cancel",
-                      },
-                    ]
-                  );
-                } else {
-                  // Web - redirect to Stripe checkout
-                  Alert.alert(
-                    "Redirect to Upgrade",
-                    "You'll be redirected to our secure checkout page.",
-                    [
-                      {
-                        text: "Cancel",
-                        style: "cancel",
-                      },
-                      {
-                        text: "Continue",
-                        onPress: () => {
-                          // TODO: Open Stripe checkout URL
-                          console.log("Redirect to Stripe checkout");
-                        },
-                      },
-                    ]
-                  );
-                }
-              },
-            },
-          ]
-        );
+        showUpgradeDialog(() => {
+          // Callback after successful purchase
+          queryClient.invalidateQueries({ queryKey: ["quests"] });
+          setShowCreateQuestModal(false);
+        });
       } else {
         // Show generic error for other errors
         Alert.alert("Error", error.message || "Failed to create quest");

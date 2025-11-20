@@ -12,6 +12,7 @@
 | **Onboarding Flow** | ✅ **FIXED** | New users now see age verification → onboarding |
 | **Custom Quests** | ✅ **FIXED** | Users can create custom quests without selecting friends |
 | **Free Tier Limits** | ✅ **IMPLEMENTED** | Free users limited to 10 custom quests, premium unlimited |
+| **In-App Purchases** | ✅ **ENABLED** | iOS & Android IAP integrated with expo-in-app-purchases |
 | Database | ⚠️ Dev-Only | SQLite (needs PostgreSQL for production) |
 | SSL/TLS | ⚠️ Required | Not set up (needs Let's Encrypt for rejectionhero.com) |
 
@@ -21,6 +22,39 @@
 - 📄 `PRODUCTION_DEPLOYMENT_GUIDE.md` - Full deployment instructions for rejectionhero.com
 
 ---
+
+## 🔧 Recent Updates
+
+### ✨ In-App Purchases Integration (Latest)
+- **Feature**: Full in-app purchase support for iOS, Android, and Web
+- **Implementation**:
+  - ✅ Installed and configured `expo-in-app-purchases` package
+  - ✅ Created subscription service (`src/services/subscriptionService.ts`)
+  - ✅ Platform-specific handling:
+    - **iOS**: Apple In-App Purchase with product selection dialog
+    - **Android**: Google Play Billing with product selection dialog
+    - **Web**: Stripe checkout redirect (URL configurable)
+  - ✅ Graceful upgrade flow when hitting free tier limits
+  - ✅ Clean error handling - no red error screens for subscription limits
+- **Product IDs**:
+  - Monthly: `com.vibecode.goforno.premium.monthly`
+  - Yearly: `com.vibecode.goforno.premium.yearly`
+- **Setup Required**:
+  - Configure products in App Store Connect (iOS)
+  - Configure products in Google Play Console (Android)
+  - Add Stripe checkout URL in `subscriptionService.ts` (Web)
+  - Implement backend verification of purchases
+- **User Experience**: When users hit 10 quest limit, they see beautiful upgrade dialog with platform-appropriate payment flow
+
+### 📺 Live Streaming Enhancements (Latest)
+- **Quest Card on Live Stream**:
+  - ✅ Sparkles button on camera controls to show/hide quest card
+  - ✅ Create quests directly from live stream
+  - ✅ Interactive Yes/No buttons on quest card
+  - ✅ Real-time progress tracking without leaving stream
+  - ✅ Beautiful expandable card design
+- **Chat Functionality**: Fixed and working for streamers on their own stream
+- **UI Improvements**: Added helper text and smooth animations
 
 ## 🔧 Bug Fixes & Features
 
