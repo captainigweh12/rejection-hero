@@ -8,7 +8,7 @@ export async function decayConfidenceMeters() {
   const now = new Date();
   
   // Get all user stats
-  const allStats = await db.userStats.findMany({
+  const allStats = await db.user_stats.findMany({
     where: {
       dailyConfidenceMeter: {
         gt: 0, // Only process users with confidence > 0
@@ -33,7 +33,7 @@ export async function decayConfidenceMeters() {
       const isNowLow = newConfidence < 20;
       
       // Update confidence meter
-      await db.userStats.update({
+      await db.user_stats.update({
         where: { id: stats.id },
         data: {
           dailyConfidenceMeter: newConfidence,

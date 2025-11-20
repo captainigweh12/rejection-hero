@@ -40,7 +40,7 @@ export async function generateDailyChallengesForAllUsers() {
         }
 
         // Check if quest already exists for today
-        const existingQuest = await db.challengeDailyQuest.findUnique({
+        const existingQuest = await db.challenge_daily_quest.findUnique({
           where: {
             challengeId_day: {
               challengeId: challenge.id,
@@ -88,7 +88,7 @@ export async function generateDailyChallengesForAllUsers() {
         });
 
         // Create or update daily quest entry
-        const dailyQuest = await db.challengeDailyQuest.upsert({
+        const dailyQuest = await db.challenge_daily_quest.upsert({
           where: {
             challengeId_day: {
               challengeId: challenge.id,
@@ -109,7 +109,7 @@ export async function generateDailyChallengesForAllUsers() {
         });
 
         // Create user quest and auto-start it
-        const userQuest = await db.userQuest.create({
+        const userQuest = await db.user_quest.create({
           data: {
             userId: challenge.userId,
             questId: quest.id,
@@ -119,7 +119,7 @@ export async function generateDailyChallengesForAllUsers() {
         });
 
         // Link user quest to daily quest
-        await db.challengeDailyQuest.update({
+        await db.challenge_daily_quest.update({
           where: { id: dailyQuest.id },
           data: {
             userQuestId: userQuest.id,

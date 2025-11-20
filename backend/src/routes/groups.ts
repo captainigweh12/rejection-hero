@@ -17,7 +17,7 @@ groupsRouter.get("/", async (c) => {
   }
 
   // Get user's group memberships
-  const memberships = await db.groupMember.findMany({
+  const memberships = await db.group_member.findMany({
     where: { userId: user.id },
     include: {
       group: {
@@ -177,7 +177,7 @@ groupsRouter.post("/create", zValidator("json", createGroupSchema), async (c) =>
   });
 
   // Add creator as admin member
-  await db.groupMember.create({
+  await db.group_member.create({
     data: {
       groupId: group.id,
       userId: user.id,
@@ -214,7 +214,7 @@ groupsRouter.post("/:groupId/join", async (c) => {
   }
 
   // Check if already a member
-  const existing = await db.groupMember.findUnique({
+  const existing = await db.group_member.findUnique({
     where: {
       groupId_userId: {
         groupId,
@@ -228,7 +228,7 @@ groupsRouter.post("/:groupId/join", async (c) => {
   }
 
   // Add user as member
-  await db.groupMember.create({
+  await db.group_member.create({
     data: {
       groupId,
       userId: user.id,
@@ -252,7 +252,7 @@ groupsRouter.post("/:groupId/leave", async (c) => {
   const groupId = c.req.param("groupId");
 
   // Find membership
-  const membership = await db.groupMember.findUnique({
+  const membership = await db.group_member.findUnique({
     where: {
       groupId_userId: {
         groupId,
@@ -275,7 +275,7 @@ groupsRouter.post("/:groupId/leave", async (c) => {
   }
 
   // Remove membership
-  await db.groupMember.delete({
+  await db.group_member.delete({
     where: {
       groupId_userId: {
         groupId,
@@ -459,7 +459,7 @@ groupsRouter.patch("/:groupId/avatar", zValidator("json", updateGroupAvatarSchem
   const { coverImage } = c.req.valid("json");
 
   // Check if user is admin
-  const membership = await db.groupMember.findUnique({
+  const membership = await db.group_member.findUnique({
     where: {
       groupId_userId: {
         groupId,
@@ -500,7 +500,7 @@ groupsRouter.post("/:groupId/invite-user", zValidator("json", inviteUserSchema),
   const { userId, message } = c.req.valid("json");
 
   // Check if user is admin or moderator
-  const membership = await db.groupMember.findUnique({
+  const membership = await db.group_member.findUnique({
     where: {
       groupId_userId: {
         groupId,
@@ -524,7 +524,7 @@ groupsRouter.post("/:groupId/invite-user", zValidator("json", inviteUserSchema),
   }
 
   // Check if user is already a member
-  const existingMember = await db.groupMember.findUnique({
+  const existingMember = await db.group_member.findUnique({
     where: {
       groupId_userId: {
         groupId,
@@ -538,7 +538,7 @@ groupsRouter.post("/:groupId/invite-user", zValidator("json", inviteUserSchema),
   }
 
   // Add user as member
-  await db.groupMember.create({
+  await db.group_member.create({
     data: {
       groupId,
       userId,
@@ -574,7 +574,7 @@ groupsRouter.get("/:groupId/posts", async (c) => {
   const groupId = c.req.param("groupId");
 
   // Check if user is a member
-  const membership = await db.groupMember.findUnique({
+  const membership = await db.group_member.findUnique({
     where: {
       groupId_userId: {
         groupId,
@@ -638,17 +638,17 @@ groupsRouter.get("/:groupId/posts", async (c) => {
       id: groupId,
       name: "", // Will be filled by frontend
     },
-    images: post.images.map((img) => ({
+    images: post.post_image.map((img) => ({
       id: img.id,
       imageUrl: img.imageUrl,
       order: img.order,
     })),
-    likes: post.likes.map((like) => ({
+    likes: post.post_like.map((like) => ({
       id: like.id,
       userId: like.userId,
       createdAt: like.createdAt.toISOString(),
     })),
-    comments: post.comments.map((comment) => ({
+    comments: post.post_comment.map((comment) => ({
       id: comment.id,
       content: comment.content,
       createdAt: comment.createdAt.toISOString(),
@@ -658,9 +658,9 @@ groupsRouter.get("/:groupId/posts", async (c) => {
         avatar: comment.user.image,
       },
     })),
-    likeCount: post.likes.length,
-    commentCount: post.comments.length,
-    isLikedByCurrentUser: post.likes.some((like) => like.userId === user.id),
+    likeCount: post.post_like.length,
+    commentCount: post.post_comment.length,
+    isLikedByCurrentUser: post.post_like.some((like) => like.userId === user.id),
   }));
 
   return c.json({ posts: formattedPosts });
@@ -679,7 +679,7 @@ groupsRouter.get("/:groupId/moments", async (c) => {
   const groupId = c.req.param("groupId");
 
   // Check if user is a member
-  const membership = await db.groupMember.findUnique({
+  const membership = await db.group_member.findUnique({
     where: {
       groupId_userId: {
         groupId,

@@ -301,7 +301,7 @@ sharedQuestsRouter.get("/", async (c) => {
     return c.json({ message: "Unauthorized" }, 401);
   }
 
-  const sharedQuests = await db.sharedQuest.findMany({
+  const sharedQuests = await db.shared_quest.findMany({
     where: {
       receiverId: user.id,
     },
@@ -384,7 +384,7 @@ sharedQuestsRouter.post("/share", zValidator("json", shareQuestSchema), async (c
   }
 
   // Check token balance (1 token required to send quest to friend)
-  const userStats = await db.userStats.findUnique({
+  const userStats = await db.user_stats.findUnique({
     where: { userId: user.id },
   });
 
@@ -399,7 +399,7 @@ sharedQuestsRouter.post("/share", zValidator("json", shareQuestSchema), async (c
   }
 
   // Deduct token
-  await db.userStats.update({
+  await db.user_stats.update({
     where: { userId: user.id },
     data: {
       tokens: {
@@ -409,7 +409,7 @@ sharedQuestsRouter.post("/share", zValidator("json", shareQuestSchema), async (c
   });
 
   // Create token transaction record
-  await db.tokenTransaction.create({
+  await db.token_transaction.create({
     data: {
       userId: user.id,
       type: "spent",
@@ -420,7 +420,7 @@ sharedQuestsRouter.post("/share", zValidator("json", shareQuestSchema), async (c
   });
 
   // Create shared quest
-  const sharedQuest = await db.sharedQuest.create({
+  const sharedQuest = await db.shared_quest.create({
     data: {
       senderId: user.id,
       receiverId: friendId,
@@ -445,7 +445,7 @@ sharedQuestsRouter.post("/:id/accept", async (c) => {
 
   const sharedQuestId = c.req.param("id");
 
-  const sharedQuest = await db.sharedQuest.findUnique({
+  const sharedQuest = await db.shared_quest.findUnique({
     where: { id: sharedQuestId },
   });
 
@@ -458,13 +458,13 @@ sharedQuestsRouter.post("/:id/accept", async (c) => {
   }
 
   // Update status
-  await db.sharedQuest.update({
+  await db.shared_quest.update({
     where: { id: sharedQuestId },
     data: { status: "accepted" },
   });
 
   // Check if user already has this quest
-  const existingUserQuest = await db.userQuest.findUnique({
+  const existingUserQuest = await db.user_quest.findUnique({
     where: {
       userId_questId: {
         userId: user.id,
@@ -478,7 +478,7 @@ sharedQuestsRouter.post("/:id/accept", async (c) => {
   }
 
   // Get active quests - check slots separately
-  const activeQuests = await db.userQuest.findMany({
+  const activeQuests = await db.user_quest.findMany({
     where: {
       userId: user.id,
       status: "ACTIVE",
@@ -493,7 +493,7 @@ sharedQuestsRouter.post("/:id/accept", async (c) => {
   const status = activeFriendQuests.length < 1 ? "ACTIVE" : "QUEUED";
 
   // Create user quest marked as from friend
-  await db.userQuest.create({
+  await db.user_quest.create({
     data: {
       userId: user.id,
       questId: sharedQuest.questId,
@@ -519,7 +519,7 @@ sharedQuestsRouter.post("/:id/decline", async (c) => {
 
   const sharedQuestId = c.req.param("id");
 
-  const sharedQuest = await db.sharedQuest.findUnique({
+  const sharedQuest = await db.shared_quest.findUnique({
     where: { id: sharedQuestId },
   });
 
@@ -532,7 +532,7 @@ sharedQuestsRouter.post("/:id/decline", async (c) => {
   }
 
   // Update status
-  await db.sharedQuest.update({
+  await db.shared_quest.update({
     where: { id: sharedQuestId },
     data: { status: "declined" },
   });
@@ -598,7 +598,7 @@ sharedQuestsRouter.post("/create-custom", zValidator("json", createCustomQuestSc
 
     // If not premium, count custom quests created by this user
     if (!isPremium) {
-      const customQuestCount = await db.userQuest.count({
+      const customQuestCount = await db.user_quest.count({
         where: {
           userId: user.id,
           quest: {
@@ -608,7 +608,7 @@ sharedQuestsRouter.post("/create-custom", zValidator("json", createCustomQuestSc
       });
 
       // Also count shared custom quests sent by this user
-      const sharedCustomQuestCount = await db.sharedQuest.count({
+      const sharedCustomQuestCount = await db.shared_quest.count({
         where: {
           senderId: user.id,
           isCustomQuest: true,
@@ -663,7 +663,7 @@ sharedQuestsRouter.post("/create-custom", zValidator("json", createCustomQuestSc
 
     // Check token balance (1 token per friend required)
     const requiredTokens = validFriendIds.length;
-    const userStats = await db.userStats.findUnique({
+    const userStats = await db.user_stats.findUnique({
       where: { userId: user.id },
     });
 
@@ -682,7 +682,7 @@ sharedQuestsRouter.post("/create-custom", zValidator("json", createCustomQuestSc
 
   // Check user's balance if gifting points/XP
   if (giftXP > 0 || giftPoints > 0) {
-    const userStats = await db.userStats.findUnique({
+    const userStats = await db.user_stats.findUnique({
       where: { userId: user.id },
     });
 
@@ -711,7 +711,7 @@ sharedQuestsRouter.post("/create-custom", zValidator("json", createCustomQuestSc
     }
 
     // Deduct from sender's balance
-    await db.userStats.update({
+    await db.user_stats.update({
       where: { userId: user.id },
       data: {
         totalXP: { decrement: giftXP },
@@ -738,7 +738,7 @@ sharedQuestsRouter.post("/create-custom", zValidator("json", createCustomQuestSc
   if (!safetyCheck.isSafe) {
     // Refund XP/Points if quest was unsafe
     if (giftXP > 0 || giftPoints > 0) {
-      await db.userStats.update({
+      await db.user_stats.update({
         where: { userId: user.id },
         data: {
           totalXP: { increment: giftXP },
@@ -804,7 +804,7 @@ sharedQuestsRouter.post("/create-custom", zValidator("json", createCustomQuestSc
   // For shared quests: deduct tokens, create SharedQuest records, and send notifications
   if (isPersonalQuest) {
     // Create a UserQuest for the user (personal quest)
-    const userQuest = await db.userQuest.create({
+    const userQuest = await db.user_quest.create({
       data: {
         userId: user.id,
         questId: quest.id,
@@ -838,7 +838,7 @@ sharedQuestsRouter.post("/create-custom", zValidator("json", createCustomQuestSc
 
   // Shared quest flow (with friends)
   // Deduct tokens for sending quest (1 per friend)
-  await db.userStats.update({
+  await db.user_stats.update({
     where: { userId: user.id },
     data: {
       tokens: {
@@ -848,7 +848,7 @@ sharedQuestsRouter.post("/create-custom", zValidator("json", createCustomQuestSc
   });
 
   // Create token transaction record
-  await db.tokenTransaction.create({
+  await db.token_transaction.create({
     data: {
       userId: user.id,
       type: "spent",
@@ -861,7 +861,7 @@ sharedQuestsRouter.post("/create-custom", zValidator("json", createCustomQuestSc
   // Create shared quests for all friends
   const sharedQuests = await Promise.all(
     validFriendIds.map((fId) =>
-      db.sharedQuest.create({
+      db.shared_quest.create({
         data: {
           senderId: user.id,
           receiverId: fId,

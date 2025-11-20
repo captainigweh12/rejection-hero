@@ -29,7 +29,7 @@ moderationRouter.post("/block", zValidator("json", blockUserSchema), async (c) =
   }
 
   // Check if already blocked
-  const existingBlock = await db.userBlock.findUnique({
+  const existingBlock = await db.user_block.findUnique({
     where: {
       blockerId_blockedId: {
         blockerId: user.id,
@@ -43,7 +43,7 @@ moderationRouter.post("/block", zValidator("json", blockUserSchema), async (c) =
   }
 
   // Create block
-  await db.userBlock.create({
+  await db.user_block.create({
     data: {
       blockerId: user.id,
       blockedId: userId,
@@ -103,7 +103,7 @@ moderationRouter.post("/unblock", zValidator("json", unblockUserSchema), async (
 
   const { userId } = c.req.valid("json");
 
-  const block = await db.userBlock.findUnique({
+  const block = await db.user_block.findUnique({
     where: {
       blockerId_blockedId: {
         blockerId: user.id,
@@ -116,7 +116,7 @@ moderationRouter.post("/unblock", zValidator("json", unblockUserSchema), async (
     return c.json({ message: "User is not blocked" }, 404);
   }
 
-  await db.userBlock.delete({
+  await db.user_block.delete({
     where: { id: block.id },
   });
 
@@ -136,7 +136,7 @@ moderationRouter.get("/blocked", async (c) => {
     return c.json({ message: "Unauthorized" }, 401);
   }
 
-  const blocked = await db.userBlock.findMany({
+  const blocked = await db.user_block.findMany({
     where: { blockerId: user.id },
     include: {
       blocked: {
@@ -505,7 +505,7 @@ moderationRouter.post("/chat/review", zValidator("json", reviewReportSchema), as
       }
     } else if (report.contentType === "post") {
       // Moderate post
-      await db.contentModeration.create({
+      await db.content_moderation.create({
         data: {
           contentId: report.contentId,
           contentType: "post",
@@ -541,7 +541,7 @@ moderationRouter.post("/chat/review", zValidator("json", reviewReportSchema), as
 // Helper: Check if user is blocked
 // ============================================
 export async function isUserBlocked(blockerId: string, blockedId: string): Promise<boolean> {
-  const block = await db.userBlock.findUnique({
+  const block = await db.user_block.findUnique({
     where: {
       blockerId_blockedId: {
         blockerId,
@@ -557,7 +557,7 @@ export async function isUserBlocked(blockerId: string, blockedId: string): Promi
 // Helper: Filter blocked users from list
 // ============================================
 export async function filterBlockedUsers(userId: string, userIds: string[]): Promise<string[]> {
-  const blocks = await db.userBlock.findMany({
+  const blocks = await db.user_block.findMany({
     where: {
       blockerId: userId,
       blockedId: { in: userIds },

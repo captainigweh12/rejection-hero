@@ -101,7 +101,7 @@ challengesRouter.get("/active", async (c) => {
         isActive: true,
       },
       include: {
-        dailyQuests: {
+        challenge_daily_quest: {
           where: {
             day: { lte: 100 }, // Only get up to day 100
           },
@@ -110,7 +110,7 @@ challengesRouter.get("/active", async (c) => {
           },
           include: {
             quest: true,
-            userQuest: true,
+            user_quest: true,
           },
         },
       },
@@ -134,7 +134,7 @@ challengesRouter.get("/active", async (c) => {
     }
 
     // Get today's quest
-    const todayQuest = challenge.dailyQuests.find((dq) => dq.day === currentDay);
+    const todayQuest = challenge.challenge_daily_quest.find((dq) => dq.day === currentDay);
 
     return c.json({
       challenge: {
@@ -158,7 +158,7 @@ challengesRouter.get("/active", async (c) => {
                     goalCount: todayQuest.quest.goalCount,
                   }
                 : null,
-              userQuestId: todayQuest.userQuestId,
+              userQuestId: todayQuest.user_questId,
             }
           : null,
       },
@@ -197,7 +197,7 @@ challengesRouter.post("/generate-daily", async (c) => {
     const currentDay = Math.min(Math.max(1, daysSinceStart), 100);
 
     // Check if quest already exists for today
-    const existingQuest = await db.challengeDailyQuest.findUnique({
+    const existingQuest = await db.challenge_daily_quest.findUnique({
       where: {
         challengeId_day: {
           challengeId: challenge.id,
@@ -280,7 +280,7 @@ async function generateDailyChallengeQuest(challengeId: string, day: number, cat
   });
 
   // Create or update daily quest entry
-  const dailyQuest = await db.challengeDailyQuest.upsert({
+  const dailyQuest = await db.challenge_daily_quest.upsert({
     where: {
       challengeId_day: {
         challengeId,

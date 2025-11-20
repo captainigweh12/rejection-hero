@@ -18,7 +18,7 @@ friendsRouter.get("/", async (c) => {
   }
 
   // Get blocked users
-  const blockedUsers = await db.userBlock.findMany({
+  const blockedUsers = await db.user_block.findMany({
     where: { blockerId: user.id },
     select: { blockedId: true },
   });

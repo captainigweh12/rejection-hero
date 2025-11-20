@@ -11,7 +11,7 @@ export async function checkQuestTimeWarnings(): Promise<{ warningsSent: number }
     let warningsSent = 0;
 
     // Get all active quests with their start times
-    const activeQuests = await db.userQuest.findMany({
+    const activeQuests = await db.user_quest.findMany({
       where: {
         status: "ACTIVE",
         startedAt: { not: null },
@@ -61,7 +61,7 @@ export async function checkQuestTimeWarnings(): Promise<{ warningsSent: number }
         const existingWarning = recentNotifications.find((n) => {
           try {
             const data = n.data ? JSON.parse(n.data) : {};
-            return data.userQuestId === userQuest.id;
+            return data.user_questId === userQuest.id;
           } catch {
             return false;
           }
@@ -115,7 +115,7 @@ export async function checkQuestTimeWarnings(): Promise<{ warningsSent: number }
         const existingWarning = recentNotifications.find((n) => {
           try {
             const data = n.data ? JSON.parse(n.data) : {};
-            return data.userQuestId === userQuest.id;
+            return data.user_questId === userQuest.id;
           } catch {
             return false;
           }
@@ -172,7 +172,7 @@ export async function sendQuestReminders(): Promise<{ remindersSent: number }> {
     // Get all active quests that started more than 5 minutes ago
     const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
     
-    const activeQuests = await db.userQuest.findMany({
+    const activeQuests = await db.user_quest.findMany({
       where: {
         status: "ACTIVE",
         startedAt: {
@@ -204,7 +204,7 @@ export async function sendQuestReminders(): Promise<{ remindersSent: number }> {
       const recentReminder = recentNotifications.find((n) => {
         try {
           const data = n.data ? JSON.parse(n.data) : {};
-          return data.userQuestId === userQuest.id;
+          return data.user_questId === userQuest.id;
         } catch {
           return false;
         }

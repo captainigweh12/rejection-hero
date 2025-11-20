@@ -122,7 +122,7 @@ journalRouter.post("/", zValidator("json", createJournalEntryRequestSchema), asy
 
   try {
     // Create journal entry
-    const journalEntry = await db.journalEntry.create({
+    const journalEntry = await db.journal_entry.create({
       data: {
         userId: user.id,
         audioUrl,
@@ -155,7 +155,7 @@ journalRouter.post("/", zValidator("json", createJournalEntryRequestSchema), asy
     }
 
     // Create growth achievement
-    const achievement = await db.growthAchievement.create({
+    const achievement = await db.growth_achievement.create({
       data: {
         userId: user.id,
         journalEntryId: journalEntry.id,
@@ -190,7 +190,7 @@ journalRouter.get("/", async (c) => {
   }
 
   try {
-    const entries = await db.journalEntry.findMany({
+    const entries = await db.journal_entry.findMany({
       where: {
         userId: user.id,
       },
@@ -258,7 +258,7 @@ journalRouter.put("/:id", zValidator("json", updateJournalEntryRequestSchema), a
 
   try {
     // Verify entry belongs to user
-    const entry = await db.journalEntry.findFirst({
+    const entry = await db.journal_entry.findFirst({
       where: {
         id,
         userId: user.id,
@@ -286,7 +286,7 @@ journalRouter.put("/:id", zValidator("json", updateJournalEntryRequestSchema), a
       updateData.location = location;
     }
 
-    const updatedEntry = await db.journalEntry.update({
+    const updatedEntry = await db.journal_entry.update({
       where: { id },
       data: updateData,
     });
@@ -326,7 +326,7 @@ journalRouter.get("/achievements", async (c) => {
   }
 
   try {
-    const achievements = await db.growthAchievement.findMany({
+    const achievements = await db.growth_achievement.findMany({
       where: {
         userId: user.id,
       },

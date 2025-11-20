@@ -67,7 +67,7 @@ postsRouter.post("/", zValidator("json", createPostRequestSchema), async (c) => 
       for (let i = 0; i < imageUrls.length; i++) {
         const imageUrl = imageUrls[i];
         if (!imageUrl) continue;
-        const image = await db.postImage.create({
+        const image = await db.post_image.create({
           data: {
             postId: post.id,
             imageUrl: imageUrl,
@@ -130,14 +130,14 @@ postsRouter.get("/feed", async (c) => {
     friendIds = await filterBlockedUsers(user.id, friendIds);
 
     // Get blocked users
-    const blockedUsers = await db.userBlock.findMany({
+    const blockedUsers = await db.user_block.findMany({
       where: { blockerId: user.id },
       select: { blockedId: true },
     });
     const blockedIds = blockedUsers.map((b) => b.blockedId);
 
     // Get user's groups
-    const userGroups = await db.groupMember.findMany({
+    const userGroups = await db.group_member.findMany({
       where: { userId: user.id },
       select: { groupId: true },
     });
@@ -229,17 +229,17 @@ postsRouter.get("/feed", async (c) => {
         avatar: post.user.Profile?.avatar || post.user.image || null,
       },
       group: post.group,
-      images: post.images.map((img) => ({
+      images: post.post_image.map((img) => ({
         id: img.id,
         imageUrl: img.imageUrl,
         order: img.order,
       })),
-      likes: post.likes.map((like) => ({
+      likes: post.post_like.map((like) => ({
         id: like.id,
         userId: like.userId,
         createdAt: like.createdAt.toISOString(),
       })),
-      comments: post.comments.map((comment) => ({
+      comments: post.post_comment.map((comment) => ({
         id: comment.id,
         content: comment.content,
         createdAt: comment.createdAt.toISOString(),
@@ -249,9 +249,9 @@ postsRouter.get("/feed", async (c) => {
           avatar: comment.user.Profile?.avatar || comment.user.image || null,
         },
       })),
-      likeCount: post.likes.length,
-      commentCount: post.comments.length,
-      isLikedByCurrentUser: post.likes.some((like) => like.userId === user.id),
+      likeCount: post.post_like.length,
+      commentCount: post.post_comment.length,
+      isLikedByCurrentUser: post.post_like.some((like) => like.userId === user.id),
     }));
 
     return c.json({
@@ -277,7 +277,7 @@ postsRouter.post("/:id/like", async (c) => {
 
   try {
     // Check if already liked
-    const existingLike = await db.postLike.findUnique({
+    const existingLike = await db.post_like.findUnique({
       where: {
         postId_userId: {
           postId,
@@ -291,7 +291,7 @@ postsRouter.post("/:id/like", async (c) => {
     }
 
     // Create like
-    await db.postLike.create({
+    await db.post_like.create({
       data: {
         postId,
         userId: user.id,
@@ -299,7 +299,7 @@ postsRouter.post("/:id/like", async (c) => {
     });
 
     // Get updated like count
-    const likeCount = await db.postLike.count({
+    const likeCount = await db.post_like.count({
       where: { postId },
     });
 
@@ -327,7 +327,7 @@ postsRouter.delete("/:id/like", async (c) => {
 
   try {
     // Delete like
-    await db.postLike.delete({
+    await db.post_like.delete({
       where: {
         postId_userId: {
           postId,
@@ -337,7 +337,7 @@ postsRouter.delete("/:id/like", async (c) => {
     });
 
     // Get updated like count
-    const likeCount = await db.postLike.count({
+    const likeCount = await db.post_like.count({
       where: { postId },
     });
 
@@ -375,7 +375,7 @@ postsRouter.post("/:id/comment", zValidator("json", addCommentRequestSchema), as
     }
 
     // Create comment
-    const comment = await db.postComment.create({
+    const comment = await db.post_comment.create({
       data: {
         postId,
         userId: user.id,

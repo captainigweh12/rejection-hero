@@ -346,7 +346,7 @@ paymentsRouter.post("/webhook", async (c) => {
 
         if (userId && tokenAmount > 0) {
           // Update user stats with tokens
-          await db.userStats.update({
+          await db.user_stats.update({
             where: { userId },
             data: {
               tokens: {
@@ -356,7 +356,7 @@ paymentsRouter.post("/webhook", async (c) => {
           });
 
           // Create transaction record
-          await db.tokenTransaction.create({
+          await db.token_transaction.create({
             data: {
               userId,
               type: "purchase",
@@ -407,7 +407,7 @@ paymentsRouter.get("/tokens", async (c) => {
   }
 
   try {
-    const stats = await db.userStats.findUnique({
+    const stats = await db.user_stats.findUnique({
       where: { userId: user.id },
     });
 

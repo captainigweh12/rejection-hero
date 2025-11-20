@@ -173,7 +173,7 @@ bugReportRouter.post("/", zValidator("json", bugReportSchema), async (c) => {
     // For now, we'll rely on the email notification
 
     // Store bug report in database for tracking
-    await db.bugReport.create({
+    await db.bug_report.create({
       data: {
         userId: user.id,
         subject,

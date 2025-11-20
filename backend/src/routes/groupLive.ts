@@ -19,7 +19,7 @@ groupLiveRouter.get("/:groupId", async (c) => {
   const groupId = c.req.param("groupId");
 
   // Check if user is a member of the group
-  const membership = await db.groupMember.findUnique({
+  const membership = await db.group_member.findUnique({
     where: {
       groupId_userId: {
         groupId,
@@ -33,7 +33,7 @@ groupLiveRouter.get("/:groupId", async (c) => {
   }
 
   // Get all active live streams in this group
-  const liveStreams = await db.liveStream.findMany({
+  const liveStreams = await db.live_stream.findMany({
     where: {
       groupId,
       isActive: true,
@@ -44,7 +44,7 @@ groupLiveRouter.get("/:groupId", async (c) => {
           Profile: true,
         },
       },
-      userQuest: {
+      user_quest: {
         include: {
           quest: true,
         },
@@ -66,13 +66,13 @@ groupLiveRouter.get("/:groupId", async (c) => {
       displayName: stream.user.Profile?.displayName || stream.user.email?.split("@")[0] || "User",
       avatar: stream.user.Profile?.avatar || null,
     },
-    quest: stream.userQuest
+    quest: stream.user_quest
       ? {
-          id: stream.userQuest.quest.id,
-          title: stream.userQuest.quest.title,
-          description: stream.userQuest.quest.description,
-          category: stream.userQuest.quest.category,
-          difficulty: stream.userQuest.quest.difficulty,
+          id: stream.user_quest.quest.id,
+          title: stream.user_quest.quest.title,
+          description: stream.user_quest.quest.description,
+          category: stream.user_quest.quest.category,
+          difficulty: stream.user_quest.quest.difficulty,
         }
       : null,
   }));
@@ -98,7 +98,7 @@ groupLiveRouter.post("/start", zValidator("json", startGroupLiveSchema), async (
   const { groupId, userQuestId } = c.req.valid("json");
 
   // Check if user is a member of the group
-  const membership = await db.groupMember.findUnique({
+  const membership = await db.group_member.findUnique({
     where: {
       groupId_userId: {
         groupId,
@@ -112,7 +112,7 @@ groupLiveRouter.post("/start", zValidator("json", startGroupLiveSchema), async (
   }
 
   // Check if user already has an active stream
-  const existingStream = await db.liveStream.findFirst({
+  const existingStream = await db.live_stream.findFirst({
     where: {
       userId: user.id,
       isActive: true,
@@ -130,7 +130,7 @@ groupLiveRouter.post("/start", zValidator("json", startGroupLiveSchema), async (
   console.log(`📹 [Group Live] Starting group live stream for user ${user.id} in group ${groupId}`);
 
   // Create the live stream
-  const liveStream = await db.liveStream.create({
+  const liveStream = await db.live_stream.create({
     data: {
       userId: user.id,
       groupId,
@@ -174,7 +174,7 @@ groupLiveRouter.post("/:streamId/end", async (c) => {
   const streamId = c.req.param("streamId");
 
   // Find the stream
-  const stream = await db.liveStream.findUnique({
+  const stream = await db.live_stream.findUnique({
     where: { id: streamId },
   });
 
@@ -190,7 +190,7 @@ groupLiveRouter.post("/:streamId/end", async (c) => {
   console.log(`📹 [Group Live] Ending stream ${streamId}`);
 
   // End the stream
-  await db.liveStream.update({
+  await db.live_stream.update({
     where: { id: streamId },
     data: {
       isActive: false,
@@ -225,7 +225,7 @@ groupLiveRouter.post("/:streamId/join", async (c) => {
   const streamId = c.req.param("streamId");
 
   // Find the stream
-  const stream = await db.liveStream.findUnique({
+  const stream = await db.live_stream.findUnique({
     where: { id: streamId },
     include: {
       group: true,
@@ -242,7 +242,7 @@ groupLiveRouter.post("/:streamId/join", async (c) => {
 
   // Check if user is a member of the group
   if (stream.groupId) {
-    const membership = await db.groupMember.findUnique({
+    const membership = await db.group_member.findUnique({
       where: {
         groupId_userId: {
           groupId: stream.groupId,
@@ -257,7 +257,7 @@ groupLiveRouter.post("/:streamId/join", async (c) => {
   }
 
   // Increment viewer count
-  await db.liveStream.update({
+  await db.live_stream.update({
     where: { id: streamId },
     data: {
       viewerCount: {
@@ -292,7 +292,7 @@ groupLiveRouter.post("/:streamId/leave", async (c) => {
   const streamId = c.req.param("streamId");
 
   // Find the stream
-  const stream = await db.liveStream.findUnique({
+  const stream = await db.live_stream.findUnique({
     where: { id: streamId },
   });
 
@@ -301,7 +301,7 @@ groupLiveRouter.post("/:streamId/leave", async (c) => {
   }
 
   // Decrement viewer count (don't go below 0)
-  await db.liveStream.update({
+  await db.live_stream.update({
     where: { id: streamId },
     data: {
       viewerCount: Math.max(0, stream.viewerCount - 1),

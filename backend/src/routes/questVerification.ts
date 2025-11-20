@@ -30,7 +30,7 @@ questVerificationRouter.post(
     const { userQuestId, friendIds, message } = c.req.valid("json");
 
     // Get user quest
-    const userQuest = await db.userQuest.findUnique({
+    const userQuest = await db.user_quest.findUnique({
       where: { id: userQuestId },
       include: { quest: true },
     });
@@ -65,7 +65,7 @@ questVerificationRouter.post(
     // Create verification requests
     const requests = await Promise.all(
       validFriendIds.map((friendId) =>
-        db.questVerificationRequest.create({
+        db.quest_verification_request.create({
           data: {
             userQuestId: userQuestId,
             senderId: user.id,
@@ -133,13 +133,13 @@ questVerificationRouter.get("/requests", async (c) => {
     return c.json({ message: "Unauthorized" }, 401);
   }
 
-  const requests = await db.questVerificationRequest.findMany({
+  const requests = await db.quest_verification_request.findMany({
     where: {
       receiverId: user.id,
       status: "pending",
     },
     include: {
-      userQuest: {
+      user_quest: {
         include: {
           quest: true,
           user: {
@@ -162,15 +162,15 @@ questVerificationRouter.get("/requests", async (c) => {
 
   const formatted = requests.map((req) => ({
     id: req.id,
-    userQuestId: req.userQuestId,
+    userQuestId: req.user_questId,
     quest: {
-      id: req.userQuest.quest.id,
-      title: req.userQuest.quest.title,
-      description: req.userQuest.quest.description,
-      category: req.userQuest.quest.category,
-      difficulty: req.userQuest.quest.difficulty,
-      goalType: req.userQuest.quest.goalType,
-      goalCount: req.userQuest.quest.goalCount,
+      id: req.user_quest.quest.id,
+      title: req.user_quest.quest.title,
+      description: req.user_quest.quest.description,
+      category: req.user_quest.quest.category,
+      difficulty: req.user_quest.quest.difficulty,
+      goalType: req.user_quest.quest.goalType,
+      goalCount: req.user_quest.quest.goalCount,
     },
     sender: {
       id: req.sender.id,
@@ -180,10 +180,10 @@ questVerificationRouter.get("/requests", async (c) => {
     message: req.message,
     createdAt: req.createdAt.toISOString(),
     questStats: {
-      noCount: req.userQuest.noCount,
-      yesCount: req.userQuest.yesCount,
-      actionCount: req.userQuest.actionCount,
-      completedAt: req.userQuest.completedAt?.toISOString() || null,
+      noCount: req.user_quest.noCount,
+      yesCount: req.user_quest.yesCount,
+      actionCount: req.user_quest.actionCount,
+      completedAt: req.user_quest.completedAt?.toISOString() || null,
     },
   }));
 
@@ -203,10 +203,10 @@ questVerificationRouter.post("/:requestId/verify", async (c) => {
   const requestId = c.req.param("requestId");
 
   // Get verification request
-  const verificationRequest = await db.questVerificationRequest.findUnique({
+  const verificationRequest = await db.quest_verification_request.findUnique({
     where: { id: requestId },
     include: {
-      userQuest: {
+      user_quest: {
         include: {
           quest: true,
           user: true,
@@ -230,10 +230,10 @@ questVerificationRouter.post("/:requestId/verify", async (c) => {
   }
 
   // Check if already verified by this user
-  const existingVerification = await db.questVerification.findUnique({
+  const existingVerification = await db.quest_verification.findUnique({
     where: {
       userQuestId_verifiedBy: {
-        userQuestId: verificationRequest.userQuestId,
+        userQuestId: verificationRequest.user_questId,
         verifiedBy: user.id,
       },
     },
@@ -244,16 +244,16 @@ questVerificationRouter.post("/:requestId/verify", async (c) => {
   }
 
   // Create verification
-  const verification = await db.questVerification.create({
+  const verification = await db.quest_verification.create({
     data: {
-      userQuestId: verificationRequest.userQuestId,
+      userQuestId: verificationRequest.user_questId,
       verifiedBy: user.id,
       verificationRequestId: requestId,
     },
   });
 
   // Update request status
-  await db.questVerificationRequest.update({
+  await db.quest_verification_request.update({
     where: { id: requestId },
     data: {
       status: "verified",
@@ -262,8 +262,8 @@ questVerificationRouter.post("/:requestId/verify", async (c) => {
   });
 
   // Count total verifications for this quest
-  const verificationCount = await db.questVerification.count({
-    where: { userQuestId: verificationRequest.userQuestId },
+  const verificationCount = await db.quest_verification.count({
+    where: { userQuestId: verificationRequest.user_questId },
   });
 
   // Get verifier profile
@@ -276,14 +276,14 @@ questVerificationRouter.post("/:requestId/verify", async (c) => {
   // Send notification to quest owner
   const notification = await db.notification.create({
     data: {
-      userId: verificationRequest.userQuest.userId,
+      userId: verificationRequest.user_quest.userId,
       senderId: user.id,
       type: "QUEST_VERIFIED",
       title: "✅ Quest Verified!",
-      message: `${verifierName} verified your quest: "${verificationRequest.userQuest.quest.title}" (${verificationCount} verification${verificationCount > 1 ? "s" : ""})`,
+      message: `${verifierName} verified your quest: "${verificationRequest.user_quest.quest.title}" (${verificationCount} verification${verificationCount > 1 ? "s" : ""})`,
       data: JSON.stringify({
-        userQuestId: verificationRequest.userQuestId,
-        questId: verificationRequest.userQuest.questId,
+        userQuestId: verificationRequest.user_questId,
+        questId: verificationRequest.user_quest.questId,
         verificationCount,
         type: "quest_verified",
       }),
@@ -293,7 +293,7 @@ questVerificationRouter.post("/:requestId/verify", async (c) => {
   // Send push notification
   try {
     await sendPushNotificationForNotification(
-      verificationRequest.userQuest.userId,
+      verificationRequest.user_quest.userId,
       notification.title,
       notification.message,
       JSON.parse(notification.data || "{}")
@@ -304,7 +304,7 @@ questVerificationRouter.post("/:requestId/verify", async (c) => {
 
   // If 2+ verifications, check and update badge
   if (verificationCount >= 2) {
-    const badges = await getQuestBadges(verificationRequest.userQuestId);
+    const badges = await getQuestBadges(verificationRequest.user_questId);
     
     // If quest doesn't have silver badge yet, update it via post (since we check posts for silver badge)
     // Actually, we should check if a post exists and add images, or create a verified post
@@ -315,13 +315,13 @@ questVerificationRouter.post("/:requestId/verify", async (c) => {
     if (verificationCount === 2) {
       const badgeNotification = await db.notification.create({
         data: {
-          userId: verificationRequest.userQuest.userId,
+          userId: verificationRequest.user_quest.userId,
           type: "QUEST_VERIFICATION_BADGE",
           title: "🏆 Verification Badge Earned!",
-          message: `Congratulations! Your quest "${verificationRequest.userQuest.quest.title}" has been verified by 2+ friends and earned a Silver Verification Badge!`,
+          message: `Congratulations! Your quest "${verificationRequest.user_quest.quest.title}" has been verified by 2+ friends and earned a Silver Verification Badge!`,
           data: JSON.stringify({
-            userQuestId: verificationRequest.userQuestId,
-            questId: verificationRequest.userQuest.questId,
+            userQuestId: verificationRequest.user_questId,
+            questId: verificationRequest.user_quest.questId,
             badge: "silver",
             type: "quest_verification_badge",
           }),
@@ -330,7 +330,7 @@ questVerificationRouter.post("/:requestId/verify", async (c) => {
 
       try {
         await sendPushNotificationForNotification(
-          verificationRequest.userQuest.userId,
+          verificationRequest.user_quest.userId,
           badgeNotification.title,
           badgeNotification.message,
           JSON.parse(badgeNotification.data || "{}")
@@ -361,7 +361,7 @@ questVerificationRouter.post("/:requestId/decline", async (c) => {
 
   const requestId = c.req.param("requestId");
 
-  const verificationRequest = await db.questVerificationRequest.findUnique({
+  const verificationRequest = await db.quest_verification_request.findUnique({
     where: { id: requestId },
   });
 
@@ -373,7 +373,7 @@ questVerificationRouter.post("/:requestId/decline", async (c) => {
     return c.json({ message: "You can only decline requests sent to you" }, 403);
   }
 
-  await db.questVerificationRequest.update({
+  await db.quest_verification_request.update({
     where: { id: requestId },
     data: { status: "declined" },
   });
@@ -393,7 +393,7 @@ questVerificationRouter.get("/:userQuestId/status", async (c) => {
 
   const userQuestId = c.req.param("userQuestId");
 
-  const userQuest = await db.userQuest.findUnique({
+  const userQuest = await db.user_quest.findUnique({
     where: { id: userQuestId },
   });
 
@@ -401,7 +401,7 @@ questVerificationRouter.get("/:userQuestId/status", async (c) => {
     return c.json({ message: "Quest not found or unauthorized" }, 404);
   }
 
-  const verifications = await db.questVerification.findMany({
+  const verifications = await db.quest_verification.findMany({
     where: { userQuestId },
     include: {
       verifier: {
@@ -412,7 +412,7 @@ questVerificationRouter.get("/:userQuestId/status", async (c) => {
     },
   });
 
-  const pendingRequests = await db.questVerificationRequest.count({
+  const pendingRequests = await db.quest_verification_request.count({
     where: {
       userQuestId,
       status: "pending",

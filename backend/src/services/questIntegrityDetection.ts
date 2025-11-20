@@ -26,7 +26,7 @@ export async function detectSuspiciousActivity(
 
   try {
     // Get user quest with timing info
-    const userQuest = await db.userQuest.findUnique({
+    const userQuest = await db.user_quest.findUnique({
       where: { id: userQuestId },
       include: { quest: true },
     });
@@ -40,7 +40,7 @@ export async function detectSuspiciousActivity(
     const elapsedMinutes = (now.getTime() - startedAt.getTime()) / (1000 * 60);
 
     // Get quest action history for more accurate detection
-    const recentActions = await db.questActionLog.count({
+    const recentActions = await db.quest_action_log.count({
       where: {
         userQuestId: userQuestId,
         recordedAt: {
@@ -77,7 +77,7 @@ export async function detectSuspiciousActivity(
 
     // Detection 2: Actions coming in suspiciously fast intervals
     // Check the last few action timestamps from logs
-    const recentActionLogs = await db.questActionLog.findMany({
+    const recentActionLogs = await db.quest_action_log.findMany({
       where: {
         userQuestId: userQuestId,
       },
@@ -134,7 +134,7 @@ export async function detectSuspiciousActivity(
     }
 
     // Detection 4: Pattern detection - check if user has a history of suspicious quests
-    const userSuspiciousQuests = await db.userQuest.count({
+    const userSuspiciousQuests = await db.user_quest.count({
       where: {
         userId: userId,
         isFlaggedAsSuspicious: true,

@@ -20,7 +20,7 @@ groupQuestsRouter.get("/:groupId", async (c) => {
   const groupId = c.req.param("groupId");
 
   // Check if user is a member of the group
-  const membership = await db.groupMember.findUnique({
+  const membership = await db.group_member.findUnique({
     where: {
       groupId_userId: {
         groupId,
@@ -34,7 +34,7 @@ groupQuestsRouter.get("/:groupId", async (c) => {
   }
 
   // Get all group quests with participants
-  const groupQuests = await db.groupQuest.findMany({
+  const groupQuests = await db.group_quest.findMany({
     where: { groupId },
     include: {
       quest: true,
@@ -85,7 +85,7 @@ groupQuestsRouter.get("/:groupId", async (c) => {
       latitude: gq.quest.latitude,
       longitude: gq.quest.longitude,
     },
-    participants: gq.participants.map((p) => ({
+    participants: gq.group_quest_participant.map((p) => ({
       id: p.id,
       userId: p.userId,
       displayName: p.user.Profile?.displayName || p.user.email?.split("@")[0] || "User",
@@ -103,7 +103,7 @@ groupQuestsRouter.get("/:groupId", async (c) => {
       displayName: a.user.Profile?.displayName || a.user.email?.split("@")[0] || "User",
       avatar: a.user.Profile?.avatar || null,
     })),
-    userParticipation: gq.participants.find((p) => p.userId === user.id) || null,
+    userParticipation: gq.group_quest_participant.find((p) => p.userId === user.id) || null,
   }));
 
   return c.json({ groupQuests: formattedQuests });
@@ -140,7 +140,7 @@ groupQuestsRouter.post("/create", zValidator("json", createGroupQuestSchema), as
   }
 
   // Check if user is a member of the group
-  const membership = await db.groupMember.findUnique({
+  const membership = await db.group_member.findUnique({
     where: {
       groupId_userId: {
         groupId,
@@ -203,7 +203,7 @@ groupQuestsRouter.post("/create", zValidator("json", createGroupQuestSchema), as
   }
 
   // Create the group quest
-  const groupQuest = await db.groupQuest.create({
+  const groupQuest = await db.group_quest.create({
     data: {
       groupId,
       questId: finalQuestId,
@@ -216,7 +216,7 @@ groupQuestsRouter.post("/create", zValidator("json", createGroupQuestSchema), as
   if (assignmentType === "assigned" && assignedMemberIds && assignedMemberIds.length > 0) {
     await Promise.all(
       assignedMemberIds.map((memberId) =>
-        db.groupQuestAssignment.create({
+        db.group_quest_assignment.create({
           data: {
             groupQuestId: groupQuest.id,
             userId: memberId,
@@ -242,7 +242,7 @@ groupQuestsRouter.post("/:groupQuestId/join", async (c) => {
   const groupQuestId = c.req.param("groupQuestId");
 
   // Get the group quest
-  const groupQuest = await db.groupQuest.findUnique({
+  const groupQuest = await db.group_quest.findUnique({
     where: { id: groupQuestId },
     include: {
       assignments: true,
@@ -254,7 +254,7 @@ groupQuestsRouter.post("/:groupQuestId/join", async (c) => {
   }
 
   // Check if user is a member of the group
-  const membership = await db.groupMember.findUnique({
+  const membership = await db.group_member.findUnique({
     where: {
       groupId_userId: {
         groupId: groupQuest.groupId,
@@ -276,7 +276,7 @@ groupQuestsRouter.post("/:groupQuestId/join", async (c) => {
   }
 
   // Check if already joined
-  const existing = await db.groupQuestParticipant.findUnique({
+  const existing = await db.group_quest_participant.findUnique({
     where: {
       groupQuestId_userId: {
         groupQuestId,
@@ -290,7 +290,7 @@ groupQuestsRouter.post("/:groupQuestId/join", async (c) => {
   }
 
   // Join the quest
-  await db.groupQuestParticipant.create({
+  await db.group_quest_participant.create({
     data: {
       groupQuestId,
       userId: user.id,
@@ -314,7 +314,7 @@ groupQuestsRouter.post("/:groupQuestId/start", async (c) => {
   const groupQuestId = c.req.param("groupQuestId");
 
   // Find participation
-  const participation = await db.groupQuestParticipant.findUnique({
+  const participation = await db.group_quest_participant.findUnique({
     where: {
       groupQuestId_userId: {
         groupQuestId,
@@ -336,7 +336,7 @@ groupQuestsRouter.post("/:groupQuestId/start", async (c) => {
   }
 
   // Start the quest
-  await db.groupQuestParticipant.update({
+  await db.group_quest_participant.update({
     where: {
       groupQuestId_userId: {
         groupQuestId,
@@ -370,7 +370,7 @@ groupQuestsRouter.post("/:groupQuestId/record", zValidator("json", recordProgres
   const { action } = c.req.valid("json");
 
   // Find participation
-  const participation = await db.groupQuestParticipant.findUnique({
+  const participation = await db.group_quest_participant.findUnique({
     where: {
       groupQuestId_userId: {
         groupQuestId,
@@ -378,7 +378,7 @@ groupQuestsRouter.post("/:groupQuestId/record", zValidator("json", recordProgres
       },
     },
     include: {
-      groupQuest: {
+      group_quest: {
         include: {
           quest: true,
         },
@@ -390,7 +390,7 @@ groupQuestsRouter.post("/:groupQuestId/record", zValidator("json", recordProgres
     return c.json({ message: "You have not joined this quest" }, 404);
   }
 
-  const quest = participation.groupQuest.quest;
+  const quest = participation.group_quest.quest;
 
   // Update counts based on action
   let updateData: any = {};
@@ -426,7 +426,7 @@ groupQuestsRouter.post("/:groupQuestId/record", zValidator("json", recordProgres
   }
 
   // Update participation
-  const updated = await db.groupQuestParticipant.update({
+  const updated = await db.group_quest_participant.update({
     where: {
       groupQuestId_userId: {
         groupQuestId,
@@ -459,7 +459,7 @@ groupQuestsRouter.post("/:groupQuestId/fail", async (c) => {
   const groupQuestId = c.req.param("groupQuestId");
 
   // Find participation
-  const participation = await db.groupQuestParticipant.findUnique({
+  const participation = await db.group_quest_participant.findUnique({
     where: {
       groupQuestId_userId: {
         groupQuestId,
@@ -473,7 +473,7 @@ groupQuestsRouter.post("/:groupQuestId/fail", async (c) => {
   }
 
   // Mark as failed
-  await db.groupQuestParticipant.update({
+  await db.group_quest_participant.update({
     where: {
       groupQuestId_userId: {
         groupQuestId,

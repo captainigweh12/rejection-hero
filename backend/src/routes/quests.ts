@@ -34,7 +34,7 @@ questsRouter.get("/", async (c) => {
     return c.json({ message: "Unauthorized" }, 401);
   }
 
-  const userQuests = await db.userQuest.findMany({
+  const userQuests = await db.user_quest.findMany({
     where: { userId: user.id },
     include: {
       quest: true,
@@ -113,7 +113,7 @@ questsRouter.get("/completed", async (c) => {
     return c.json({ message: "Unauthorized" }, 401);
   }
 
-  const completedUserQuests = await db.userQuest.findMany({
+  const completedUserQuests = await db.user_quest.findMany({
     where: {
       userId: user.id,
       status: "COMPLETED",
@@ -192,7 +192,7 @@ async function canGenerateQuest(userId: string): Promise<{ canGenerate: boolean;
   }
 
   // Count AI-generated quests created by user
-  const questCount = await db.userQuest.count({
+  const questCount = await db.user_quest.count({
     where: {
       userId,
       quest: {
@@ -322,7 +322,7 @@ questsRouter.post("/generate", zValidator("json", generateQuestRequestSchema), a
   }
 
   // Create user quest (normal quest-by-quest mode)
-  const userQuest = await db.userQuest.create({
+  const userQuest = await db.user_quest.create({
     data: {
       userId: user.id,
       questId: quest.id,
@@ -401,7 +401,7 @@ questsRouter.post("/refresh-all", zValidator("json", refreshAllQuestsRequestSche
       });
 
       // Create user quest
-      const userQuest = await db.userQuest.create({
+      const userQuest = await db.user_quest.create({
         data: {
           userId: user.id,
           questId: quest.id,
@@ -452,7 +452,7 @@ questsRouter.post("/:id/start", async (c) => {
   const skipLimitCheck = c.req.query("skipLimitCheck") === "true"; // Allow bypassing limit for regeneration
 
   // Get the quest to check if it's from a friend
-  const userQuestToStart = await db.userQuest.findUnique({
+  const userQuestToStart = await db.user_quest.findUnique({
     where: { id: userQuestId },
     include: { quest: true },
   });
@@ -463,7 +463,7 @@ questsRouter.post("/:id/start", async (c) => {
 
   // Check active quests limit - NEW LOGIC: 1 slot for user quests, 1 slot for friend quests
   if (!skipLimitCheck) {
-    const activeQuests = await db.userQuest.findMany({
+    const activeQuests = await db.user_quest.findMany({
       where: {
         userId: user.id,
         status: "ACTIVE",
@@ -490,7 +490,7 @@ questsRouter.post("/:id/start", async (c) => {
   }
 
   // Update quest status
-  const userQuest = await db.userQuest.update({
+  const userQuest = await db.user_quest.update({
     where: { id: userQuestId },
     data: {
       status: "ACTIVE",
@@ -616,7 +616,7 @@ questsRouter.get("/friend/:userQuestId", async (c) => {
   const userQuestId = c.req.param("userQuestId");
 
   // Get the user quest
-  const userQuest = await db.userQuest.findUnique({
+  const userQuest = await db.user_quest.findUnique({
     where: { id: userQuestId },
     include: {
       quest: true,
@@ -647,7 +647,7 @@ questsRouter.get("/friend/:userQuestId", async (c) => {
   }
 
   return c.json({
-    userQuest: {
+    user_quest: {
       id: userQuest.id,
       status: userQuest.status,
       noCount: userQuest.noCount,
@@ -694,12 +694,12 @@ questsRouter.post("/swap", zValidator("json", swapQuestRequestSchema), async (c)
   const { activeQuestId, queuedQuestId } = c.req.valid("json");
 
   // Fetch both quests and verify they belong to the user
-  const activeQuest = await db.userQuest.findUnique({
+  const activeQuest = await db.user_quest.findUnique({
     where: { id: activeQuestId },
     include: { quest: true },
   });
 
-  const queuedQuest = await db.userQuest.findUnique({
+  const queuedQuest = await db.user_quest.findUnique({
     where: { id: queuedQuestId },
     include: { quest: true },
   });
@@ -738,7 +738,7 @@ questsRouter.post("/swap", zValidator("json", swapQuestRequestSchema), async (c)
   // Perform the swap: active -> queued, queued -> active
   await db.$transaction([
     // Move active quest to queue (reset startedAt)
-    db.userQuest.update({
+    db.user_quest.update({
       where: { id: activeQuestId },
       data: {
         status: "QUEUED",
@@ -746,7 +746,7 @@ questsRouter.post("/swap", zValidator("json", swapQuestRequestSchema), async (c)
       },
     }),
     // Move queued quest to active (set startedAt)
-    db.userQuest.update({
+    db.user_quest.update({
       where: { id: queuedQuestId },
       data: {
         status: "ACTIVE",
@@ -774,7 +774,7 @@ questsRouter.post("/:id/record", zValidator("json", recordQuestActionRequestSche
   const userQuestId = c.req.param("id");
   const { action } = c.req.valid("json");
 
-  const userQuest = await db.userQuest.findUnique({
+  const userQuest = await db.user_quest.findUnique({
     where: { id: userQuestId },
     include: { quest: true },
   });
@@ -834,7 +834,7 @@ questsRouter.post("/:id/record", zValidator("json", recordQuestActionRequestSche
     }),
   };
 
-  const updated = await db.userQuest.update({
+  const updated = await db.user_quest.update({
     where: { id: userQuestId },
     data: updateData,
   });
@@ -927,7 +927,7 @@ questsRouter.post("/:id/record", zValidator("json", recordQuestActionRequestSche
           : Math.max(1, newActionCount); // For ACTION quests, use action count
 
         // Update user stats with tokens
-        await db.userStats.update({
+        await db.user_stats.update({
           where: { userId: user.id },
           data: {
             tokens: {
@@ -937,7 +937,7 @@ questsRouter.post("/:id/record", zValidator("json", recordQuestActionRequestSche
         });
 
         // Create token transaction record
-        await db.tokenTransaction.create({
+        await db.token_transaction.create({
           data: {
             userId: user.id,
             type: "earned",
@@ -948,7 +948,7 @@ questsRouter.post("/:id/record", zValidator("json", recordQuestActionRequestSche
         });
 
     // Check if this is a challenge daily quest and mark it as completed
-    const challengeDailyQuest = await db.challengeDailyQuest.findFirst({
+    const challengeDailyQuest = await db.challenge_daily_quest.findFirst({
       where: {
         userQuestId: userQuestId,
       },
@@ -959,7 +959,7 @@ questsRouter.post("/:id/record", zValidator("json", recordQuestActionRequestSche
 
     if (challengeDailyQuest && challengeDailyQuest.status !== "COMPLETED") {
       // Mark daily quest as completed
-      await db.challengeDailyQuest.update({
+      await db.challenge_daily_quest.update({
         where: { id: challengeDailyQuest.id },
         data: {
           status: "COMPLETED",
@@ -1013,7 +1013,7 @@ questsRouter.post("/:id/record", zValidator("json", recordQuestActionRequestSche
       // Check if this quest is part of a series
       if (userQuest.isSeriesQuest && userQuest.seriesId) {
         // Find all quests in this series
-        const seriesQuests = await db.userQuest.findMany({
+        const seriesQuests = await db.user_quest.findMany({
           where: {
             userId: user.id,
             seriesId: userQuest.seriesId,
@@ -1260,7 +1260,7 @@ The user is creating this quest RIGHT NOW at ${hour}:00 ${timeOfDay} and will li
     // Get user's previous quests to avoid duplicates
     let previousQuestTitles: string[] = [];
     if (userId) {
-      const userQuests = await db.userQuest.findMany({
+      const userQuests = await db.user_quest.findMany({
         where: { userId },
         include: { quest: true },
         take: 20,
@@ -1654,7 +1654,7 @@ async function generateAISeries(userId: string, previousSeriesId?: string) {
         });
 
         // Create user quest (only the first one is active, others are queued)
-        const userQuest = await db.userQuest.create({
+        const userQuest = await db.user_quest.create({
           data: {
             userId,
             questId: quest.id,
@@ -1711,7 +1711,7 @@ export async function updateUserStats(userId: string, xpReward: number, pointRew
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
   // Get current stats
-  const currentStats = await db.userStats.findUnique({
+  const currentStats = await db.user_stats.findUnique({
     where: { userId },
   });
 
@@ -1837,7 +1837,7 @@ export async function updateUserStats(userId: string, xpReward: number, pointRew
   // Calculate confidence meter for create case (use existing difficultyMultiplier above)
   const initialConfidence = difficultyMultiplier[difficulty?.toLowerCase() || "medium"] || 10;
 
-  await db.userStats.upsert({
+  await db.user_stats.upsert({
     where: { userId },
     create: {
       userId,
@@ -1872,7 +1872,7 @@ questsRouter.delete("/:id", async (c) => {
   const userQuestId = c.req.param("id");
 
   // Check if the user quest exists and belongs to the user
-  const userQuest = await db.userQuest.findUnique({
+  const userQuest = await db.user_quest.findUnique({
     where: { id: userQuestId },
   });
 
@@ -1885,7 +1885,7 @@ questsRouter.delete("/:id", async (c) => {
   }
 
   // Delete the user quest
-  await db.userQuest.delete({
+  await db.user_quest.delete({
     where: { id: userQuestId },
   });
 
@@ -2035,12 +2035,12 @@ questsRouter.get("/smart-suggestions", async (c) => {
   }
 
   // Get user's stats to understand their behavior
-  const stats = await db.userStats.findUnique({
+  const stats = await db.user_stats.findUnique({
     where: { userId: user.id },
   });
 
   // Get user's quest history
-  const userQuests = await db.userQuest.findMany({
+  const userQuests = await db.user_quest.findMany({
     where: { userId: user.id },
     include: { quest: true },
     orderBy: { createdAt: "desc" },
@@ -2295,7 +2295,7 @@ questsRouter.get("/:questId/friends", async (c) => {
   }
 
   // Get friends' active quests for this quest
-  const friendsQuests = await db.userQuest.findMany({
+  const friendsQuests = await db.user_quest.findMany({
     where: {
       questId: questId,
       userId: { in: friendIds },

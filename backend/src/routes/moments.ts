@@ -25,7 +25,7 @@ momentsRouter.post("/", zValidator("json", createMomentRequestSchema), async (c)
 
   // If groupId provided, verify user is a member
   if (groupId) {
-    const membership = await db.groupMember.findUnique({
+    const membership = await db.group_member.findUnique({
       where: {
         groupId_userId: {
           groupId,

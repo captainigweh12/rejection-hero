@@ -236,7 +236,7 @@ app.post("/sync-stats", async (c) => {
 
   try {
     // Get user stats from database
-    const stats = await db.userStats.findUnique({
+    const stats = await db.user_stats.findUnique({
       where: { userId: user.id },
     });
 

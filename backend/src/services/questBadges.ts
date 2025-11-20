@@ -20,7 +20,7 @@ export async function getQuestBadges(userQuestId: string): Promise<QuestBadges> 
 
   try {
     // Check for silver badge: Quest verified by 2+ friends OR shared to community with photos
-    const verificationCount = await db.questVerification.count({
+    const verificationCount = await db.quest_verification.count({
       where: { userQuestId: userQuestId },
     });
 
@@ -42,13 +42,13 @@ export async function getQuestBadges(userQuestId: string): Promise<QuestBadges> 
         },
       });
 
-      if (postWithImages && postWithImages.images.length > 0) {
+      if (postWithImages && postWithImages.post_image.length > 0) {
         badges.silver = true;
       }
     }
 
     // Check for gold badge: Quest was live streamed
-    const liveStream = await db.liveStream.findFirst({
+    const liveStream = await db.live_stream.findFirst({
       where: {
         userQuestId: userQuestId,
         isActive: false, // Completed stream
@@ -61,22 +61,22 @@ export async function getQuestBadges(userQuestId: string): Promise<QuestBadges> 
     }
 
     // Get user quest to check questId and userId
-    const userQuest = await db.userQuest.findUnique({
+    const userQuest = await db.user_quest.findUnique({
       where: { id: userQuestId },
     });
 
     if (userQuest) {
       // Check for blue badge: Quest is a group quest
-      const groupQuestParticipant = await db.groupQuestParticipant.findFirst({
+      const groupQuestParticipant = await db.group_quest_participant.findFirst({
         where: {
           userId: userQuest.userId,
-          groupQuest: {
+          group_quest: {
             questId: userQuest.questId,
           },
           status: "completed",
         },
         include: {
-          groupQuest: {
+          group_quest: {
             include: {
               participants: true,
             },
@@ -88,7 +88,7 @@ export async function getQuestBadges(userQuestId: string): Promise<QuestBadges> 
         badges.blue = true;
 
         // Check for bronze badge: Quest performed with others (group quest with multiple participants)
-        if (groupQuestParticipant.groupQuest.participants.length > 1) {
+        if (groupQuestParticipant.group_quest.group_quest_participant.length > 1) {
           badges.bronze = true;
         }
       } else {
@@ -103,7 +103,7 @@ export async function getQuestBadges(userQuestId: string): Promise<QuestBadges> 
           const timeWindow = new Date(userQuest.completedAt.getTime() - 60 * 60 * 1000); // 1 hour before
           const timeWindowEnd = new Date(userQuest.completedAt.getTime() + 60 * 60 * 1000); // 1 hour after
 
-          const simultaneousCompletions = await db.userQuest.count({
+          const simultaneousCompletions = await db.user_quest.count({
             where: {
               questId: userQuest.questId,
               status: "COMPLETED",
@@ -147,7 +147,7 @@ export async function getQuestBadgesBatch(userQuestIds: string[]): Promise<Recor
   try {
     // Batch check for silver badges (verifications OR posts with images)
     // Check verifications first (takes priority)
-    const verifications = await db.questVerification.groupBy({
+    const verifications = await db.quest_verification.groupBy({
       by: ["userQuestId"],
       where: {
         userQuestId: { in: userQuestIds },
@@ -159,7 +159,7 @@ export async function getQuestBadgesBatch(userQuestIds: string[]): Promise<Recor
 
     for (const verification of verifications) {
       if (verification._count.id >= 2) {
-        result[verification.userQuestId].silver = true;
+        result[verification.user_questId].silver = true;
       }
     }
 
@@ -179,14 +179,14 @@ export async function getQuestBadgesBatch(userQuestIds: string[]): Promise<Recor
       });
 
       for (const post of postsWithImages) {
-        if (post.userQuestId && post.images.length > 0) {
-          result[post.userQuestId].silver = true;
+        if (post.user_questId && post.post_image.length > 0) {
+          result[post.user_questId].silver = true;
         }
       }
     }
 
     // Batch check for gold badges
-    const liveStreams = await db.liveStream.findMany({
+    const liveStreams = await db.live_stream.findMany({
       where: {
         userQuestId: { in: userQuestIds },
         isActive: false,
@@ -195,13 +195,13 @@ export async function getQuestBadgesBatch(userQuestIds: string[]): Promise<Recor
     });
 
     for (const stream of liveStreams) {
-      if (stream.userQuestId) {
-        result[stream.userQuestId].gold = true;
+      if (stream.user_questId) {
+        result[stream.user_questId].gold = true;
       }
     }
 
     // Get user quests to check for group quests
-    const userQuests = await db.userQuest.findMany({
+    const userQuests = await db.user_quest.findMany({
       where: {
         id: { in: userQuestIds },
       },
@@ -209,16 +209,16 @@ export async function getQuestBadgesBatch(userQuestIds: string[]): Promise<Recor
 
     // Batch check for blue and bronze badges (group quests)
     for (const userQuest of userQuests) {
-      const groupQuestParticipant = await db.groupQuestParticipant.findFirst({
+      const groupQuestParticipant = await db.group_quest_participant.findFirst({
         where: {
           userId: userQuest.userId,
-          groupQuest: {
+          group_quest: {
             questId: userQuest.questId,
           },
           status: "completed",
         },
         include: {
-          groupQuest: {
+          group_quest: {
             include: {
               participants: true,
             },
@@ -228,7 +228,7 @@ export async function getQuestBadgesBatch(userQuestIds: string[]): Promise<Recor
 
       if (groupQuestParticipant) {
         result[userQuest.id].blue = true;
-        if (groupQuestParticipant.groupQuest.participants.length > 1) {
+        if (groupQuestParticipant.group_quest.group_quest_participant.length > 1) {
           result[userQuest.id].bronze = true;
         }
       }
@@ -238,7 +238,7 @@ export async function getQuestBadgesBatch(userQuestIds: string[]): Promise<Recor
     const questsNeedingBronzeCheck = userQuestIds.filter((id) => !result[id].bronze && !result[id].blue);
 
     if (questsNeedingBronzeCheck.length > 0) {
-      const questsForBronzeCheck = await db.userQuest.findMany({
+      const questsForBronzeCheck = await db.user_quest.findMany({
         where: {
           id: { in: questsNeedingBronzeCheck },
           status: "COMPLETED",
@@ -250,7 +250,7 @@ export async function getQuestBadgesBatch(userQuestIds: string[]): Promise<Recor
         if (!questForBronze.completedAt) continue;
 
         // Check live stream viewers
-        const stream = await db.liveStream.findFirst({
+        const stream = await db.live_stream.findFirst({
           where: {
             userQuestId: questForBronze.id,
             viewerCount: { gt: 0 },
@@ -266,7 +266,7 @@ export async function getQuestBadgesBatch(userQuestIds: string[]): Promise<Recor
         const timeWindow = new Date(questForBronze.completedAt.getTime() - 60 * 60 * 1000);
         const timeWindowEnd = new Date(questForBronze.completedAt.getTime() + 60 * 60 * 1000);
 
-        const simultaneousCompletions = await db.userQuest.count({
+        const simultaneousCompletions = await db.user_quest.count({
           where: {
             questId: questForBronze.questId,
             status: "COMPLETED",

@@ -32,7 +32,7 @@ live.post("/start", async (c) => {
     const { userQuestId } = startLiveStreamRequestSchema.parse(body);
 
     // Check if user already has an active live stream and end it automatically
-    const existingStream = await db.liveStream.findFirst({
+    const existingStream = await db.live_stream.findFirst({
       where: {
         userId: user.id,
         isActive: true,
@@ -41,7 +41,7 @@ live.post("/start", async (c) => {
 
     if (existingStream) {
       // Automatically end the existing stream
-      await db.liveStream.update({
+      await db.live_stream.update({
         where: { id: existingStream.id },
         data: {
           isActive: false,
@@ -130,7 +130,7 @@ live.post("/start", async (c) => {
     }
 
     // Create live stream in database
-    const liveStream = await db.liveStream.create({
+    const liveStream = await db.live_stream.create({
       data: {
         userId: user.id,
         roomUrl,
@@ -181,7 +181,7 @@ live.post("/:id/end", async (c) => {
   try {
     const liveStreamId = c.req.param("id");
 
-    const liveStream = await db.liveStream.findUnique({
+    const liveStream = await db.live_stream.findUnique({
       where: { id: liveStreamId },
     });
 
@@ -194,7 +194,7 @@ live.post("/:id/end", async (c) => {
     }
 
     // End the live stream
-    await db.liveStream.update({
+    await db.live_stream.update({
       where: { id: liveStreamId },
       data: {
         isActive: false,
@@ -247,7 +247,7 @@ live.post("/:id/end", async (c) => {
 // GET /api/live/active - Get active live streams
 live.get("/active", async (c) => {
   try {
-    const streams = await db.liveStream.findMany({
+    const streams = await db.live_stream.findMany({
       where: {
         isActive: true,
       },
@@ -259,7 +259,7 @@ live.get("/active", async (c) => {
             image: true,
           },
         },
-        userQuest: {
+        user_quest: {
           include: {
             quest: {
               select: {
@@ -290,18 +290,18 @@ live.get("/active", async (c) => {
           name: stream.user.name,
           image: stream.user.image,
         },
-        userQuest: stream.userQuest
+        user_quest: stream.user_quest
           ? {
-              id: stream.userQuest.id,
-              noCount: stream.userQuest.noCount,
-              yesCount: stream.userQuest.yesCount,
-              actionCount: stream.userQuest.actionCount,
+              id: stream.user_quest.id,
+              noCount: stream.user_quest.noCount,
+              yesCount: stream.user_quest.yesCount,
+              actionCount: stream.user_quest.actionCount,
               quest: {
-                title: stream.userQuest.quest.title,
-                description: stream.userQuest.quest.description,
-                category: stream.userQuest.quest.category,
-                goalCount: stream.userQuest.quest.goalCount,
-                goalType: stream.userQuest.quest.goalType,
+                title: stream.user_quest.quest.title,
+                description: stream.user_quest.quest.description,
+                category: stream.user_quest.quest.category,
+                goalCount: stream.user_quest.quest.goalCount,
+                goalType: stream.user_quest.quest.goalType,
               },
             }
           : null,
@@ -327,7 +327,7 @@ live.post("/:id/comment", async (c) => {
     const body = await c.req.json();
     const { message } = addLiveCommentRequestSchema.parse(body);
 
-    const liveStream = await db.liveStream.findUnique({
+    const liveStream = await db.live_stream.findUnique({
       where: { id: liveStreamId },
     });
 
@@ -335,7 +335,7 @@ live.post("/:id/comment", async (c) => {
       return c.json({ error: "Live stream not found or ended" }, 404);
     }
 
-    const comment = await db.liveStreamComment.create({
+    const comment = await db.live_stream_comment.create({
       data: {
         liveStreamId,
         userId: user.id,
@@ -376,7 +376,7 @@ live.get("/:id/comments", async (c) => {
   try {
     const liveStreamId = c.req.param("id");
 
-    const comments = await db.liveStreamComment.findMany({
+    const comments = await db.live_stream_comment.findMany({
       where: { liveStreamId },
       include: {
         user: {
@@ -424,7 +424,7 @@ live.post("/:id/suggest-quest", async (c) => {
     const { questId, boostAmount, message } = suggestQuestToStreamerRequestSchema.parse(body);
 
     // Verify stream exists and is active
-    const liveStream = await db.liveStream.findUnique({
+    const liveStream = await db.live_stream.findUnique({
       where: { id: liveStreamId },
       include: { user: true },
     });
@@ -449,7 +449,7 @@ live.post("/:id/suggest-quest", async (c) => {
 
     // Check if user has enough diamonds for boost
     if (boostAmount > 0) {
-      const userStats = await db.userStats.findUnique({
+      const userStats = await db.user_stats.findUnique({
         where: { userId: user.id },
       });
 
@@ -458,7 +458,7 @@ live.post("/:id/suggest-quest", async (c) => {
       }
 
       // Deduct diamonds
-      await db.userStats.update({
+      await db.user_stats.update({
         where: { userId: user.id },
         data: {
           diamonds: {
@@ -482,7 +482,7 @@ live.post("/:id/suggest-quest", async (c) => {
       });
 
       // Get updated diamond balance
-      const updatedStats = await db.userStats.findUnique({
+      const updatedStats = await db.user_stats.findUnique({
         where: { userId: user.id },
       });
 
@@ -514,7 +514,7 @@ live.get("/:id/quest-suggestions", async (c) => {
     const liveStreamId = c.req.param("id");
 
     // Verify user owns this stream
-    const liveStream = await db.liveStream.findUnique({
+    const liveStream = await db.live_stream.findUnique({
       where: { id: liveStreamId },
     });
 
@@ -594,7 +594,7 @@ live.post("/:id/respond-to-suggestion", async (c) => {
     const { suggestionId, action } = respondToSuggestionRequestSchema.parse(body);
 
     // Verify stream ownership
-    const liveStream = await db.liveStream.findUnique({
+    const liveStream = await db.live_stream.findUnique({
       where: { id: liveStreamId },
     });
 
@@ -621,7 +621,7 @@ live.post("/:id/respond-to-suggestion", async (c) => {
 
       if (action === "accept") {
         // Check active quests count
-        const activeQuests = await db.userQuest.findMany({
+        const activeQuests = await db.user_quest.findMany({
           where: {
             userId: user.id,
             status: "active",
@@ -633,7 +633,7 @@ live.post("/:id/respond-to-suggestion", async (c) => {
         }
 
         // Check if user already has this quest
-        const existingUserQuest = await db.userQuest.findUnique({
+        const existingUserQuest = await db.user_quest.findUnique({
           where: {
             userId_questId: {
               userId: user.id,
@@ -647,7 +647,7 @@ live.post("/:id/respond-to-suggestion", async (c) => {
         }
 
         // Create UserQuest
-        const userQuest = await db.userQuest.create({
+        const userQuest = await db.user_quest.create({
           data: {
             userId: user.id,
             questId: suggestion.questId,
@@ -666,7 +666,7 @@ live.post("/:id/respond-to-suggestion", async (c) => {
         });
 
         // Update live stream to link this quest
-        await db.liveStream.update({
+        await db.live_stream.update({
           where: { id: liveStreamId },
           data: {
             userQuestId: userQuest.id,
@@ -726,10 +726,10 @@ live.post("/:id/record-quest-action", async (c) => {
     }
 
     // Get live stream with user quest
-    const liveStream = await db.liveStream.findUnique({
+    const liveStream = await db.live_stream.findUnique({
       where: { id: liveStreamId },
       include: {
-        userQuest: {
+        user_quest: {
           include: {
             quest: true,
           },
@@ -741,7 +741,7 @@ live.post("/:id/record-quest-action", async (c) => {
       return c.json({ error: "Live stream not found or ended" }, 404);
     }
 
-    if (!liveStream.userQuest) {
+    if (!liveStream.user_quest) {
       return c.json({ error: "Streamer has no active quest" }, 400);
     }
 
@@ -750,7 +750,7 @@ live.post("/:id/record-quest-action", async (c) => {
       return c.json({ error: "Use the quest detail screen to record your own quest actions" }, 400);
     }
 
-    const userQuest = liveStream.userQuest;
+    const userQuest = liveStream.user_quest;
 
     // Update counts based on action type
     const newNoCount = action === "NO" ? userQuest.noCount + 1 : userQuest.noCount;
@@ -764,7 +764,7 @@ live.post("/:id/record-quest-action", async (c) => {
       (userQuest.quest.goalType === "TAKE_ACTION" && newActionCount >= userQuest.quest.goalCount);
 
     // Update user quest
-    const updated = await db.userQuest.update({
+    const updated = await db.user_quest.update({
       where: { id: userQuest.id },
       data: {
         noCount: newNoCount,
@@ -819,7 +819,7 @@ live.post("/:id/link-quest", zValidator("json", linkQuestSchema), async (c) => {
 
   try {
     // Verify the stream belongs to the user
-    const liveStream = await db.liveStream.findUnique({
+    const liveStream = await db.live_stream.findUnique({
       where: { id: liveStreamId },
     });
 
@@ -832,7 +832,7 @@ live.post("/:id/link-quest", zValidator("json", linkQuestSchema), async (c) => {
     }
 
     // Verify the quest belongs to the user
-    const userQuest = await db.userQuest.findUnique({
+    const userQuest = await db.user_quest.findUnique({
       where: { id: userQuestId },
     });
 
@@ -845,7 +845,7 @@ live.post("/:id/link-quest", zValidator("json", linkQuestSchema), async (c) => {
     }
 
     // Update the stream to link the quest
-    await db.liveStream.update({
+    await db.live_stream.update({
       where: { id: liveStreamId },
       data: {
         userQuestId: userQuestId,

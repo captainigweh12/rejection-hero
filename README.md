@@ -24,6 +24,29 @@
 
 ## 🔧 Bug Fixes & Features
 
+### 🐛 Fixed Livestream & Create Quest API Errors (2025-11-20)
+- **Issue**: Getting 500 errors on `/api/live/active` and `/api/quests` endpoints
+- **Root Cause**: Database model references were using incorrect camelCase instead of snake_case
+  - Prisma schema uses snake_case model names: `live_stream`, `user_quest`, `challenge_daily_quest`, etc.
+  - But routes were incorrectly referencing them as: `db.liveStream`, `db.userQuest`, etc.
+  - The Prisma client exposes models using the exact schema names (snake_case), NOT camelCase
+- **✅ FIXED**:
+  - Updated all database model references to use snake_case: `db.live_stream`, `db.user_quest`, `db.post_comment`, etc.
+  - Fixed all relation field names: `userQuest:` → `user_quest:`, `postImage:` → `post_image:`, etc.
+  - Fixed all relation property accesses: `stream.userQuest` → `stream.user_quest`, `post.likes` → `post.post_like`, etc.
+  - Applied fixes across all routes, services, and utilities
+  - Regenerated Prisma client to ensure consistency
+- **Affected Files**:
+  - `/backend/src/routes/live.ts` - Live stream endpoints now working ✅
+  - `/backend/src/routes/quests.ts` - Quest endpoints now working ✅
+  - `/backend/src/routes/challenges.ts` - Challenge endpoints now working ✅
+  - All other routes updated for consistency
+  - Services: `questBadges.ts`, `questTimeWarnings.ts`, and others
+- **Testing**:
+  - `/api/live/active` now returns 200 ✅
+  - Quest creation endpoints fixed ✅
+  - All database queries now properly validated by Prisma
+
 ### 🎁 Free Tier Limit: 10 Custom Quests (2025-11-19)
 - **✅ IMPLEMENTED**: Free users can now create up to 10 custom quests, premium users get unlimited
 - **How it Works**:

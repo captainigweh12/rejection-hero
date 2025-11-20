@@ -24,7 +24,7 @@ statsRouter.get("/", async (c) => {
     return c.json({ message: "Unauthorized" }, 401);
   }
 
-  const stats = await db.userStats.findUnique({
+  const stats = await db.user_stats.findUnique({
     where: { userId: user.id },
   });
 
@@ -52,7 +52,7 @@ statsRouter.get("/", async (c) => {
       }
 
       // Create default stats
-      const newStats = await db.userStats.create({
+      const newStats = await db.user_stats.create({
         data: {
           userId: user.id,
           currentStreak: 0,
@@ -155,7 +155,7 @@ statsRouter.get("/leaderboard", async (c) => {
   
   if (startDate) {
     // Count completed quests per user in the period
-    const completedQuests = await db.userQuest.findMany({
+    const completedQuests = await db.user_quest.findMany({
       where: {
         status: "COMPLETED",
         completedAt: {
@@ -180,7 +180,7 @@ statsRouter.get("/leaderboard", async (c) => {
   }
 
   // Get all user stats
-  const allUserStats = await db.userStats.findMany({
+  const allUserStats = await db.user_stats.findMany({
     include: {
       user: {
         select: {
@@ -300,7 +300,7 @@ statsRouter.get("/courage-boost", async (c) => {
     return c.json({ message: "Unauthorized" }, 401);
   }
 
-  const stats = await db.userStats.findUnique({
+  const stats = await db.user_stats.findUnique({
     where: { userId: user.id },
   });
 
@@ -338,7 +338,7 @@ statsRouter.get("/weekly-forecast", async (c) => {
     return c.json({ message: "Unauthorized" }, 401);
   }
 
-  const stats = await db.userStats.findUnique({
+  const stats = await db.user_stats.findUnique({
     where: { userId: user.id },
   });
 
@@ -346,7 +346,7 @@ statsRouter.get("/weekly-forecast", async (c) => {
   const oneWeekAgo = new Date();
   oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 
-  const recentQuests = await db.userQuest.findMany({
+  const recentQuests = await db.user_quest.findMany({
     where: {
       userId: user.id,
       createdAt: { gte: oneWeekAgo },
@@ -504,7 +504,7 @@ statsRouter.post("/complete-warmup", zValidator("json", completeWarmupRequestSch
   const data = c.req.valid("json");
 
   // Update stats with warm-up completion
-  const stats = await db.userStats.upsert({
+  const stats = await db.user_stats.upsert({
     where: { userId: user.id },
     create: {
       userId: user.id,

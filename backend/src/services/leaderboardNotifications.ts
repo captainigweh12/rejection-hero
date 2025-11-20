@@ -42,7 +42,7 @@ export async function checkLeaderboardFallBehind() {
 
   for (const period of periods) {
     // Get quest completions for this period
-    const completedQuests = await db.userQuest.findMany({
+    const completedQuests = await db.user_quest.findMany({
       where: {
         status: "COMPLETED",
         completedAt: {
@@ -61,7 +61,7 @@ export async function checkLeaderboardFallBehind() {
     }
 
     // Get all users with stats
-    const allUserStats = await db.userStats.findMany({
+    const allUserStats = await db.user_stats.findMany({
       include: {
         user: {
           select: {
@@ -93,7 +93,7 @@ export async function checkLeaderboardFallBehind() {
       const hasNoCompletions = userRanking.completions === 0;
 
       // Check if user has completed a quest in the last 24 hours
-      const lastQuestCompletion = await db.userQuest.findFirst({
+      const lastQuestCompletion = await db.user_quest.findFirst({
         where: {
           userId: userRanking.userId,
           status: "COMPLETED",
