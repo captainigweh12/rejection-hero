@@ -56,6 +56,8 @@ export default function LiveScreen({ navigation }: Props) {
   const [facing, setFacing] = useState<"front" | "back">("front");
   const [permission, requestPermission] = useCameraPermissions();
   const [showQuestCardOnStream, setShowQuestCardOnStream] = useState(false);
+  const [showCreateQuestModal, setShowCreateQuestModal] = useState(false);
+  const [newQuestPrompt, setNewQuestPrompt] = useState("");
 
   // Check if live streaming is disabled by parental guidance
   useEffect(() => {
@@ -248,6 +250,34 @@ export default function LiveScreen({ navigation }: Props) {
     },
     onError: (error: any) => {
       Alert.alert("Error", error.message || "Failed to record action");
+    },
+  });
+
+  // Create quest mutation (for creating quests directly in livestream)
+  const createQuestInLiveMutation = useMutation({
+    mutationFn: async (prompt: string) => {
+      return api.post<any>("/api/quests/generate", {
+        userInput: prompt,
+      });
+    },
+    onSuccess: async (data) => {
+      setNewQuestPrompt("");
+      setShowCreateQuestModal(false);
+      queryClient.invalidateQueries({ queryKey: ["quests"] });
+
+      // Auto-start the quest
+      if (data.userQuestId) {
+        try {
+          await api.post(`/api/quests/${data.userQuestId}/start`, {});
+          setShowQuestCardOnStream(true);
+          Alert.alert("Quest Created!", "Your quest is now live on your stream!");
+        } catch (error) {
+          console.error("Failed to start quest:", error);
+        }
+      }
+    },
+    onError: (error: any) => {
+      Alert.alert("Error", error.message || "Failed to create quest");
     },
   });
 
@@ -1002,20 +1032,7 @@ export default function LiveScreen({ navigation }: Props) {
           <Pressable
             onPress={() => {
               if (!activeQuest) {
-                Alert.alert(
-                  "No Active Quest",
-                  "Start a live stream with a linked quest to track your progress live!",
-                  [
-                    {
-                      text: "OK",
-                      style: "cancel",
-                    },
-                    {
-                      text: "Create Quest",
-                      onPress: () => navigation.navigate("CreateQuest"),
-                    },
-                  ]
-                );
+                setShowCreateQuestModal(true);
               } else {
                 setShowQuestCardOnStream(!showQuestCardOnStream);
               }
@@ -1033,9 +1050,13 @@ export default function LiveScreen({ navigation }: Props) {
           </Pressable>
         </View>
 
-        {/* Modern Quest Card Overlay - Interactive */}
+        {/* Modern Quest Card Overlay - Interactive & Expandable */}
         {activeQuest && showQuestCardOnStream && (
-          <View
+          <Pressable
+            onPress={() => {
+              // Expand/collapse on tap - for now just toggle visibility
+              setShowQuestCardOnStream(!showQuestCardOnStream);
+            }}
             style={{
               position: "absolute",
               bottom: 240,
@@ -1120,7 +1141,11 @@ export default function LiveScreen({ navigation }: Props) {
                 </Text>
               </Pressable>
             </View>
-          </View>
+
+            <Text style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: 11, marginTop: 8, textAlign: "center" }}>
+              Tap card to hide • Tap sparkles to show
+            </Text>
+          </Pressable>
         )}
 
         {/* Create Quest Button - Show when streaming without active quest */}
@@ -1247,6 +1272,81 @@ export default function LiveScreen({ navigation }: Props) {
             </View>
           </KeyboardAvoidingView>
         </View>
+
+        {/* Create Quest Modal */}
+        <Modal
+          visible={showCreateQuestModal}
+          animationType="slide"
+          transparent
+          onRequestClose={() => setShowCreateQuestModal(false)}
+        >
+          <View style={{ flex: 1, backgroundColor: colors.modalOverlay, justifyContent: "flex-end" }}>
+            <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"}>
+              <View
+                style={{
+                  backgroundColor: colors.backgroundSolid,
+                  borderTopLeftRadius: 24,
+                  borderTopRightRadius: 24,
+                  paddingTop: 20,
+                  paddingBottom: 40,
+                  paddingHorizontal: 20,
+                }}
+              >
+                <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+                  <Text style={{ color: colors.text, fontSize: 22, fontWeight: "bold" }}>
+                    Create Quest Live
+                  </Text>
+                  <Pressable onPress={() => setShowCreateQuestModal(false)}>
+                    <X size={28} color={colors.text} />
+                  </Pressable>
+                </View>
+
+                <Text style={{ color: colors.textSecondary, fontSize: 14, marginBottom: 16 }}>
+                  Describe what you want to do, and AI will create a quest for your livestream
+                </Text>
+
+                <TextInput
+                  value={newQuestPrompt}
+                  onChangeText={setNewQuestPrompt}
+                  placeholder="E.g., Ask 5 strangers for directions..."
+                  placeholderTextColor={colors.textTertiary}
+                  multiline
+                  numberOfLines={3}
+                  style={{
+                    backgroundColor: colors.card,
+                    borderRadius: 12,
+                    padding: 16,
+                    color: colors.text,
+                    fontSize: 15,
+                    minHeight: 100,
+                    textAlignVertical: "top",
+                    marginBottom: 20,
+                  }}
+                />
+
+                <Pressable
+                  onPress={() => {
+                    if (newQuestPrompt.trim()) {
+                      createQuestInLiveMutation.mutate(newQuestPrompt.trim());
+                    }
+                  }}
+                  disabled={!newQuestPrompt.trim() || createQuestInLiveMutation.isPending}
+                  style={{
+                    backgroundColor: newQuestPrompt.trim() ? colors.secondary : colors.card,
+                    paddingVertical: 16,
+                    borderRadius: 12,
+                    alignItems: "center",
+                    opacity: createQuestInLiveMutation.isPending ? 0.6 : 1,
+                  }}
+                >
+                  <Text style={{ color: colors.text, fontSize: 16, fontWeight: "bold" }}>
+                    {createQuestInLiveMutation.isPending ? "Creating Quest..." : "Create & Start Quest"}
+                  </Text>
+                </Pressable>
+              </View>
+            </KeyboardAvoidingView>
+          </View>
+        </Modal>
 
         {/* Quest Suggestions Modal */}
         <Modal
