@@ -140,6 +140,7 @@ live.post("/start", async (c) => {
         userQuestId,
         isActive: true,
         viewerCount: 0,
+        updatedAt: new Date(),
       },
     });
 

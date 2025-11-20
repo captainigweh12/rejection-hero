@@ -302,6 +302,7 @@ questsRouter.post("/generate", zValidator("json", generateQuestRequestSchema), a
       longitude: questData.longitude,
       timeContext: questData.timeContext,
       dateContext: questData.dateContext,
+      updatedAt: new Date(),
     },
   });
 
@@ -329,6 +330,7 @@ questsRouter.post("/generate", zValidator("json", generateQuestRequestSchema), a
       userId: user.id,
       questId: quest.id,
       status: "QUEUED",
+      updatedAt: new Date(),
     },
   });
 
@@ -400,6 +402,7 @@ questsRouter.post("/refresh-all", zValidator("json", refreshAllQuestsRequestSche
           longitude: questData.longitude,
           timeContext: questData.timeContext,
           dateContext: questData.dateContext,
+          updatedAt: new Date(),
         },
       });
 
@@ -555,7 +558,7 @@ questsRouter.post("/:id/start", async (c) => {
     );
 
     // Get user's profile for display name
-    const userProfile = userQuest.user.Profile;
+    const userProfile = userQuest.user.profile;
     const userName = userProfile?.displayName || userQuest.user.name || user.email?.split("@")[0] || "A friend";
 
     // Create notifications for all friends and send push notifications
@@ -675,10 +678,10 @@ questsRouter.get("/friend/:userQuestId", async (c) => {
       id: userQuest.user.id,
       name: userQuest.user.name,
       email: userQuest.user.email,
-      profile: userQuest.user.Profile
+      profile: userQuest.user.profile
         ? {
-            displayName: userQuest.user.Profile.displayName,
-            avatar: userQuest.user.Profile.avatar,
+            displayName: userQuest.user.profile.displayName,
+            avatar: userQuest.user.profile.avatar,
           }
         : null,
     },
@@ -2324,8 +2327,8 @@ questsRouter.get("/:questId/friends", async (c) => {
     .map((uq) => ({
       userId: uq.userId,
       userQuestId: uq.id,
-      displayName: uq.user.Profile?.displayName || uq.user.name || uq.user.email?.split("@")[0] || "Friend",
-      avatar: uq.user.Profile?.avatar || null,
+      displayName: uq.user.profile?.displayName || uq.user.name || uq.user.email?.split("@")[0] || "Friend",
+      avatar: uq.user.profile?.avatar || null,
       noCount: uq.noCount,
       yesCount: uq.yesCount,
       actionCount: uq.actionCount,

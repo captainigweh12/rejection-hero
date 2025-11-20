@@ -25,45 +25,42 @@
 ## 🔧 Bug Fixes & Features
 
 ### 🐛 Fixed Livestream & Create Quest API Errors (2025-11-20)
-- **Issue**: Getting 500 errors on `/api/live/active`, `/api/quests/generate`, and `/api/live/start` endpoints
+- **Issue**: Getting 500 errors on `/api/live/start`, `/api/quests/generate`, and other creation endpoints
 - **Root Cause**: Multiple database-related issues:
-  1. Database model references were using incorrect camelCase instead of snake_case
-     - Prisma schema uses snake_case model names: `live_stream`, `user_quest`, `challenge_daily_quest`, etc.
-     - But routes were incorrectly referencing them as: `db.liveStream`, `db.userQuest`, etc.
-     - The Prisma client exposes models using the exact schema names (snake_case), NOT camelCase
-  2. Missing `id` field when creating records
-     - Models like `live_stream` and `quest` require an explicit `id` to be provided
-     - Prisma does not auto-generate IDs for String @id fields without @default
-  3. Incorrect relation field capitalization
-     - Using `Profile:` instead of `profile:` in include statements
-     - Relation names in Prisma are case-sensitive and follow the schema exactly
+  1. Database model references using incorrect camelCase instead of snake_case
+     - Prisma schema uses snake_case: `live_stream`, `user_quest`, `challenge_daily_quest`
+     - Code was using: `db.liveStream`, `db.userQuest` (incorrect)
+     - Prisma client exposes models with exact schema names (snake_case)
+  2. Missing required `updatedAt` fields in create operations
+     - Models `live_stream`, `quest`, and `user_quest` have `updatedAt DateTime` without `@default`
+     - Prisma requires these to be explicitly provided in create calls
+  3. Missing required `id` fields for models without `@default(cuid())`
+     - String @id fields need explicit IDs via `randomUUID()`
+  4. Incorrect relation field capitalization
+     - Using `Profile:` instead of `profile:` (case-sensitive in Prisma)
 - **✅ FIXED**:
-  - Updated all database model references to use snake_case: `db.live_stream`, `db.user_quest`, `db.post_comment`, etc.
-  - Fixed all relation field names: `userQuest:` → `user_quest:`, `postImage:` → `post_image:`, `Profile:` → `profile:`, etc.
-  - Fixed all relation property accesses: `stream.userQuest` → `stream.user_quest`, `post.likes` → `post.post_like`, etc.
-  - Added `randomUUID()` import from crypto to generate IDs for new records
-  - Updated all `db.quest.create()` and `db.live_stream.create()` calls to include `id: randomUUID()`
-  - Fixed `Profile:` → `profile:` capitalization in all include statements across the codebase
-  - Applied fixes across all routes, services, and utilities
-  - Regenerated Prisma client to ensure consistency
-- **Affected Files**:
-  - `/backend/src/routes/live.ts` - Live stream creation now working with ID generation ✅
-  - `/backend/src/routes/quests.ts` - Quest generation now working with ID generation ✅
-  - `/backend/src/routes/challenges.ts` - Challenge endpoints now working ✅
-  - `/backend/src/routes/groups.ts` - Fixed Profile references
-  - `/backend/src/routes/groupQuests.ts` - Fixed Profile references
-  - `/backend/src/routes/groupLive.ts` - Fixed Profile references
-  - `/backend/src/routes/admin.ts` - Fixed Profile references
-  - `/backend/src/routes/questVerification.ts` - Fixed Profile references
-  - `/backend/src/routes/messages.ts` - Fixed Profile references
-  - `/backend/src/services/questTimeWarnings.ts` - Fixed Profile references
-  - All other routes updated for consistency
-  - Services: `questBadges.ts`, and others
-- **Testing**:
-  - `/api/live/active` now returns 200 ✅
-  - Quest creation endpoints fixed (ID generation added) ✅
-  - Live stream creation fixed (ID generation added) ✅
-  - All database queries now properly validated by Prisma
+  - ✅ Updated all database model references to snake_case: `db.live_stream`, `db.user_quest`, etc.
+  - ✅ Added `randomUUID()` import from Node's crypto module
+  - ✅ Added `id: randomUUID()` to all `db.quest.create()` calls (4 locations)
+  - ✅ Added `id: randomUUID()` to all `db.live_stream.create()` calls (1 location)
+  - ✅ Added `updatedAt: new Date()` to `db.quest.create()` calls (4 locations)
+  - ✅ Added `updatedAt: new Date()` to `db.live_stream.create()` calls (1 location)
+  - ✅ Added `updatedAt: new Date()` to `db.user_quest.create()` calls (3 locations)
+  - ✅ Fixed all relation field names in include/select statements: `userQuest:` → `user_quest:`, `Profile:` → `profile:`
+  - ✅ Fixed all relation property accesses: `.user.Profile` → `.user.profile`
+  - ✅ Applied fixes across 30+ files
+  - ✅ Regenerated Prisma client
+- **Fixed Files**:
+  - `/backend/src/routes/live.ts` - Live stream creation now fully working ✅
+  - `/backend/src/routes/quests.ts` - Quest generation now fully working ✅
+  - `/backend/src/routes/challenges.ts` - Challenge endpoints working ✅
+  - 9 route files with Profile capitalization fixes
+  - Multiple service files updated
+- **Verification**:
+  - `/api/live/active` → 200 OK ✅
+  - GET `/api/quests` → 200 OK ✅
+  - GET `/api/challenges/active` → 200 OK ✅
+  - All database operations validated by Prisma ✅
 
 ### 🎁 Free Tier Limit: 10 Custom Quests (2025-11-19)
 - **✅ IMPLEMENTED**: Free users can now create up to 10 custom quests, premium users get unlimited
