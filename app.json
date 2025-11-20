@@ -10,6 +10,7 @@
     "ios": {
       "bundleIdentifier": "com.vibecode.goforno",
       "supportsTablet": true,
+      "deploymentTarget": "15.1",
       "config": {
         "googleMobileAdsAppId": "ca-app-pub-xxxxxxxxxxxxxxxx~yyyyyyyyyy"
       },
