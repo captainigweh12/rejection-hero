@@ -142,7 +142,7 @@ export default function LiveScreen({ navigation }: Props) {
       setIsStreaming(true);
       setCurrentStreamId(data.liveStreamId);
       queryClient.invalidateQueries({ queryKey: ["liveStreams"] });
-      Alert.alert("Live!", "You are now live streaming!");
+      // Don't show alert - let the UI update automatically
     },
     onError: (error: any) => {
       Alert.alert("Error", error.message || "Failed to start live stream");

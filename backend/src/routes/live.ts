@@ -158,6 +158,7 @@ live.post("/start", async (c) => {
       update: {
         isLive: true,
         liveViewers: 0,
+        updatedAt: new Date(),
       },
       create: {
         id: crypto.randomUUID(),
@@ -165,6 +166,7 @@ live.post("/start", async (c) => {
         displayName: user.name || user.email || "User",
         isLive: true,
         liveViewers: 0,
+        updatedAt: new Date(),
       },
     });
 
