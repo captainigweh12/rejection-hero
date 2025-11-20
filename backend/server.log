@@ -985,3 +985,171 @@ Unknown field `dailyQuests` for include statement on model `challenge`. Availabl
       at request (/home/user/workspace/backend/generated/prisma/runtime/library.js:124:6300)
 
 --> GET /api/challenges/active [31m500[0m 2ms
+Error checking quest time warnings:  9 |   try {
+10 |     const now = new Date();
+11 |     let warningsSent = 0;
+12 | 
+13 |     // Get all active quests with their start times
+14 |     const activeQuests = await db.userQuest.findMany({
+                                       ^
+TypeError: undefined is not an object (evaluating 'db.userQuest.findMany')
+      at checkQuestTimeWarnings (/home/user/workspace/backend/src/services/questTimeWarnings.ts:14:35)
+      at checkQuestTimeWarnings (/home/user/workspace/backend/src/services/questTimeWarnings.ts:8:45)
+      at <anonymous> (/home/user/workspace/backend/src/index.ts:257:26)
+
+<-- GET /api/challenges/active
+🔐 [Auth Middleware] GET /api/challenges/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+Get active challenge error: 19 | `)}
+20 | 
+21 | We suggest to move the contents of ${Y(l)} to ${Y(a)} to consolidate your env vars.
+22 | `;throw new Error(u)}else if(t==="warn"){let u=`Conflict for env var${s.length>1?"s":""} ${s.map(c=>W(c)).join(", ")} in ${Y(a)} and ${Y(l)}
+23 | Env vars from ${Y(l)} overwrite the ones from ${Y(a)}
+24 |       `;console.warn(`${Ie("warn(prisma)")} ${u}`)}}}}function Is(e){if(yp(e)){$i(`Environment variables loaded from ${e}`);let r=qi.default.config({path:e,debug:process.env.DOTENV_CONFIG_DEBUG?!0:void 0});return{dotenvResult:Cs(r),message:Ce(`Environment variables loaded from ${xr.default.relative(process.cwd(),e)}`),path:e}}else $i(`Environment variables not found at ${e}`);return null}function Ds(e,r){return e&&r&&xr.default.resolve(e)===xr.default.resolve(r)}function yp(e){return!!(e&&un.default.existsSync(e))}function Vi(e,r){return Object.prototype.hasOwnProperty.call(e,r)}function pn(e,r){let t={};for(let n of Object.keys(e))t[n]=r(e[n],n);return t}function ji(e,r){if(e.length===0)return;let t=e[0];for(let n=1;n<e.length;n++)r(t,e[n])<0&&(t=e[n]);return t}function x(e,r){Object.defineProperty(e,"name",{value:r,configurable:!0})}var ks=new Set,at=(e,r,...t)=>{ks.has(e)||(ks.add(e),_i(r,...t))};var P=class e extends Error{clientVersion;errorCode;retryable;constructor(r,t,n){super(r),this.name="PrismaClie
+
+PrismaClientValidationError: 
+Invalid `db.challenge.findFirst()` invocation in
+/home/user/workspace/backend/src/routes/challenges.ts:98:42
+
+  95 }
+  96 
+  97 try {
+→ 98   const challenge = await db.challenge.findFirst({
+         where: {
+           userId: "N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI",
+           isActive: true
+         },
+         include: {
+           dailyQuests: {
+           ~~~~~~~~~~~
+             where: {
+               day: {
+                 lte: 100
+               }
+             },
+             orderBy: {
+               day: "desc"
+             },
+             include: {
+               quest: true,
+               userQuest: true
+             }
+           },
+       ?   user?: true,
+       ?   challenge_daily_quest?: true
+         }
+       })
+
+Unknown field `dailyQuests` for include statement on model `challenge`. Available options are marked with ?.
+ clientVersion: "6.17.1",
+
+      at new PrismaClientValidationError (/home/user/workspace/backend/generated/prisma/runtime/library.js:24:2335)
+      at Nn (/home/user/workspace/backend/generated/prisma/runtime/library.js:32:1363)
+      at handleRequestError (/home/user/workspace/backend/generated/prisma/runtime/library.js:124:6911)
+      at handleAndLogRequestError (/home/user/workspace/backend/generated/prisma/runtime/library.js:124:6593)
+      at request (/home/user/workspace/backend/generated/prisma/runtime/library.js:124:6300)
+
+--> GET /api/challenges/active [31m500[0m 2ms
+<-- GET /api/challenges/active
+🔐 [Auth Middleware] GET /api/challenges/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+Get active challenge error: 19 | `)}
+20 | 
+21 | We suggest to move the contents of ${Y(l)} to ${Y(a)} to consolidate your env vars.
+22 | `;throw new Error(u)}else if(t==="warn"){let u=`Conflict for env var${s.length>1?"s":""} ${s.map(c=>W(c)).join(", ")} in ${Y(a)} and ${Y(l)}
+23 | Env vars from ${Y(l)} overwrite the ones from ${Y(a)}
+24 |       `;console.warn(`${Ie("warn(prisma)")} ${u}`)}}}}function Is(e){if(yp(e)){$i(`Environment variables loaded from ${e}`);let r=qi.default.config({path:e,debug:process.env.DOTENV_CONFIG_DEBUG?!0:void 0});return{dotenvResult:Cs(r),message:Ce(`Environment variables loaded from ${xr.default.relative(process.cwd(),e)}`),path:e}}else $i(`Environment variables not found at ${e}`);return null}function Ds(e,r){return e&&r&&xr.default.resolve(e)===xr.default.resolve(r)}function yp(e){return!!(e&&un.default.existsSync(e))}function Vi(e,r){return Object.prototype.hasOwnProperty.call(e,r)}function pn(e,r){let t={};for(let n of Object.keys(e))t[n]=r(e[n],n);return t}function ji(e,r){if(e.length===0)return;let t=e[0];for(let n=1;n<e.length;n++)r(t,e[n])<0&&(t=e[n]);return t}function x(e,r){Object.defineProperty(e,"name",{value:r,configurable:!0})}var ks=new Set,at=(e,r,...t)=>{ks.has(e)||(ks.add(e),_i(r,...t))};var P=class e extends Error{clientVersion;errorCode;retryable;constructor(r,t,n){super(r),this.name="PrismaClie
+
+PrismaClientValidationError: 
+Invalid `db.challenge.findFirst()` invocation in
+/home/user/workspace/backend/src/routes/challenges.ts:98:42
+
+  95 }
+  96 
+  97 try {
+→ 98   const challenge = await db.challenge.findFirst({
+         where: {
+           userId: "N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI",
+           isActive: true
+         },
+         include: {
+           dailyQuests: {
+           ~~~~~~~~~~~
+             where: {
+               day: {
+                 lte: 100
+               }
+             },
+             orderBy: {
+               day: "desc"
+             },
+             include: {
+               quest: true,
+               userQuest: true
+             }
+           },
+       ?   user?: true,
+       ?   challenge_daily_quest?: true
+         }
+       })
+
+Unknown field `dailyQuests` for include statement on model `challenge`. Available options are marked with ?.
+ clientVersion: "6.17.1",
+
+      at new PrismaClientValidationError (/home/user/workspace/backend/generated/prisma/runtime/library.js:24:2335)
+      at Nn (/home/user/workspace/backend/generated/prisma/runtime/library.js:32:1363)
+      at handleRequestError (/home/user/workspace/backend/generated/prisma/runtime/library.js:124:6911)
+      at handleAndLogRequestError (/home/user/workspace/backend/generated/prisma/runtime/library.js:124:6593)
+      at request (/home/user/workspace/backend/generated/prisma/runtime/library.js:124:6300)
+
+--> GET /api/challenges/active [31m500[0m 3ms
+<-- GET /api/challenges/active
+🔐 [Auth Middleware] GET /api/challenges/active - User: N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI
+Get active challenge error: 19 | `)}
+20 | 
+21 | We suggest to move the contents of ${Y(l)} to ${Y(a)} to consolidate your env vars.
+22 | `;throw new Error(u)}else if(t==="warn"){let u=`Conflict for env var${s.length>1?"s":""} ${s.map(c=>W(c)).join(", ")} in ${Y(a)} and ${Y(l)}
+23 | Env vars from ${Y(l)} overwrite the ones from ${Y(a)}
+24 |       `;console.warn(`${Ie("warn(prisma)")} ${u}`)}}}}function Is(e){if(yp(e)){$i(`Environment variables loaded from ${e}`);let r=qi.default.config({path:e,debug:process.env.DOTENV_CONFIG_DEBUG?!0:void 0});return{dotenvResult:Cs(r),message:Ce(`Environment variables loaded from ${xr.default.relative(process.cwd(),e)}`),path:e}}else $i(`Environment variables not found at ${e}`);return null}function Ds(e,r){return e&&r&&xr.default.resolve(e)===xr.default.resolve(r)}function yp(e){return!!(e&&un.default.existsSync(e))}function Vi(e,r){return Object.prototype.hasOwnProperty.call(e,r)}function pn(e,r){let t={};for(let n of Object.keys(e))t[n]=r(e[n],n);return t}function ji(e,r){if(e.length===0)return;let t=e[0];for(let n=1;n<e.length;n++)r(t,e[n])<0&&(t=e[n]);return t}function x(e,r){Object.defineProperty(e,"name",{value:r,configurable:!0})}var ks=new Set,at=(e,r,...t)=>{ks.has(e)||(ks.add(e),_i(r,...t))};var P=class e extends Error{clientVersion;errorCode;retryable;constructor(r,t,n){super(r),this.name="PrismaClie
+
+PrismaClientValidationError: 
+Invalid `db.challenge.findFirst()` invocation in
+/home/user/workspace/backend/src/routes/challenges.ts:98:42
+
+  95 }
+  96 
+  97 try {
+→ 98   const challenge = await db.challenge.findFirst({
+         where: {
+           userId: "N5NulzjY19FsKFD7MPoxCdqV0J1HgDgI",
+           isActive: true
+         },
+         include: {
+           dailyQuests: {
+           ~~~~~~~~~~~
+             where: {
+               day: {
+                 lte: 100
+               }
+             },
+             orderBy: {
+               day: "desc"
+             },
+             include: {
+               quest: true,
+               userQuest: true
+             }
+           },
+       ?   user?: true,
+       ?   challenge_daily_quest?: true
+         }
+       })
+
+Unknown field `dailyQuests` for include statement on model `challenge`. Available options are marked with ?.
+ clientVersion: "6.17.1",
+
+      at new PrismaClientValidationError (/home/user/workspace/backend/generated/prisma/runtime/library.js:24:2335)
+      at Nn (/home/user/workspace/backend/generated/prisma/runtime/library.js:32:1363)
+      at handleRequestError (/home/user/workspace/backend/generated/prisma/runtime/library.js:124:6911)
+      at handleAndLogRequestError (/home/user/workspace/backend/generated/prisma/runtime/library.js:124:6593)
+      at request (/home/user/workspace/backend/generated/prisma/runtime/library.js:124:6300)
+
+--> GET /api/challenges/active [31m500[0m 3ms
