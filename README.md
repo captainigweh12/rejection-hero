@@ -6,7 +6,8 @@
 |-----------|--------|---------|
 | Backend Server | ✅ Healthy | Running on port 3000, all routes mounted |
 | Frontend App | ✅ Working | Expo SDK 53, React Native 0.76.7 |
-| Authentication | ✅ Fixed | 3-layer protection system, 401 errors eliminated |
+| Authentication | ✅ Fixed | Google OAuth + Email/Password working |
+| **Google OAuth** | ⚠️ Sandbox URL | Currently shows "sandbox.dev" - will use rejectionhero.com in production |
 | **Backend URLs** | ✅ **SYNCHRONIZED** | Both frontend & backend now use same URL |
 | **Tokens System** | ✅ **UPDATED** | Changed from diamonds to tokens throughout |
 | **Onboarding Flow** | ✅ **FIXED** | New users now see age verification → onboarding |
