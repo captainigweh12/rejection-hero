@@ -17,7 +17,7 @@ export async function checkQuestTimeWarnings(): Promise<{ warningsSent: number }
     } catch (error: any) {
       // If table doesn't exist (P2021), skip this check
       if (error?.code === "P2021" || error?.message?.includes("does not exist")) {
-        console.log("⚠️  [Quest Time Warnings] Tables not yet initialized, skipping...");
+        console.log("⚠️  [Quest Time Warnings] user_quest table does not exist yet, skipping...");
         return { warningsSent: 0 };
       }
       throw error; // Re-throw other errors
@@ -189,7 +189,7 @@ export async function sendQuestReminders(): Promise<{ remindersSent: number }> {
       await db.$queryRawUnsafe("SELECT 1 FROM user_quest LIMIT 1");
     } catch (error: any) {
       if (error?.code === "P2021" || error?.message?.includes("does not exist")) {
-        console.log("⚠️  [Quest Reminders] Tables not yet initialized, skipping...");
+        console.log("⚠️  [Quest Reminders] user_quest table does not exist yet, skipping...");
         return { remindersSent: 0 };
       }
       throw error;
