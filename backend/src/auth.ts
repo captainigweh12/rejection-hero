@@ -72,4 +72,24 @@ console.log("✅ [Auth] Better Auth initialized");
 console.log(`🔗 [Auth] Base URL: ${env.BACKEND_URL}`);
 console.log(`🌐 [Auth] Trusted origins: ${auth.options.trustedOrigins?.join(", ")}`);
 console.log(`🔑 [Auth] Google OAuth: ${env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET ? "Enabled ✅" : "Disabled ⚠️"}`);
+if (env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET) {
+  const redirectURI = `${env.BACKEND_URL}/api/auth/callback/google`;
+  console.log(`🔗 [Auth] Google OAuth Redirect URI: ${redirectURI}`);
+  
+  if (redirectURI.includes("sandbox.dev")) {
+    console.error(`❌ [Auth] ERROR: OAuth redirect URI is using sandbox URL: ${redirectURI}`);
+    console.error(`❌ [Auth] This will cause OAuth redirect_uri_mismatch errors!`);
+    if (process.env.RAILWAY_PUBLIC_DOMAIN) {
+      const railwayUrl = `https://${process.env.RAILWAY_PUBLIC_DOMAIN}/api/auth/callback/google`;
+      console.error(`❌ [Auth] Expected Railway URL: ${railwayUrl}`);
+      console.error(`❌ [Auth] Please remove BACKEND_URL from Railway variables to auto-detect Railway domain`);
+    }
+  } else {
+    console.log(`✅ [Auth] OAuth redirect URI is using production URL: ${redirectURI}`);
+  }
+  
+  console.log(`⚠️  [Auth] IMPORTANT: Make sure this URL is added to Google Cloud Console OAuth credentials!`);
+  console.log(`⚠️  [Auth] Go to: https://console.cloud.google.com/apis/credentials`);
+  console.log(`⚠️  [Auth] Add to "Authorized redirect URIs": ${redirectURI}`);
+}
 console.log(`🔐 [Auth] Session expires in: 7 days`);

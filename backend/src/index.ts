@@ -78,7 +78,46 @@ app.route("/api/auth", authRouter);
 // Better Auth handler
 // Handles all authentication endpoints: /api/auth/sign-in, /api/auth/sign-up, etc.
 console.log("🔐 Mounting Better Auth handler at /api/auth/*");
-app.on(["GET", "POST"], "/api/auth/*", (c) => auth.handler(c.req.raw));
+app.on(["GET", "POST"], "/api/auth/*", async (c) => {
+  try {
+    // Log OAuth callback requests for debugging
+    if (c.req.path.includes("/callback/google")) {
+      console.log("🔐 [OAuth] Google callback received");
+      console.log(`   URL: ${c.req.url}`);
+      console.log(`   Method: ${c.req.method}`);
+      console.log(`   Query: ${c.req.query()}`);
+    }
+    
+    const response = await auth.handler(c.req.raw);
+    
+    // Log OAuth callback responses
+    if (c.req.path.includes("/callback/google")) {
+      console.log(`🔐 [OAuth] Google callback response: ${response.status}`);
+      if (response.status >= 400) {
+        const text = await response.clone().text().catch(() => "Unable to read response");
+        console.error(`❌ [OAuth] Google callback error: ${text.substring(0, 200)}`);
+      }
+    }
+    
+    return response;
+  } catch (error: any) {
+    console.error("❌ [OAuth] Error in auth handler:", error);
+    console.error("   Path:", c.req.path);
+    console.error("   Method:", c.req.method);
+    console.error("   Error message:", error?.message || error);
+    console.error("   Stack:", error?.stack?.substring(0, 500));
+    
+    // Return proper error response instead of crashing
+    return c.json(
+      { 
+        error: "Authentication error",
+        message: error?.message || "An error occurred during authentication",
+        path: c.req.path
+      },
+      500
+    );
+  }
+});
 
 // Serve uploaded images statically
 // Files in uploads/ directory are accessible at /uploads/* URLs

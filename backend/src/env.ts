@@ -54,9 +54,46 @@ const envSchema = z.object({
 function validateEnv() {
   try {
     const parsed = envSchema.parse(process.env);
+
+    // CRITICAL: Override BACKEND_URL with Railway domain if available
+    // This ensures OAuth always uses the correct Railway URL, even if BACKEND_URL is set incorrectly
+    if (process.env.RAILWAY_PUBLIC_DOMAIN) {
+      const railwayUrl = `https://${process.env.RAILWAY_PUBLIC_DOMAIN}`;
+      const originalBackendUrl = parsed.BACKEND_URL;
+
+      // Always use Railway URL when available (override any BACKEND_URL value)
+      parsed.BACKEND_URL = railwayUrl;
+
+      console.log(`🚂 [ENV] Railway Public Domain detected: ${process.env.RAILWAY_PUBLIC_DOMAIN}`);
+
+      if (originalBackendUrl && originalBackendUrl !== railwayUrl) {
+        if (originalBackendUrl.includes("sandbox.dev")) {
+          console.warn(`⚠️  [ENV] BACKEND_URL was set to sandbox URL: ${originalBackendUrl}`);
+          console.warn(`⚠️  [ENV] Overriding with Railway URL: ${railwayUrl}`);
+        } else {
+          console.log(`ℹ️  [ENV] BACKEND_URL was ${originalBackendUrl}, using Railway URL: ${railwayUrl}`);
+        }
+      }
+      console.log(`✅ [ENV] BACKEND_URL set to Railway domain: ${parsed.BACKEND_URL}`);
+    } else if (!parsed.BACKEND_URL || parsed.BACKEND_URL === "http://localhost:3000") {
+      // Fallback to localhost if not in Railway and no BACKEND_URL set
+      parsed.BACKEND_URL = "http://localhost:3000";
+      console.log(`🔧 [ENV] No BACKEND_URL or Railway domain, using localhost fallback`);
+    } else {
+      // Validate BACKEND_URL is a valid URL
+      try {
+        new URL(parsed.BACKEND_URL);
+        console.log(`🌐 [ENV] Using BACKEND_URL from environment: ${parsed.BACKEND_URL}`);
+      } catch {
+        throw new Error(`BACKEND_URL must be a valid URL: ${parsed.BACKEND_URL}`);
+      }
+    }
+
     console.log("✅ Environment variables validated successfully");
     console.log("🔍 OPENAI_API_KEY from process.env:", process.env.OPENAI_API_KEY ? "EXISTS" : "MISSING");
     console.log("🔍 OPENAI_API_KEY in parsed:", parsed.OPENAI_API_KEY ? "EXISTS" : "MISSING");
+    console.log(`🌐 [ENV] Final BACKEND_URL: ${parsed.BACKEND_URL}`);
+
     return parsed;
   } catch (error) {
     if (error instanceof z.ZodError) {
