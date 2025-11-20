@@ -11,7 +11,7 @@ RUN apt-get update && \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy backend files
-COPY backend/package.json backend/bun.lockb ./backend/
+COPY backend/package.json ./backend/
 COPY backend/prisma ./backend/prisma
 
 # Install dependencies
