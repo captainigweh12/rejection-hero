@@ -54,7 +54,6 @@
         "backgroundColor": "#FFFFFF"
       },
       "edgeToEdgeEnabled": true,
-      "usesCleartextTraffic": true,
       "permissions": [
         "ACCESS_COARSE_LOCATION",
         "ACCESS_FINE_LOCATION",
@@ -73,7 +72,6 @@
       "eas": {
         "projectId": "68e0c407-252d-49d4-a0f4-77ae4f37f619"
       }
-    },
-    "owner": "captainigweh12"
+    }
   }
 }

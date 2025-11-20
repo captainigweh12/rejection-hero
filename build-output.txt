@@ -1,0 +1,5 @@
+(node:67026) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+eas.json is not valid.
+- "build.production.android.gradleProperties" is not allowed
+    Error: build command failed.

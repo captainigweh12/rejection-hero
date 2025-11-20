@@ -1,0 +1,46 @@
+name: EAS Android Preview Build
+
+on:
+  workflow_dispatch: {}  # only runs when you manually trigger it in GitHub
+
+jobs:
+  build-android-preview:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: "1.2.19"
+
+      - name: Install dependencies
+        run: |
+          if [ -f bun.lock ]; then
+            bun install --frozen-lockfile
+          elif [ -f bun.lockb ]; then
+            bun install --frozen-lockfile
+          elif [ -f package-lock.json ]; then
+            npm ci
+          elif [ -f yarn.lock ]; then
+            yarn install --frozen-lockfile
+          else
+            npm install
+          fi
+
+      - name: Install EAS CLI
+        run: npm install -g eas-cli
+
+      - name: Run EAS Android Preview Build
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          eas build --platform android --profile preview --non-interactive
+
