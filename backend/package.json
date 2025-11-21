@@ -13,7 +13,8 @@
     "db:push": "prisma db push --accept-data-loss --skip-generate",
     "db:migrate": "prisma migrate deploy",
     "db:setup": "bun run postinstall && bun run db:push",
-    "verify:auth-tables": "bun run scripts/verify-better-auth-tables.ts"
+    "verify:auth-tables": "bun run scripts/verify-better-auth-tables.ts",
+    "verify:signup": "bun run scripts/verify-signup-data.ts"
   },
   "devDependencies": {
     "@types/bun": "latest",
