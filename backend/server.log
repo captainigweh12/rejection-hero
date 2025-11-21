@@ -25,3 +25,4 @@ error: Cannot find module '@/shared/contracts' from '/home/user/workspace/backen
 error: Cannot find module '@/shared/contracts' from '/home/user/workspace/backend/src/routes/live.ts'
 error: Cannot find module '@/shared/contracts' from '/home/user/workspace/backend/src/routes/swipe.ts'
 error: Cannot find module '@/shared/contracts' from '/home/user/workspace/backend/src/routes/swipe.ts'
+error: Cannot find module '@/shared/contracts' from '/home/user/workspace/backend/src/routes/live.ts'

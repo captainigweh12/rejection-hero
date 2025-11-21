@@ -82,23 +82,40 @@ app.on(["GET", "POST"], "/api/auth/*", async (c) => {
   try {
     const path = c.req.path;
     const method = c.req.method;
+    const url = c.req.url;
+    const headers = Object.fromEntries(c.req.raw.headers.entries());
     
-    // Log sign-up requests for debugging
+    // Log ALL auth requests (not just sign-up) for debugging
+    console.log(`🔐 [Auth Request] ${method} ${path}`);
+    console.log(`   Full URL: ${url}`);
+    console.log(`   Origin: ${headers.origin || "none"}`);
+    console.log(`   User-Agent: ${headers["user-agent"]?.substring(0, 50) || "none"}...`);
+    
+    // Log sign-up requests with more detail
     if (path.includes("/sign-up/email")) {
       console.log("🔐 [Sign-Up] Email sign-up request received");
       console.log(`   Method: ${method}`);
       console.log(`   Path: ${path}`);
+      console.log(`   Headers:`, JSON.stringify({
+        origin: headers.origin,
+        referer: headers.referer,
+        contentType: headers["content-type"],
+      }, null, 2));
       
       // Try to get request body for debugging (if available)
       try {
-        const body = await c.req.json().catch(() => null);
+        // Clone request to read body without consuming it
+        const clonedRequest = c.req.raw.clone();
+        const body = await clonedRequest.json().catch(() => null);
         if (body) {
           console.log(`   Email: ${body.email || "not provided"}`);
           console.log(`   Name: ${body.name || "not provided"}`);
-          // Don't log password
+          console.log(`   Password: ${body.password ? "***" : "not provided"}`);
+        } else {
+          console.log(`   Body: Unable to parse (might be FormData or already consumed)`);
         }
-      } catch {
-        // Body might not be JSON or already consumed
+      } catch (error) {
+        console.log(`   Body parse error: ${error instanceof Error ? error.message : String(error)}`);
       }
     }
     

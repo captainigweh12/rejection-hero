@@ -18,8 +18,15 @@ const getBackendURL = () => {
   return url;
 };
 
+const backendURL = getBackendURL();
+
+if (!backendURL) {
+  console.error("❌ [Auth Client] EXPO_PUBLIC_VIBECODE_BACKEND_URL is not set!");
+  console.error("   Please set EXPO_PUBLIC_VIBECODE_BACKEND_URL in your environment variables");
+}
+
 export const authClient = createAuthClient({
-  baseURL: getBackendURL(),
+  baseURL: backendURL,
   plugins: [
     emailOTPClient(),
     expoClient({
@@ -29,3 +36,9 @@ export const authClient = createAuthClient({
     }),
   ],
 });
+
+// Log auth client configuration
+console.log("🔐 [Auth Client] Initialized");
+console.log(`   Base URL: ${backendURL}`);
+console.log(`   Scheme: vibecode`);
+console.log(`   Storage: SecureStore`);

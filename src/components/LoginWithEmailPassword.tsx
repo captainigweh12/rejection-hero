@@ -168,13 +168,24 @@ export default function LoginWithEmailPassword() {
 
     try {
       console.log("🔐 [SignUp] Calling authClient.signUp.email...");
+      console.log("🔐 [SignUp] Backend URL:", process.env.EXPO_PUBLIC_VIBECODE_BACKEND_URL);
+      console.log("🔐 [SignUp] Auth client baseURL:", authClient.baseURL);
+      
       const result = await authClient.signUp.email({
         email,
         password,
         name,
       });
 
-      console.log("🔐 [SignUp] Auth result:", JSON.stringify(result, null, 2));
+      console.log("🔐 [SignUp] Auth result received");
+      console.log("🔐 [SignUp] Result has error:", !!result.error);
+      console.log("🔐 [SignUp] Result has data:", !!result.data);
+      if (result.error) {
+        console.error("🔐 [SignUp] Error details:", JSON.stringify(result.error, null, 2));
+      }
+      if (result.data) {
+        console.log("🔐 [SignUp] Success data:", JSON.stringify(result.data, null, 2));
+      }
 
       if (result.error) {
         console.error("🔐 [SignUp] Sign up error:", result.error);
