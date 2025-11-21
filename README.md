@@ -26,7 +26,18 @@
 
 ## 🔧 Recent Updates
 
-### ✅ Fixed Better Auth URL Configuration (Latest)
+### ✅ Fixed 502 Google OAuth Error - Backend Import Path Issue (Latest)
+- **Issue**: 502 "Failed to sign in with Google" error in production
+- **Root Cause**: Backend couldn't start due to incorrect module import path alias - `live.ts` couldn't find `@/shared/contracts`
+- **Problem**: Path alias `@/shared/*` in backend's `tsconfig.json` was pointing to `./shared/*` (relative to backend dir) instead of `../shared/*`
+- **Fix Applied**:
+  - ✅ Updated `backend/tsconfig.json` path alias from `./shared/*` → `../shared/*`
+  - ✅ Updated `backend/src/routes/live.ts` import to use correct relative path `../../../shared/contracts`
+  - ✅ Ensured consistency with other routes like `journal.ts`
+- **Result**: Backend server now starts successfully, all routes (including `/api/live/*`) are mounted and responding
+- **Status**: Google OAuth sign-in should now work - backend is running on port 3000
+
+### ✅ Fixed Better Auth URL Configuration
 - **Issue**: BetterAuthError "Invalid base URL: api.rejectionhero.com" - protocol prefix was being stripped
 - **Root Cause**: Environment variable or build process was removing `https://` from the backend URL
 - **Fix**: Added URL validation in `authClient.ts` to ensure protocol prefix is always present

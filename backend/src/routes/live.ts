@@ -17,7 +17,7 @@ import {
   getQuestSuggestionsResponseSchema,
   respondToSuggestionRequestSchema,
   respondToSuggestionResponseSchema,
-} from "@/shared/contracts";
+} from "../../../shared/contracts";
 
 const live = new Hono<AppType>();
 

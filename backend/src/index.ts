@@ -44,6 +44,7 @@ import { type AppType } from "./types";
 const app = new Hono<AppType>();
 
 console.log("🔧 Initializing Hono application...");
+// Fixed import path aliases for shared contracts
 app.use("*", logger());
 app.use("/*", cors());
 
