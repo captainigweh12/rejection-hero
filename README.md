@@ -26,16 +26,39 @@
 
 ## 🔧 Recent Updates
 
-### ✅ Fixed 502 Google OAuth Error - Backend Import Path Issue (Latest)
-- **Issue**: 502 "Failed to sign in with Google" error in production
-- **Root Cause**: Backend couldn't start due to incorrect module import path alias - `live.ts` couldn't find `@/shared/contracts`
-- **Problem**: Path alias `@/shared/*` in backend's `tsconfig.json` was pointing to `./shared/*` (relative to backend dir) instead of `../shared/*`
+### ✅ Fixed 500 Google OAuth Error - Database Provider Issue (Latest)
+- **Issue**: 500 error when signing in with Google after 502 was fixed
+- **Root Cause**: Prisma schema was hardcoded to PostgreSQL but backend uses SQLite in development
+- **Problem**: When Better Auth tried to create a session in the database after OAuth, Prisma threw initialization error
+- **Error Message**: `Error validating datasource db: the URL must start with the protocol postgresql:// or postgres://`
 - **Fix Applied**:
-  - ✅ Updated `backend/tsconfig.json` path alias from `./shared/*` → `../shared/*`
-  - ✅ Updated `backend/src/routes/live.ts` import to use correct relative path `../../../shared/contracts`
-  - ✅ Ensured consistency with other routes like `journal.ts`
-- **Result**: Backend server now starts successfully, all routes (including `/api/live/*`) are mounted and responding
-- **Status**: Google OAuth sign-in should now work - backend is running on port 3000
+  - ✅ Changed `backend/prisma/schema.prisma` provider from `"postgresql"` to `"sqlite"`
+  - ✅ Added `DATABASE_PROVIDER=sqlite` to `backend/.env`
+  - ✅ Regenerated Prisma client with `bunx prisma generate`
+  - ✅ Verified all auth tables now connect successfully
+- **Result**:
+  - ✅ Database connection now successful
+  - ✅ Auth tables (user, account, session) accessible
+  - ✅ Backend accepts OAuth sign-in requests without 500 errors
+- **Status**: OAuth flow now reaches Google, but redirect URI issue prevents completion (see below)
+
+### ⚠️ Current Issue: Google OAuth Redirect URI Mismatch
+- **Issue**: OAuth flow shows error after authenticating with Google
+- **Root Cause**: The redirect URI uses sandbox URL (`https://preview-*.share.sandbox.dev/api/auth/callback/google`) which isn't registered in Google Cloud Console
+- **Solution Needed**: Deploy backend to production domain (rejectionhero.com) and update Google OAuth credentials
+- **Workaround for Testing**:
+  - Option 1: Add sandbox URL to Google Cloud Console OAuth credentials (temporary)
+  - Option 2: Deploy to production (permanent fix)
+
+### ✅ Fixed 502 Google OAuth Error - Backend Import Path Issue
+- **Issue**: Backend crashed on startup with import error
+- **Root Cause**: Incorrect module import path alias - `live.ts` couldn't find `@/shared/contracts`
+- **Problem**: Path alias `@/shared/*` was pointing to `./shared/*` instead of `../shared/*`
+- **Fix Applied**:
+  - ✅ Updated `backend/tsconfig.json` path alias
+  - ✅ Updated `backend/src/routes/live.ts` import path
+  - ✅ Ensured consistency with other routes
+- **Result**: Backend now starts successfully, all 30+ API routes mounted
 
 ### ✅ Fixed Better Auth URL Configuration
 - **Issue**: BetterAuthError "Invalid base URL: api.rejectionhero.com" - protocol prefix was being stripped

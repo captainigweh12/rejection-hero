@@ -5,7 +5,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  // Use SQLite for development
+  provider = "sqlite"
   url      = env("DATABASE_URL")
   // directUrl is optional - uncomment if you want to use pooled connection for Prisma Client
   // directUrl = env("DIRECT_URL")
