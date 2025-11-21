@@ -27,13 +27,15 @@
 ## 🔧 Recent Updates
 
 ### ✅ Fixed Better Auth URL Configuration (Latest)
-- **Issue**: BetterAuthError "Invalid base URL: api.rejectionhero.com" (missing https:// protocol)
-- **Fix**: Updated frontend `.env` to use correct sandbox URL with protocol
+- **Issue**: BetterAuthError "Invalid base URL: api.rejectionhero.com" - protocol prefix was being stripped
+- **Root Cause**: Environment variable or build process was removing `https://` from the backend URL
+- **Fix**: Added URL validation in `authClient.ts` to ensure protocol prefix is always present
 - **Changes**:
-  - ✅ Changed `EXPO_PUBLIC_VIBECODE_BACKEND_URL` from `https://api.rejectionhero.com` to `https://preview-nagkkyofmizn.share.sandbox.dev`
-  - ✅ Now matches the proxied backend URL environment variable
-  - ✅ Better Auth client will initialize correctly with valid URL format
-- **Result**: App should now load without auth initialization errors
+  - ✅ Added `getBackendURL()` helper function that validates and fixes URLs
+  - ✅ Automatically adds `https://` prefix if missing
+  - ✅ Logs warnings when URL needs to be fixed
+  - ✅ Better Auth client now gets properly formatted URL
+- **Result**: App will load correctly even if environment variable loses protocol prefix
 
 ### 🚀 Railway Production Deployment Ready
 - **Status**: Backend is prepared for Railway deployment to get production URL
