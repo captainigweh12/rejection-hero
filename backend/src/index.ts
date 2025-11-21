@@ -80,18 +80,39 @@ app.route("/api/auth", authRouter);
 console.log("🔐 Mounting Better Auth handler at /api/auth/*");
 app.on(["GET", "POST"], "/api/auth/*", async (c) => {
   try {
+    const path = c.req.path;
+    const method = c.req.method;
+    
+    // Log sign-up requests for debugging
+    if (path.includes("/sign-up/email")) {
+      console.log("🔐 [Sign-Up] Email sign-up request received");
+      console.log(`   Method: ${method}`);
+      console.log(`   Path: ${path}`);
+    }
+    
     // Log OAuth callback requests for debugging
-    if (c.req.path.includes("/callback/google")) {
+    if (path.includes("/callback/google")) {
       console.log("🔐 [OAuth] Google callback received");
       console.log(`   URL: ${c.req.url}`);
-      console.log(`   Method: ${c.req.method}`);
+      console.log(`   Method: ${method}`);
       console.log(`   Query: ${c.req.query()}`);
     }
     
     const response = await auth.handler(c.req.raw);
     
+    // Log sign-up responses
+    if (path.includes("/sign-up/email")) {
+      console.log(`🔐 [Sign-Up] Sign-up response: ${response.status}`);
+      if (response.status >= 400) {
+        const text = await response.clone().text().catch(() => "Unable to read response");
+        console.error(`❌ [Sign-Up] Sign-up error: ${text.substring(0, 300)}`);
+      } else {
+        console.log("✅ [Sign-Up] Sign-up successful - user should be created in database");
+      }
+    }
+    
     // Log OAuth callback responses
-    if (c.req.path.includes("/callback/google")) {
+    if (path.includes("/callback/google")) {
       console.log(`🔐 [OAuth] Google callback response: ${response.status}`);
       if (response.status >= 400) {
         const text = await response.clone().text().catch(() => "Unable to read response");
@@ -101,18 +122,34 @@ app.on(["GET", "POST"], "/api/auth/*", async (c) => {
     
     return response;
   } catch (error: any) {
-    console.error("❌ [OAuth] Error in auth handler:", error);
-    console.error("   Path:", c.req.path);
-    console.error("   Method:", c.req.method);
-    console.error("   Error message:", error?.message || error);
-    console.error("   Stack:", error?.stack?.substring(0, 500));
+    const path = c.req.path;
+    const method = c.req.method;
+    
+    console.error(`❌ [Auth Handler] Error in auth handler:`);
+    console.error(`   Path: ${path}`);
+    console.error(`   Method: ${method}`);
+    console.error(`   Error: ${error?.message || error}`);
+    
+    // Check for database connection errors
+    if (error?.code === "P1001" || error?.message?.includes("Can't reach database")) {
+      console.error("❌ [Auth Handler] Database connection failed!");
+      console.error("   Check DATABASE_URL in Railway environment variables");
+    }
+    
+    // Check for table missing errors
+    if (error?.code === "P2021" || error?.message?.includes("does not exist")) {
+      console.error("❌ [Auth Handler] Table does not exist!");
+      console.error("   Run: bun run db:push");
+    }
+    
+    console.error(`   Stack: ${error?.stack?.substring(0, 500)}`);
     
     // Return proper error response instead of crashing
     return c.json(
       { 
         error: "Authentication error",
         message: error?.message || "An error occurred during authentication",
-        path: c.req.path
+        path: path
       },
       500
     );
