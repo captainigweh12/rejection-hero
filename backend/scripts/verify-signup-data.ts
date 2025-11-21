@@ -9,9 +9,39 @@
  * - Session record exists (if user is logged in)
  * - Profile record exists (auto-created on first profile fetch)
  * - user_stats record exists (auto-created on first stats fetch)
+ * 
+ * Usage:
+ *   DATABASE_URL="postgresql://..." bun run verify:signup
+ *   DATABASE_URL="postgresql://..." bun run verify:signup "user@example.com"
  */
 
 import { PrismaClient } from "../generated/prisma";
+
+// Check if DATABASE_URL is set
+if (!process.env.DATABASE_URL) {
+  console.error("❌ ERROR: DATABASE_URL environment variable is not set!");
+  console.error("");
+  console.error("Please set DATABASE_URL before running this script:");
+  console.error("");
+  console.error("  DATABASE_URL=\"postgresql://user:password@host:port/database?sslmode=require\" bun run verify:signup");
+  console.error("");
+  console.error("Or set it in your shell:");
+  console.error("  export DATABASE_URL=\"postgresql://user:password@host:port/database?sslmode=require\"");
+  console.error("  bun run verify:signup");
+  console.error("");
+  process.exit(1);
+}
+
+// Validate DATABASE_URL format
+if (!process.env.DATABASE_URL.startsWith("postgresql://") && !process.env.DATABASE_URL.startsWith("postgres://")) {
+  console.error("❌ ERROR: DATABASE_URL must start with 'postgresql://' or 'postgres://'");
+  console.error("");
+  console.error(`Current value: ${process.env.DATABASE_URL.substring(0, 30)}...`);
+  console.error("");
+  console.error("Please check your DATABASE_URL format.");
+  console.error("Example: postgresql://user:password@host:port/database?sslmode=require");
+  process.exit(1);
+}
 
 const db = new PrismaClient();
 
@@ -159,14 +189,27 @@ async function verifySignupData(userEmail?: string) {
   } catch (error: any) {
     console.error("❌ Error verifying sign-up data:", error);
     
-    if (error?.code === "P2021") {
+    if (error?.message?.includes("the URL must start with the protocol")) {
+      console.error("\n❌ DATABASE_URL format is invalid!");
+      console.error(`   Current DATABASE_URL: ${process.env.DATABASE_URL ? "SET" : "NOT SET"}`);
+      console.error("   DATABASE_URL must start with 'postgresql://' or 'postgres://'");
+      console.error("");
+      console.error("   Set it like this:");
+      console.error('   DATABASE_URL="postgresql://user:password@host:port/database?sslmode=require" bun run verify:signup');
+    } else if (error?.code === "P2021") {
       console.error("\n❌ Table does not exist in database!");
-      console.error("   Run: bun run db:push");
+      console.error("   Run: DATABASE_URL=\"your-url\" bun run db:push");
     } else if (error?.code === "P1001") {
       console.error("\n❌ Cannot reach database server!");
-      console.error("   Check DATABASE_URL in Railway environment variables");
+      console.error("   Check DATABASE_URL connection string");
+      console.error("   Ensure it's correct and accessible from your network");
+    } else if (error?.message) {
+      console.error(`\n❌ Error: ${error.message}`);
+      if (error.message.includes("DATABASE_URL")) {
+        console.error("   Please set DATABASE_URL environment variable");
+      }
     } else {
-      console.error("\n❌ Unexpected error:", error.message);
+      console.error("\n❌ Unexpected error:", error);
     }
     
     process.exit(1);
