@@ -226,12 +226,34 @@ app.on(["GET", "POST"], "/api/auth/*", async (c) => {
     console.error(`❌ [Auth Handler] Error in auth handler:`);
     console.error(`   Path: ${path}`);
     console.error(`   Method: ${method}`);
+    console.error(`   URL: ${c.req.url}`);
     console.error(`   Error: ${error?.message || error}`);
+    console.error(`   Error stack: ${error?.stack?.substring(0, 500) || "No stack trace"}`);
+    
+    // Enhanced error detection for OAuth callbacks
+    if (path.includes("/callback/google")) {
+      console.error(`❌ [OAuth] Google callback error detected!`);
+      console.error(`   This is causing the 502 error in the app`);
+      
+      // Check for specific OAuth errors
+      if (error?.message?.includes("redirect_uri_mismatch") || error?.message?.includes("invalid_grant")) {
+        console.error("   ⚠️  OAuth redirect URI mismatch!");
+        console.error(`   Check Google Console has: ${env.BACKEND_URL}/api/auth/callback/google`);
+        console.error(`   Current BACKEND_URL: ${env.BACKEND_URL}`);
+      }
+      if (error?.message?.includes("invalid_client") || error?.message?.includes("unauthorized_client")) {
+        console.error("   ⚠️  OAuth client credentials invalid!");
+        console.error("   Check GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET in Railway");
+        console.error(`   GOOGLE_CLIENT_ID is set: ${!!env.GOOGLE_CLIENT_ID}`);
+        console.error(`   GOOGLE_CLIENT_SECRET is set: ${!!env.GOOGLE_CLIENT_SECRET}`);
+      }
+    }
     
     // Check for database connection errors
     if (error?.code === "P1001" || error?.message?.includes("Can't reach database")) {
       console.error("❌ [Auth Handler] Database connection failed!");
       console.error("   Check DATABASE_URL in Railway environment variables");
+      console.error(`   DATABASE_URL is set: ${!!process.env.DATABASE_URL}`);
     }
     
     // Check for table missing errors
@@ -240,16 +262,27 @@ app.on(["GET", "POST"], "/api/auth/*", async (c) => {
       console.error("   Run: bun run db:push");
     }
     
-    console.error(`   Stack: ${error?.stack?.substring(0, 500)}`);
+    // Check for Better Auth errors
+    if (error?.name === "BetterAuthError" || error?.message?.includes("Better Auth")) {
+      console.error("❌ [Auth Handler] Better Auth error!");
+      console.error("   Check Better Auth configuration");
+      console.error(`   BETTER_AUTH_SECRET is set: ${!!env.BETTER_AUTH_SECRET}`);
+      console.error(`   BACKEND_URL: ${env.BACKEND_URL}`);
+    }
     
     // Return proper error response instead of crashing
+    // For OAuth callbacks, return 502 to match what app sees
+    const statusCode = path.includes("/callback/google") ? 502 : 500;
     return c.json(
       { 
         error: "Authentication error",
         message: error?.message || "An error occurred during authentication",
-        path: path
+        path: path,
+        ...(path.includes("/callback/google") && {
+          hint: "Check Railway logs for detailed OAuth callback error"
+        })
       },
-      500
+      statusCode
     );
   }
 });
