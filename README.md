@@ -44,11 +44,24 @@
 
 ### ⚠️ Current Issue: Google OAuth Redirect URI Mismatch
 - **Issue**: OAuth flow shows error after authenticating with Google
-- **Root Cause**: The redirect URI uses sandbox URL (`https://preview-*.share.sandbox.dev/api/auth/callback/google`) which isn't registered in Google Cloud Console
-- **Solution Needed**: Deploy backend to production domain (rejectionhero.com) and update Google OAuth credentials
-- **Workaround for Testing**:
-  - Option 1: Add sandbox URL to Google Cloud Console OAuth credentials (temporary)
-  - Option 2: Deploy to production (permanent fix)
+- **Root Cause**: The redirect URI uses sandbox URL which isn't registered in Google Cloud Console
+- **Current Sandbox URL**: `https://preview-nvhibrpzfraq.share.sandbox.dev/api/auth/callback/google`
+- **Production URL**: `https://api.rejectionhero.com/api/auth/callback/google`
+- **Note**: Vibecode's reverse proxy automatically replaces BACKEND_URL with sandbox URL for security
+
+**To fix for testing (temporary - 5 minutes):**
+1. Go to https://console.cloud.google.com/apis/credentials
+2. Find your OAuth 2.0 Client ID (94427138884-...)
+3. Click to edit it
+4. Add to "Authorized redirect URIs": `https://preview-nvhibrpzfraq.share.sandbox.dev/api/auth/callback/google`
+5. Save changes
+6. Refresh your app and try signing in again
+7. Google OAuth sign-in should now work!
+
+**For production (permanent):**
+- Deploy backend to rejectionhero.com domain
+- Update Google Cloud Console with production redirect URI: `https://api.rejectionhero.com/api/auth/callback/google`
+- Update backend BACKEND_URL to production domain
 
 ### ✅ Fixed 502 Google OAuth Error - Backend Import Path Issue
 - **Issue**: Backend crashed on startup with import error

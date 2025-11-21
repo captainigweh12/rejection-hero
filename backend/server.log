@@ -1,13 +1,13 @@
 + exec gosu vibecode scripts/start --hot
 Installing dependencies and generating Prisma client...
-[0.04ms] ".env"
+[0.06ms] ".env"
 bun install v1.2.19 (aad3abea)
 
 $ prisma generate
 Environment variables loaded from .env
 Prisma schema loaded from prisma/schema.prisma
 
-✔ Generated Prisma Client (v6.17.1) to ./generated/prisma in 367ms
+✔ Generated Prisma Client (v6.17.1) to ./generated/prisma in 322ms
 
 Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
 
@@ -81,6 +81,10 @@ Failed to find Response internal state key
 🐛 Mounting bug report routes at /api/bug-reports
 🌐 Mounting web redirect routes
 ⚙️  Starting server...
+✅ [Auth] Database connection successful
+✅ [Auth] User table accessible
+✅ [Auth] Account table accessible
+✅ [Auth] Session table accessible
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📍 Environment: development
 🚀 Server is running on port 3000
@@ -110,207 +114,6 @@ Failed to find Response internal state key
 ⏰ Challenge Scheduler: Active (Daily at 9 AM & 2 PM UTC)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-❌ [Auth] Database connection test failed: error: Error validating datasource `db`: the URL must start with the protocol `postgresql://` or `postgres://`.
-  -->  schema.prisma:9
-   | 
- 8 |   provider = "postgresql"
- 9 |   url      = env("DATABASE_URL")
-   | 
-
-Validation Error Count: 1
-   Better Auth may not work correctly until database is accessible
-Failed to find Response internal state key
-🌐 [ENV] Using explicitly set BACKEND_URL: https://preview-nvhibrpzfraq.share.sandbox.dev
-⚠️  [ENV] WARNING: BACKEND_URL is set to sandbox URL: https://preview-nvhibrpzfraq.share.sandbox.dev
-⚠️  [ENV] This may cause OAuth redirect_uri_mismatch errors!
-✅ Environment variables validated successfully
-🔍 OPENAI_API_KEY from process.env: EXISTS
-🔍 OPENAI_API_KEY in parsed: EXISTS
-🌐 [ENV] Final BACKEND_URL: https://preview-nvhibrpzfraq.share.sandbox.dev
-🔐 [Auth] Initializing Better Auth...
-🔍 [Auth] Testing database connection...
-✅ [Auth] Google OAuth credentials configured
-🔑 [Auth] Google Client ID: 94427138884-cc2db90q...
-📊 [Auth] Database provider: sqlite
-📊 [Auth] DATABASE_URL: file:dev.db...
-✅ [Auth] Better Auth initialized
-🔗 [Auth] Base URL: https://preview-nvhibrpzfraq.share.sandbox.dev
-🌐 [Auth] Trusted origins: vibecode://, http://localhost:3000, http://localhost:8081, https://preview-nvhibrpzfraq.share.sandbox.dev
-🔑 [Auth] Google OAuth: Enabled ✅
-🔗 [Auth] Google OAuth Redirect URI: https://preview-nvhibrpzfraq.share.sandbox.dev/api/auth/callback/google
-❌ [Auth] ERROR: OAuth redirect URI is using sandbox URL: https://preview-nvhibrpzfraq.share.sandbox.dev/api/auth/callback/google
-❌ [Auth] This will cause OAuth redirect_uri_mismatch errors!
-⚠️  [Auth] IMPORTANT: Make sure this URL is added to Google Cloud Console OAuth credentials!
-⚠️  [Auth] Go to: https://console.cloud.google.com/apis/credentials
-⚠️  [Auth] Add to "Authorized redirect URIs": https://preview-nvhibrpzfraq.share.sandbox.dev/api/auth/callback/google
-🔐 [Auth] Session expires in: 7 days
-📁 [Upload] Uploads directory exists: /home/user/workspace/backend/uploads
-📜 [Policies] Router initialized. __dirname: /home/user/workspace/backend/src/routes
-🔧 Initializing Hono application...
-🔐 Mounting custom password reset routes at /api/auth
-🔐 Mounting Better Auth handler at /api/auth/*
-📁 Serving static files from uploads/ directory
-📤 Mounting upload routes at /api/upload
-📝 Mounting sample routes at /api/sample
-👤 Mounting profile routes at /api/profile
-🔍 Mounting discover routes at /api/discover
-👆 Mounting swipe routes at /api/swipe
-💕 Mounting matches routes at /api/matches
-🎯 Mounting quests routes at /api/quests
-🏆 Mounting challenges routes at /api/challenges
-📊 Mounting stats routes at /api/stats
-📹 Mounting live routes at /api/live
-👥 Mounting friends routes at /api/friends
-💬 Mounting messages routes at /api/messages
-🏘️  Mounting groups routes at /api/groups
-🎯 Mounting group quests routes at /api/group-quests
-📹 Mounting group live routes at /api/group-live
-🎁 Mounting shared quests routes at /api/shared-quests
-✅ Mounting quest verification routes at /api/quest-verification
-🛡️ Mounting moderation routes at /api/moderation
-📓 Mounting journal routes at /api/journal
-📝 Mounting posts routes at /api/posts
-⏰ Mounting moments routes at /api/moments
-🔔 Mounting notifications routes at /api/notifications
-📧 Mounting GoHighLevel routes at /api/gohighlevel
-🎫 Mounting support routes at /api/support
-📁 Mounting categories routes at /api/categories
-🎤 Mounting audio routes at /api/audio
-💳 Mounting payments routes at /api/payments
-💳 Mounting payment redirect routes at root level
-📜 Mounting policies routes at /api/policies
-👑 Mounting admin routes at /api/admin
-🐛 Mounting bug report routes at /api/bug-reports
-🌐 Mounting web redirect routes
-⚙️  Starting server...
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📍 Environment: development
-🚀 Server is running on port 3000
-🔗 Base URL: http://localhost:3000
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-📚 Available endpoints:
-  🔐 Auth:         /api/auth/*
-  📤 Upload:       POST /api/upload/image
-  📝 Sample:       GET/POST /api/sample
-  👤 profile:      GET/POST /api/profile
-  🔍 Discover:     GET /api/discover
-  👆 Swipe:        POST /api/swipe
-  💕 Matches:      GET /api/matches
-  🎯 Quests:       GET/POST /api/quests
-  🏆 Challenges:   GET/POST /api/challenges
-  📊 Stats:        GET /api/stats
-  📹 Live:        GET/POST /api/live
-  👥 Friends:      GET/POST /api/friends
-  💬 Messages:     GET/POST /api/messages
-  🏘️  Groups:       GET/POST /api/groups
-  🎁 SharedQuests: GET/POST /api/shared-quests
-  📓 Journal:      GET/POST /api/journal
-  🔔 Notifications: GET /api/notifications
-  💚 Health:       GET /health
-
-⏰ Challenge Scheduler: Active (Daily at 9 AM & 2 PM UTC)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-❌ [Auth] Database connection test failed: error: Error validating datasource `db`: the URL must start with the protocol `postgresql://` or `postgres://`.
-  -->  schema.prisma:9
-   | 
- 8 |   provider = "postgresql"
- 9 |   url      = env("DATABASE_URL")
-   | 
-
-Validation Error Count: 1
-   Better Auth may not work correctly until database is accessible
-<-- GET /api/auth/get-session
-🔐 [Auth Request] GET /api/auth/get-session
-   Full URL: http://20.3.213.69:3000/api/auth/get-session
-   Origin: none
-   User-Agent: vibecode/209 CFNetwork/3860.300.31 Darwin/25.2.0...
---> GET /api/auth/get-session [32m200[0m 6ms
-<-- GET /api/auth/get-session
-🔐 [Auth Request] GET /api/auth/get-session
-   Full URL: http://20.3.213.69:3000/api/auth/get-session
-   Origin: none
-   User-Agent: vibecode/209 CFNetwork/3860.300.31 Darwin/25.2.0...
---> GET /api/auth/get-session [32m200[0m 3ms
-<-- POST /api/auth/sign-in/social
-🔐 [Auth Request] POST /api/auth/sign-in/social
-   Full URL: http://20.3.213.69:3000/api/auth/sign-in/social
-   Origin: none
-   User-Agent: vibecode/209 CFNetwork/3860.300.31 Darwin/25.2.0...
-2025-11-21T12:19:35.984Z ERROR [Better Auth]: 
-Invalid `db[model].create()` invocation in
-/home/user/workspace/backend/node_modules/better-auth/dist/adapters/prisma-adapter/index.mjs:89:32
-
-  86     `Model ${model} does not exist in the database. If you haven't generated the Prisma client, you need to run 'npx prisma generate'`
-  87   );
-  88 }
-→ 89 return await db[model].create(
-error: Error validating datasource `db`: the URL must start with the protocol `postgresql://` or `postgres://`.
-  -->  schema.prisma:9
-   | 
- 8 |   provider = "postgresql"
- 9 |   url      = env("DATABASE_URL")
-   | 
-
-Validation Error Count: 1
-# SERVER_ERROR:  19 | `)}
-20 | 
-21 | We suggest to move the contents of ${Y(l)} to ${Y(a)} to consolidate your env vars.
-22 | `;throw new Error(u)}else if(t==="warn"){let u=`Conflict for env var${s.length>1?"s":""} ${s.map(c=>W(c)).join(", ")} in ${Y(a)} and ${Y(l)}
-23 | Env vars from ${Y(l)} overwrite the ones from ${Y(a)}
-24 |       `;console.warn(`${Ie("warn(prisma)")} ${u}`)}}}}function Is(e){if(yp(e)){$i(`Environment variables loaded from ${e}`);let r=qi.default.config({path:e,debug:process.env.DOTENV_CONFIG_DEBUG?!0:void 0});return{dotenvResult:Cs(r),message:Ce(`Environment variables loaded from ${xr.default.relative(process.cwd(),e)}`),path:e}}else $i(`Environment variables not found at ${e}`);return null}function Ds(e,r){return e&&r&&xr.default.resolve(e)===xr.default.resolve(r)}function yp(e){return!!(e&&un.default.existsSync(e))}function Vi(e,r){return Object.prototype.hasOwnProperty.call(e,r)}function pn(e,r){let t={};for(let n of Object.keys(e))t[n]=r(e[n],n);return t}function ji(e,r){if(e.length===0)return;let t=e[0];for(let n=1;n<e.length;n++)r(t,e[n])<0&&(t=e[n]);return t}function x(e,r){Object.defineProperty(e,"name",{value:r,configurable:!0})}var ks=new Set,at=(e,r,...t)=>{ks.has(e)||(ks.add(e),_i(r,...t))};var P=class e extends Error{clientVersion;errorCode;retryable;constructor(r,t,n){super(r),this.name="PrismaClie
-
-PrismaClientInitializationError: 
-Invalid `db[model].create()` invocation in
-/home/user/workspace/backend/node_modules/better-auth/dist/adapters/prisma-adapter/index.mjs:89:32
-
-  86     `Model ${model} does not exist in the database. If you haven't generated the Prisma client, you need to run 'npx prisma generate'`
-  87   );
-  88 }
-→ 89 return await db[model].create(
-error: Error validating datasource `db`: the URL must start with the protocol `postgresql://` or `postgres://`.
-  -->  schema.prisma:9
-   | 
- 8 |   provider = "postgresql"
- 9 |   url      = env("DATABASE_URL")
-   | 
-
-Validation Error Count: 1
- clientVersion: "6.17.1",
-  errorCode: undefined,
-  retryable: undefined,
-
-      at new PrismaClientInitializationError (/home/user/workspace/backend/generated/prisma/runtime/library.js:24:995)
-      at handleRequestError (/home/user/workspace/backend/generated/prisma/runtime/library.js:124:7568)
-      at handleAndLogRequestError (/home/user/workspace/backend/generated/prisma/runtime/library.js:124:6593)
-      at request (/home/user/workspace/backend/generated/prisma/runtime/library.js:124:6300)
-
---> POST /api/auth/sign-in/social [31m500[0m 22ms
-⚠️  [Quest Time Warnings] Database connection error, skipping...
-   Error: 
-Invalid `prisma.$queryRawUnsafe()` invocation:
-
-
-error: Error validating datasource `db`: the URL m
-⚠️  [Quest Time Warnings] Database connection error, skipping...
-   Error: 
-Invalid `prisma.$queryRawUnsafe()` invocation:
-
-
-error: Error validating datasource `db`: the URL m
-⚠️  [Quest Time Warnings] Database connection error, skipping...
-   Error: 
-Invalid `prisma.$queryRawUnsafe()` invocation:
-
-
-error: Error validating datasource `db`: the URL m
-⚠️  [Quest Time Warnings] Database connection error, skipping...
-   Error: 
-Invalid `prisma.$queryRawUnsafe()` invocation:
-
-
-error: Error validating datasource `db`: the URL m
 Failed to find Response internal state key
 🌐 [ENV] Using explicitly set BACKEND_URL: https://preview-nvhibrpzfraq.share.sandbox.dev
 ⚠️  [ENV] WARNING: BACKEND_URL is set to sandbox URL: https://preview-nvhibrpzfraq.share.sandbox.dev
@@ -410,7 +213,302 @@ Failed to find Response internal state key
 ✅ [Auth] Session table accessible
 <-- GET /api/auth/get-session
 🔐 [Auth Request] GET /api/auth/get-session
-   Full URL: http://localhost:3000/api/auth/get-session
+   Full URL: http://20.3.213.69:3000/api/auth/get-session
    Origin: none
-   User-Agent: curl/7.88.1...
---> GET /api/auth/get-session [32m200[0m 3ms
+   User-Agent: vibecode/209 CFNetwork/3860.300.31 Darwin/25.2.0...
+--> GET /api/auth/get-session [32m200[0m 7ms
+<-- GET /api/auth/get-session
+🔐 [Auth Request] GET /api/auth/get-session
+   Full URL: http://20.3.213.69:3000/api/auth/get-session
+   Origin: none
+   User-Agent: vibecode/209 CFNetwork/3860.300.31 Darwin/25.2.0...
+--> GET /api/auth/get-session [32m200[0m 2ms
+<-- POST /api/auth/sign-in/social
+🔐 [Auth Request] POST /api/auth/sign-in/social
+   Full URL: http://20.3.213.69:3000/api/auth/sign-in/social
+   Origin: none
+   User-Agent: vibecode/209 CFNetwork/3860.300.31 Darwin/25.2.0...
+--> POST /api/auth/sign-in/social [32m200[0m 14ms
+<-- GET /api/auth/get-session
+🔐 [Auth Request] GET /api/auth/get-session
+   Full URL: http://20.3.213.69:3000/api/auth/get-session
+   Origin: none
+   User-Agent: vibecode/209 CFNetwork/3860.300.31 Darwin/25.2.0...
+--> GET /api/auth/get-session [32m200[0m 2ms
+<-- GET /api/auth/get-session
+🔐 [Auth Request] GET /api/auth/get-session
+   Full URL: http://20.3.213.69:3000/api/auth/get-session
+   Origin: none
+   User-Agent: vibecode/209 CFNetwork/3860.300.31 Darwin/25.2.0...
+--> GET /api/auth/get-session [32m200[0m 2ms
+<-- GET /api/auth/get-session
+🔐 [Auth Request] GET /api/auth/get-session
+   Full URL: http://20.3.213.69:3000/api/auth/get-session
+   Origin: none
+   User-Agent: vibecode/209 CFNetwork/3860.300.31 Darwin/25.2.0...
+--> GET /api/auth/get-session [32m200[0m 1ms
+<-- GET /api/auth/get-session
+🔐 [Auth Request] GET /api/auth/get-session
+   Full URL: http://20.3.213.69:3000/api/auth/get-session
+   Origin: none
+   User-Agent: vibecode/209 CFNetwork/3860.300.31 Darwin/25.2.0...
+--> GET /api/auth/get-session [32m200[0m 1ms
+<-- GET /api/auth/get-session
+🔐 [Auth Request] GET /api/auth/get-session
+   Full URL: http://20.3.213.69:3000/api/auth/get-session
+   Origin: none
+   User-Agent: vibecode/209 CFNetwork/3860.300.31 Darwin/25.2.0...
+--> GET /api/auth/get-session [32m200[0m 1ms
+<-- GET /api/auth/get-session
+🔐 [Auth Request] GET /api/auth/get-session
+   Full URL: http://20.3.213.69:3000/api/auth/get-session
+   Origin: none
+   User-Agent: vibecode/209 CFNetwork/3860.300.31 Darwin/25.2.0...
+--> GET /api/auth/get-session [32m200[0m 2ms
+<-- GET /api/auth/get-session
+🔐 [Auth Request] GET /api/auth/get-session
+   Full URL: http://20.3.213.69:3000/api/auth/get-session
+   Origin: none
+   User-Agent: vibecode/209 CFNetwork/3860.300.31 Darwin/25.2.0...
+--> GET /api/auth/get-session [32m200[0m 2ms
+<-- GET /api/auth/get-session
+🔐 [Auth Request] GET /api/auth/get-session
+   Full URL: http://20.3.213.69:3000/api/auth/get-session
+   Origin: none
+   User-Agent: vibecode/209 CFNetwork/3860.300.31 Darwin/25.2.0...
+--> GET /api/auth/get-session [32m200[0m 1ms
+<-- GET /api/auth/get-session
+🔐 [Auth Request] GET /api/auth/get-session
+   Full URL: http://20.3.213.69:3000/api/auth/get-session
+   Origin: none
+   User-Agent: vibecode/209 CFNetwork/3860.300.31 Darwin/25.2.0...
+--> GET /api/auth/get-session [32m200[0m 1ms
+<-- POST /api/auth/sign-in/social
+🔐 [Auth Request] POST /api/auth/sign-in/social
+   Full URL: http://20.3.213.69:3000/api/auth/sign-in/social
+   Origin: none
+   User-Agent: vibecode/209 CFNetwork/3860.300.31 Darwin/25.2.0...
+--> POST /api/auth/sign-in/social [32m200[0m 3ms
+<-- GET /api/auth/get-session
+🔐 [Auth Request] GET /api/auth/get-session
+   Full URL: http://20.3.213.69:3000/api/auth/get-session
+   Origin: none
+   User-Agent: vibecode/209 CFNetwork/3860.300.31 Darwin/25.2.0...
+--> GET /api/auth/get-session [32m200[0m 1ms
+<-- GET /api/auth/expo-authorization-proxy
+🔐 [Auth Request] GET /api/auth/expo-authorization-proxy
+   Full URL: http://20.3.213.69:3000/api/auth/expo-authorization-proxy?authorizationURL=https%3A%2F%2Faccounts.google.com%2Fo%2Foauth2%2Fauth%3Fresponse_type%3Dcode%26client_id%3D94427138884-cc2db90qkmg6dfshccce94ffmt5rpla0.apps.googleusercontent.com%26state%3DqnaiEEx_xbk9cjmaODzgk49ePaEDfidw%26scope%3Demail%2Bprofile%2Bopenid%2Bopenid%2Bprofile%2Bemail%26redirect_uri%3Dhttps%253A%252F%252Fpreview-nvhibrpzfraq.share.sandbox.dev%252Fapi%252Fauth%252Fcallback%252Fgoogle%26code_challenge_method%3DS256%26code_challenge%3DIas2Adn9_74LtqQyoRN-KtRCmbGM1SG3h7dRO7dTC3E%26include_granted_scopes%3Dtrue
+   Origin: none
+   User-Agent: Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac O...
+--> GET /api/auth/expo-authorization-proxy [36m302[0m 3ms
+<-- GET /api/auth/get-session
+🔐 [Auth Request] GET /api/auth/get-session
+   Full URL: http://20.3.213.69:3000/api/auth/get-session
+   Origin: none
+   User-Agent: vibecode/209 CFNetwork/3860.300.31 Darwin/25.2.0...
+--> GET /api/auth/get-session [32m200[0m 2ms
+<-- GET /api/auth/get-session
+🔐 [Auth Request] GET /api/auth/get-session
+   Full URL: http://20.3.213.69:3000/api/auth/get-session
+   Origin: none
+   User-Agent: vibecode/209 CFNetwork/3860.300.31 Darwin/25.2.0...
+--> GET /api/auth/get-session [32m200[0m 2ms
+<-- GET /api/auth/get-session
+🔐 [Auth Request] GET /api/auth/get-session
+   Full URL: http://20.3.213.69:3000/api/auth/get-session
+   Origin: none
+   User-Agent: vibecode/209 CFNetwork/3860.300.31 Darwin/25.2.0...
+--> GET /api/auth/get-session [32m200[0m 1ms
+<-- GET /api/auth/get-session
+🔐 [Auth Request] GET /api/auth/get-session
+   Full URL: http://20.3.213.69:3000/api/auth/get-session
+   Origin: none
+   User-Agent: vibecode/209 CFNetwork/3860.300.31 Darwin/25.2.0...
+--> GET /api/auth/get-session [32m200[0m 1ms
+<-- GET /api/auth/get-session
+🔐 [Auth Request] GET /api/auth/get-session
+   Full URL: http://20.3.213.69:3000/api/auth/get-session
+   Origin: none
+   User-Agent: vibecode/209 CFNetwork/3860.300.31 Darwin/25.2.0...
+--> GET /api/auth/get-session [32m200[0m 1ms
+<-- GET /api/auth/get-session
+🔐 [Auth Request] GET /api/auth/get-session
+   Full URL: http://20.3.213.69:3000/api/auth/get-session
+   Origin: none
+   User-Agent: vibecode/209 CFNetwork/3860.300.31 Darwin/25.2.0...
+--> GET /api/auth/get-session [32m200[0m 1ms
+<-- GET /api/auth/get-session
+🔐 [Auth Request] GET /api/auth/get-session
+   Full URL: http://20.3.213.69:3000/api/auth/get-session
+   Origin: none
+   User-Agent: vibecode/209 CFNetwork/3860.300.31 Darwin/25.2.0...
+--> GET /api/auth/get-session [32m200[0m 1ms
+<-- GET /api/auth/get-session
+🔐 [Auth Request] GET /api/auth/get-session
+   Full URL: http://20.3.213.69:3000/api/auth/get-session
+   Origin: none
+   User-Agent: vibecode/209 CFNetwork/3860.300.31 Darwin/25.2.0...
+--> GET /api/auth/get-session [32m200[0m 2ms
+<-- POST /api/auth/sign-in/social
+🔐 [Auth Request] POST /api/auth/sign-in/social
+   Full URL: http://20.3.213.69:3000/api/auth/sign-in/social
+   Origin: none
+   User-Agent: vibecode/209 CFNetwork/3860.300.31 Darwin/25.2.0...
+--> POST /api/auth/sign-in/social [32m200[0m 4ms
+<-- GET /api/auth/get-session
+🔐 [Auth Request] GET /api/auth/get-session
+   Full URL: http://20.3.213.69:3000/api/auth/get-session
+   Origin: none
+   User-Agent: vibecode/209 CFNetwork/3860.300.31 Darwin/25.2.0...
+--> GET /api/auth/get-session [32m200[0m 1ms
+<-- GET /api/auth/expo-authorization-proxy
+🔐 [Auth Request] GET /api/auth/expo-authorization-proxy
+   Full URL: http://20.3.213.69:3000/api/auth/expo-authorization-proxy?authorizationURL=https%3A%2F%2Faccounts.google.com%2Fo%2Foauth2%2Fauth%3Fresponse_type%3Dcode%26client_id%3D94427138884-cc2db90qkmg6dfshccce94ffmt5rpla0.apps.googleusercontent.com%26state%3DOQb5rlgnWC48Kj6BWjhrYfT_6thTT7nB%26scope%3Demail%2Bprofile%2Bopenid%2Bopenid%2Bprofile%2Bemail%26redirect_uri%3Dhttps%253A%252F%252Fpreview-nvhibrpzfraq.share.sandbox.dev%252Fapi%252Fauth%252Fcallback%252Fgoogle%26code_challenge_method%3DS256%26code_challenge%3DXzFeM0zuNN4-OsXpBjDq9lTd9pir5WW4g_q8R6IlY54%26include_granted_scopes%3Dtrue
+   Origin: none
+   User-Agent: Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac O...
+--> GET /api/auth/expo-authorization-proxy [36m302[0m 1ms
+<-- GET /api/auth/get-session
+🔐 [Auth Request] GET /api/auth/get-session
+   Full URL: http://20.3.213.69:3000/api/auth/get-session
+   Origin: none
+   User-Agent: vibecode/209 CFNetwork/3860.300.31 Darwin/25.2.0...
+--> GET /api/auth/get-session [32m200[0m 2ms
+<-- GET /api/auth/get-session
+🔐 [Auth Request] GET /api/auth/get-session
+   Full URL: http://20.3.213.69:3000/api/auth/get-session
+   Origin: none
+   User-Agent: vibecode/209 CFNetwork/3860.300.31 Darwin/25.2.0...
+--> GET /api/auth/get-session [32m200[0m 0ms
+<-- GET /api/auth/get-session
+🔐 [Auth Request] GET /api/auth/get-session
+   Full URL: http://20.3.213.69:3000/api/auth/get-session
+   Origin: none
+   User-Agent: vibecode/209 CFNetwork/3860.300.31 Darwin/25.2.0...
+--> GET /api/auth/get-session [32m200[0m 1ms
+<-- GET /api/auth/get-session
+🔐 [Auth Request] GET /api/auth/get-session
+   Full URL: http://20.3.213.69:3000/api/auth/get-session
+   Origin: none
+   User-Agent: vibecode/209 CFNetwork/3860.300.31 Darwin/25.2.0...
+--> GET /api/auth/get-session [32m200[0m 2ms
+<-- GET /api/auth/get-session
+🔐 [Auth Request] GET /api/auth/get-session
+   Full URL: http://20.3.213.69:3000/api/auth/get-session
+   Origin: none
+   User-Agent: vibecode/209 CFNetwork/3860.300.31 Darwin/25.2.0...
+--> GET /api/auth/get-session [32m200[0m 1ms
+<-- GET /api/auth/get-session
+🔐 [Auth Request] GET /api/auth/get-session
+   Full URL: http://20.3.213.69:3000/api/auth/get-session
+   Origin: none
+   User-Agent: vibecode/209 CFNetwork/3860.300.31 Darwin/25.2.0...
+--> GET /api/auth/get-session [32m200[0m 1ms
+<-- GET /api/auth/get-session
+🔐 [Auth Request] GET /api/auth/get-session
+   Full URL: http://20.3.213.69:3000/api/auth/get-session
+   Origin: none
+   User-Agent: vibecode/209 CFNetwork/3860.300.31 Darwin/25.2.0...
+--> GET /api/auth/get-session [32m200[0m 1ms
+<-- GET /api/auth/get-session
+🔐 [Auth Request] GET /api/auth/get-session
+   Full URL: http://20.3.213.69:3000/api/auth/get-session
+   Origin: none
+   User-Agent: vibecode/209 CFNetwork/3860.300.31 Darwin/25.2.0...
+--> GET /api/auth/get-session [32m200[0m 1ms
+Failed to find Response internal state key
+🌐 [ENV] Using explicitly set BACKEND_URL: https://preview-nvhibrpzfraq.share.sandbox.dev
+⚠️  [ENV] WARNING: BACKEND_URL is set to sandbox URL: https://preview-nvhibrpzfraq.share.sandbox.dev
+⚠️  [ENV] This may cause OAuth redirect_uri_mismatch errors!
+✅ Environment variables validated successfully
+🔍 OPENAI_API_KEY from process.env: EXISTS
+🔍 OPENAI_API_KEY in parsed: EXISTS
+🌐 [ENV] Final BACKEND_URL: https://preview-nvhibrpzfraq.share.sandbox.dev
+🔐 [Auth] Initializing Better Auth...
+🔍 [Auth] Testing database connection...
+✅ [Auth] Google OAuth credentials configured
+🔑 [Auth] Google Client ID: 94427138884-cc2db90q...
+📊 [Auth] Database provider: sqlite
+📊 [Auth] DATABASE_URL: file:dev.db...
+✅ [Auth] Better Auth initialized
+🔗 [Auth] Base URL: https://preview-nvhibrpzfraq.share.sandbox.dev
+🌐 [Auth] Trusted origins: vibecode://, http://localhost:3000, http://localhost:8081, https://preview-nvhibrpzfraq.share.sandbox.dev
+🔑 [Auth] Google OAuth: Enabled ✅
+🔗 [Auth] Google OAuth Redirect URI: https://preview-nvhibrpzfraq.share.sandbox.dev/api/auth/callback/google
+❌ [Auth] ERROR: OAuth redirect URI is using sandbox URL: https://preview-nvhibrpzfraq.share.sandbox.dev/api/auth/callback/google
+❌ [Auth] This will cause OAuth redirect_uri_mismatch errors!
+⚠️  [Auth] IMPORTANT: Make sure this URL is added to Google Cloud Console OAuth credentials!
+⚠️  [Auth] Go to: https://console.cloud.google.com/apis/credentials
+⚠️  [Auth] Add to "Authorized redirect URIs": https://preview-nvhibrpzfraq.share.sandbox.dev/api/auth/callback/google
+🔐 [Auth] Session expires in: 7 days
+📁 [Upload] Uploads directory exists: /home/user/workspace/backend/uploads
+📜 [Policies] Router initialized. __dirname: /home/user/workspace/backend/src/routes
+🔧 Initializing Hono application...
+🔐 Mounting custom password reset routes at /api/auth
+🔐 Mounting Better Auth handler at /api/auth/*
+📁 Serving static files from uploads/ directory
+📤 Mounting upload routes at /api/upload
+📝 Mounting sample routes at /api/sample
+👤 Mounting profile routes at /api/profile
+🔍 Mounting discover routes at /api/discover
+👆 Mounting swipe routes at /api/swipe
+💕 Mounting matches routes at /api/matches
+🎯 Mounting quests routes at /api/quests
+🏆 Mounting challenges routes at /api/challenges
+📊 Mounting stats routes at /api/stats
+📹 Mounting live routes at /api/live
+👥 Mounting friends routes at /api/friends
+💬 Mounting messages routes at /api/messages
+🏘️  Mounting groups routes at /api/groups
+🎯 Mounting group quests routes at /api/group-quests
+📹 Mounting group live routes at /api/group-live
+🎁 Mounting shared quests routes at /api/shared-quests
+✅ Mounting quest verification routes at /api/quest-verification
+🛡️ Mounting moderation routes at /api/moderation
+📓 Mounting journal routes at /api/journal
+📝 Mounting posts routes at /api/posts
+⏰ Mounting moments routes at /api/moments
+🔔 Mounting notifications routes at /api/notifications
+📧 Mounting GoHighLevel routes at /api/gohighlevel
+🎫 Mounting support routes at /api/support
+📁 Mounting categories routes at /api/categories
+🎤 Mounting audio routes at /api/audio
+💳 Mounting payments routes at /api/payments
+💳 Mounting payment redirect routes at root level
+📜 Mounting policies routes at /api/policies
+👑 Mounting admin routes at /api/admin
+🐛 Mounting bug report routes at /api/bug-reports
+🌐 Mounting web redirect routes
+⚙️  Starting server...
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📍 Environment: development
+🚀 Server is running on port 3000
+🔗 Base URL: http://localhost:3000
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📚 Available endpoints:
+  🔐 Auth:         /api/auth/*
+  📤 Upload:       POST /api/upload/image
+  📝 Sample:       GET/POST /api/sample
+  👤 profile:      GET/POST /api/profile
+  🔍 Discover:     GET /api/discover
+  👆 Swipe:        POST /api/swipe
+  💕 Matches:      GET /api/matches
+  🎯 Quests:       GET/POST /api/quests
+  🏆 Challenges:   GET/POST /api/challenges
+  📊 Stats:        GET /api/stats
+  📹 Live:        GET/POST /api/live
+  👥 Friends:      GET/POST /api/friends
+  💬 Messages:     GET/POST /api/messages
+  🏘️  Groups:       GET/POST /api/groups
+  🎁 SharedQuests: GET/POST /api/shared-quests
+  📓 Journal:      GET/POST /api/journal
+  🔔 Notifications: GET /api/notifications
+  💚 Health:       GET /health
+
+⏰ Challenge Scheduler: Active (Daily at 9 AM & 2 PM UTC)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ [Auth] Database connection successful
+✅ [Auth] User table accessible
+✅ [Auth] Account table accessible
+✅ [Auth] Session table accessible

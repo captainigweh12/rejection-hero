@@ -24,6 +24,7 @@ import { db } from "./db";
 //   - Email/password authentication
 //   - Google OAuth authentication
 //   - Trusted origins for CORS
+//   - Production domain: api.rejectionhero.com
 console.log("🔐 [Auth] Initializing Better Auth...");
 
 // Test database connection before initializing Better Auth
