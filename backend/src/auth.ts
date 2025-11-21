@@ -159,11 +159,8 @@ if (env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET) {
   if (redirectURI.includes("sandbox.dev")) {
     console.error(`❌ [Auth] ERROR: OAuth redirect URI is using sandbox URL: ${redirectURI}`);
     console.error(`❌ [Auth] This will cause OAuth redirect_uri_mismatch errors!`);
-    if (process.env.RAILWAY_PUBLIC_DOMAIN) {
-      const railwayUrl = `https://${process.env.RAILWAY_PUBLIC_DOMAIN}/api/auth/callback/google`;
-      console.error(`❌ [Auth] Expected Railway URL: ${railwayUrl}`);
-      console.error(`❌ [Auth] Please remove BACKEND_URL from Railway variables to auto-detect Railway domain`);
-    }
+    // Note: BACKEND_URL should be set to production domain in environment variables
+    console.error(`❌ [Auth] Please ensure BACKEND_URL is set to production domain: https://api.rejectionhero.com`);
   } else {
     console.log(`✅ [Auth] OAuth redirect URI is using production URL: ${redirectURI}`);
   }

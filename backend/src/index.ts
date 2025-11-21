@@ -141,7 +141,7 @@ app.on(["GET", "POST"], "/api/auth/*", async (c) => {
         // Check for specific error types
         if (text.includes("database") || text.includes("connection")) {
           console.error("   ⚠️  Database connection issue detected!");
-          console.error("   Check DATABASE_URL in Railway environment variables");
+          console.error("   Check DATABASE_URL in environment variables");
         }
         if (text.includes("table") || text.includes("does not exist")) {
           console.error("   ⚠️  Missing table detected!");
@@ -180,7 +180,7 @@ app.on(["GET", "POST"], "/api/auth/*", async (c) => {
         // Check for specific error types
         if (text.includes("database") || text.includes("connection")) {
           console.error("   ⚠️  Database connection issue detected!");
-          console.error("   Check DATABASE_URL in Railway environment variables");
+          console.error("   Check DATABASE_URL in environment variables");
         }
         if (text.includes("table") || text.includes("does not exist")) {
           console.error("   ⚠️  Missing table detected!");
@@ -192,7 +192,7 @@ app.on(["GET", "POST"], "/api/auth/*", async (c) => {
         }
         if (text.includes("invalid_client") || text.includes("unauthorized_client")) {
           console.error("   ⚠️  OAuth client credentials invalid!");
-          console.error("   Check GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET in Railway");
+          console.error("   Check GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET in environment variables");
         }
       } else {
         console.log("✅ [OAuth] Google callback successful");
@@ -253,7 +253,7 @@ app.on(["GET", "POST"], "/api/auth/*", async (c) => {
     // Check for database connection errors
     if (error?.code === "P1001" || error?.message?.includes("Can't reach database")) {
       console.error("❌ [Auth Handler] Database connection failed!");
-      console.error("   Check DATABASE_URL in Railway environment variables");
+      console.error("   Check DATABASE_URL in environment variables");
       console.error(`   DATABASE_URL is set: ${!!process.env.DATABASE_URL}`);
     }
     
@@ -280,7 +280,7 @@ app.on(["GET", "POST"], "/api/auth/*", async (c) => {
         message: error?.message || "An error occurred during authentication",
         path: path,
         ...(path.includes("/callback/google") && {
-          hint: "Check Railway logs for detailed OAuth callback error"
+          hint: "Check logs for detailed OAuth callback error"
         })
       },
       statusCode
