@@ -26,18 +26,25 @@
 
 ## 🔧 Recent Updates
 
-### ✅ Hardcoded Production URL for OAuth (Latest)
-- **Issue**: Vibecode's reverse proxy was overriding BACKEND_URL with sandbox URL, breaking OAuth
-- **Solution**: Hardcoded production URL in `backend/src/env.ts` to force `https://api.rejectionhero.com`
+### ✅ Fixed Google OAuth Redirect URI - No More sandbox.dev! (Latest)
+- **Issue**: Google OAuth was redirecting to sandbox.dev instead of production domain
+- **Root Cause**: Vibecode's reverse proxy was overriding `BACKEND_URL` and `EXPO_PUBLIC_VIBECODE_BACKEND_URL` with sandbox.dev URL at runtime
+- **Solution**: Added sandbox.dev detection and override in frontend auth client and API client
 - **Changes**:
-  - ✅ Modified `validateEnv()` to force PRODUCTION_URL regardless of environment variables
-  - ✅ Overrides any sandbox URL injection by the platform
-  - ✅ Logs show: `🚀 [ENV] PRODUCTION MODE: Forcing BACKEND_URL to https://api.rejectionhero.com`
+  - ✅ Modified `src/lib/authClient.ts` to detect and override sandbox.dev URLs
+  - ✅ Modified `src/lib/api.ts` to detect and override sandbox.dev URLs
+  - ✅ Both now force `https://api.rejectionhero.com` when sandbox.dev is detected
+  - ✅ Logs will show: `⚠️ [Auth Client] Detected sandbox.dev URL` → `✅ [Auth Client] Overriding with production URL`
 - **Result**:
-  - ✅ Backend now uses `https://api.rejectionhero.com/api/auth/callback/google` for OAuth
+  - ✅ Frontend now always uses `https://api.rejectionhero.com` for OAuth and API calls
+  - ✅ Google OAuth redirect URI will be: `https://api.rejectionhero.com/api/auth/callback/google`
   - ✅ Matches the redirect URI configured in Google Cloud Console
-  - ✅ Google OAuth should now work correctly
-- **Status**: **READY FOR TESTING** - Try signing in with Google now!
+- **Action Required**:
+  - ⚠️ **Verify Google Cloud Console** has this redirect URI configured:
+    - Go to: https://console.cloud.google.com/apis/credentials
+    - Find your OAuth 2.0 Client ID: `94427138884-cc2db90qkmg6dfshccce94ffmt5rpla0.apps.googleusercontent.com`
+    - Under "Authorized redirect URIs", ensure this is added: `https://api.rejectionhero.com/api/auth/callback/google`
+- **Status**: **READY FOR TESTING** - Refresh the app and try Google sign-in!
 
 ### ✅ Fixed 500 Google OAuth Error - Database Provider Issue
 - **Issue**: 500 error when signing in with Google after 502 was fixed
