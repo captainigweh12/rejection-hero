@@ -173,7 +173,48 @@ app.on(["GET", "POST"], "/api/auth/*", async (c) => {
       console.log(`🔐 [OAuth] Google callback response: ${response.status}`);
       if (response.status >= 400) {
         const text = await response.clone().text().catch(() => "Unable to read response");
-        console.error(`❌ [OAuth] Google callback error: ${text.substring(0, 200)}`);
+        console.error(`❌ [OAuth] Google callback error (${response.status}):`);
+        console.error(`   ${text.substring(0, 500)}`);
+        
+        // Check for specific error types
+        if (text.includes("database") || text.includes("connection")) {
+          console.error("   ⚠️  Database connection issue detected!");
+          console.error("   Check DATABASE_URL in Railway environment variables");
+        }
+        if (text.includes("table") || text.includes("does not exist")) {
+          console.error("   ⚠️  Missing table detected!");
+          console.error("   Run: bun run db:push");
+        }
+        if (text.includes("redirect_uri_mismatch") || text.includes("invalid_grant")) {
+          console.error("   ⚠️  OAuth redirect URI mismatch!");
+          console.error(`   Check Google Console has: ${env.BACKEND_URL}/api/auth/callback/google`);
+        }
+        if (text.includes("invalid_client") || text.includes("unauthorized_client")) {
+          console.error("   ⚠️  OAuth client credentials invalid!");
+          console.error("   Check GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET in Railway");
+        }
+      } else {
+        console.log("✅ [OAuth] Google callback successful");
+        
+        // Try to get user data from response (non-blocking)
+        try {
+          const responseText = await response.clone().text().catch(() => "");
+          if (responseText) {
+            // Response might be HTML redirect, so try JSON parse carefully
+            try {
+              const data = JSON.parse(responseText);
+              if (data?.user?.id) {
+                console.log(`   ✅ User ID: ${data.user.id}`);
+                console.log(`   ✅ Email: ${data.user.email}`);
+              }
+            } catch {
+              // Not JSON, might be HTML redirect - that's fine
+              console.log("   ✅ Response is redirect (expected for OAuth)");
+            }
+          }
+        } catch {
+          // Verification failed, but callback was successful
+        }
       }
     }
     
