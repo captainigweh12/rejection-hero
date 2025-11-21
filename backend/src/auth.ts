@@ -26,6 +26,68 @@ import { db } from "./db";
 //   - Trusted origins for CORS
 console.log("🔐 [Auth] Initializing Better Auth...");
 
+// Test database connection before initializing Better Auth
+async function testDatabaseConnection() {
+  try {
+    console.log("🔍 [Auth] Testing database connection...");
+    await db.$connect();
+    console.log("✅ [Auth] Database connection successful");
+    
+    // Test if Better Auth tables exist
+    try {
+      await db.user.findFirst({ take: 1 });
+      console.log("✅ [Auth] User table accessible");
+    } catch (error: any) {
+      if (error?.code === "P2021") {
+        console.error("❌ [Auth] User table does not exist!");
+        console.error("   Run: bun run db:push");
+        throw new Error("Better Auth tables missing - run db:push");
+      }
+      throw error;
+    }
+    
+    try {
+      await db.account.findFirst({ take: 1 });
+      console.log("✅ [Auth] Account table accessible");
+    } catch (error: any) {
+      if (error?.code === "P2021") {
+        console.error("❌ [Auth] Account table does not exist!");
+        console.error("   Run: bun run db:push");
+        throw new Error("Better Auth tables missing - run db:push");
+      }
+      throw error;
+    }
+    
+    try {
+      await db.session.findFirst({ take: 1 });
+      console.log("✅ [Auth] Session table accessible");
+    } catch (error: any) {
+      if (error?.code === "P2021") {
+        console.error("❌ [Auth] Session table does not exist!");
+        console.error("   Run: bun run db:push");
+        throw new Error("Better Auth tables missing - run db:push");
+      }
+      throw error;
+    }
+    
+    return true;
+  } catch (error: any) {
+    if (error?.code === "P1001" || error?.message?.includes("Can't reach database")) {
+      console.error("❌ [Auth] Cannot reach database server!");
+      console.error("   Check DATABASE_URL in Railway environment variables");
+      console.error(`   Current DATABASE_URL: ${process.env.DATABASE_URL ? "SET" : "NOT SET"}`);
+      throw new Error("Database connection failed - check DATABASE_URL");
+    }
+    throw error;
+  }
+}
+
+// Test database connection (non-blocking, but log errors)
+testDatabaseConnection().catch((error) => {
+  console.error("❌ [Auth] Database connection test failed:", error.message);
+  console.error("   Better Auth may not work correctly until database is accessible");
+});
+
 // Validate Google OAuth configuration
 if (!env.GOOGLE_CLIENT_ID || !env.GOOGLE_CLIENT_SECRET) {
   console.warn("⚠️ [Auth] Google OAuth credentials not configured. Google sign-in will not work.");
@@ -34,6 +96,23 @@ if (!env.GOOGLE_CLIENT_ID || !env.GOOGLE_CLIENT_SECRET) {
   console.log("✅ [Auth] Google OAuth credentials configured");
   console.log(`🔑 [Auth] Google Client ID: ${env.GOOGLE_CLIENT_ID.substring(0, 20)}...`);
 }
+
+// Validate Better Auth configuration
+if (!env.BETTER_AUTH_SECRET || env.BETTER_AUTH_SECRET.length < 32) {
+  console.error("❌ [Auth] BETTER_AUTH_SECRET is invalid or too short!");
+  console.error("   BETTER_AUTH_SECRET must be at least 32 characters");
+  throw new Error("BETTER_AUTH_SECRET is invalid");
+}
+
+if (!env.DATABASE_URL || (!env.DATABASE_URL.startsWith("postgresql://") && !env.DATABASE_URL.startsWith("postgres://") && !env.DATABASE_URL.startsWith("file:"))) {
+  console.error("❌ [Auth] DATABASE_URL is invalid!");
+  console.error(`   Current value: ${env.DATABASE_URL ? "SET" : "NOT SET"}`);
+  console.error("   DATABASE_URL must start with postgresql://, postgres://, or file:");
+  throw new Error("DATABASE_URL is invalid");
+}
+
+console.log(`📊 [Auth] Database provider: ${env.DATABASE_PROVIDER || "sqlite"}`);
+console.log(`📊 [Auth] DATABASE_URL: ${env.DATABASE_URL.substring(0, 30)}...`);
 
 export const auth = betterAuth({
   database: prismaAdapter(db, {

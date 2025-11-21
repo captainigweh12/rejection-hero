@@ -88,6 +88,18 @@ app.on(["GET", "POST"], "/api/auth/*", async (c) => {
       console.log("🔐 [Sign-Up] Email sign-up request received");
       console.log(`   Method: ${method}`);
       console.log(`   Path: ${path}`);
+      
+      // Try to get request body for debugging (if available)
+      try {
+        const body = await c.req.json().catch(() => null);
+        if (body) {
+          console.log(`   Email: ${body.email || "not provided"}`);
+          console.log(`   Name: ${body.name || "not provided"}`);
+          // Don't log password
+        }
+      } catch {
+        // Body might not be JSON or already consumed
+      }
     }
     
     // Log OAuth callback requests for debugging
@@ -105,9 +117,37 @@ app.on(["GET", "POST"], "/api/auth/*", async (c) => {
       console.log(`🔐 [Sign-Up] Sign-up response: ${response.status}`);
       if (response.status >= 400) {
         const text = await response.clone().text().catch(() => "Unable to read response");
-        console.error(`❌ [Sign-Up] Sign-up error: ${text.substring(0, 300)}`);
+        console.error(`❌ [Sign-Up] Sign-up error (${response.status}):`);
+        console.error(`   ${text.substring(0, 500)}`);
+        
+        // Check for specific error types
+        if (text.includes("database") || text.includes("connection")) {
+          console.error("   ⚠️  Database connection issue detected!");
+          console.error("   Check DATABASE_URL in Railway environment variables");
+        }
+        if (text.includes("table") || text.includes("does not exist")) {
+          console.error("   ⚠️  Missing table detected!");
+          console.error("   Run: bun run db:push");
+        }
+        if (text.includes("unique constraint") || text.includes("already exists")) {
+          console.error("   ⚠️  User already exists with this email");
+        }
       } else {
         console.log("✅ [Sign-Up] Sign-up successful - user should be created in database");
+        
+        // Verify user was actually created (non-blocking)
+        try {
+          const responseText = await response.clone().text().catch(() => "");
+          if (responseText) {
+            const data = JSON.parse(responseText);
+            if (data?.user?.id) {
+              console.log(`   ✅ User ID: ${data.user.id}`);
+              console.log(`   ✅ Email: ${data.user.email}`);
+            }
+          }
+        } catch {
+          // Verification failed, but sign-up was successful
+        }
       }
     }
     
