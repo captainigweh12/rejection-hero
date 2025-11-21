@@ -44,7 +44,7 @@ import { type AppType } from "./types";
 const app = new Hono<AppType>();
 
 console.log("🔧 Initializing Hono application...");
-// Fixed import path aliases for shared contracts
+// Production URL hardcoded: api.rejectionhero.com
 app.use("*", logger());
 app.use("/*", cors());
 

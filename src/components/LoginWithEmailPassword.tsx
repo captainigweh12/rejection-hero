@@ -169,8 +169,7 @@ export default function LoginWithEmailPassword() {
     try {
       console.log("🔐 [SignUp] Calling authClient.signUp.email...");
       console.log("🔐 [SignUp] Backend URL:", process.env.EXPO_PUBLIC_VIBECODE_BACKEND_URL);
-      console.log("🔐 [SignUp] Auth client baseURL:", authClient.baseURL);
-      
+
       const result = await authClient.signUp.email({
         email,
         password,

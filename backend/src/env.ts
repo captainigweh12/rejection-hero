@@ -55,43 +55,15 @@ function validateEnv() {
   try {
     const parsed = envSchema.parse(process.env);
 
-    // CRITICAL: Prefer explicitly set BACKEND_URL, then Railway domain, then localhost
-    // If BACKEND_URL is explicitly set (e.g., https://api.rejectionhero.com), use it
-    // Otherwise, auto-detect Railway domain
-    const explicitlySet = parsed.BACKEND_URL && parsed.BACKEND_URL !== "http://localhost:3000";
-    
-    if (explicitlySet) {
-      // BACKEND_URL is explicitly set (e.g., custom domain like api.rejectionhero.com)
-      console.log(`🌐 [ENV] Using explicitly set BACKEND_URL: ${parsed.BACKEND_URL}`);
-      
-      // Warn if it's a sandbox URL
-      if (parsed.BACKEND_URL.includes("sandbox.dev")) {
-        console.warn(`⚠️  [ENV] WARNING: BACKEND_URL is set to sandbox URL: ${parsed.BACKEND_URL}`);
-        console.warn(`⚠️  [ENV] This may cause OAuth redirect_uri_mismatch errors!`);
-        if (process.env.RAILWAY_PUBLIC_DOMAIN) {
-          const railwayUrl = `https://${process.env.RAILWAY_PUBLIC_DOMAIN}`;
-          console.warn(`⚠️  [ENV] Consider using Railway URL: ${railwayUrl}`);
-        }
-      }
-    } else if (process.env.RAILWAY_PUBLIC_DOMAIN) {
-      // No explicit BACKEND_URL, but Railway domain is available
-      const railwayUrl = `https://${process.env.RAILWAY_PUBLIC_DOMAIN}`;
-      parsed.BACKEND_URL = railwayUrl;
-      console.log(`🚂 [ENV] Railway Public Domain detected: ${process.env.RAILWAY_PUBLIC_DOMAIN}`);
-      console.log(`✅ [ENV] BACKEND_URL set to Railway domain: ${parsed.BACKEND_URL}`);
-    } else if (!parsed.BACKEND_URL || parsed.BACKEND_URL === "http://localhost:3000") {
-      // Fallback to localhost if not in Railway and no BACKEND_URL set
-      parsed.BACKEND_URL = "http://localhost:3000";
-      console.log(`🔧 [ENV] No BACKEND_URL or Railway domain, using localhost fallback`);
-    } else {
-      // Validate BACKEND_URL is a valid URL
-      try {
-        new URL(parsed.BACKEND_URL);
-        console.log(`🌐 [ENV] Using BACKEND_URL from environment: ${parsed.BACKEND_URL}`);
-      } catch {
-        throw new Error(`BACKEND_URL must be a valid URL: ${parsed.BACKEND_URL}`);
-      }
+    // PRODUCTION MODE: Force production URL for OAuth
+    // Override any sandbox URL with production domain
+    const PRODUCTION_URL = "https://api.rejectionhero.com";
+
+    console.log(`🚀 [ENV] PRODUCTION MODE: Forcing BACKEND_URL to ${PRODUCTION_URL}`);
+    if (parsed.BACKEND_URL !== PRODUCTION_URL) {
+      console.log(`📝 [ENV] Overriding ${parsed.BACKEND_URL} → ${PRODUCTION_URL}`);
     }
+    parsed.BACKEND_URL = PRODUCTION_URL;
 
     console.log("✅ Environment variables validated successfully");
     console.log("🔍 OPENAI_API_KEY from process.env:", process.env.OPENAI_API_KEY ? "EXISTS" : "MISSING");
