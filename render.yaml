@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: rejection-hero-backend
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free  # Change to 'starter' or 'standard' for better performance
+    region: oregon  # Choose closest region: oregon, frankfurt, singapore, mumbai, tokyo
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      # Database - Set these in Render dashboard instead of here for security
+      # - key: DATABASE_URL
+      #   sync: false
+      # - key: DIRECT_URL
+      #   sync: false
+      # - key: BETTER_AUTH_SECRET
+      #   sync: false
+      # - key: BACKEND_URL
+      #   value: https://api.rejectionhero.com
+      # Add all other environment variables in Render dashboard
+
