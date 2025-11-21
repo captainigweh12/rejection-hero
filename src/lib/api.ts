@@ -15,9 +15,9 @@ import { authClient } from "./authClient";
 /**
  * Backend URL Configuration
  *
- * The backend URL is dynamically set by the Vibecode environment at runtime.
- * Format: https://[UNIQUE_ID].share.sandbox.dev/
- * This allows the app to connect to different backend instances without code changes.
+ * The backend URL is configured via environment variable.
+ * Production: https://api.rejectionhero.com
+ * Development: http://localhost:3000 (fallback)
  */
 // Get backend URL with fallback for development/Expo Go
 const BACKEND_URL = process.env.EXPO_PUBLIC_VIBECODE_BACKEND_URL || 

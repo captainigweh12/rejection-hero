@@ -153,7 +153,7 @@ export async function sendEmail(
  * Generate welcome email HTML with Rejection Hero branding
  */
 export function getWelcomeEmailHTML(userName: string): string {
-  const backendUrl = process.env.BACKEND_URL || "https://preview-ugdfgagtcpqe.share.sandbox.dev";
+  const backendUrl = process.env.BACKEND_URL || "https://api.rejectionhero.com";
 
   return `
     <!DOCTYPE html>
@@ -321,7 +321,7 @@ export function getWelcomeEmailHTML(userName: string): string {
  * Get invite email HTML template
  */
 export function getInviteEmailHTML(inviteeName: string, inviterName: string): string {
-  const backendUrl = process.env.BACKEND_URL || "https://preview-cgmxpdeghzpq.share.sandbox.dev";
+  const backendUrl = process.env.BACKEND_URL || "https://api.rejectionhero.com";
   const appUrl = `${backendUrl}/invite`; // Web URL that redirects to app
 
   return `

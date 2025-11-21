@@ -207,7 +207,7 @@ app.post(
       }
 
       // Generate reset link (web URL that redirects to app)
-      const backendUrl = process.env.BACKEND_URL || "https://preview-cgmxpdeghzpq.share.sandbox.dev";
+      const backendUrl = process.env.BACKEND_URL || "https://api.rejectionhero.com";
       const resetLink = `${backendUrl}/reset-password?token=${resetToken}&email=${encodeURIComponent(email)}`;
 
       // Send password reset email via GoHighLevel

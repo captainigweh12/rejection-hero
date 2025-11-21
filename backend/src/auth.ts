@@ -156,10 +156,10 @@ if (env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET) {
   const redirectURI = `${env.BACKEND_URL}/api/auth/callback/google`;
   console.log(`🔗 [Auth] Google OAuth Redirect URI: ${redirectURI}`);
   
-  if (redirectURI.includes("sandbox.dev")) {
-    console.error(`❌ [Auth] ERROR: OAuth redirect URI is using sandbox URL: ${redirectURI}`);
-    console.error(`❌ [Auth] This will cause OAuth redirect_uri_mismatch errors!`);
-    // Note: BACKEND_URL should be set to production domain in environment variables
+  // Verify production URL is being used
+  if (!redirectURI.includes("api.rejectionhero.com")) {
+    console.error(`❌ [Auth] ERROR: OAuth redirect URI is not using production URL: ${redirectURI}`);
+    console.error(`❌ [Auth] Expected: https://api.rejectionhero.com/api/auth/callback/google`);
     console.error(`❌ [Auth] Please ensure BACKEND_URL is set to production domain: https://api.rejectionhero.com`);
   } else {
     console.log(`✅ [Auth] OAuth redirect URI is using production URL: ${redirectURI}`);

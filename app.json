@@ -33,7 +33,7 @@
         "NSAppTransportSecurity": {
           "NSAllowsArbitraryLoads": true,
           "NSExceptionDomains": {
-            "share.sandbox.dev": {
+            "rejectionhero.com": {
               "NSExceptionAllowsInsecureHTTPLoads": false,
               "NSIncludesSubdomains": true,
               "NSExceptionRequiresForwardSecrecy": true,
