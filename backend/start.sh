@@ -60,8 +60,9 @@ echo "   Connection: $(echo "$SCHEMA_SYNC_URL" | sed "s/:[^:]*@/:***@/" | sed "s
 echo ""
 echo "🔍 Testing database connection..."
 # Test connection before attempting schema sync
-TEST_RESULT=$(echo "SELECT 1;" | DATABASE_URL="$SCHEMA_SYNC_URL" timeout 10 bunx prisma db execute --stdin 2>&1 || echo "FAILED")
-if echo "$TEST_RESULT" | grep -qi "error\|failed\|can't reach\|can not reach"; then
+# Use --url flag explicitly since DATABASE_URL env var may not be read correctly
+TEST_RESULT=$(echo "SELECT 1;" | bunx prisma db execute --url "$SCHEMA_SYNC_URL" --stdin 2>&1 || echo "FAILED")
+if echo "$TEST_RESULT" | grep -qi "error\|failed\|can't reach\|can not reach\|FAILED"; then
   echo "❌ Database connection test failed!"
   echo "❌ Error: $(echo "$TEST_RESULT" | head -5)"
   echo ""
@@ -93,7 +94,7 @@ if [ $SYNC_RESULT -eq 0 ]; then
   echo "🔍 Verifying critical tables were created..."
   
   # Check for user_quest table
-  TABLE_CHECK=$(echo "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'user_quest';" | DATABASE_URL="$SCHEMA_SYNC_URL" bunx prisma db execute --stdin 2>&1 || echo "")
+  TABLE_CHECK=$(echo "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'user_quest';" | bunx prisma db execute --url "$SCHEMA_SYNC_URL" --stdin 2>&1 || echo "")
   if echo "$TABLE_CHECK" | grep -q "[1-9]"; then
     echo "✅ user_quest table exists"
   else
@@ -102,7 +103,7 @@ if [ $SYNC_RESULT -eq 0 ]; then
   fi
   
   # Check for user_stats table
-  STATS_CHECK=$(echo "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'user_stats';" | DATABASE_URL="$SCHEMA_SYNC_URL" bunx prisma db execute --stdin 2>&1 || echo "")
+  STATS_CHECK=$(echo "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'user_stats';" | bunx prisma db execute --url "$SCHEMA_SYNC_URL" --stdin 2>&1 || echo "")
   if echo "$STATS_CHECK" | grep -q "[1-9]"; then
     echo "✅ user_stats table exists"
   else
@@ -111,7 +112,7 @@ if [ $SYNC_RESULT -eq 0 ]; then
   fi
   
   # Check for user table (basic table)
-  USER_CHECK=$(echo "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'user';" | DATABASE_URL="$SCHEMA_SYNC_URL" bunx prisma db execute --stdin 2>&1 || echo "")
+  USER_CHECK=$(echo "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'user';" | bunx prisma db execute --url "$SCHEMA_SYNC_URL" --stdin 2>&1 || echo "")
   if echo "$USER_CHECK" | grep -q "[1-9]"; then
     echo "✅ user table exists"
   else
