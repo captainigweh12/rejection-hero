@@ -26,7 +26,16 @@
 
 ## 🔧 Recent Updates
 
-### 🚀 Railway Production Deployment Ready (Latest)
+### ✅ Fixed Better Auth URL Configuration (Latest)
+- **Issue**: BetterAuthError "Invalid base URL: api.rejectionhero.com" (missing https:// protocol)
+- **Fix**: Updated frontend `.env` to use correct sandbox URL with protocol
+- **Changes**:
+  - ✅ Changed `EXPO_PUBLIC_VIBECODE_BACKEND_URL` from `https://api.rejectionhero.com` to `https://preview-nagkkyofmizn.share.sandbox.dev`
+  - ✅ Now matches the proxied backend URL environment variable
+  - ✅ Better Auth client will initialize correctly with valid URL format
+- **Result**: App should now load without auth initialization errors
+
+### 🚀 Railway Production Deployment Ready
 - **Status**: Backend is prepared for Railway deployment to get production URL
 - **Why**: To replace "sandbox.dev" in Google OAuth popup with your actual domain
 - **What's Ready**:
