@@ -2,182 +2,239 @@
 
 ## Problem
 
-Google OAuth is returning a 502 (Bad Gateway) error when users try to sign in.
+Getting a 502 error when signing in with Google OAuth:
+- Error occurs in `LoginWithEmailPassword.tsx` (line 270)
+- Backend returns 502 status code
+- OAuth callback is failing
 
 ## Root Causes
 
-A 502 error typically means:
-1. **Backend server crashed** during OAuth callback processing
-2. **Database connection failed** during user creation
-3. **Missing error handling** in OAuth callback route
-4. **BACKEND_URL misconfiguration** causing redirect issues
-5. **Better Auth handler** throwing unhandled errors
+The 502 error indicates the backend is crashing during the OAuth callback. Common causes:
 
-## Fixes Applied
+1. **Better Auth tables missing in Neon**
+   - Better Auth requires `user`, `session`, `account`, `verification` tables
+   - If tables don't exist, database operations will fail
 
-### 1. Enhanced Error Handling for OAuth Callback
+2. **Incorrect BACKEND_URL configuration**
+   - OAuth redirect URI must match Google Console configuration
+   - Must be `https://api.rejectionhero.com/api/auth/callback/google`
 
-Added comprehensive error handling in `backend/src/index.ts`:
+3. **Missing environment variables**
+   - `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` must be set in Railway
+   - `BACKEND_URL` must be set to `https://api.rejectionhero.com`
 
-```typescript
-app.on(["GET", "POST"], "/api/auth/*", async (c) => {
-  try {
-    // Log OAuth callback requests for debugging
-    if (c.req.path.includes("/callback/google")) {
-      console.log("🔐 [OAuth] Google callback received");
-      console.log(`   URL: ${c.req.url}`);
-      console.log(`   Method: ${c.req.method}`);
-    }
-    
-    const response = await auth.handler(c.req.raw);
-    
-    // Log OAuth callback responses
-    if (c.req.path.includes("/callback/google")) {
-      console.log(`🔐 [OAuth] Google callback response: ${response.status}`);
-      if (response.status >= 400) {
-        const text = await response.clone().text().catch(() => "Unable to read response");
-        console.error(`❌ [OAuth] Google callback error: ${text.substring(0, 200)}`);
-      }
-    }
-    
-    return response;
-  } catch (error: any) {
-    console.error("❌ [OAuth] Error in auth handler:", error);
-    // Return proper error response instead of crashing
-    return c.json({ error: "Authentication error", message: error?.message }, 500);
-  }
-});
+4. **Google Console redirect URI mismatch**
+   - Redirect URI in Google Console must match backend configuration
+
+## Solution
+
+### Step 1: Verify Better Auth Tables Exist
+
+Run the verification script:
+
+```bash
+cd backend
+bun run scripts/verify-better-auth-tables.ts
 ```
 
-**Benefits:**
-- ✅ Prevents server crashes from unhandled errors
-- ✅ Provides detailed logging for debugging
-- ✅ Returns proper error responses instead of 502
-- ✅ Logs OAuth callback requests/responses
-
-### 2. Railway URL Auto-Detection
-
-Updated `backend/src/env.ts` to automatically use Railway's public domain:
-
-```typescript
-// CRITICAL: Override BACKEND_URL with Railway domain if available
-if (process.env.RAILWAY_PUBLIC_DOMAIN) {
-  const railwayUrl = `https://${process.env.RAILWAY_PUBLIC_DOMAIN}`;
-  parsed.BACKEND_URL = railwayUrl;
-  console.log(`✅ [ENV] BACKEND_URL set to Railway domain: ${parsed.BACKEND_URL}`);
-}
+**Expected output:**
+```
+✅ Table "user" exists
+✅ Table "session" exists
+✅ Table "account" exists
+✅ Table "verification" exists
+✅ All Better Auth tables exist!
 ```
 
-**Benefits:**
-- ✅ Automatically uses Railway URL when deployed
-- ✅ Prevents sandbox.dev URL issues
-- ✅ Ensures OAuth redirect URI is correct
-
-### 3. Enhanced OAuth Logging
-
-Added detailed logging in `backend/src/auth.ts`:
-
-```typescript
-if (env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET) {
-  const redirectURI = `${env.BACKEND_URL}/api/auth/callback/google`;
-  console.log(`🔗 [Auth] Google OAuth Redirect URI: ${redirectURI}`);
-  
-  if (redirectURI.includes("sandbox.dev")) {
-    console.error(`❌ [Auth] ERROR: OAuth redirect URI is using sandbox URL`);
-  }
-}
+**If tables are missing:**
+```bash
+bun run db:push
 ```
 
-**Benefits:**
-- ✅ Shows exact redirect URI being used
-- ✅ Warns about sandbox URLs
-- ✅ Helps verify Google Console configuration
+This will create all missing tables in Neon.
 
-## Verification Steps
+### Step 2: Verify Railway Environment Variables
 
-### 1. Check Railway Logs
+In Railway → Backend Service → Variables, ensure these are set:
 
-After deployment, check Railway logs for:
-
+```env
+✅ BACKEND_URL=https://api.rejectionhero.com
+✅ DATABASE_URL=postgresql://neondb_owner:...@ep-withered-field-a4skic0c.us-east-1.aws.neon.tech/neondb?sslmode=require
+✅ GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
+✅ GOOGLE_CLIENT_SECRET=your-client-secret
+✅ BETTER_AUTH_SECRET=your-secret-min-32-chars
+✅ DATABASE_PROVIDER=postgresql
 ```
-✅ [ENV] BACKEND_URL set to Railway domain: https://your-app.railway.app
-🔗 [Auth] Google OAuth Redirect URI: https://your-app.railway.app/api/auth/callback/google
+
+**Critical:** `BACKEND_URL` must be exactly `https://api.rejectionhero.com` (not Railway URL).
+
+### Step 3: Verify Google Cloud Console Configuration
+
+1. Go to [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
+2. Find your OAuth 2.0 Client ID (Web client)
+3. Verify **Authorized JavaScript origins:**
+   ```
+   https://api.rejectionhero.com
+   ```
+4. Verify **Authorized redirect URIs:**
+   ```
+   https://api.rejectionhero.com/api/auth/callback/google
+   ```
+
+**The redirect URI must match exactly!**
+
+### Step 4: Check Railway Logs
+
+After setting environment variables, check Railway logs:
+
+**Expected logs:**
+```
+🌐 [ENV] Using explicitly set BACKEND_URL: https://api.rejectionhero.com
+✅ [Auth] Better Auth initialized
+🔗 [Auth] Base URL: https://api.rejectionhero.com
+🔑 [Auth] Google OAuth: Enabled ✅
+🔗 [Auth] Google OAuth Redirect URI: https://api.rejectionhero.com/api/auth/callback/google
 ✅ [Auth] OAuth redirect URI is using production URL
 ```
 
-### 2. Verify Google Cloud Console
+**If you see errors:**
+- `❌ [Auth] ERROR: OAuth redirect URI is using sandbox URL` → Set `BACKEND_URL` in Railway
+- `⚠️ [Auth] Google OAuth credentials not configured` → Set `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`
 
-1. Go to [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
-2. Find your OAuth 2.0 Client ID
-3. Verify **Authorized redirect URIs** includes:
-   ```
-   https://your-app.railway.app/api/auth/callback/google
-   ```
+### Step 5: Test OAuth Flow
 
-### 3. Test OAuth Flow
-
-1. Try signing in with Google
-2. Check Railway logs for:
+1. **Trigger OAuth sign-in from app**
+2. **Check Railway logs for:**
    ```
    🔐 [OAuth] Google callback received
+      URL: https://api.rejectionhero.com/api/auth/callback/google?code=...
+      Method: GET
    🔐 [OAuth] Google callback response: 200
    ```
-3. If you see errors, they'll be logged with details
 
-## Common Issues & Solutions
+3. **If you see errors:**
+   - Check the error message in logs
+   - Common errors:
+     - `redirect_uri_mismatch` → Fix Google Console redirect URI
+     - `P2021` (table does not exist) → Run `bun run db:push`
+     - `PrismaClientInitializationError` → Check `DATABASE_URL`
 
-### Issue: Still Getting 502 Error
+## How Better Auth Works with Neon
 
-**Check:**
-1. Railway logs for the exact error message
-2. Database connection (Neon should be working)
-3. `BACKEND_URL` in Railway variables (should match Railway domain)
-4. Google Console redirect URI matches exactly
+**Important Understanding:**
 
-**Solution:**
-- Remove `BACKEND_URL` from Railway variables (let it auto-detect)
-- Or set `BACKEND_URL` to your Railway domain: `https://your-app.railway.app`
+1. **Neon is just the database** - it stores user data, sessions, accounts
+2. **Better Auth is the library** - it handles OAuth logic in your Railway backend
+3. **Google OAuth is the provider** - Google handles authentication
+
+**Flow:**
+```
+User clicks "Sign in with Google"
+  ↓
+Frontend calls: authClient.signIn.social({ provider: "google" })
+  ↓
+Better Auth redirects to: https://accounts.google.com/oauth/authorize
+  ↓
+User authenticates with Google
+  ↓
+Google redirects to: https://api.rejectionhero.com/api/auth/callback/google?code=...
+  ↓
+Railway backend receives callback
+  ↓
+Better Auth exchanges code for tokens
+  ↓
+Better Auth creates/updates user in Neon (user table)
+  ↓
+Better Auth creates session in Neon (session table)
+  ↓
+Better Auth creates account in Neon (account table)
+  ↓
+Backend returns session to frontend
+  ↓
+User is logged in
+```
+
+**Database Tables Used:**
+- `user` - User profile data
+- `session` - Active user sessions
+- `account` - OAuth provider account data (Google tokens, etc.)
+- `verification` - Email verification tokens, etc.
+
+## Troubleshooting
+
+### Issue: Still getting 502 error
+
+**Check Railway logs:**
+1. Open Railway → Backend Service → Deployments → Latest → Logs
+2. Look for errors during OAuth callback
+3. Common errors:
+   - Database connection errors → Check `DATABASE_URL`
+   - Table not found → Run `bun run db:push`
+   - OAuth configuration error → Check `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`
 
 ### Issue: redirect_uri_mismatch
 
-**Solution:**
-1. Get your Railway domain from Railway dashboard
-2. Add to Google Console: `https://your-app.railway.app/api/auth/callback/google`
+**Symptoms:**
+- OAuth flow starts but fails at Google redirect
+- Error: "redirect_uri_mismatch"
+
+**Fix:**
+1. Check Railway logs for actual redirect URI being used
+2. Verify Google Console has exact redirect URI:
+   ```
+   https://api.rejectionhero.com/api/auth/callback/google
+   ```
 3. Wait 2-3 minutes for Google to update
+4. Try again
 
-### Issue: Database Errors During OAuth
+### Issue: Tables don't exist
 
-**Check:**
-- Railway logs for Prisma errors
-- Verify `DATABASE_URL` is set correctly
-- Check Neon connection is working
+**Symptoms:**
+- Error: `P2021: The table "user" does not exist`
+- Verification script shows missing tables
 
-**Solution:**
-- Verify Neon tables exist (they should after deployment)
-- Check `DATABASE_URL` in Railway matches Neon connection string
+**Fix:**
+```bash
+cd backend
+DATABASE_URL="your-neon-url" bun run db:push
+```
 
-## Expected Behavior After Fix
+Or set `DATABASE_URL` in Railway and redeploy (it will auto-run on startup).
 
-1. ✅ OAuth callback receives request
-2. ✅ Better Auth processes callback
-3. ✅ User created in database (if new)
-4. ✅ Session created
-5. ✅ Redirect back to app with success
-6. ✅ No 502 errors
+### Issue: Database connection fails
 
-## Monitoring
+**Symptoms:**
+- Error: `PrismaClientInitializationError: Can't reach database server`
 
-Watch Railway logs for:
-- `🔐 [OAuth] Google callback received` - Callback started
-- `🔐 [OAuth] Google callback response: 200` - Success
-- `❌ [OAuth] Google callback error:` - Error details
+**Fix:**
+1. Verify `DATABASE_URL` in Railway is correct
+2. Ensure it includes `?sslmode=require`
+3. Test connection:
+   ```bash
+   cd backend
+   DATABASE_URL="your-neon-url" bun run scripts/verify-better-auth-tables.ts
+   ```
+
+## Verification Checklist
+
+Before testing OAuth:
+
+- [ ] Better Auth tables exist in Neon (`user`, `session`, `account`, `verification`)
+- [ ] `BACKEND_URL=https://api.rejectionhero.com` in Railway
+- [ ] `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` set in Railway
+- [ ] `DATABASE_URL` points to Neon with `?sslmode=require`
+- [ ] Google Console redirect URI matches exactly
+- [ ] Railway logs show correct OAuth configuration
+- [ ] Frontend has `EXPO_PUBLIC_VIBECODE_BACKEND_URL=https://api.rejectionhero.com`
 
 ## Summary
 
-✅ **Error handling added** - Prevents crashes
-✅ **Railway URL auto-detection** - Ensures correct redirect URI
-✅ **Enhanced logging** - Better debugging
-✅ **Proper error responses** - No more 502s
+**The fix is:**
+1. ✅ Ensure Better Auth tables exist in Neon
+2. ✅ Set `BACKEND_URL=https://api.rejectionhero.com` in Railway
+3. ✅ Configure Google Console redirect URI correctly
+4. ✅ Verify all environment variables are set
 
-The OAuth flow should now work correctly without 502 errors!
+**Neon is just the database** - it doesn't "handle OAuth". Better Auth (running on Railway) handles OAuth and stores data in Neon.
 
+Once these are configured correctly, OAuth should work!
