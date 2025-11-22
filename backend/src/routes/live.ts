@@ -164,6 +164,18 @@ live.post("/start", async (c) => {
       },
     });
 
+    // Notify friends that user went live
+    try {
+      const { notifyFriends } = await import("../services/friendNotifications");
+      await notifyFriends(user.id, "FRIEND_WENT_LIVE", {
+        liveId: liveStream.id,
+        liveTitle: userQuestId ? "Quest Live Stream" : "Live Stream",
+      });
+    } catch (error) {
+      console.error("Error notifying friends about live stream:", error);
+      // Continue even if notification fails
+    }
+
     const response: startLiveStreamResponseSchema._type = {
       success: true,
       liveStreamId: liveStream.id,

@@ -8,6 +8,7 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "@/navigation/types";
 import { api } from "@/lib/api";
 import { useTheme } from "@/contexts/ThemeContext";
+import { FriendButton, type FriendshipStatus } from "@/components/FriendButton";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Friends">;
 
@@ -50,6 +51,9 @@ interface Recommendation {
   sharedInterests: string[];
   matchScore: number;
   location: string | null;
+  mutualFriendsCount?: number;
+  mutualFriends?: Array<{ displayName: string; avatar: string | null }>;
+  reason?: string;
 }
 
 export default function FriendsScreen({ navigation }: Props) {
@@ -93,6 +97,29 @@ export default function FriendsScreen({ navigation }: Props) {
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
     staleTime: 60000, // Cache for 1 minute
   });
+
+  // Fetch friendship status for each recommendation
+  const getFriendshipStatus = (userId: string): FriendshipStatus => {
+    // Check if user is in friends list
+    const friend = friends.find((f) => f.id === userId);
+    if (friend) return "FRIENDS";
+
+    // Check if user is in requests list (pending received)
+    const request = requests.find((r) => r.userId === userId);
+    if (request) return "PENDING_RECEIVED";
+
+    // Check search results for status
+    const searchResult = searchResults.find((s) => s.id === userId);
+    if (searchResult?.friendshipStatus === "PENDING") {
+      // Need to determine if sent or received - for now assume sent if in search
+      return "PENDING_SENT";
+    }
+    if (searchResult?.friendshipStatus === "ACCEPTED") {
+      return "FRIENDS";
+    }
+
+    return "NONE";
+  };
 
   // Search users
   const { data: searchData, isLoading: searchLoading } = useQuery({
@@ -282,50 +309,34 @@ export default function FriendsScreen({ navigation }: Props) {
           </Text>
         </View>
       </View>
-      <View style={{ flexDirection: "row", gap: 8 }}>
-        <Pressable
-          onPress={() => acceptRequestMutation.mutate(request.id)}
-          disabled={acceptRequestMutation.isPending}
-          style={{
-            flex: 1,
-            backgroundColor: colors.success + "33",
-            borderRadius: 12,
-            padding: 12,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 8,
-            borderWidth: 1,
-            borderColor: colors.success,
-          }}
-        >
-          <Check size={18} color={colors.success} />
-          <Text style={{ color: colors.success, fontWeight: "600", fontSize: 15 }}>
-            Accept
-          </Text>
-        </Pressable>
-        <Pressable
-          onPress={() => declineRequestMutation.mutate(request.id)}
-          disabled={declineRequestMutation.isPending}
-          style={{
-            flex: 1,
-            backgroundColor: colors.secondary + "33",
-            borderRadius: 12,
-            padding: 12,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 8,
-            borderWidth: 1,
-            borderColor: colors.secondary,
-          }}
-        >
-          <X size={18} color={colors.secondary} />
-          <Text style={{ color: colors.secondary, fontWeight: "600", fontSize: 15 }}>
-            Decline
-          </Text>
-        </Pressable>
-      </View>
+      <FriendButton
+        userId={request.userId}
+        friendshipStatus="PENDING_RECEIVED"
+        requestId={request.id}
+        showMessageButton={false}
+        size="medium"
+      />
+      <Pressable
+        onPress={() => declineRequestMutation.mutate(request.id)}
+        disabled={declineRequestMutation.isPending}
+        style={{
+          marginTop: 8,
+          backgroundColor: colors.secondary + "33",
+          borderRadius: 12,
+          padding: 12,
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 8,
+          borderWidth: 1,
+          borderColor: colors.secondary,
+        }}
+      >
+        <X size={18} color={colors.secondary} />
+        <Text style={{ color: colors.secondary, fontWeight: "600", fontSize: 15 }}>
+          Decline
+        </Text>
+      </Pressable>
     </View>
   );
 
@@ -367,7 +378,20 @@ export default function FriendsScreen({ navigation }: Props) {
           <Text style={{ fontSize: 18, fontWeight: "bold", color: colors.text, marginBottom: 4 }}>
             {user.displayName}
           </Text>
-          {user.sharedInterests.length > 0 && (
+          {user.reason && (
+            <Text style={{ fontSize: 13, color: colors.info, marginBottom: 4 }}>
+              {user.reason}
+            </Text>
+          )}
+          {user.mutualFriendsCount !== undefined && user.mutualFriendsCount > 0 && (
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 4, marginBottom: 4 }}>
+              <Users size={14} color={colors.textSecondary} />
+              <Text style={{ fontSize: 12, color: colors.textSecondary }}>
+                {user.mutualFriendsCount} mutual friend{user.mutualFriendsCount > 1 ? "s" : ""}
+              </Text>
+            </View>
+          )}
+          {user.sharedInterests.length > 0 && !user.reason && (
             <Text style={{ fontSize: 13, color: colors.info, marginBottom: 4 }}>
               {user.sharedInterests.length} shared interest{user.sharedInterests.length > 1 ? "s" : ""}
             </Text>
@@ -378,30 +402,18 @@ export default function FriendsScreen({ navigation }: Props) {
             </Text>
           )}
         </View>
-        <Pressable
-          onPress={() => sendRequestMutation.mutate(user.id)}
-          disabled={sendRequestMutation.isPending}
-          style={{
-            backgroundColor: colors.info + "33",
-            borderRadius: 12,
-            paddingHorizontal: 16,
-            paddingVertical: 10,
-            borderWidth: 1,
-            borderColor: colors.info,
-            flexDirection: "row",
-            alignItems: "center",
-            gap: 6,
+        <FriendButton
+          userId={user.id}
+          friendshipStatus={getFriendshipStatus(user.id)}
+          onMessagePress={() => {
+            navigation.navigate("Chat", {
+              userId: user.id,
+              userName: user.displayName,
+              userAvatar: user.avatar || undefined,
+            });
           }}
-        >
-          {sendRequestMutation.isPending ? (
-            <ActivityIndicator size="small" color={colors.info} />
-          ) : (
-            <>
-              <UserPlus size={18} color={colors.info} />
-              <Text style={{ color: colors.info, fontSize: 14, fontWeight: "600" }}>Add</Text>
-            </>
-          )}
-        </Pressable>
+          size="small"
+        />
       </View>
       {user.sharedInterests.length > 0 && (
         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6, marginTop: 8 }}>

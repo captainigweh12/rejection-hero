@@ -178,6 +178,20 @@ messagesRouter.post("/send", zValidator("json", sendMessageSchema), async (c) =>
     return c.json({ message: "Cannot send messages to blocked user" }, 403);
   }
 
+  // Check if users are friends (required for messaging)
+  const friendship = await db.friendship.findFirst({
+    where: {
+      OR: [
+        { initiatorId: user.id, receiverId: receiverId, status: "ACCEPTED" },
+        { initiatorId: receiverId, receiverId: user.id, status: "ACCEPTED" },
+      ],
+    },
+  });
+
+  if (!friendship) {
+    return c.json({ message: "You can only message friends. Send a friend request first." }, 403);
+  }
+
   // Basic content moderation - check for inappropriate content
   const inappropriateWords = ["spam", "scam"]; // Add more as needed
   const contentLower = content.toLowerCase();

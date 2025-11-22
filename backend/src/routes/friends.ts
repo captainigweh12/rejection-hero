@@ -445,7 +445,7 @@ friendsRouter.get("/recommendations", async (c) => {
     where: { userId: user.id },
   });
 
-  // Get existing friendships to exclude
+  // Get existing friendships to exclude (including pending)
   const friendships = await db.friendship.findMany({
     where: {
       OR: [
@@ -459,31 +459,81 @@ friendsRouter.get("/recommendations", async (c) => {
     f.initiatorId === user.id ? f.receiverId : f.initiatorId
   );
 
+  // Get user's friends for mutual friends calculation
+  const userFriends = friendships
+    .filter((f) => f.status === "ACCEPTED")
+    .map((f) => (f.initiatorId === user.id ? f.receiverId : f.initiatorId));
+
   // Find profiles with similar interests or nearby location
   const recommendations = await db.profile.findMany({
     where: {
       AND: [
         { userId: { not: user.id } }, // Exclude current user
-        { userId: { notIn: friendUserIds } }, // Exclude existing friends
+        { userId: { notIn: friendUserIds } }, // Exclude existing friends and pending requests
         { onboardingCompleted: true }, // Only show users who completed onboarding
       ],
     },
     include: {
       user: true,
     },
-    take: 10,
-    orderBy: {
-      createdAt: "desc", // Prioritize newer users
-    },
+    take: 50, // Get more to calculate mutual friends
   });
 
-  const users = recommendations.map((profile) => {
+  // Calculate mutual friends for each recommendation
+  const recommendationsWithMutuals = await Promise.all(
+    recommendations.map(async (profile) => {
+      // Get this user's friends
+      const theirFriendships = await db.friendship.findMany({
+        where: {
+          OR: [
+            { initiatorId: profile.userId, status: "ACCEPTED" },
+            { receiverId: profile.userId, status: "ACCEPTED" },
+          ],
+        },
+      });
+
+      const theirFriends = theirFriendships.map((f) =>
+        f.initiatorId === profile.userId ? f.receiverId : f.initiatorId
+      );
+
+      // Calculate mutual friends
+      const mutualFriends = userFriends.filter((friendId) => theirFriends.includes(friendId));
+      const mutualFriendsCount = mutualFriends.length;
+
+      // Get mutual friends profiles for display
+      const mutualFriendsProfiles = await db.profile.findMany({
+        where: { userId: { in: mutualFriends.slice(0, 3) } },
+        select: { displayName: true, avatar: true },
+      });
+
+      return {
+        profile,
+        mutualFriendsCount,
+        mutualFriends: mutualFriendsProfiles,
+      };
+    })
+  );
+
+  const users = recommendationsWithMutuals.map(({ profile, mutualFriendsCount, mutualFriends }) => {
     const interests = profile.interests ? JSON.parse(profile.interests) : [];
     const userInterests = userProfile?.interests ? JSON.parse(userProfile.interests) : [];
 
     // Calculate interest match score
     const sharedInterests = interests.filter((i: string) => userInterests.includes(i));
     const matchScore = sharedInterests.length;
+
+    // Calculate total recommendation score (mutual friends weighted more)
+    const recommendationScore = mutualFriendsCount * 3 + matchScore;
+
+    // Generate reason text
+    let reason = "";
+    if (mutualFriendsCount > 0) {
+      reason = `${mutualFriendsCount} mutual friend${mutualFriendsCount > 1 ? "s" : ""}`;
+    } else if (matchScore > 0) {
+      reason = "Similar interests";
+    } else {
+      reason = "New to Rejection Hero";
+    }
 
     return {
       id: profile.userId,
@@ -495,10 +545,57 @@ friendsRouter.get("/recommendations", async (c) => {
       sharedInterests,
       matchScore,
       location: profile.location,
+      mutualFriendsCount,
+      mutualFriends: mutualFriends.map((mf) => ({
+        displayName: mf.displayName,
+        avatar: mf.avatar,
+      })),
+      reason,
+      recommendationScore,
     };
-  }).sort((a, b) => b.matchScore - a.matchScore); // Sort by match score
+  }).sort((a, b) => b.recommendationScore - a.recommendationScore).slice(0, 10); // Sort by recommendation score and take top 10
 
   return c.json({ recommendations: users });
+});
+
+// ============================================
+// GET /api/friends/status/:userId - Get friendship status with a specific user
+// ============================================
+friendsRouter.get("/status/:userId", async (c) => {
+  const user = c.get("user");
+
+  if (!user) {
+    return c.json({ message: "Unauthorized" }, 401);
+  }
+
+  const otherUserId = c.req.param("userId");
+
+  // Check if friendship exists
+  const friendship = await db.friendship.findFirst({
+    where: {
+      OR: [
+        { initiatorId: user.id, receiverId: otherUserId },
+        { initiatorId: otherUserId, receiverId: user.id },
+      ],
+    },
+  });
+
+  if (!friendship) {
+    return c.json({ status: "NONE" });
+  }
+
+  // Determine status based on friendship state and who initiated
+  let status: "PENDING_SENT" | "PENDING_RECEIVED" | "FRIENDS" = "FRIENDS";
+  
+  if (friendship.status === "PENDING") {
+    if (friendship.initiatorId === user.id) {
+      status = "PENDING_SENT";
+    } else {
+      status = "PENDING_RECEIVED";
+    }
+  }
+
+  return c.json({ status, friendshipId: friendship.id });
 });
 
 export { friendsRouter };

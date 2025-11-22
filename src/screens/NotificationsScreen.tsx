@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, ScrollView, Pressable, ActivityIndicator, Image, RefreshControl } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
-import { ChevronLeft, Bell, Check, UserPlus, Users, X, TrendingUp, Trophy, Target } from "lucide-react-native";
+import { ChevronLeft, Bell, Check, UserPlus, Users, X, TrendingUp, Trophy, Target, CheckCircle, Video } from "lucide-react-native";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "@/navigation/types";
@@ -119,8 +119,24 @@ export default function NotificationsScreen({ navigation }: Props) {
     }
 
     // Handle navigation based on notification type
-    if (notification.type === "FRIEND_ACCEPTED") {
+    if (notification.type === "FRIEND_ACCEPTED" || notification.type === "FRIEND_REQUEST") {
       navigation.navigate("Friends");
+    } else if (notification.type === "FRIEND_STARTED_QUEST" || notification.type === "FRIEND_COMPLETED_QUEST") {
+      // Navigate to quest detail if questId is available
+      if (notification.data?.questId) {
+        // Try to navigate to quest detail - adjust route name as needed
+        navigation.navigate("Tabs", { screen: "HomeTab" });
+      } else {
+        navigation.navigate("Tabs", { screen: "HomeTab" });
+      }
+    } else if (notification.type === "FRIEND_WENT_LIVE") {
+      // Navigate to live stream if liveId is available
+      if (notification.data?.liveId) {
+        // Navigate to live stream - adjust route name as needed
+        navigation.navigate("Tabs", { screen: "CommunityTab" });
+      } else {
+        navigation.navigate("Tabs", { screen: "CommunityTab" });
+      }
     } else if (notification.type === "CONFIDENCE_LOW") {
       // Navigate to home to see quests
       navigation.navigate("Tabs", { screen: "HomeTab" });
@@ -139,9 +155,16 @@ export default function NotificationsScreen({ navigation }: Props) {
   const getNotificationIcon = (type: string) => {
     switch (type) {
       case "FRIEND_REQUEST":
+      case "FRIEND_REQUEST_RECEIVED":
         return <UserPlus size={24} color="#00D9FF" />;
       case "FRIEND_ACCEPTED":
         return <Users size={24} color="#4CAF50" />;
+      case "FRIEND_STARTED_QUEST":
+        return <Target size={24} color="#7E3FE4" />;
+      case "FRIEND_COMPLETED_QUEST":
+        return <CheckCircle size={24} color="#4CAF50" />;
+      case "FRIEND_WENT_LIVE":
+        return <Video size={24} color="#FF3B30" />;
       case "CONFIDENCE_LOW":
         return <TrendingUp size={24} color="#FF6B35" />;
       case "LEADERBOARD_FALL_BEHIND":

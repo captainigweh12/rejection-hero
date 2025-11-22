@@ -524,6 +524,18 @@ questsRouter.post("/:id/start", async (c) => {
     },
   });
 
+  // Notify friends that user started a quest
+  try {
+    const { notifyFriends } = await import("../services/friendNotifications");
+    await notifyFriends(user.id, "FRIEND_STARTED_QUEST", {
+      questId: userQuest.id,
+      questTitle: userQuest.quest.title,
+    });
+  } catch (error) {
+    console.error("Error notifying friends about quest start:", error);
+    // Continue even if notification fails
+  }
+
   // Send quest started reminder notification
   try {
     const { sendPushNotificationForNotification } = await import("../services/pushNotifications");
@@ -932,6 +944,18 @@ questsRouter.post("/:id/record", zValidator("json", recordQuestActionRequestSche
     // If completed, always award rewards (transparent system - no blocking)
     if (isCompleted) {
       await updateUserStats(user.id, userQuest.quest.xpReward, userQuest.quest.pointReward, userQuest.quest.difficulty);
+      
+      // Notify friends that user completed a quest
+      try {
+        const { notifyFriends } = await import("../services/friendNotifications");
+        await notifyFriends(user.id, "FRIEND_COMPLETED_QUEST", {
+          questId: updated.id,
+          questTitle: userQuest.quest.title,
+        });
+      } catch (error) {
+        console.error("Error notifying friends about quest completion:", error);
+        // Continue even if notification fails
+      }
       
       // Send quest completion notification with rewards
       try {
