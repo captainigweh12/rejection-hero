@@ -22,6 +22,9 @@ const envSchema = z.object({
   // Used for Better Auth and for Expo client access
   BACKEND_URL: z.url("BACKEND_URL must be a valid URL").default("http://localhost:3000"),
 
+  // Storage URL (for file uploads - R2 public URL)
+  STORAGE_URL: z.string().url("STORAGE_URL must be a valid URL").optional().default("https://storage.rejectionhero.com"),
+
   // Google OAuth Configuration
   GOOGLE_CLIENT_ID: z.string().optional(),
   GOOGLE_CLIENT_SECRET: z.string().optional(),

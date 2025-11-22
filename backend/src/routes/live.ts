@@ -216,12 +216,15 @@ live.post("/:id/end", async (c) => {
       update: {
         isLive: false,
         liveViewers: 0,
+        updatedAt: new Date(),
       },
       create: {
+        id: crypto.randomUUID(), // Required field
         userId: user.id,
         displayName: user.name || user.email || "User",
         isLive: false,
         liveViewers: 0,
+        updatedAt: new Date(), // Required field
       },
     });
 

@@ -142,16 +142,23 @@ profileRouter.post("/", zValidator("json", updateProfileRequestSchema), async (c
   const photosJson = data.photos ? JSON.stringify(data.photos) : undefined;
   const interestsJson = data.interests ? JSON.stringify(data.interests) : undefined;
 
-  // Normalize avatar URL - remove sandbox.dev if present, use production URL
+  // Normalize avatar URL - use storage domain (storage.rejectionhero.com) for all file URLs
   let normalizedAvatar = data.avatar;
   if (normalizedAvatar && typeof normalizedAvatar === "string") {
-    // Replace sandbox.dev URLs with production URL
+    // Storage URL - use for all file uploads
+    const storageUrl = env.STORAGE_URL || process.env.STORAGE_URL || "https://storage.rejectionhero.com";
+    
+    // Replace sandbox.dev URLs with storage URL
     if (normalizedAvatar.includes("sandbox.dev")) {
-      normalizedAvatar = normalizedAvatar.replace(/https?:\/\/[^\/]+\.sandbox\.dev/, env.BACKEND_URL || "https://api.rejectionhero.com");
+      normalizedAvatar = normalizedAvatar.replace(/https?:\/\/[^\/]+\.sandbox\.dev/, storageUrl);
     }
-    // If it's a relative path, convert to absolute using production URL
+    // Replace api.rejectionhero.com with storage.rejectionhero.com for uploads
+    if (normalizedAvatar.includes("api.rejectionhero.com")) {
+      normalizedAvatar = normalizedAvatar.replace(/https?:\/\/api\.rejectionhero\.com/, storageUrl);
+    }
+    // If it's a relative path, convert to absolute using storage URL
     if (normalizedAvatar.startsWith("/")) {
-      normalizedAvatar = `${env.BACKEND_URL || "https://api.rejectionhero.com"}${normalizedAvatar}`;
+      normalizedAvatar = `${storageUrl}${normalizedAvatar}`;
     }
   }
 
@@ -175,6 +182,7 @@ profileRouter.post("/", zValidator("json", updateProfileRequestSchema), async (c
       onboardingCompleted: data.onboardingCompleted ?? false,
       challengeDuration: data.challengeDuration,
       questMode: data.questMode,
+      updatedAt: new Date(), // Required field
     },
     update: {
       username: data.username,
@@ -239,13 +247,17 @@ profileRouter.post("/generate-avatar", zValidator("json", generateAvatarRequestS
   const data = c.req.valid("json");
 
   // Check if OpenAI API key is configured
+  // Try multiple sources: env.OPENAI_API_KEY, process.env.OPENAI_API_KEY, or process.env.EXPO_PUBLIC_VIBECODE_OPENAI_API_KEY
+  const openaiApiKey = env.OPENAI_API_KEY || process.env.OPENAI_API_KEY || process.env.EXPO_PUBLIC_VIBECODE_OPENAI_API_KEY;
+  
   console.log("🔑 Checking OpenAI API key...");
   console.log("  env.OPENAI_API_KEY exists:", !!env.OPENAI_API_KEY);
-  console.log("  env.OPENAI_API_KEY length:", env.OPENAI_API_KEY?.length);
   console.log("  process.env.OPENAI_API_KEY exists:", !!process.env.OPENAI_API_KEY);
-  console.log("  All env keys:", Object.keys(env));
+  console.log("  process.env.EXPO_PUBLIC_VIBECODE_OPENAI_API_KEY exists:", !!process.env.EXPO_PUBLIC_VIBECODE_OPENAI_API_KEY);
+  console.log("  Final openaiApiKey exists:", !!openaiApiKey);
+  console.log("  Final openaiApiKey length:", openaiApiKey?.length);
 
-  if (!env.OPENAI_API_KEY) {
+  if (!openaiApiKey) {
     return c.json({
       success: false,
       avatarUrl: "",
@@ -291,7 +303,7 @@ profileRouter.post("/generate-avatar", zValidator("json", generateAvatarRequestS
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${env.OPENAI_API_KEY}`,
+        Authorization: `Bearer ${openaiApiKey}`,
       },
       body: JSON.stringify({
         model: "dall-e-3",
@@ -347,12 +359,13 @@ profileRouter.post("/generate-avatar", zValidator("json", generateAvatarRequestS
       const uniqueFilename = `avatar-${randomUUID()}.png`;
       const filePath = path.join(UPLOADS_DIR, uniqueFilename);
 
-      // Save file to disk
+      // Save file to disk (temporary - will be moved to R2 if configured)
       fs.writeFileSync(filePath, imageBuffer);
       console.log("💾 Avatar saved to server:", filePath);
 
-      // Return server URL instead of DALL-E URL
-      const serverAvatarUrl = `/uploads/${uniqueFilename}`;
+      // Use storage URL (storage.rejectionhero.com) for all file URLs
+      const storageUrl = env.STORAGE_URL || process.env.STORAGE_URL || "https://storage.rejectionhero.com";
+      const serverAvatarUrl = `${storageUrl}/uploads/${uniqueFilename}`;
       console.log("✅ Avatar URL saved:", serverAvatarUrl);
 
       return c.json({
