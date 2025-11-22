@@ -70,6 +70,10 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
 
   const userQuest = questsData?.activeQuests.find((q) => q.id === currentUserQuestId) ||
                     questsData?.queuedQuests.find((q) => q.id === currentUserQuestId);
+  
+  // Check if quest is active (only active quests can record actions)
+  // Active quests are in activeQuests array, queued quests are in queuedQuests array
+  const isQuestActive = !!questsData?.activeQuests.find((q) => q.id === currentUserQuestId);
 
   // Request location permission on mount
   useEffect(() => {
@@ -197,11 +201,20 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
       const code = error?.response?.data?.code || error?.code;
       const message = error?.response?.data?.message || error?.message;
       
+      // Handle quest not active error
+      if (code === "QUEST_NOT_ACTIVE") {
+        Alert.alert(
+          "Activate quest first",
+          "Move this quest to your Active list before logging a YES/NO result."
+        );
+        return;
+      }
+      
       // Handle specific error codes
       if (code === "TOO_FREQUENT_SUBMISSIONS" || message?.toLowerCase().includes("too frequent") || message?.toLowerCase().includes("slow down")) {
         Alert.alert(
-          "Slow down 😅",
-          "You're submitting No's too frequently. Go out and actually do the quest, then record your result."
+          "Too fast 😅",
+          "You're submitting NOs too frequently. Go out and actually do the quest, then log your result."
         );
         return;
       }
@@ -209,19 +222,24 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
       // Handle 429 (Too Many Requests) status code
       if (error?.status === 429 || error?.response?.status === 429) {
         Alert.alert(
-          "Slow down 😅",
-          "You're submitting quest actions too frequently. Go out and actually do the quest, then record your result."
+          "Too fast 😅",
+          "You're submitting NOs too frequently. Go out and actually do the quest, then log your result."
         );
         return;
       }
       
       // Fallback error message
       Alert.alert(
-        "Something went wrong",
-        message || "We couldn't submit this quest action. Please try again in a moment."
+        "Couldn't record action",
+        message || "Please try again in a moment."
       );
     },
     onSuccess: async (data) => {
+      // Update local quest state with response data
+      if (data.currentNos !== undefined && data.targetNos !== undefined) {
+        // Invalidate queries to refresh quest data
+        await queryClient.invalidateQueries({ queryKey: ["quests"] });
+      }
       // Refetch quests and stats immediately to update counts
       await queryClient.refetchQueries({ queryKey: ["quests"] });
       await queryClient.refetchQueries({ queryKey: ["stats"] });
@@ -1193,8 +1211,17 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
           {quest.goalType === "TAKE_ACTION" ? (
             /* Action Star Button for TAKE_ACTION quests */
             <Pressable
-              onPress={() => recordMutation.mutate({ action: "ACTION" })}
-              disabled={recordMutation.isPending}
+              onPress={() => {
+                if (!isQuestActive) {
+                  Alert.alert(
+                    "Activate quest first",
+                    "Move this quest to your Active list before logging an action."
+                  );
+                  return;
+                }
+                recordMutation.mutate({ action: "ACTION" });
+              }}
+              disabled={recordMutation.isPending || !isQuestActive}
               style={{
                 paddingVertical: 20,
                 borderRadius: 24,
@@ -1235,8 +1262,17 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
             <View style={{ flexDirection: "row", gap: 12 }}>
               {/* YES Button */}
               <Pressable
-                onPress={() => recordMutation.mutate({ action: "YES" })}
-                disabled={recordMutation.isPending}
+                onPress={() => {
+                  if (!isQuestActive) {
+                    Alert.alert(
+                      "Activate quest first",
+                      "Move this quest to your Active list before logging a YES."
+                    );
+                    return;
+                  }
+                  recordMutation.mutate({ action: "YES" });
+                }}
+                disabled={recordMutation.isPending || !isQuestActive}
                 style={{
                   flex: 1,
                   paddingVertical: 20,
@@ -1269,8 +1305,17 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
 
               {/* NO Button */}
               <Pressable
-                onPress={() => recordMutation.mutate({ action: "NO" })}
-                disabled={recordMutation.isPending}
+                onPress={() => {
+                  if (!isQuestActive) {
+                    Alert.alert(
+                      "Activate quest first",
+                      "Move this quest to your Active list before logging a NO."
+                    );
+                    return;
+                  }
+                  recordMutation.mutate({ action: "NO" });
+                }}
+                disabled={recordMutation.isPending || !isQuestActive}
                 style={{
                   flex: 1,
                   paddingVertical: 20,

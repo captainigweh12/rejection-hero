@@ -147,18 +147,46 @@ export default function HomeScreen({ navigation }: Props) {
 
   const activeQuests = questsData?.activeQuests || [];
   const queuedQuests = questsData?.queuedQuests || [];
+  const MAX_ACTIVE_QUESTS = 2; // Maximum active quests allowed
+
+  // State for activation modal
+  const [showActivationModal, setShowActivationModal] = useState(false);
+  const [selectedQueuedQuest, setSelectedQueuedQuest] = useState<string | null>(null);
+
+  // Activate quest mutation
+  const activateQuestMutation = useMutation({
+    mutationFn: async (userQuestId: string) => {
+      return api.post(`/api/quests/${userQuestId}/start`, {});
+    },
+    onSuccess: async (_, userQuestId) => {
+      await queryClient.invalidateQueries({ queryKey: ["quests"] });
+      setShowActivationModal(false);
+      setSelectedQueuedQuest(null);
+      Alert.alert("Success", "Quest moved to Active. You can now log YES/NO results.");
+      // Navigate to the newly activated quest
+      navigation.navigate("QuestDetail", { userQuestId });
+    },
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || error?.message || "Failed to activate quest";
+      Alert.alert("Error", message);
+    },
+  });
 
   // Swap quest mutation
   const swapQuestMutation = useMutation({
     mutationFn: async (data: SwapQuestRequest) => {
       return api.post<SwapQuestResponse>("/api/quests/swap", data);
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["quests"] });
-      Alert.alert("Success", "Quests swapped successfully!");
+    onSuccess: async (_, variables) => {
+      await queryClient.invalidateQueries({ queryKey: ["quests"] });
+      setShowActivationModal(false);
+      setSelectedQueuedQuest(null);
+      Alert.alert("Success", "Quest swapped and activated. You can now log YES/NO results.");
+      // Navigate to the newly activated quest
+      navigation.navigate("QuestDetail", { userQuestId: variables.queuedQuestId });
     },
     onError: (error: any) => {
-      const errorMessage = error?.message || error?.toString() || "Failed to swap quests";
+      const errorMessage = error?.response?.data?.message || error?.message || error?.toString() || "Failed to swap quests";
       Alert.alert("Error", errorMessage);
     },
   });
@@ -1192,15 +1220,25 @@ export default function HomeScreen({ navigation }: Props) {
                 <Pressable
                   key={userQuest.id}
                   onPress={() => {
-                    // Allow user to start queued quest if they have less than 2 active quests
-                    if (activeQuests.length < 2) {
-                      navigation.navigate("QuestDetail", { userQuestId: userQuest.id });
-                    } else {
+                    // If user has fewer than max active quests, show activation confirmation
+                    if (activeQuests.length < MAX_ACTIVE_QUESTS) {
                       Alert.alert(
-                        "Quest Queue",
-                        "You already have 2 active quests. Complete one to start this queued quest.",
-                        [{ text: "OK" }]
+                        "Move to Active?",
+                        "Move this quest from your queue into Active quests so you can log YES/NO results.",
+                        [
+                          { text: "Cancel", style: "cancel" },
+                          {
+                            text: "Move to Active",
+                            onPress: () => {
+                              activateQuestMutation.mutate(userQuest.id);
+                            },
+                          },
+                        ]
                       );
+                    } else {
+                      // Show swap modal with active quests
+                      setSelectedQueuedQuest(userQuest.id);
+                      setShowActivationModal(true);
                     }
                   }}
                   style={{
@@ -2198,6 +2236,122 @@ export default function HomeScreen({ navigation }: Props) {
           </Pressable>
         </Modal>
       )}
+
+      {/* Swap Quest Modal */}
+      <Modal
+        visible={showActivationModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => {
+          setShowActivationModal(false);
+          setSelectedQueuedQuest(null);
+        }}
+      >
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            justifyContent: "center",
+            alignItems: "center",
+            padding: 20,
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: colors.card,
+              borderRadius: 20,
+              padding: 24,
+              width: "100%",
+              maxWidth: 400,
+              borderWidth: 1,
+              borderColor: colors.cardBorder,
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 20,
+                fontWeight: "bold",
+                color: colors.text,
+                marginBottom: 8,
+              }}
+            >
+              Swap Quest
+            </Text>
+            <Text
+              style={{
+                fontSize: 14,
+                color: colors.textSecondary,
+                marginBottom: 20,
+              }}
+            >
+              You already have {MAX_ACTIVE_QUESTS} active quests. Choose one to replace with this quest.
+            </Text>
+
+            <ScrollView style={{ maxHeight: 300, marginBottom: 20 }}>
+              {activeQuests.map((activeQuest) => (
+                <Pressable
+                  key={activeQuest.id}
+                  onPress={() => {
+                    if (selectedQueuedQuest) {
+                      swapQuestMutation.mutate({
+                        activeQuestId: activeQuest.id,
+                        queuedQuestId: selectedQueuedQuest,
+                      });
+                      setShowActivationModal(false);
+                      setSelectedQueuedQuest(null);
+                    }
+                  }}
+                  style={{
+                    padding: 16,
+                    borderRadius: 12,
+                    backgroundColor: colors.surface,
+                    marginBottom: 12,
+                    borderWidth: 1,
+                    borderColor: colors.cardBorder,
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      fontWeight: "600",
+                      color: colors.text,
+                      marginBottom: 4,
+                    }}
+                  >
+                    {activeQuest.quest.title}
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: 12,
+                      color: colors.textSecondary,
+                    }}
+                  >
+                    {activeQuest.quest.category} • {activeQuest.quest.difficulty}
+                  </Text>
+                </Pressable>
+              ))}
+            </ScrollView>
+
+            <View style={{ flexDirection: "row", gap: 12 }}>
+              <Pressable
+                onPress={() => {
+                  setShowActivationModal(false);
+                  setSelectedQueuedQuest(null);
+                }}
+                style={{
+                  flex: 1,
+                  paddingVertical: 12,
+                  borderRadius: 12,
+                  backgroundColor: colors.surface,
+                  alignItems: "center",
+                }}
+              >
+                <Text style={{ color: colors.text, fontWeight: "600" }}>Cancel</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }

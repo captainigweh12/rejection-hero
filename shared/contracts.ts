@@ -321,6 +321,9 @@ export const recordQuestActionResponseSchema = z.object({
   noCount: z.number(),
   yesCount: z.number(),
   actionCount: z.number(),
+  currentNos: z.number().optional(), // Current count based on goal type (for UI display)
+  targetNos: z.number().optional(),   // Target count (for UI display)
+  status: z.enum(["ACTIVE", "COMPLETED", "QUEUED", "EXPIRED"]).optional(), // Updated quest status
   suspicious: z.boolean().optional(),
   flagged: z.boolean().optional(),
   warning: z.string().optional(),
