@@ -282,7 +282,14 @@ function AuthWrapper() {
       try {
         const response = await api.get("/api/profile");
         return response as { onboardingCompleted?: boolean; ageVerified?: boolean; age?: number };
-      } catch (error) {
+      } catch (error: any) {
+        // Don't log 401 errors as errors - they're expected when users aren't authenticated
+        if (error?.status === 401 || error?.message?.includes("Unauthorized")) {
+          // 401 is expected - user is not authenticated, interceptor will handle it
+          // Return default profile silently
+          return { onboardingCompleted: false, ageVerified: false };
+        }
+        // Log other errors
         console.error("🔐 [AuthWrapper] Error fetching profile:", error);
         // Return default profile if fetch fails (assume onboarding not completed)
         return { onboardingCompleted: false, ageVerified: false };

@@ -7,22 +7,88 @@ $ prisma generate
 Environment variables loaded from .env
 Prisma schema loaded from prisma/schema.prisma
 
-✔ Generated Prisma Client (v6.17.1) to ./generated/prisma in 668ms
+✔ Generated Prisma Client (v6.17.1) to ./generated/prisma in 378ms
 
 Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
 
-Tip: Want to turn off tips and other hints? https://pris.ly/tip-4-nohints
+Tip: Need your database queries to be 1000x faster? Accelerate offers you that and more: https://pris.ly/tip-2-accelerate
 
 
-Checked 900 installs across 818 packages (no changes) [2.96s]
+Checked 900 installs across 818 packages (no changes) [2.36s]
 Starting server in dev mode with hot reload...
 $ NODE_ENV=development bun run --hot src/index.ts
-error: Cannot find module '@/shared/contracts' from '/home/user/workspace/backend/src/routes/auth.ts'
-error: Cannot find module '@/shared/contracts' from '/home/user/workspace/backend/src/routes/stats.ts'
-error: Cannot find module '@/shared/contracts' from '/home/user/workspace/backend/src/routes/stats.ts'
-error: Cannot find module '@/shared/contracts' from '/home/user/workspace/backend/src/routes/profile.ts'
-error: Cannot find module '@/shared/contracts' from '/home/user/workspace/backend/src/routes/profile.ts'
-error: Cannot find module '@/shared/contracts' from '/home/user/workspace/backend/src/routes/auth.ts'
-error: Cannot find module '@/shared/contracts' from '/home/user/workspace/backend/src/routes/auth.ts'
-error: Cannot find module '@/shared/contracts' from '/home/user/workspace/backend/src/routes/swipe.ts'
-error: Cannot find module '@/shared/contracts' from '/home/user/workspace/backend/src/routes/stats.ts'
+Failed to find Response internal state key
+🚀 [ENV] PRODUCTION MODE: Forcing BACKEND_URL to https://api.rejectionhero.com
+📝 [ENV] Overriding https://preview-bhveolgljyyi.share.sandbox.dev → https://api.rejectionhero.com
+✅ Environment variables validated successfully
+🔍 OPENAI_API_KEY from process.env: EXISTS
+🔍 OPENAI_API_KEY in parsed: EXISTS
+🌐 [ENV] Final BACKEND_URL: https://api.rejectionhero.com
+🔐 [Auth] Initializing Better Auth...
+🔍 [Auth] Testing database connection...
+✅ [Auth] Google OAuth credentials configured
+🔑 [Auth] Google Client ID: 94427138884-cc2db90q...
+📊 [Auth] Database provider: postgresql
+📊 [Auth] DATABASE_URL: postgresql://neondb_owner:npg_...
+✅ [Auth] Better Auth initialized
+🔗 [Auth] Base URL: https://api.rejectionhero.com
+🌐 [Auth] Trusted origins: vibecode://, http://localhost:3000, http://localhost:8081, https://api.rejectionhero.com
+🔑 [Auth] Google OAuth: Enabled ✅
+🔗 [Auth] Google OAuth Redirect URI: https://api.rejectionhero.com/api/auth/callback/google
+✅ [Auth] OAuth redirect URI is using production URL: https://api.rejectionhero.com/api/auth/callback/google
+⚠️  [Auth] IMPORTANT: Make sure this URL is added to Google Cloud Console OAuth credentials!
+⚠️  [Auth] Go to: https://console.cloud.google.com/apis/credentials
+⚠️  [Auth] Add to "Authorized redirect URIs": https://api.rejectionhero.com/api/auth/callback/google
+🔐 [Auth] Session expires in: 7 days
+📁 [Upload] Uploads directory exists: /home/user/workspace/backend/uploads
+📜 [Policies] Router initialized. __dirname: /home/user/workspace/backend/src/routes
+🔧 Initializing Hono application...
+🔐 Mounting custom password reset routes at /api/auth
+🔐 Mounting Better Auth handler at /api/auth/*
+📁 Serving static files from uploads/ directory
+📤 Mounting upload routes at /api/upload
+📝 Mounting sample routes at /api/sample
+👤 Mounting profile routes at /api/profile
+🔍 Mounting discover routes at /api/discover
+👆 Mounting swipe routes at /api/swipe
+💕 Mounting matches routes at /api/matches
+🎯 Mounting quests routes at /api/quests
+🏆 Mounting challenges routes at /api/challenges
+📊 Mounting stats routes at /api/stats
+📹 Mounting live routes at /api/live
+👥 Mounting friends routes at /api/friends
+💬 Mounting messages routes at /api/messages
+🏘️  Mounting groups routes at /api/groups
+🎯 Mounting group quests routes at /api/group-quests
+📹 Mounting group live routes at /api/group-live
+🎁 Mounting shared quests routes at /api/shared-quests
+✅ Mounting quest verification routes at /api/quest-verification
+🛡️ Mounting moderation routes at /api/moderation
+📓 Mounting journal routes at /api/journal
+📝 Mounting posts routes at /api/posts
+⏰ Mounting moments routes at /api/moments
+🔔 Mounting notifications routes at /api/notifications
+📧 Mounting GoHighLevel routes at /api/gohighlevel
+🎫 Mounting support routes at /api/support
+📁 Mounting categories routes at /api/categories
+🎤 Mounting audio routes at /api/audio
+💳 Mounting payments routes at /api/payments
+💳 Mounting payment redirect routes at root level
+📜 Mounting policies routes at /api/policies
+👑 Mounting admin routes at /api/admin
+🐛 Mounting bug report routes at /api/bug-reports
+🌐 Mounting web redirect routes
+⚙️  Starting server...
+46 |     }
+47 |   }
+48 |   let er;
+49 |   if (args.length > 0)
+50 |     er = args[0];
+51 |     throw er;
+                 ^
+error: Failed to start server. Is port 3000 in use?
+      at emitError (node:_http_server:554:13)
+✅ [Auth] Database connection successful
+✅ [Auth] User table accessible
+✅ [Auth] Account table accessible
+✅ [Auth] Session table accessible
