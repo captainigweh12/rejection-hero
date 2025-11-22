@@ -112,12 +112,12 @@ if (!env.DATABASE_URL || (!env.DATABASE_URL.startsWith("postgresql://") && !env.
   throw new Error("DATABASE_URL is invalid");
 }
 
-console.log(`📊 [Auth] Database provider: ${env.DATABASE_PROVIDER || "sqlite"}`);
+console.log(`📊 [Auth] Database provider: ${env.DATABASE_PROVIDER || "postgresql"}`);
 console.log(`📊 [Auth] DATABASE_URL: ${env.DATABASE_URL.substring(0, 30)}...`);
 
 export const auth = betterAuth({
   database: prismaAdapter(db, {
-    provider: env.DATABASE_PROVIDER || "sqlite",
+    provider: env.DATABASE_PROVIDER || "postgresql",
   }),
   secret: env.BETTER_AUTH_SECRET,
   baseURL: env.BACKEND_URL,

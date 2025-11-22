@@ -10,8 +10,11 @@ const envSchema = z.object({
   NODE_ENV: z.string().optional(),
 
   // Database Configuration
+  // For production (Render), DATABASE_URL should be PostgreSQL connection string
+  // For local development, can use SQLite: file:./prisma/dev.db
   DATABASE_URL: z.string().min(1, "DATABASE_URL is required").default("file:./prisma/dev.db"),
-  DATABASE_PROVIDER: z.enum(["sqlite", "postgresql"]).optional().default("sqlite"),
+  // Default to postgresql for production compatibility (Render uses PostgreSQL)
+  DATABASE_PROVIDER: z.enum(["sqlite", "postgresql"]).optional().default("postgresql"),
 
   // Better Auth Configuration
   BETTER_AUTH_SECRET: z.string().min(32, "BETTER_AUTH_SECRET must be at least 32 characters"),

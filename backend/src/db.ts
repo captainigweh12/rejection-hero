@@ -1,5 +1,5 @@
 // IMPORTANT: DO NOT MODIFY THIS FILE AT ALL
-// This file is used to initialize the Prisma client and the SQLite database.
+// This file is used to initialize the Prisma client and the database (PostgreSQL/SQLite).
 // ============================================
 // Prisma Database Client
 // ============================================
