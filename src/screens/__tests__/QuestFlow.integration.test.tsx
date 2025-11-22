@@ -34,13 +34,16 @@ const createTestWrapper = () => {
     },
   });
 
-  return ({ children }: { children: React.ReactNode }) => (
+  const TestWrapper = ({ children }: { children: React.ReactNode }) => (
     <QueryClientProvider client={queryClient}>
       <NavigationContainer>
         {children}
       </NavigationContainer>
     </QueryClientProvider>
   );
+
+  TestWrapper.displayName = "TestWrapper";
+  return TestWrapper;
 };
 
 describe('Quest Completion Flow Integration', () => {

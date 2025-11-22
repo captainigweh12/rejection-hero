@@ -44,6 +44,10 @@ jobs:
     name: Build Android
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    # Note: EXPO_TOKEN must be set in GitHub repository secrets for EAS builds to work
+    # Generate token at https://expo.dev/accounts/[your-account]/settings/access-tokens
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -77,6 +81,10 @@ jobs:
     name: Build iOS
     runs-on: macos-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    # Note: EXPO_TOKEN must be set in GitHub repository secrets for EAS builds to work
+    # Generate token at https://expo.dev/accounts/[your-account]/settings/access-tokens
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
