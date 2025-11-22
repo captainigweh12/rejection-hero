@@ -26,7 +26,26 @@
 
 ## 🔧 Recent Updates
 
-### ✅ Fixed Google OAuth Redirect URI - No More sandbox.dev! (Latest)
+### ✅ Fixed Notification Settings Black Screen (Latest)
+- **Issue**: Black screen when navigating from Profile → Settings → Manage Notifications
+- **Root Cause**: NotificationSettingsScreen was using Nativewind classes on `LinearGradient` component, which doesn't support Nativewind styling
+- **Problem**:
+  - `<LinearGradient className="flex-1">` doesn't render properly
+  - Missing outer `View` wrapper with background color
+  - Inconsistent SafeArea configuration
+- **Fix Applied**:
+  - ✅ Replaced all Nativewind classes with inline styles throughout the screen
+  - ✅ Added proper View wrapper with `backgroundColor: colors.backgroundSolid`
+  - ✅ Fixed LinearGradient to use `style={{ flex: 1 }}` instead of `className="flex-1"`
+  - ✅ Converted all header, ScrollView, and content styling to inline styles
+  - ✅ Applied same pattern to loading and error states
+- **Result**:
+  - ✅ Notification Settings screen now displays correctly
+  - ✅ Consistent with other screens in the app (ProfileScreen, SettingsScreen)
+  - ✅ Proper gradient background and theme colors applied
+- **Location**: `src/screens/NotificationSettingsScreen.tsx:190-293`
+
+### ✅ Fixed Google OAuth Redirect URI - No More sandbox.dev!
 - **Issue**: Google OAuth was redirecting to sandbox.dev instead of production domain
 - **Root Cause**: Vibecode's reverse proxy was overriding `BACKEND_URL` and `EXPO_PUBLIC_VIBECODE_BACKEND_URL` with sandbox.dev URL at runtime
 - **Solution**: Added sandbox.dev detection and override in frontend auth client and API client
