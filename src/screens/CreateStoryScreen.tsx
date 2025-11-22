@@ -3,6 +3,7 @@ import {
   View,
   Text,
   TouchableOpacity,
+  Pressable,
   Image,
   TextInput,
   Alert,
@@ -274,14 +275,19 @@ export default function CreateStoryScreen({ route, navigation }: Props) {
               backgroundColor: colors.backgroundSolid,
             }}
           >
-          <TouchableOpacity onPress={handleClose}>
+          <Pressable
+            onPress={handleClose}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            style={{ padding: 8 }}
+          >
             <X size={24} color={colors.text} />
-          </TouchableOpacity>
+          </Pressable>
           <Text style={{ fontSize: 18, fontWeight: "700", color: colors.text }}>Create Story</Text>
-          <TouchableOpacity
+          <Pressable
             testID="share-story-button"
             onPress={handleShareStory}
             disabled={!selectedMedia || isUploading || createStoryMutation.isPending}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             style={{
               paddingHorizontal: 16,
               paddingVertical: 6,
@@ -298,7 +304,7 @@ export default function CreateStoryScreen({ route, navigation }: Props) {
             ) : (
               <Send size={18} color={colors.text} />
             )}
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         <KeyboardAvoidingView

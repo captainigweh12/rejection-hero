@@ -126,75 +126,83 @@ friendsRouter.post("/request", zValidator("json", sendRequestSchema), async (c) 
 
   const { userId } = c.req.valid("json");
 
-  // Check if user is trying to add themselves
-  if (userId === user.id) {
-    return c.json({ message: "You cannot add yourself as a friend" }, 400);
-  }
-
-  // Check if user is blocked
-  const isBlocked = await isUserBlocked(user.id, userId);
-  const hasBlockedYou = await isUserBlocked(userId, user.id);
-
-  if (isBlocked || hasBlockedYou) {
-    return c.json({ message: "Cannot send friend request to blocked user" }, 403);
-  }
-
-  // Check if friendship already exists
-  const existing = await db.friendship.findFirst({
-    where: {
-      OR: [
-        { initiatorId: user.id, receiverId: userId },
-        { initiatorId: userId, receiverId: user.id },
-      ],
-    },
-  });
-
-  if (existing) {
-    return c.json({ message: "Friendship already exists or request already sent" }, 400);
-  }
-
-  // Create new friend request
-  const friendship = await db.friendship.create({
-    data: {
-      initiatorId: user.id,
-      receiverId: userId,
-      status: "PENDING",
-    },
-  });
-
-  // Get sender's profile for notification
-  const senderProfile = await db.profile.findUnique({
-    where: { userId: user.id },
-  });
-
-  // Create notification for the receiver and send push notification
-  const notification = await db.notification.create({
-    data: {
-      id: randomUUID(),
-      userId: userId,
-      senderId: user.id,
-      type: "FRIEND_REQUEST",
-      title: "New Friend Request",
-      message: `${senderProfile?.displayName || user.email?.split("@")[0] || "Someone"} sent you a friend request`,
-      data: JSON.stringify({ friendshipId: friendship.id }),
-    },
-  });
-
-  // Send push notification
   try {
-    const { sendPushNotificationForNotification } = await import("../services/pushNotifications");
-    await sendPushNotificationForNotification(
-      userId,
-      notification.title,
-      notification.message,
-      JSON.parse(notification.data || "{}")
-    );
-  } catch (error) {
-    console.error("Error sending push notification for friend request:", error);
-    // Continue even if push notification fails
-  }
+    // Check if user is trying to add themselves
+    if (userId === user.id) {
+      return c.json({ message: "You cannot add yourself as a friend" }, 400);
+    }
 
-  return c.json({ success: true, friendshipId: friendship.id });
+    // Check if user is blocked
+    const isBlocked = await isUserBlocked(user.id, userId);
+    const hasBlockedYou = await isUserBlocked(userId, user.id);
+
+    if (isBlocked || hasBlockedYou) {
+      return c.json({ message: "Cannot send friend request to blocked user" }, 403);
+    }
+
+    // Check if friendship already exists
+    const existing = await db.friendship.findFirst({
+      where: {
+        OR: [
+          { initiatorId: user.id, receiverId: userId },
+          { initiatorId: userId, receiverId: user.id },
+        ],
+      },
+    });
+
+    if (existing) {
+      return c.json({ message: "Friendship already exists or request already sent" }, 400);
+    }
+
+    // Create new friend request
+    const friendship = await db.friendship.create({
+      data: {
+        initiatorId: user.id,
+        receiverId: userId,
+        status: "PENDING",
+      },
+    });
+    console.log(`✅ [Friends] Friend request created from ${user.id} to ${userId}`);
+
+    // Get sender's profile for notification
+    const senderProfile = await db.profile.findUnique({
+      where: { userId: user.id },
+    });
+
+    // Create notification for the receiver and send push notification
+    const notification = await db.notification.create({
+      data: {
+        id: randomUUID(),
+        userId: userId,
+        senderId: user.id,
+        type: "FRIEND_REQUEST",
+        title: "New Friend Request",
+        message: `${senderProfile?.displayName || user.email?.split("@")[0] || "Someone"} sent you a friend request`,
+        data: JSON.stringify({ friendshipId: friendship.id }),
+      },
+    });
+    console.log(`✅ [Friends] Notification created for friend request`);
+
+    // Send push notification
+    try {
+      const { sendPushNotificationForNotification } = await import("../services/pushNotifications");
+      await sendPushNotificationForNotification(
+        userId,
+        notification.title,
+        notification.message,
+        JSON.parse(notification.data || "{}")
+      );
+    } catch (error) {
+      console.error("Error sending push notification for friend request:", error);
+      // Continue even if push notification fails
+    }
+
+    return c.json({ success: true, friendshipId: friendship.id });
+  } catch (error) {
+    console.error(`❌ [Friends] Error creating friend request:`, error);
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    return c.json({ message: `Failed to send friend request: ${errorMessage}` }, 500);
+  }
 });
 
 // ============================================

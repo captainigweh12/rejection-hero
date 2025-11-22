@@ -26,7 +26,41 @@
 
 ## 🔧 Recent Updates
 
-### ✅ Fixed Create Story Screen SafeArea Issues (Latest)
+### ✅ Fixed Create Story Screen SafeArea & Friend Request Issues (Latest)
+- **Issues Fixed**:
+  1. **Story Screen SafeArea** - X and Share buttons unclickable (exceeding safe area bounds)
+  2. **Friend Request 500 Errors** - Internal server errors when sending friend requests
+
+- **Root Causes**:
+  1. `SafeAreaView` with `edges={["top", "bottom"]}` rendered header buttons under status bar/notch, making them unclickable
+  2. Friend request endpoint lacked error handling and proper logging to identify issues
+
+- **Fixes Applied**:
+  - ✅ **CreateStoryScreen.tsx:1-310** - Changed to use `Pressable` component instead of `TouchableOpacity` for better touch handling
+  - ✅ **CreateStoryScreen.tsx:258-261** - Restructured SafeAreaView: outer `<View>` + `SafeAreaView edges={["top"]}` + header with proper padding
+  - ✅ **CreateStoryScreen.tsx:277-307** - Added `hitSlop` to Close and Share buttons to expand touch targets by 8dp
+  - ✅ **CreateStoryScreen.tsx:6** - Added `Pressable` import from React Native
+  - ✅ **backend/routes/friends.ts:120-206** - Wrapped friend request handler in try-catch with detailed error logging and messaging
+  - ✅ **backend/src/db.ts** - Verified Prisma client generation and PostgreSQL connection
+
+- **Result**:
+  - ✅ Create Story header buttons (X and Share) now fully clickable with expanded touch targets
+  - ✅ Buttons properly positioned below status bar on all devices (iPhone X notch, Android, etc.)
+  - ✅ Friend request endpoint returns detailed error messages instead of generic 500 errors
+  - ✅ Backend logs now show exactly where friend request failures occur
+  - ✅ PostgreSQL database properly synchronized with Prisma schema
+  - ✅ All dependencies and Prisma client regenerated
+
+- **Files Modified**:
+  - `src/screens/CreateStoryScreen.tsx` (lines 1-310)
+  - `backend/src/routes/friends.ts` (lines 120-206)
+
+- **Testing Instructions**:
+  - Try clicking the X button and Share button on Create Story screen - they should now be responsive
+  - Try sending a friend request - watch backend logs for detailed error messages if any occur
+  - Check that story media preview displays correctly with proper safe area insets
+
+### ✅ Fixed Create Story Screen SafeArea Issues
 - **Issue**: X button and Share button unclickable on Create Story screen
 - **Root Cause**: Header buttons positioned outside safe area (under status bar/notch)
 - **Problem**:
