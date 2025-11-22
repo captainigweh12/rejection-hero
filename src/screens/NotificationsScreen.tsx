@@ -269,6 +269,104 @@ export default function NotificationsScreen({ navigation }: Props) {
               {formatTime(notification.createdAt)}
             </Text>
 
+            {/* CTA Buttons for various notification types */}
+            {(notification.type === "FRIEND_STARTED_QUEST" || notification.type === "FRIEND_COMPLETED_QUEST") && notification.data?.questId && (
+              <Pressable
+                onPress={() => {
+                  if (notification.data?.userQuestId && notification.data?.userId) {
+                    navigation.navigate("FriendQuestView", {
+                      userQuestId: notification.data.userQuestId,
+                      userId: notification.data.userId,
+                    });
+                  }
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                }}
+                style={{
+                  marginTop: 12,
+                  backgroundColor: colors.primary + "33",
+                  borderRadius: 12,
+                  paddingVertical: 10,
+                  alignItems: "center",
+                  borderWidth: 1,
+                  borderColor: colors.primary + "4D",
+                }}
+              >
+                <Text style={{ color: colors.primary, fontWeight: "600", fontSize: 14 }}>View Quest</Text>
+              </Pressable>
+            )}
+
+            {notification.type === "FRIEND_WENT_LIVE" && (
+              <Pressable
+                onPress={() => {
+                  navigation.navigate("Tabs", { screen: "LiveTab" });
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                }}
+                style={{
+                  marginTop: 12,
+                  backgroundColor: "#FF3B30" + "33",
+                  borderRadius: 12,
+                  paddingVertical: 10,
+                  alignItems: "center",
+                  borderWidth: 1,
+                  borderColor: "#FF3B30" + "4D",
+                }}
+              >
+                <Text style={{ color: "#FF3B30", fontWeight: "600", fontSize: 14 }}>Join Live</Text>
+              </Pressable>
+            )}
+
+            {(notification.type === "GROUP_POST_CREATED" || notification.type === "GROUP_QUEST_STARTED" || notification.type === "GROUP_QUEST_COMPLETED") && notification.data?.groupId && (
+              <Pressable
+                onPress={() => {
+                  if (notification.type === "GROUP_POST_CREATED") {
+                    navigation.navigate("GroupDetail", { groupId: notification.data.groupId });
+                  } else {
+                    navigation.navigate("GroupQuests", {
+                      groupId: notification.data.groupId,
+                      groupName: notification.data.groupName || "Group",
+                    });
+                  }
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                }}
+                style={{
+                  marginTop: 12,
+                  backgroundColor: colors.primary + "33",
+                  borderRadius: 12,
+                  paddingVertical: 10,
+                  alignItems: "center",
+                  borderWidth: 1,
+                  borderColor: colors.primary + "4D",
+                }}
+              >
+                <Text style={{ color: colors.primary, fontWeight: "600", fontSize: 14 }}>
+                  {notification.type === "GROUP_POST_CREATED" ? "View Post" : "View Quest"}
+                </Text>
+              </Pressable>
+            )}
+
+            {(notification.type === "GROUP_LIVE_STARTED" || notification.type === "GROUP_CALL_STARTED") && notification.data?.groupId && (
+              <Pressable
+                onPress={() => {
+                  navigation.navigate("GroupLive", {
+                    groupId: notification.data.groupId,
+                    groupName: notification.data.groupName || "Group",
+                  });
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                }}
+                style={{
+                  marginTop: 12,
+                  backgroundColor: "#FF3B30" + "33",
+                  borderRadius: 12,
+                  paddingVertical: 10,
+                  alignItems: "center",
+                  borderWidth: 1,
+                  borderColor: "#FF3B30" + "4D",
+                }}
+              >
+                <Text style={{ color: "#FF3B30", fontWeight: "600", fontSize: 14 }}>Join Now</Text>
+              </Pressable>
+            )}
+
             {/* Friend Request Actions */}
             {isFriendRequest && notification.data?.friendshipId && (
               <View style={{ flexDirection: "row", gap: 8, marginTop: 12 }}>
