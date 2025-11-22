@@ -91,35 +91,52 @@ SYNC_RESULT=$?
 echo ""
 if [ $SYNC_RESULT -eq 0 ]; then
   echo "✅ Database schema sync completed successfully"
-  echo "🔍 Verifying critical tables were created..."
+  echo "🔍 Verifying critical tables exist..."
   
-  # Check for user_quest table
-  TABLE_CHECK=$(echo "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'user_quest';" | bunx prisma db execute --url "$SCHEMA_SYNC_URL" --stdin 2>&1 || echo "")
-  if echo "$TABLE_CHECK" | grep -q "[1-9]"; then
-    echo "✅ user_quest table exists"
-  else
-    echo "⚠️  user_quest table not found in database"
-    echo "   This may indicate the schema sync did not complete properly"
-  fi
+  # Since Prisma says "already in sync", we trust that the tables exist
+  # But we verify by attempting direct queries (most reliable method)
+  VERIFICATION_FAILED=0
   
-  # Check for user_stats table
-  STATS_CHECK=$(echo "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'user_stats';" | bunx prisma db execute --url "$SCHEMA_SYNC_URL" --stdin 2>&1 || echo "")
-  if echo "$STATS_CHECK" | grep -q "[1-9]"; then
-    echo "✅ user_stats table exists"
-  else
-    echo "⚠️  user_stats table not found in database"
-    echo "   This may indicate the schema sync did not complete properly"
-  fi
-  
-  # Check for user table (basic table)
-  USER_CHECK=$(echo "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'user';" | bunx prisma db execute --url "$SCHEMA_SYNC_URL" --stdin 2>&1 || echo "")
-  if echo "$USER_CHECK" | grep -q "[1-9]"; then
-    echo "✅ user table exists"
-  else
+  # Check for user table (CRITICAL - must exist)
+  echo "   Verifying user table..."
+  USER_CHECK=$(echo 'SELECT 1 FROM "user" LIMIT 1;' | bunx prisma db execute --url "$SCHEMA_SYNC_URL" --stdin 2>&1)
+  if echo "$USER_CHECK" | grep -qiE "error|does not exist|relation.*does not exist|cannot find|not found"; then
     echo "❌ CRITICAL: user table not found!"
-    echo "   Schema sync appears to have failed"
+    echo "   Error: $(echo "$USER_CHECK" | grep -iE "error|does not exist" | head -1)"
+    echo "   Full output: $(echo "$USER_CHECK" | head -5)"
+    VERIFICATION_FAILED=1
+  else
+    echo "✅ user table verified"
+  fi
+  
+  # Check for user_stats table (should exist but not critical for startup)
+  echo "   Verifying user_stats table..."
+  STATS_CHECK=$(echo 'SELECT 1 FROM "user_stats" LIMIT 1;' | bunx prisma db execute --url "$SCHEMA_SYNC_URL" --stdin 2>&1)
+  if echo "$STATS_CHECK" | grep -qiE "error|does not exist|relation.*does not exist|cannot find|not found"; then
+    echo "⚠️  user_stats table not found (will be created on first user action)"
+  else
+    echo "✅ user_stats table verified"
+  fi
+  
+  # Check for user_quest table (should exist but not critical for startup)
+  echo "   Verifying user_quest table..."
+  QUEST_CHECK=$(echo 'SELECT 1 FROM "user_quest" LIMIT 1;' | bunx prisma db execute --url "$SCHEMA_SYNC_URL" --stdin 2>&1)
+  if echo "$QUEST_CHECK" | grep -qiE "error|does not exist|relation.*does not exist|cannot find|not found"; then
+    echo "⚠️  user_quest table not found (will be created on first quest action)"
+  else
+    echo "✅ user_quest table verified"
+  fi
+  
+  # Only exit if critical table (user) is missing
+  if [ $VERIFICATION_FAILED -eq 1 ]; then
+    echo ""
+    echo "❌ Schema verification failed!"
+    echo "   The user table is required for the application to function"
+    echo "   Please check the database connection and schema sync logs above"
     exit 1
   fi
+  
+  echo "✅ All critical tables verified"
 else
   echo "❌ Database schema sync failed!"
   echo "❌ Exit code: $SYNC_RESULT"
