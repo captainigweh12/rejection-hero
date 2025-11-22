@@ -126,11 +126,26 @@ const fetchFn = async <T>(path: string, options: FetchOptions): Promise<T> => {
     // The response is cast to the expected type T for type safety
     return response.json() as Promise<T>;
   } catch (error: any) {
-    // Enhanced error logging for debugging - but skip 400/403/500 errors (validation/subscription/server errors)
+    // Check for bad gateway (502) errors - backend server is down or unreachable
+    const is502Error = error.status === 502 || error.message?.includes('bad gateway');
+    
+    // Enhanced error logging for debugging - but skip 400/403/500/502 errors (validation/subscription/server errors)
     // These are handled gracefully by the app, so we don't want red error screens
     const is400Error = error.status === 400;
     const is403Error = error.status === 403;
     const is500Error = error.status === 500;
+    
+    if (is502Error) {
+      // Log 502 errors non-disruptively - backend is likely down or unreachable
+      console.warn(`[API Warning] ${method} ${path}: Backend server unreachable (502 Bad Gateway). The server may be down or the URL is incorrect.`);
+      // Create a more user-friendly error message
+      const gatewayError: any = new Error(`Backend server is temporarily unavailable. Please try again in a moment.`);
+      gatewayError.status = 502;
+      gatewayError.isGatewayError = true;
+      gatewayError.originalError = error;
+      throw gatewayError;
+    }
+    
     if (!is400Error && !is403Error && !is500Error) {
       console.error(`[API Error] ${method} ${path}:`, error);
     } else {
@@ -147,6 +162,12 @@ const fetchFn = async <T>(path: string, options: FetchOptions): Promise<T> => {
         // This is a DNS/hostname resolution error - likely temporary
         // The error will be caught by React Query retry logic
         throw new Error(`Connection error: Unable to reach the server. Retrying...`);
+      }
+      if (error.message.includes('bad gateway')) {
+        const gatewayError: any = new Error(`Backend server is temporarily unavailable. Please try again in a moment.`);
+        gatewayError.status = 502;
+        gatewayError.isGatewayError = true;
+        throw gatewayError;
       }
     }
 

@@ -179,6 +179,17 @@ export default function AddJournalModal({ visible, onClose, onSuccess }: AddJour
       setCurrentStep(3);
     } catch (err: any) {
       console.error("Text processing error:", err);
+      
+      // Handle bad gateway errors specifically
+      if (err?.status === 502 || err?.isGatewayError || err?.message?.includes("bad gateway")) {
+        Alert.alert(
+          "Server Unavailable",
+          "The backend server is temporarily unavailable. Please check your connection and try again in a moment.",
+          [{ text: "OK" }]
+        );
+        return;
+      }
+      
       const errorMessage = err?.response?.data?.message || err?.message || "Failed to process text";
       Alert.alert("Error", errorMessage);
     } finally {
