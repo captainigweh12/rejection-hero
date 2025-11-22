@@ -7,8 +7,7 @@ generator client {
 datasource db {
   // PostgreSQL for production (Render uses PostgreSQL)
   // For local SQLite development, change provider to "sqlite" and DATABASE_URL to "file:./dev.db"
-  // Using SQLite for local development - change to postgresql for production
-  provider  = "sqlite"
+  provider  = "postgresql"
   url       = env("DATABASE_URL")
   // directUrl is optional - use DIRECT_URL env var if provided (for connection pooling)
   // Commented out by default - uncomment if DIRECT_URL is set in production
