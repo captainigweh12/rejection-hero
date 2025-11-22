@@ -114,10 +114,11 @@ app.on(["GET", "POST"], "/api/auth/*", async (c) => {
         // Clone request to read body without consuming it
         const clonedRequest = c.req.raw.clone();
         const body = await clonedRequest.json().catch(() => null);
-        if (body) {
-          console.log(`   Email: ${body.email || "not provided"}`);
-          console.log(`   Name: ${body.name || "not provided"}`);
-          console.log(`   Password: ${body.password ? "***" : "not provided"}`);
+        if (body && typeof body === "object") {
+          const bodyObj = body as Record<string, unknown>;
+          console.log(`   Email: ${bodyObj.email || "not provided"}`);
+          console.log(`   Name: ${bodyObj.name || "not provided"}`);
+          console.log(`   Password: ${bodyObj.password ? "***" : "not provided"}`);
         } else {
           console.log(`   Body: Unable to parse (might be FormData or already consumed)`);
         }
@@ -414,8 +415,12 @@ app.get("/", (c) => {
 });
 
 // Handle favicon requests silently (reduce log noise from browser requests)
-app.get("/favicon.ico", (c) => c.status(204));
-app.get("/favicon.png", (c) => c.status(204));
+app.get("/favicon.ico", (c) => {
+  return c.status(204);
+});
+app.get("/favicon.png", (c) => {
+  return c.status(204);
+});
 
 // Health check endpoint
 // Used by load balancers and monitoring tools to verify service is running
