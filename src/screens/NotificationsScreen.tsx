@@ -187,6 +187,15 @@ export default function NotificationsScreen({ navigation }: Props) {
         return <CheckCircle size={24} color="#4CAF50" />;
       case "FRIEND_WENT_LIVE":
         return <Video size={24} color="#FF3B30" />;
+      case "GROUP_POST_CREATED":
+        return <Users size={24} color="#7E3FE4" />;
+      case "GROUP_QUEST_STARTED":
+        return <Target size={24} color="#7E3FE4" />;
+      case "GROUP_QUEST_COMPLETED":
+        return <CheckCircle size={24} color="#4CAF50" />;
+      case "GROUP_LIVE_STARTED":
+      case "GROUP_CALL_STARTED":
+        return <Video size={24} color="#FF3B30" />;
       case "CONFIDENCE_LOW":
         return <TrendingUp size={24} color="#FF6B35" />;
       case "LEADERBOARD_FALL_BEHIND":
