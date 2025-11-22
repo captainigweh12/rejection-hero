@@ -10,8 +10,9 @@ RUN apt-get update && \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy shared directory into backend (so it shares node_modules)
-COPY shared ./backend/shared
+# Copy shared directory to workspace root (matches local development structure)
+# This allows @/shared/* path alias to work correctly (points to ../shared/* from backend)
+COPY shared ./shared
 
 # Copy backend package.json and prisma schema
 COPY backend/package.json ./backend/
@@ -29,7 +30,7 @@ RUN bun run postinstall
 
 # Verify shared directory and tsconfig are in place
 RUN echo "🔍 Verifying project structure..." && \
-    ls -la /app/backend/shared/contracts.ts && \
+    ls -la /app/shared/contracts.ts && \
     cat /app/backend/tsconfig.json | grep -A 2 '"paths"' && \
     echo "✅ Project structure verified"
 

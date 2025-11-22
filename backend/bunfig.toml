@@ -2,4 +2,4 @@
 baseUrl = "."
 
 [compilerOptions.paths]
-"@/shared/*" = ["../shared/*"]
+"@/shared/*" = ["./shared/*"]
