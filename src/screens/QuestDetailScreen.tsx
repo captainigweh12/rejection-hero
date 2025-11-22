@@ -190,6 +190,37 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
         data
       );
     },
+    onError: (error: any) => {
+      console.error("completeQuest error", error);
+      
+      // Extract error code and message from backend response
+      const code = error?.response?.data?.code || error?.code;
+      const message = error?.response?.data?.message || error?.message;
+      
+      // Handle specific error codes
+      if (code === "TOO_FREQUENT_SUBMISSIONS" || message?.toLowerCase().includes("too frequent") || message?.toLowerCase().includes("slow down")) {
+        Alert.alert(
+          "Slow down 😅",
+          "You're submitting No's too frequently. Go out and actually do the quest, then record your result."
+        );
+        return;
+      }
+      
+      // Handle 429 (Too Many Requests) status code
+      if (error?.status === 429 || error?.response?.status === 429) {
+        Alert.alert(
+          "Slow down 😅",
+          "You're submitting quest actions too frequently. Go out and actually do the quest, then record your result."
+        );
+        return;
+      }
+      
+      // Fallback error message
+      Alert.alert(
+        "Something went wrong",
+        message || "We couldn't submit this quest action. Please try again in a moment."
+      );
+    },
     onSuccess: async (data) => {
       // Refetch quests and stats immediately to update counts
       await queryClient.refetchQueries({ queryKey: ["quests"] });

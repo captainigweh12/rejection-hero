@@ -47,59 +47,115 @@ export default function CreateStoryScreen({ navigation }: Props) {
   }, []);
 
   const handlePickFromGallery = async (mediaType: "image" | "video") => {
-    // Use MediaType (replaces deprecated MediaTypeOptions in expo-image-picker ~16.1.4)
-    const mediaTypes = mediaType === "image" 
-      ? ImagePicker.MediaType.Images 
-      : ImagePicker.MediaType.Videos;
-    
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes,
-      quality: 0.8,
-      allowsEditing: true,
-      aspect: [9, 16], // Story aspect ratio
-    });
+    try {
+      // 1. Ask for permission
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert(
+          "Permission needed",
+          "We need access to your photos to let you upload a story."
+        );
+        return;
+      }
 
-    if (!result.canceled && result.assets[0]) {
-      setSelectedMedia({ uri: result.assets[0].uri, type: mediaType });
+      // 2. Correct mediaTypes enum (MediaTypeOptions, not MediaType)
+      const mediaTypes =
+        mediaType === "image"
+          ? ImagePicker.MediaTypeOptions.Images
+          : ImagePicker.MediaTypeOptions.Videos;
+
+      // 3. Launch picker
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes,
+        allowsEditing: true,
+        quality: 0.8,
+        aspect: [9, 16], // Story aspect ratio
+      });
+
+      // 4. User cancelled
+      if (result.canceled) {
+        return;
+      }
+
+      // 5. Use first asset
+      const asset = result.assets[0];
+      if (asset) {
+        setSelectedMedia({
+          uri: asset.uri,
+          type: mediaType,
+        });
+      }
+    } catch (err) {
+      console.error("handlePickFromGallery error", err);
+      Alert.alert(
+        "Upload error",
+        "Something went wrong while picking media. Please try again."
+      );
     }
   };
 
   const handleTakePhoto = async () => {
-    const { status } = await ImagePicker.requestCameraPermissionsAsync();
-    if (status !== "granted") {
-      Alert.alert("Permission Required", "Camera permission is required to take photos.");
-      return;
-    }
+    try {
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert("Permission Required", "Camera permission is required to take photos.");
+        return;
+      }
 
-    const result = await ImagePicker.launchCameraAsync({
-      mediaTypes: ImagePicker.MediaType.Images,
-      quality: 0.8,
-      allowsEditing: true,
-      aspect: [9, 16],
-    });
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        quality: 0.8,
+        allowsEditing: true,
+        aspect: [9, 16],
+      });
 
-    if (!result.canceled && result.assets[0]) {
-      setSelectedMedia({ uri: result.assets[0].uri, type: "image" });
+      if (result.canceled) {
+        return;
+      }
+
+      const asset = result.assets[0];
+      if (asset) {
+        setSelectedMedia({ uri: asset.uri, type: "image" });
+      }
+    } catch (err) {
+      console.error("handleTakePhoto error", err);
+      Alert.alert(
+        "Camera error",
+        "Something went wrong while taking a photo. Please try again."
+      );
     }
   };
 
   const handleRecordVideo = async () => {
-    const { status } = await ImagePicker.requestCameraPermissionsAsync();
-    if (status !== "granted") {
-      Alert.alert("Permission Required", "Camera permission is required to record videos.");
-      return;
-    }
+    try {
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert("Permission Required", "Camera permission is required to record videos.");
+        return;
+      }
 
-    const result = await ImagePicker.launchCameraAsync({
-      mediaTypes: ImagePicker.MediaType.Videos,
-      quality: 0.8,
-      allowsEditing: true,
-      aspect: [9, 16],
-      videoMaxDuration: 15, // 15 seconds max for stories
-    });
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Videos,
+        quality: 0.8,
+        allowsEditing: true,
+        aspect: [9, 16],
+        videoMaxDuration: 15, // 15 seconds max for stories
+      });
 
-    if (!result.canceled && result.assets[0]) {
-      setSelectedMedia({ uri: result.assets[0].uri, type: "video" });
+      if (result.canceled) {
+        return;
+      }
+
+      const asset = result.assets[0];
+      if (asset) {
+        setSelectedMedia({ uri: asset.uri, type: "video" });
+      }
+    } catch (err) {
+      console.error("handleRecordVideo error", err);
+      Alert.alert(
+        "Video recording error",
+        "Something went wrong while recording video. Please try again."
+      );
     }
   };
 
