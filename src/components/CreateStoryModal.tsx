@@ -35,7 +35,7 @@ export default function CreateStoryModal({
 
   const handlePickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaType.Images,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       quality: 0.8,
       allowsEditing: true,
     });
@@ -48,7 +48,7 @@ export default function CreateStoryModal({
 
   const handlePickVideo = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaType.Videos,
+      mediaTypes: ImagePicker.MediaTypeOptions.Videos,
       quality: 0.8,
       allowsEditing: true,
       videoMaxDuration: 60, // 60 seconds max
@@ -68,7 +68,7 @@ export default function CreateStoryModal({
     }
 
     const result = await ImagePicker.launchCameraAsync({
-      mediaTypes: ImagePicker.MediaType.Images,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       quality: 0.8,
       allowsEditing: true,
     });
@@ -87,15 +87,12 @@ export default function CreateStoryModal({
       return;
     }
 
-    // Request microphone permissions for video recording
-    const micStatus = await ImagePicker.requestMicrophonePermissionsAsync();
-    if (micStatus.status !== "granted") {
-      Alert.alert("Permission Required", "Microphone permission is required to record videos with audio.");
-      return;
-    }
+    // Note: Camera permission typically includes microphone access for video recording
+    // If separate microphone permission is needed, use expo-av Audio.requestPermissionsAsync()
+    // For now, camera permission is sufficient for video recording
 
     const result = await ImagePicker.launchCameraAsync({
-      mediaTypes: ImagePicker.MediaType.Videos,
+      mediaTypes: ImagePicker.MediaTypeOptions.Videos,
       quality: 0.8,
       allowsEditing: true,
       videoMaxDuration: 60, // 60 seconds max
@@ -232,7 +229,7 @@ export default function CreateStoryModal({
                           height: "100%",
                         }}
                         useNativeControls
-                        resizeMode="contain"
+                        resizeMode={ResizeMode.CONTAIN}
                         isLooping
                       />
                     </View>

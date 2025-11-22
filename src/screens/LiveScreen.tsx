@@ -385,11 +385,20 @@ export default function LiveScreen({ navigation }: Props) {
   };
 
   // Get active quest from stream or selected quest
+  // Ensure we always have a valid active quest with proper error handling
   const currentStream = streamsData?.streams.find((s) => s.id === currentStreamId);
   const streamQuestId = currentStream?.userQuest?.id;
-  const activeQuest = questsData?.activeQuests.find((uq) => {
+  const activeQuest = questsData?.activeQuests?.find((uq) => {
     return streamQuestId === uq.id || uq.id === selectedQuestId;
   });
+
+  // Validate active quest has required fields
+  const isValidActiveQuest = !!(
+    activeQuest && 
+    activeQuest.quest && 
+    activeQuest.quest.title && 
+    activeQuest.quest.goalCount !== undefined
+  );
 
   // Find the stream being viewed
   const viewingStream = streamsData?.streams.find((s) => s.id === viewingStreamId);
@@ -1134,37 +1143,39 @@ export default function LiveScreen({ navigation }: Props) {
             </Pressable>
 
             {/* Quest Info */}
-            <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 8, paddingRight: 32 }}>
-              <Text style={{ color: colors.text, fontSize: 11, fontWeight: "700", textTransform: "uppercase", letterSpacing: 1 }}>
-                {activeQuest.quest.category || "Quest"}
-              </Text>
-              <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-                <Text style={{ color: "white", fontSize: 10, fontWeight: "600" }}>
-                  {activeQuest.noCount || 0} / {activeQuest.quest.goalCount || 0}
-                </Text>
-                <View style={{ width: 40, height: 6, backgroundColor: "rgba(255, 255, 255, 0.3)", borderRadius: 3 }}>
-                  <View
-                    style={{
-                      width: `${Math.min(((activeQuest.noCount || 0) / (activeQuest.quest.goalCount || 1)) * 100, 100)}%`,
-                      height: "100%",
-                      backgroundColor: "#FFD700",
-                      borderRadius: 3,
-                    }}
-                  />
+            {activeQuest && activeQuest.quest && (
+              <>
+                <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 8, paddingRight: 32 }}>
+                  <Text style={{ color: colors.text, fontSize: 11, fontWeight: "700", textTransform: "uppercase", letterSpacing: 1 }}>
+                    {activeQuest.quest.category || "Quest"}
+                  </Text>
+                  <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+                    <Text style={{ color: "white", fontSize: 10, fontWeight: "600" }}>
+                      {activeQuest.noCount || 0} / {activeQuest.quest.goalCount || 0}
+                    </Text>
+                    <View style={{ width: 40, height: 6, backgroundColor: "rgba(255, 255, 255, 0.3)", borderRadius: 3 }}>
+                      <View
+                        style={{
+                          width: `${Math.min(((activeQuest.noCount || 0) / (activeQuest.quest.goalCount || 1)) * 100, 100)}%`,
+                          height: "100%",
+                          backgroundColor: "#FFD700",
+                          borderRadius: 3,
+                        }}
+                      />
+                    </View>
+                  </View>
                 </View>
-              </View>
-            </View>
-            
-            <Text style={{ color: "white", fontSize: 16, fontWeight: "bold", marginBottom: 6 }} numberOfLines={1}>
-              {activeQuest.quest.title || "Active Quest"}
-            </Text>
-            
-            <Text style={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 13, lineHeight: 18 }} numberOfLines={2}>
-              {activeQuest.quest.description || "Complete this quest to earn rewards!"}
-            </Text>
+                
+                <Text style={{ color: "white", fontSize: 16, fontWeight: "bold", marginBottom: 6 }} numberOfLines={1}>
+                  {activeQuest.quest.title || "Active Quest"}
+                </Text>
+                
+                <Text style={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 13, lineHeight: 18 }} numberOfLines={2}>
+                  {activeQuest.quest.description || "Complete this quest to earn rewards!"}
+                </Text>
 
-            {/* Interactive Yes/No Buttons - Only show for COLLECT_NOS or COLLECT_YES quests */}
-            {(activeQuest.quest.goalType === "COLLECT_NOS" || activeQuest.quest.goalType === "COLLECT_YES") && (
+                {/* Interactive Yes/No Buttons - Only show for COLLECT_NOS or COLLECT_YES quests */}
+                {(activeQuest.quest.goalType === "COLLECT_NOS" || activeQuest.quest.goalType === "COLLECT_YES") && (
               <View style={{ flexDirection: "row", gap: 8, marginTop: 12 }}>
                 <Pressable
                   onPress={() => {
@@ -1228,12 +1239,14 @@ export default function LiveScreen({ navigation }: Props) {
                   )}
                 </Pressable>
               </View>
-            )}
+                )}
 
-            {/* Helper text */}
-            <Text style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: 11, marginTop: 8, textAlign: "center" }}>
-              Tap target icon to toggle
-            </Text>
+                {/* Helper text */}
+                <Text style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: 11, marginTop: 8, textAlign: "center" }}>
+                  Tap target icon to toggle
+                </Text>
+              </>
+            )}
           </View>
         )}
 
