@@ -154,11 +154,13 @@ export default function HomeScreen({ navigation }: Props) {
       return api.post<SwapQuestResponse>("/api/quests/swap", data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["quests"] });
+      // Refetch quests to update the UI
+      refetchQuests();
       Alert.alert("Success", "Quests swapped successfully!");
     },
     onError: (error: any) => {
-      const errorMessage = error?.message || error?.toString() || "Failed to swap quests";
+      // Show the backend's error message if available
+      const errorMessage = error?.response?.data?.message || error?.message || "Failed to swap quests. Please try again.";
       Alert.alert("Error", errorMessage);
     },
   });
@@ -217,9 +219,15 @@ export default function HomeScreen({ navigation }: Props) {
         refetchQuests();
         Alert.alert("Success", `Generated ${response.newQuestCount} new quests!`);
       }
-    } catch (error) {
-      console.error("[HomeScreen] Refresh quests error:", error);
-      Alert.alert("Error", "Failed to refresh quests. Please try again.");
+    } catch (error: any) {
+      // Log the real error details for debugging
+      console.error("[HomeScreen] Refresh quests error raw:", error?.response?.data || error);
+      console.error("[HomeScreen] Refresh quests error status:", error?.status);
+      console.error("[HomeScreen] Refresh quests error message:", error?.message);
+      
+      // Show the backend's error message if available, otherwise show a fallback
+      const errorMessage = error?.response?.data?.message || error?.message || "Failed to refresh quests. Please try again.";
+      Alert.alert("Error", errorMessage);
     } finally {
       setIsRefreshingQuests(false);
     }
@@ -1188,18 +1196,64 @@ export default function HomeScreen({ navigation }: Props) {
             </View>
             {queuedQuests.map((userQuest, index) => {
               const quest = userQuest.quest;
+              // Filter active quests to only count user quests (not friend quests)
+              // The limit is 1 slot for user quests and 1 slot for friend quests
+              const activeUserQuests = activeQuests.filter((aq) => !aq.isFromFriend);
+              const MAX_ACTIVE_USER_QUESTS = 1;
+              
               return (
                 <Pressable
                   key={userQuest.id}
                   onPress={() => {
-                    // Allow user to start queued quest if they have less than 2 active quests
-                    if (activeQuests.length < 2) {
-                      navigation.navigate("QuestDetail", { userQuestId: userQuest.id });
-                    } else {
+                    // Handle queued quest tap: Move to Active or Swap with Active
+                    if (activeUserQuests.length < MAX_ACTIVE_USER_QUESTS) {
+                      // Show confirmation to move to active
                       Alert.alert(
-                        "Quest Queue",
-                        "You already have 2 active quests. Complete one to start this queued quest.",
-                        [{ text: "OK" }]
+                        "Move to Active?",
+                        "Move this quest from your queue into Active quests so you can log YES/NO results.",
+                        [
+                          { text: "Cancel", style: "cancel" },
+                          {
+                            text: "Move to Active",
+                            onPress: async () => {
+                              try {
+                                await api.post(`/api/quests/${userQuest.id}/start`, {});
+                                // Refetch quests to update the UI
+                                refetchQuests();
+                              } catch (error: any) {
+                                const errorMessage = error?.response?.data?.message || error?.message || "Failed to activate quest. Please try again.";
+                                Alert.alert("Error", errorMessage);
+                              }
+                            },
+                          },
+                        ]
+                      );
+                    } else {
+                      // Show swap modal with list of active quests
+                      const swapOptions: Array<{ text: string; onPress?: () => void; style?: "default" | "cancel" | "destructive" }> = activeUserQuests.map((aq) => ({
+                        text: aq.quest.title,
+                        onPress: () => {
+                          // Check if active quest has actions
+                          const hasActions = aq.noCount > 0 || aq.yesCount > 0 || aq.actionCount > 0;
+                          if (hasActions) {
+                            Alert.alert(
+                              "Cannot Swap",
+                              "This quest has already been started (you've recorded actions). Complete it first before swapping.",
+                              [{ text: "OK" }]
+                            );
+                          } else {
+                            swapQuestMutation.mutate({
+                              activeQuestId: aq.id,
+                              queuedQuestId: userQuest.id,
+                            });
+                          }
+                        },
+                      }));
+                      swapOptions.push({ text: "Cancel", style: "cancel" });
+                      Alert.alert(
+                        "Active quest limit reached",
+                        "You already have the maximum number of active quests. Choose one to replace with this quest.",
+                        swapOptions
                       );
                     }
                   }}
@@ -1298,7 +1352,7 @@ export default function HomeScreen({ navigation }: Props) {
                     </View>
                   </View>
 
-                  {activeQuests.length < 2 ? (
+                  {activeUserQuests.length < MAX_ACTIVE_USER_QUESTS ? (
                     <View
                       style={{
                         marginTop: 12,
@@ -1308,14 +1362,14 @@ export default function HomeScreen({ navigation }: Props) {
                       }}
                     >
                       <Text style={{ color: "#00D9FF", fontSize: 12, textAlign: "center" }}>
-                        Tap to start this quest
+                        Tap to move to Active
                       </Text>
                     </View>
                   ) : (
                     <Pressable
                       onPress={() => {
-                        // Show swap options
-                        const swapOptions: Array<{ text: string; onPress?: () => void; style?: "default" | "cancel" | "destructive" }> = activeQuests.map((aq) => ({
+                        // Show swap options with only user quests (not friend quests)
+                        const swapOptions: Array<{ text: string; onPress?: () => void; style?: "default" | "cancel" | "destructive" }> = activeUserQuests.map((aq) => ({
                           text: aq.quest.title,
                           onPress: () => {
                             // Check if active quest has actions
@@ -1336,8 +1390,8 @@ export default function HomeScreen({ navigation }: Props) {
                         }));
                         swapOptions.push({ text: "Cancel", style: "cancel" });
                         Alert.alert(
-                          "Swap Quest",
-                          "Choose an active quest to swap with this queued quest:",
+                          "Active quest limit reached",
+                          "You already have the maximum number of active quests. Choose one to replace with this quest.",
                           swapOptions
                         );
                       }}

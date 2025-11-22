@@ -70,6 +70,9 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
 
   const userQuest = questsData?.activeQuests.find((q) => q.id === currentUserQuestId) ||
                     questsData?.queuedQuests.find((q) => q.id === currentUserQuestId);
+  
+  // Check if quest is queued (not active)
+  const isQueuedQuest = questsData?.queuedQuests.some((q) => q.id === currentUserQuestId) || false;
 
   // Request location permission on mount
   useEffect(() => {
@@ -1112,8 +1115,18 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
           {quest.goalType === "TAKE_ACTION" ? (
             /* Action Star Button for TAKE_ACTION quests */
             <Pressable
-              onPress={() => recordMutation.mutate({ action: "ACTION" })}
-              disabled={recordMutation.isPending}
+              onPress={() => {
+                if (isQueuedQuest) {
+                  Alert.alert(
+                    "Activate quest first",
+                    "Move this quest to your Active list before logging an action.",
+                    [{ text: "OK" }]
+                  );
+                  return;
+                }
+                recordMutation.mutate({ action: "ACTION" });
+              }}
+              disabled={recordMutation.isPending || isQueuedQuest}
               style={{
                 paddingVertical: 20,
                 borderRadius: 24,
@@ -1154,8 +1167,18 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
             <View style={{ flexDirection: "row", gap: 12 }}>
               {/* YES Button */}
               <Pressable
-                onPress={() => recordMutation.mutate({ action: "YES" })}
-                disabled={recordMutation.isPending}
+                onPress={() => {
+                  if (isQueuedQuest) {
+                    Alert.alert(
+                      "Activate quest first",
+                      "Move this quest to your Active list before logging a YES or NO.",
+                      [{ text: "OK" }]
+                    );
+                    return;
+                  }
+                  recordMutation.mutate({ action: "YES" });
+                }}
+                disabled={recordMutation.isPending || isQueuedQuest}
                 style={{
                   flex: 1,
                   paddingVertical: 20,
@@ -1188,8 +1211,18 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
 
               {/* NO Button */}
               <Pressable
-                onPress={() => recordMutation.mutate({ action: "NO" })}
-                disabled={recordMutation.isPending}
+                onPress={() => {
+                  if (isQueuedQuest) {
+                    Alert.alert(
+                      "Activate quest first",
+                      "Move this quest to your Active list before logging a YES or NO.",
+                      [{ text: "OK" }]
+                    );
+                    return;
+                  }
+                  recordMutation.mutate({ action: "NO" });
+                }}
+                disabled={recordMutation.isPending || isQueuedQuest}
                 style={{
                   flex: 1,
                   paddingVertical: 20,

@@ -76,6 +76,7 @@ questsRouter.get("/", async (c) => {
     status: uq.status,
     startedAt: uq.startedAt?.toISOString() || null,
     badges: badgesMap[uq.id] || { silver: false, gold: false, bronze: false, blue: false },
+    isFromFriend: uq.isFromFriend || false,
   }));
 
   const queuedQuests = userQuests
@@ -438,9 +439,18 @@ questsRouter.post("/refresh-all", zValidator("json", refreshAllQuestsRequestSche
       quests: newQuests,
     } satisfies RefreshAllQuestsResponse);
   } catch (error) {
+    // Log detailed error information for debugging
     console.error("Error refreshing quests:", error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorStack = error instanceof Error ? error.stack : undefined;
+    console.error("Error details:", { message: errorMessage, stack: errorStack });
+    
+    // Return detailed error message to help with debugging
     return c.json(
-      { message: "Failed to generate quests. Please try again." },
+      { 
+        message: errorMessage || "Failed to generate quests. Please try again.",
+        error: errorMessage,
+      },
       500
     );
   }

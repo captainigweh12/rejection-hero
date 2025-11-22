@@ -233,6 +233,7 @@ export const getUserQuestsResponseSchema = z.object({
       status: z.string(),
       startedAt: z.string().nullable(),
       badges: questBadgesSchema.optional(),
+      isFromFriend: z.boolean().optional(),
     })
   ),
   queuedQuests: z.array(
