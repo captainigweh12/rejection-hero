@@ -14,7 +14,7 @@ import {
 } from "react-native";
 import { X, Camera, Image as ImageIcon, Video, VideoIcon } from "lucide-react-native";
 import * as ImagePicker from "expo-image-picker";
-import { Video as ExpoVideo } from "expo-av";
+import { Video as ExpoVideo, ResizeMode } from "expo-av";
 
 interface CreateStoryModalProps {
   visible: boolean;
