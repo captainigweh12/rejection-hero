@@ -79,5 +79,7 @@ backend/generated/
 backend/uploads/
 
 # Bun
+# Note: bun.lock (text format) is tracked in git for reproducible builds
+# bun.lockb (binary format) is ignored if generated
 bun.lockb
 

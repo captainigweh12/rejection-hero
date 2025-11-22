@@ -2231,6 +2231,34 @@ Running automatically:
 - **Backend**: Port 3000 (Hono)
 - **Database Studio**: Port 3001 (Prisma Studio - CLOUD tab)
 
+### Dependency Management
+
+This project uses **Bun** for package management. The lockfile (`bun.lock`) is tracked in git to ensure reproducible builds.
+
+**When adding or updating dependencies:**
+
+```bash
+# Install new package
+bun add <package-name>
+
+# Update existing package
+bun add <package-name>@latest
+
+# After any dependency changes, commit the lockfile
+git add bun.lock package.json
+git commit -m "chore: update dependencies"
+```
+
+**Important Notes:**
+- Always commit `bun.lock` after dependency changes
+- The lockfile ensures CI builds use the exact same dependency versions
+- CI uses `bun run ci:install` which gracefully handles lockfile updates
+- If you see lockfile conflicts, run `bun install` and commit the updated `bun.lock`
+
+**Monorepo Structure:**
+- Root: `bun.lock` (main app dependencies)
+- Backend: `backend/bun.lock` (backend-specific dependencies)
+
 ## Setup
 
 See `ENV_SETUP.md` for complete environment variable setup guide.
