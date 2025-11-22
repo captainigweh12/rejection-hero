@@ -19,7 +19,7 @@ jobs:
         with:
           node-version: '20'
           # Note: Project uses bun, not npm. Cache disabled to avoid lockfile requirement.
-          # bun.lockb is used for dependency locking instead of package-lock.json
+          # bun.lock (text format) is used for dependency locking instead of package-lock.json
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
