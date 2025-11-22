@@ -42,12 +42,71 @@ export type RootStackParamList = {
   ParentalGuidanceSettings: undefined;
   ReportBug: undefined;
   FriendQuestView: { userQuestId: string; userId: string };
-  CreateStory: undefined;
+  CreateStory: { initialCaption?: string } | undefined;
+  QuestComplete: {
+    questData: {
+      questTitle: string;
+      questCategory: string;
+      xpEarned: number;
+      pointsEarned: number;
+      noCount: number;
+      yesCount: number;
+      actionCount: number;
+    };
+    onContinue: () => void;
+  };
+  QuestStreak: {
+    streakData: {
+      currentStreak: number;
+      previousStreak: number;
+      streakIncreased: boolean;
+    };
+    onContinue: () => void;
+  };
+  QuestWeeklyAchievements: {
+    weeklyData: {
+      achievements: Array<{
+        id: string;
+        title: string;
+        description: string;
+        progress: number;
+        target: number;
+        icon: "trophy" | "target" | "award" | "star";
+        completed: boolean;
+      }>;
+      weeklyNoCount: number;
+      weeklyQuestCount: number;
+    };
+    onContinue: () => void;
+  };
+  QuestLeaderboardPosition: {
+    leaderboardData: {
+      currentRank: number;
+      previousRank: number;
+      rankChanged: boolean;
+      rankDirection: "up" | "down" | "same";
+      totalXP: number;
+      totalPoints: number;
+    };
+    onContinue: () => void;
+  };
+  QuestCelebrationFinal: {
+    celebrationSummary: {
+      questTitle: string;
+      xpEarned: number;
+      pointsEarned: number;
+      streak: number;
+      rank: number;
+      rankChange?: number;
+    };
+    onShareToStory: () => void;
+    onShareAsPost: () => void;
+  };
 };
 
 export type BottomTabParamList = {
   HomeTab: undefined;
-  SwipeTab: undefined;
+  SwipeTab: { initialPostContent?: string } | undefined;
   MatchesTab: undefined;
   LiveTab: undefined;
   JournalTab: undefined;

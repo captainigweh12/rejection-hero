@@ -232,19 +232,50 @@ const api = {
 };
 
 /**
- * Upload image with authentication
- * Helper function for uploading images with FormData while maintaining authentication
+ * Upload image or video with authentication
+ * Helper function for uploading media with FormData while maintaining authentication
  */
-const uploadImage = async (imageUri: string, filename?: string): Promise<string> => {
+const uploadImage = async (mediaUri: string, filename?: string): Promise<string> => {
   const formData = new FormData();
-  const fileExtension = imageUri.split(".").pop() || "jpg";
-  const finalFilename = filename || `image.${fileExtension}`;
+  const fileExtension = mediaUri.split(".").pop() || "jpg";
+  const finalFilename = filename || `media.${fileExtension}`;
+  
+  // Determine mime type based on file extension
+  const isVideo = /\.(mp4|mov|avi|mkv|webm|m4v)$/i.test(finalFilename);
   const match = /\.(\w+)$/.exec(finalFilename);
-  const type = match ? `image/${match[1]}` : "image/jpeg";
+  let type: string;
+  
+  if (isVideo) {
+    // Video mime types
+    const videoTypes: Record<string, string> = {
+      mp4: "video/mp4",
+      mov: "video/quicktime",
+      avi: "video/x-msvideo",
+      mkv: "video/x-matroska",
+      webm: "video/webm",
+      m4v: "video/mp4",
+    };
+    type = match ? videoTypes[match[1].toLowerCase()] || "video/mp4" : "video/mp4";
+  } else {
+    // Image mime types
+    const imageTypes: Record<string, string> = {
+      jpg: "image/jpeg",
+      jpeg: "image/jpeg",
+      png: "image/png",
+      gif: "image/gif",
+      webp: "image/webp",
+    };
+    type = match ? imageTypes[match[1].toLowerCase()] || "image/jpeg" : "image/jpeg";
+  }
+
+  // Extract filename from URI if not provided
+  const fileName = finalFilename.includes("/") 
+    ? finalFilename.split("/").pop() || `media.${fileExtension}`
+    : finalFilename;
 
   formData.append("image", {
-    uri: imageUri,
-    name: finalFilename,
+    uri: mediaUri,
+    name: fileName,
     type,
   } as any);
 

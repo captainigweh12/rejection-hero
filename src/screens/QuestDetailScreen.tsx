@@ -19,6 +19,7 @@ import type {
   GenerateQuestResponse,
   GetLeaderboardResponse,
 } from "@/shared/contracts";
+import { generateStoryCaption, generatePostContent, getCategoryColor } from "@/utils/celebrationHelpers";
 
 type Props = RootStackScreenProps<"QuestDetail">;
 
@@ -198,66 +199,226 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
       await queryClient.refetchQueries({ queryKey: ["quests"] });
       await queryClient.refetchQueries({ queryKey: ["stats"] });
 
-      if (data.completed) {
+      if (data.completed && savedQuestData) {
         // Trigger success haptic feedback
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
         // Refresh leaderboard data
-        queryClient.invalidateQueries({ queryKey: ["leaderboard"] });
+        await queryClient.refetchQueries({ queryKey: ["leaderboard"] });
+        await queryClient.refetchQueries({ queryKey: ["stats"] });
 
-        // Show loading screen first
-        setShowLoading(true);
+        // Get updated stats and leaderboard
+        const updatedStats = await queryClient.fetchQuery<GetUserStatsResponse>({
+          queryKey: ["stats"],
+          queryFn: async () => api.get<GetUserStatsResponse>("/api/stats"),
+        });
 
-        // Start loading animation
-        Animated.loop(
-          Animated.sequence([
-            Animated.timing(loadingAnim, {
-              toValue: 1,
-              duration: 1000,
-              useNativeDriver: true,
-            }),
-            Animated.timing(loadingAnim, {
-              toValue: 0,
-              duration: 1000,
-              useNativeDriver: true,
-            }),
-          ])
-        ).start();
+        const updatedLeaderboard = await queryClient.fetchQuery<GetLeaderboardResponse>({
+          queryKey: ["leaderboard"],
+          queryFn: async () => api.get<GetLeaderboardResponse>("/api/stats/leaderboard"),
+        });
 
-        // After 2 seconds, show completion modal
-        setTimeout(() => {
-          setShowLoading(false);
-          setCompletionData(data);
-          setShowCompletion(true);
+        const quest = savedQuestData.quest;
+        const previousStreak = (statsData?.currentStreak || 0);
+        const currentStreak = (updatedStats?.currentStreak || 0);
+        const previousRank = leaderboardData?.currentUserRank || 999;
+        const currentRank = updatedLeaderboard?.currentUserRank || 999;
 
-          // Trigger celebration animation with bounce effect
-          Animated.spring(celebrationAnim, {
-            toValue: 1,
-            useNativeDriver: true,
-            tension: 40,
-            friction: 8,
-          }).start();
+        // Prepare celebration data
+        const celebrationData = {
+          questTitle: quest.title,
+          questCategory: quest.category,
+          xpEarned: quest.xpReward,
+          pointsEarned: quest.pointReward,
+          noCount: data.noCount,
+          yesCount: data.yesCount,
+          actionCount: data.actionCount,
+        };
 
-          // Initialize page transition animation
-          pageTransitionAnim.setValue(1);
+        // Navigate to QuestCompleteScreen
+        navigation.navigate("QuestComplete", {
+          questData: celebrationData,
+          onContinue: () => {
+            // Navigate to QuestStreakScreen if streak changed
+            if (currentStreak !== previousStreak) {
+              navigation.navigate("QuestStreak", {
+                streakData: {
+                  currentStreak,
+                  previousStreak,
+                  streakIncreased: currentStreak > previousStreak,
+                },
+                onContinue: () => {
+                  // Navigate to QuestWeeklyAchievementsScreen
+                  // For now, create a simple weekly achievements structure
+                  const weeklyAchievements = [
+                    {
+                      id: "weekly-nos",
+                      title: "Weekly NOs",
+                      description: "Collect NOs this week",
+                      progress: updatedStats?.easyZoneCount || 0,
+                      target: 10,
+                      icon: "target" as const,
+                      completed: (updatedStats?.easyZoneCount || 0) >= 10,
+                    },
+                    {
+                      id: "weekly-quests",
+                      title: "Weekly Quests",
+                      description: "Complete quests this week",
+                      progress: 1, // This would need to come from weekly stats
+                      target: 5,
+                      icon: "trophy" as const,
+                      completed: false,
+                    },
+                  ];
 
-          // Animate confetti particles
-          confettiAnims.forEach((anim, index) => {
-            anim.setValue(0);
-            Animated.timing(anim, {
-              toValue: 1,
-              duration: 2000 + Math.random() * 1000,
-              delay: index * 50,
-              useNativeDriver: true,
-            }).start();
-          });
+                  navigation.navigate("QuestWeeklyAchievements", {
+                    weeklyData: {
+                      achievements: weeklyAchievements,
+                      weeklyNoCount: updatedStats?.easyZoneCount || 0,
+                      weeklyQuestCount: 1,
+                    },
+                    onContinue: () => {
+                      // Navigate to QuestLeaderboardPositionScreen if rank changed
+                      if (currentRank !== previousRank) {
+                        navigation.navigate("QuestLeaderboardPosition", {
+                          leaderboardData: {
+                            currentRank,
+                            previousRank,
+                            rankChanged: true,
+                            rankDirection: currentRank < previousRank ? "up" : currentRank > previousRank ? "down" : "same",
+                            totalXP: updatedStats?.totalXP || 0,
+                            totalPoints: updatedStats?.totalPoints || 0,
+                          },
+                          onContinue: () => {
+                            navigateToFinalScreen(celebrationData, currentStreak, currentRank, currentRank - previousRank);
+                          },
+                        });
+                      } else {
+                        navigateToFinalScreen(celebrationData, currentStreak, currentRank);
+                      }
+                    },
+                  });
+                },
+              });
+            } else {
+              // Skip streak screen, go to weekly achievements
+              const weeklyAchievements = [
+                {
+                  id: "weekly-nos",
+                  title: "Weekly NOs",
+                  description: "Collect NOs this week",
+                  progress: updatedStats?.easyZoneCount || 0,
+                  target: 10,
+                  icon: "target" as const,
+                  completed: (updatedStats?.easyZoneCount || 0) >= 10,
+                },
+              ];
 
-          // Reset page to accomplishments
-          setCompletionPage("accomplishments");
-        }, 2000);
+              navigation.navigate("QuestWeeklyAchievements", {
+                weeklyData: {
+                  achievements: weeklyAchievements,
+                  weeklyNoCount: updatedStats?.easyZoneCount || 0,
+                  weeklyQuestCount: 1,
+                },
+                onContinue: () => {
+                  if (currentRank !== previousRank) {
+                    navigation.navigate("QuestLeaderboardPosition", {
+                      leaderboardData: {
+                        currentRank,
+                        previousRank,
+                        rankChanged: true,
+                        rankDirection: currentRank < previousRank ? "up" : currentRank > previousRank ? "down" : "same",
+                        totalXP: updatedStats?.totalXP || 0,
+                        totalPoints: updatedStats?.totalPoints || 0,
+                      },
+                      onContinue: () => {
+                        navigateToFinalScreen(celebrationData, currentStreak, currentRank, currentRank - previousRank);
+                      },
+                    });
+                  } else {
+                    navigateToFinalScreen(celebrationData, currentStreak, currentRank);
+                  }
+                },
+              });
+            }
+          },
+        });
       }
     },
   });
+
+  // Helper function to navigate to final celebration screen
+  const navigateToFinalScreen = (
+    celebrationData: {
+      questTitle: string;
+      questCategory: string;
+      xpEarned: number;
+      pointsEarned: number;
+      noCount: number;
+      yesCount: number;
+      actionCount: number;
+    },
+    streak: number,
+    rank: number,
+    rankChange?: number
+  ) => {
+    if (!savedQuestData) return;
+
+    const summary = {
+      questTitle: celebrationData.questTitle,
+      xpEarned: celebrationData.xpEarned,
+      pointsEarned: celebrationData.pointsEarned,
+      streak,
+      rank,
+      rankChange,
+    };
+
+    navigation.navigate("QuestCelebrationFinal", {
+      celebrationSummary: summary,
+      onShareToStory: () => {
+        const caption = generateStoryCaption({
+          questTitle: summary.questTitle,
+          questCategory: celebrationData.questCategory,
+          xpEarned: summary.xpEarned,
+          pointsEarned: summary.pointsEarned,
+          noCount: celebrationData.noCount,
+          streak: summary.streak,
+          rank: summary.rank,
+          rankChange: summary.rankChange,
+        });
+        // Navigate to CreateStory with pre-filled caption
+        navigation.navigate("CreateStory", { initialCaption: caption });
+      },
+      onShareAsPost: () => {
+        const content = generatePostContent({
+          questTitle: summary.questTitle,
+          questCategory: celebrationData.questCategory,
+          xpEarned: summary.xpEarned,
+          pointsEarned: summary.pointsEarned,
+          noCount: celebrationData.noCount,
+          streak: summary.streak,
+          rank: summary.rank,
+          rankChange: summary.rankChange,
+        });
+        // Navigate to feed/community screen to create post
+        // For now, we'll show an alert - this can be enhanced to navigate to post creation
+        Alert.alert(
+          "Share as Post",
+          "Post creation will open with your achievement details pre-filled.",
+          [
+            { text: "Cancel", style: "cancel" },
+            {
+              text: "Continue",
+              onPress: () => {
+                navigation.navigate("Tabs", { screen: "HomeTab" });
+                // TODO: Open post creation modal with pre-filled content
+              },
+            },
+          ]
+        );
+      },
+    });
+  };
 
   const handleGenerateNext = () => {
     if (!savedQuestData) return;

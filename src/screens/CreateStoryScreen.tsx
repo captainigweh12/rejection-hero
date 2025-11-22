@@ -25,12 +25,12 @@ import { useSession } from "@/lib/useSession";
 
 type Props = RootStackScreenProps<"CreateStory">;
 
-export default function CreateStoryScreen({ navigation }: Props) {
+export default function CreateStoryScreen({ route, navigation }: Props) {
   const { colors } = useTheme();
   const { data: sessionData } = useSession();
   const queryClient = useQueryClient();
   const [selectedMedia, setSelectedMedia] = useState<{ uri: string; type: "image" | "video" } | null>(null);
-  const [storyText, setStoryText] = useState("");
+  const [storyText, setStoryText] = useState(route.params?.initialCaption || "");
   const [isUploading, setIsUploading] = useState(false);
 
   // Request camera permissions on mount
@@ -58,11 +58,11 @@ export default function CreateStoryScreen({ navigation }: Props) {
         return;
       }
 
-      // 2. Correct mediaTypes enum (MediaTypeOptions, not MediaType)
+      // 2. Use new MediaType API (array format)
       const mediaTypes =
         mediaType === "image"
-          ? ImagePicker.MediaTypeOptions.Images
-          : ImagePicker.MediaTypeOptions.Videos;
+          ? ImagePicker.MediaType.Images
+          : ImagePicker.MediaType.Videos;
 
       // 3. Launch picker
       const result = await ImagePicker.launchImageLibraryAsync({
@@ -103,7 +103,7 @@ export default function CreateStoryScreen({ navigation }: Props) {
       }
 
       const result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: ImagePicker.MediaType.Images,
         quality: 0.8,
         allowsEditing: true,
         aspect: [9, 16],
@@ -135,7 +135,7 @@ export default function CreateStoryScreen({ navigation }: Props) {
       }
 
       const result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Videos,
+        mediaTypes: ImagePicker.MediaType.Videos,
         quality: 0.8,
         allowsEditing: true,
         aspect: [9, 16],
@@ -187,8 +187,12 @@ export default function CreateStoryScreen({ navigation }: Props) {
     setIsUploading(true);
 
     try {
+      // Determine filename based on media type
+      const fileExtension = selectedMedia.type === "video" ? "mp4" : "jpg";
+      const filename = `story-${Date.now()}.${fileExtension}`;
+      
       // Upload media to server
-      const serverMediaUrl = await uploadImage(selectedMedia.uri);
+      const serverMediaUrl = await uploadImage(selectedMedia.uri, filename);
 
       // Create story with server URL
       if (selectedMedia.type === "image") {
@@ -204,7 +208,17 @@ export default function CreateStoryScreen({ navigation }: Props) {
       }
     } catch (error: any) {
       console.error("Upload error:", error);
-      Alert.alert("Error", error?.message || "Failed to upload media. Please try again.");
+      console.error("Upload error details:", {
+        endpoint: `${BACKEND_URL}/api/upload/image`,
+        mediaType: selectedMedia.type,
+        errorMessage: error?.message,
+        errorStatus: error?.status,
+        errorResponse: error?.response,
+      });
+      Alert.alert(
+        "Upload Error",
+        error?.message || "Failed to upload media. Please try again."
+      );
       setIsUploading(false);
     }
   };

@@ -152,6 +152,31 @@ const RootNavigator = () => {
           options={{ presentation: "fullScreenModal", headerShown: false }}
         />
         <RootStack.Screen
+          name="QuestComplete"
+          component={QuestCompleteScreen}
+          options={{ headerShown: false, animation: "slide_from_right" }}
+        />
+        <RootStack.Screen
+          name="QuestStreak"
+          component={QuestStreakScreen}
+          options={{ headerShown: false, animation: "slide_from_right" }}
+        />
+        <RootStack.Screen
+          name="QuestWeeklyAchievements"
+          component={QuestWeeklyAchievementsScreen}
+          options={{ headerShown: false, animation: "slide_from_right" }}
+        />
+        <RootStack.Screen
+          name="QuestLeaderboardPosition"
+          component={QuestLeaderboardPositionScreen}
+          options={{ headerShown: false, animation: "slide_from_right" }}
+        />
+        <RootStack.Screen
+          name="QuestCelebrationFinal"
+          component={QuestCelebrationFinalScreen}
+          options={{ headerShown: false, animation: "slide_from_right" }}
+        />
+        <RootStack.Screen
           name="Admin"
           component={AdminScreen}
           options={{ headerShown: false }}
