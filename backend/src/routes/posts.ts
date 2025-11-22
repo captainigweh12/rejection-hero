@@ -7,6 +7,7 @@ import {
   addCommentRequestSchema,
 } from "../../../shared/contracts";
 import { filterBlockedUsers } from "./moderation";
+import { randomUUID } from "node:crypto";
 
 const postsRouter = new Hono<AppType>();
 
@@ -46,11 +47,13 @@ postsRouter.post("/", zValidator("json", createPostRequestSchema), async (c) => 
     // Create post
     const post = await db.post.create({
       data: {
+        id: randomUUID(),
         userId: user.id,
         content,
         privacy,
         groupId: groupId || null,
         userQuestId: userQuestId || null,
+        updatedAt: new Date(),
       },
       include: {
         user: {
@@ -69,6 +72,7 @@ postsRouter.post("/", zValidator("json", createPostRequestSchema), async (c) => 
         if (!imageUrl) continue;
         const image = await db.post_image.create({
           data: {
+            id: randomUUID(),
             postId: post.id,
             imageUrl: imageUrl,
             order: i,
@@ -293,6 +297,7 @@ postsRouter.post("/:id/like", async (c) => {
     // Create like
     await db.post_like.create({
       data: {
+        id: randomUUID(),
         postId,
         userId: user.id,
       },
@@ -377,9 +382,11 @@ postsRouter.post("/:id/comment", zValidator("json", addCommentRequestSchema), as
     // Create comment
     const comment = await db.post_comment.create({
       data: {
+        id: randomUUID(),
         postId,
         userId: user.id,
         content,
+        updatedAt: new Date(),
       },
       include: {
         user: {

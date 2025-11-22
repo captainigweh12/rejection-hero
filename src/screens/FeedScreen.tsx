@@ -16,7 +16,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Plus, X, Image as ImageIcon, Globe, Users, Lock, Camera } from "lucide-react-native";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
-import { api } from "@/lib/api";
+import { api, BACKEND_URL } from "@/lib/api";
 import PostCard from "@/components/PostCard";
 import { useSession } from "@/lib/useSession";
 import CreateStoryModal from "@/components/CreateStoryModal";
@@ -223,7 +223,7 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
         type,
       } as any);
 
-      const uploadResponse = await fetch(`${process.env.EXPO_PUBLIC_VIBECODE_BACKEND_URL}/api/upload/image`, {
+      const uploadResponse = await fetch(`${BACKEND_URL}/api/upload/image`, {
         method: "POST",
         body: formData,
         headers: {
@@ -236,7 +236,7 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
       }
 
       const uploadData = await uploadResponse.json();
-      const serverImageUrl = `${process.env.EXPO_PUBLIC_VIBECODE_BACKEND_URL}${uploadData.url}`;
+      const serverImageUrl = `${BACKEND_URL}${uploadData.url}`;
 
       // Now create moment with server URL
       createMomentMutation.mutate({
@@ -633,7 +633,7 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
           onRequestClose={() => setSelectedMoment(null)}
         >
           <View style={{ flex: 1, backgroundColor: "black" }}>
-            <SafeAreaView style={{ flex: 1 }} edges={["top", "bottom"]}>
+            <SafeAreaView style={{ flex: 1 }} edges={["top", "bottom", "left", "right"]}>
               {/* Progress Bars */}
               <View
                 style={{
@@ -749,12 +749,27 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
                 }}
                 style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
               >
-                {selectedMoment.moments[momentIndex]?.imageUrl && (
+                {selectedMoment.moments[momentIndex]?.imageUrl ? (
                   <Image
                     source={{ uri: selectedMoment.moments[momentIndex].imageUrl }}
                     style={{ width: "100%", height: "100%" }}
                     resizeMode="contain"
+                    onError={(error) => {
+                      console.error("Failed to load story image:", error);
+                    }}
                   />
+                ) : selectedMoment.moments[momentIndex]?.content ? (
+                  <View style={{ padding: 20 }}>
+                    <Text style={{ color: "white", fontSize: 18, textAlign: "center" }}>
+                      {selectedMoment.moments[momentIndex].content}
+                    </Text>
+                  </View>
+                ) : (
+                  <View style={{ padding: 20 }}>
+                    <Text style={{ color: "white", fontSize: 16, textAlign: "center" }}>
+                      No content available
+                    </Text>
+                  </View>
                 )}
               </TouchableOpacity>
 

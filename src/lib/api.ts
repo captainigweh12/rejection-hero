@@ -20,19 +20,17 @@ import { authClient } from "./authClient";
  * Development: http://localhost:3000 (fallback)
  */
 // Get backend URL with fallback for development/Expo Go
-// PRODUCTION: Always use production URL to prevent sandbox.dev override
 const getBackendURL = () => {
   const PRODUCTION_URL = "https://api.rejectionhero.com";
   let url = process.env.EXPO_PUBLIC_VIBECODE_BACKEND_URL;
 
-  // Check if we're in sandbox environment (sandbox.dev URL)
-  if (url?.includes("sandbox.dev")) {
-    console.warn(`⚠️ [API Client] Detected sandbox.dev URL: ${url}`);
-    console.log(`✅ [API Client] Overriding with production URL: ${PRODUCTION_URL}`);
-    return PRODUCTION_URL;
+  // Use the configured URL directly (don't override sandbox URLs)
+  // Sandbox URLs are valid for preview/staging environments
+  if (url) {
+    return url;
   }
 
-  return url || (__DEV__ ? "http://localhost:3000" : PRODUCTION_URL);
+  return __DEV__ ? "http://localhost:3000" : PRODUCTION_URL;
 };
 
 const BACKEND_URL = getBackendURL();
