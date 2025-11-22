@@ -13,10 +13,11 @@ import {
   Image,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Plus, X, Image as ImageIcon, Globe, Users, Lock, Camera } from "lucide-react-native";
+import { Plus, X, Image as ImageIcon, Globe, Users, Lock, Camera, ChevronLeft, ChevronRight } from "lucide-react-native";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
-import { api, BACKEND_URL } from "@/lib/api";
+import { Video as ExpoVideo, ResizeMode } from "expo-av";
+import { api, BACKEND_URL, uploadImage } from "@/lib/api";
 import PostCard from "@/components/PostCard";
 import { useSession } from "@/lib/useSession";
 import CreateStoryModal from "@/components/CreateStoryModal";
@@ -89,9 +90,10 @@ interface GetMomentsResponse {
 
 interface FeedScreenProps {
   onCreatePostPress?: () => void;
+  navigation?: any;
 }
 
-export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) {
+export default function FeedScreen({ onCreatePostPress, navigation }: FeedScreenProps = {}) {
   const { colors } = useTheme();
   const queryClient = useQueryClient();
   const { data: sessionData } = useSession();
@@ -152,7 +154,7 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
 
   // Create moment mutation
   const createMomentMutation = useMutation({
-    mutationFn: (data: { imageUrl?: string; content?: string }) =>
+    mutationFn: (data: { imageUrl?: string; videoUrl?: string; content?: string }) =>
       api.post("/api/moments", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["moments"] });
@@ -209,43 +211,32 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
     });
   };
 
-  const handleCreateMoment = async (imageUrl: string, text?: string) => {
+  const handleCreateMoment = async (imageUrl?: string, videoUrl?: string, text?: string) => {
     try {
-      // Upload image to server first
-      const formData = new FormData();
-      const filename = imageUrl.split("/").pop() || "moment.jpg";
-      const match = /\.(\w+)$/.exec(filename);
-      const type = match ? `image/${match[1]}` : "image/jpeg";
+      let serverImageUrl: string | undefined;
+      let serverVideoUrl: string | undefined;
 
-      formData.append("image", {
-        uri: imageUrl,
-        name: filename,
-        type,
-      } as any);
-
-      const uploadResponse = await fetch(`${BACKEND_URL}/api/upload/image`, {
-        method: "POST",
-        body: formData,
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-
-      if (!uploadResponse.ok) {
-        throw new Error("Failed to upload image");
+      // Upload image if provided
+      if (imageUrl) {
+        // Use the uploadImage helper which handles FormData correctly
+        serverImageUrl = await uploadImage(imageUrl);
       }
 
-      const uploadData = await uploadResponse.json();
-      const serverImageUrl = `${BACKEND_URL}${uploadData.url}`;
+      // Upload video if provided (using same endpoint for now, backend will handle it)
+      if (videoUrl) {
+        // Use the uploadImage helper which handles FormData correctly (works for videos too)
+        serverVideoUrl = await uploadImage(videoUrl, videoUrl.split("/").pop() || "moment.mp4");
+      }
 
-      // Now create moment with server URL
+      // Now create moment with server URL(s)
       createMomentMutation.mutate({
         imageUrl: serverImageUrl,
+        videoUrl: serverVideoUrl,
         content: text,
       });
     } catch (error) {
       console.error("Upload error:", error);
-      Alert.alert("Error", "Failed to upload image. Please try again.");
+      Alert.alert("Error", "Failed to upload media. Please try again.");
       throw error; // Re-throw so modal can handle it
     }
   };
@@ -272,13 +263,22 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
         style={{
           borderBottomWidth: 1,
           borderBottomColor: colors.cardBorder,
-          marginBottom: 12,
+          marginBottom: 24, // Increased padding between stories and posts
+          paddingTop: 8, // Add top padding
         }}
         contentContainerStyle={{ paddingHorizontal: 12, paddingVertical: 12, gap: 10, paddingBottom: 16 }}
       >
         {/* Your Story Button */}
         <TouchableOpacity
-          onPress={() => setShowCreateMoment(true)}
+          onPress={() => {
+            // Navigate to CreateStory screen if navigation is available
+            // Otherwise fall back to modal
+            if (navigation) {
+              navigation.navigate("CreateStory");
+            } else {
+              setShowCreateMoment(true);
+            }
+          }}
           style={{
             alignItems: "center",
             marginRight: 8,
@@ -421,7 +421,7 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
         </TouchableOpacity>
       </View>
 
-      {/* Posts Feed */}
+      {/* Posts Feed - Scrollable with infinite scroll */}
       {feedLoading ? (
         <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
           <ActivityIndicator size="large" color={colors.primary} />
@@ -444,6 +444,12 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
               tintColor={colors.primary}
             />
           }
+          onEndReached={() => {
+            // Infinite scroll: Load more posts when reaching the end
+            // This will be handled by the backend pagination if implemented
+            console.log("[FeedScreen] Reached end of posts list");
+          }}
+          onEndReachedThreshold={0.5}
           ListEmptyComponent={
             <View style={{ alignItems: "center", paddingVertical: 40 }}>
               <Text style={{ color: colors.textSecondary, fontSize: 16 }}>No posts yet</Text>
@@ -739,6 +745,7 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
         >
           <View style={{ flex: 1, backgroundColor: "black" }}>
             <SafeAreaView style={{ flex: 1 }} edges={["top", "bottom", "left", "right"]}>
+              <View style={{ flex: 1, overflow: "hidden" }}>
               {/* Progress Bars */}
               <View
                 style={{
@@ -832,71 +839,116 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
                 </TouchableOpacity>
               </View>
 
-              {/* Story Content */}
-              <TouchableOpacity
-                activeOpacity={1}
-                onPress={(e) => {
-                  const { locationX } = e.nativeEvent;
-                  const screenWidth = 400; // approximate
-                  if (locationX < screenWidth / 2) {
-                    // Tap left side - previous
-                    if (momentIndex > 0) {
-                      setMomentIndex(momentIndex - 1);
-                    }
-                  } else {
-                    // Tap right side - next
-                    if (momentIndex < selectedMoment.moments.length - 1) {
-                      setMomentIndex(momentIndex + 1);
+              {/* Story Content with Swipe Navigation */}
+              <View style={{ flex: 1, position: "relative", overflow: "hidden" }}>
+                <TouchableOpacity
+                  activeOpacity={1}
+                  onPress={(e) => {
+                    const { locationX } = e.nativeEvent;
+                    const screenWidth = 400; // approximate
+                    if (locationX < screenWidth / 2) {
+                      // Tap left side - previous
+                      if (momentIndex > 0) {
+                        setMomentIndex(momentIndex - 1);
+                      }
                     } else {
-                      setSelectedMoment(null);
+                      // Tap right side - next
+                      if (momentIndex < selectedMoment.moments.length - 1) {
+                        setMomentIndex(momentIndex + 1);
+                      } else {
+                        setSelectedMoment(null);
+                      }
                     }
-                  }
-                }}
-                style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-              >
-                {selectedMoment.moments[momentIndex]?.imageUrl ? (
-                  <Image
-                    source={{ uri: selectedMoment.moments[momentIndex].imageUrl }}
-                    style={{ width: "100%", height: "100%" }}
-                    resizeMode="contain"
-                    onError={(error) => {
-                      console.error("Failed to load story image:", error);
+                  }}
+                  style={{ flex: 1, justifyContent: "center", alignItems: "center", overflow: "hidden" }}
+                >
+                  {selectedMoment.moments[momentIndex]?.imageUrl && (
+                    <Image
+                      source={{ uri: String(selectedMoment.moments[momentIndex].imageUrl) }}
+                      style={{ width: "100%", height: "100%" }}
+                      resizeMode="contain"
+                      onError={(error) => {
+                        const imageUrl = selectedMoment.moments[momentIndex]?.imageUrl;
+                        console.error("Failed to load story image:", {
+                          imageUrl: typeof imageUrl === "string" ? imageUrl : "Invalid URL type",
+                          error: error?.nativeEvent?.error || "Unknown error",
+                        });
+                      }}
+                    />
+                  )}
+                  {selectedMoment.moments[momentIndex]?.videoUrl && (
+                    <ExpoVideo
+                      source={{ uri: selectedMoment.moments[momentIndex].videoUrl }}
+                      style={{ width: "100%", height: "100%" }}
+                      useNativeControls
+                      resizeMode={ResizeMode.CONTAIN}
+                      isLooping
+                    />
+                  )}
+                  {selectedMoment.moments[momentIndex]?.content && !selectedMoment.moments[momentIndex]?.imageUrl && !selectedMoment.moments[momentIndex]?.videoUrl && (
+                    <View style={{ padding: 20 }}>
+                      <Text style={{ color: "white", fontSize: 18, textAlign: "center" }}>
+                        {selectedMoment.moments[momentIndex].content}
+                      </Text>
+                    </View>
+                  )}
+
+                {/* Navigation Arrows */}
+                {momentIndex > 0 && (
+                  <TouchableOpacity
+                    onPress={() => setMomentIndex(momentIndex - 1)}
+                    style={{
+                      position: "absolute",
+                      left: 10,
+                      top: "50%",
+                      transform: [{ translateY: -20 }],
+                      padding: 12,
+                      backgroundColor: "rgba(0, 0, 0, 0.5)",
+                      borderRadius: 20,
                     }}
-                  />
-                ) : selectedMoment.moments[momentIndex]?.content ? (
-                  <View style={{ padding: 20 }}>
-                    <Text style={{ color: "white", fontSize: 18, textAlign: "center" }}>
+                  >
+                    <ChevronLeft size={24} color="white" />
+                  </TouchableOpacity>
+                )}
+                {momentIndex < selectedMoment.moments.length - 1 && (
+                  <TouchableOpacity
+                    onPress={() => setMomentIndex(momentIndex + 1)}
+                    style={{
+                      position: "absolute",
+                      right: 10,
+                      top: "50%",
+                      transform: [{ translateY: -20 }],
+                      padding: 12,
+                      backgroundColor: "rgba(0, 0, 0, 0.5)",
+                      borderRadius: 20,
+                    }}
+                  >
+                    <ChevronRight size={24} color="white" />
+                  </TouchableOpacity>
+                )}
+
+                {/* Bottom Info */}
+                {selectedMoment.moments[momentIndex]?.content && (
+                  <View
+                    style={{
+                      position: "absolute",
+                      bottom: 40,
+                      left: 20,
+                      right: 20,
+                      backgroundColor: "rgba(0, 0, 0, 0.6)",
+                      paddingHorizontal: 16,
+                      paddingVertical: 12,
+                      borderRadius: 12,
+                    }}
+                  >
+                    <Text style={{ color: "white", fontSize: 15 }}>
                       {selectedMoment.moments[momentIndex].content}
-                    </Text>
-                  </View>
-                ) : (
-                  <View style={{ padding: 20 }}>
-                    <Text style={{ color: "white", fontSize: 16, textAlign: "center" }}>
-                      No content available
                     </Text>
                   </View>
                 )}
               </TouchableOpacity>
-
-              {/* Bottom Info */}
-              {selectedMoment.moments[momentIndex]?.content && (
-                <View
-                  style={{
-                    position: "absolute",
-                    bottom: 40,
-                    left: 20,
-                    right: 20,
-                    backgroundColor: "rgba(0, 0, 0, 0.6)",
-                    paddingHorizontal: 16,
-                    paddingVertical: 12,
-                    borderRadius: 12,
-                  }}
-                >
-                  <Text style={{ color: colors.text, fontSize: 15 }}>
-                    {selectedMoment.moments[momentIndex].content}
-                  </Text>
-                </View>
-              )}
+              </View>
+              </View>
             </SafeAreaView>
           </View>
         </Modal>

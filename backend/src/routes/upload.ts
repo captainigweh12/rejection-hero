@@ -1,23 +1,9 @@
 import { Hono } from "hono";
-import * as fs from "node:fs";
-import * as path from "node:path";
 import { randomUUID } from "node:crypto";
 import { type AppType } from "../types";
 import { zValidator } from "@hono/zod-validator";
 import { uploadImageRequestSchema, type UploadImageResponse } from "@/shared/contracts";
-
-// ============================================
-// Uploads directory setup
-// ============================================
-// Creates uploads/ directory if it doesn't exist
-// All uploaded images are stored here and served via /uploads/* endpoint
-const UPLOADS_DIR = path.join(process.cwd(), "uploads");
-if (!fs.existsSync(UPLOADS_DIR)) {
-  console.log("📁 [Upload] Creating uploads directory:", UPLOADS_DIR);
-  fs.mkdirSync(UPLOADS_DIR, { recursive: true });
-} else {
-  console.log("📁 [Upload] Uploads directory exists:", UPLOADS_DIR);
-}
+import { uploadToR2 } from "../services/r2";
 
 const uploadRouter = new Hono<AppType>();
 
@@ -62,27 +48,28 @@ uploadRouter.post("/image", zValidator("form", uploadImageRequestSchema), async 
     }
     console.log(`✅ [Upload] File size validated: ${(image.size / 1024).toFixed(2)} KB`);
 
-    // Generate unique filename to prevent collisions
-    const fileExtension = path.extname(image.name);
-    const uniqueFilename = `${randomUUID()}${fileExtension}`;
-    const filePath = path.join(UPLOADS_DIR, uniqueFilename);
+    // Generate unique filename for R2
+    const fileExtension = image.name.split(".").pop() || "jpg";
+    const uniqueFilename = `${randomUUID()}.${fileExtension}`;
+    const r2Key = `uploads/${uniqueFilename}`;
     console.log(`🔑 [Upload] Generated unique filename: ${uniqueFilename}`);
 
-    // Save file to disk
-    console.log(`💾 [Upload] Saving file to: ${filePath}`);
+    // Convert to buffer
     const arrayBuffer = await image.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
-    fs.writeFileSync(filePath, buffer);
-    console.log(`✅ [Upload] File saved successfully`);
 
-    // Return the URL to access the uploaded image
-    const imageUrl = `/uploads/${uniqueFilename}`;
+    // Upload to R2 (Cloudflare R2 storage)
+    console.log(`📤 [Upload] Uploading to R2: ${r2Key}`);
+    const imageUrl = await uploadToR2(buffer, r2Key, image.type);
     console.log(`🎉 [Upload] Upload complete! Image URL: ${imageUrl}`);
 
+    // Return relative path for backward compatibility, but the full URL is what should be used
+    const relativePath = imageUrl.replace(/^https?:\/\/[^\/]+/, "");
     return c.json({
       success: true,
       message: "Image uploaded successfully",
-      url: imageUrl,
+      url: relativePath, // Relative path for backward compatibility
+      fullUrl: imageUrl, // Full R2 URL (use this in the app)
       filename: uniqueFilename,
     } satisfies UploadImageResponse);
   } catch (error) {

@@ -45,6 +45,7 @@ import LegalPoliciesScreen from "@/screens/LegalPoliciesScreen";
 import ParentalGuidanceSettingsScreen from "@/screens/ParentalGuidanceSettingsScreen";
 import ReportBugScreen from "@/screens/ReportBugScreen";
 import FriendQuestViewScreen from "@/screens/FriendQuestViewScreen";
+import CreateStoryScreen from "@/screens/CreateStoryScreen";
 import { useSession } from "@/lib/useSession";
 import { api } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
@@ -139,6 +140,11 @@ const RootNavigator = () => {
           name="FriendQuestView"
           component={FriendQuestViewScreen}
           options={{ headerShown: false }}
+        />
+        <RootStack.Screen
+          name="CreateStory"
+          component={CreateStoryScreen}
+          options={{ presentation: "fullScreenModal", headerShown: false }}
         />
         <RootStack.Screen
           name="Admin"

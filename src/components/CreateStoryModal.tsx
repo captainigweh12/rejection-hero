@@ -12,13 +12,14 @@ import {
   Platform,
   ScrollView,
 } from "react-native";
-import { X, Camera, Image as ImageIcon } from "lucide-react-native";
+import { X, Camera, Image as ImageIcon, Video, VideoIcon } from "lucide-react-native";
 import * as ImagePicker from "expo-image-picker";
+import { Video as ExpoVideo } from "expo-av";
 
 interface CreateStoryModalProps {
   visible: boolean;
   onClose: () => void;
-  onCreateStory: (imageUrl: string, text?: string) => Promise<void>;
+  onCreateStory: (imageUrl?: string, videoUrl?: string, text?: string) => Promise<void>;
   isLoading?: boolean;
 }
 
@@ -29,6 +30,7 @@ export default function CreateStoryModal({
   isLoading = false,
 }: CreateStoryModalProps) {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
   const [storyText, setStoryText] = useState("");
 
   const handlePickImage = async () => {
@@ -40,6 +42,21 @@ export default function CreateStoryModal({
 
     if (!result.canceled && result.assets[0]) {
       setSelectedImage(result.assets[0].uri);
+      setSelectedVideo(null); // Clear video if image is selected
+    }
+  };
+
+  const handlePickVideo = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Videos,
+      quality: 0.8,
+      allowsEditing: true,
+      videoMaxDuration: 60, // 60 seconds max
+    });
+
+    if (!result.canceled && result.assets[0]) {
+      setSelectedVideo(result.assets[0].uri);
+      setSelectedImage(null); // Clear image if video is selected
     }
   };
 
@@ -58,19 +75,49 @@ export default function CreateStoryModal({
 
     if (!result.canceled && result.assets[0]) {
       setSelectedImage(result.assets[0].uri);
+      setSelectedVideo(null); // Clear video if image is selected
+    }
+  };
+
+  const handleRecordVideo = async () => {
+    // Request camera permissions
+    const cameraStatus = await ImagePicker.requestCameraPermissionsAsync();
+    if (cameraStatus.status !== "granted") {
+      Alert.alert("Permission Required", "Camera permission is required to record videos.");
+      return;
+    }
+
+    // Request microphone permissions for video recording
+    const micStatus = await ImagePicker.requestMicrophonePermissionsAsync();
+    if (micStatus.status !== "granted") {
+      Alert.alert("Permission Required", "Microphone permission is required to record videos with audio.");
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Videos,
+      quality: 0.8,
+      allowsEditing: true,
+      videoMaxDuration: 60, // 60 seconds max
+    });
+
+    if (!result.canceled && result.assets[0]) {
+      setSelectedVideo(result.assets[0].uri);
+      setSelectedImage(null); // Clear image if video is selected
     }
   };
 
   const handleShare = async () => {
-    if (!selectedImage) {
-      Alert.alert("Error", "Please select or take a photo first");
+    if (!selectedImage && !selectedVideo) {
+      Alert.alert("Error", "Please select or capture a photo or video first");
       return;
     }
 
     try {
-      await onCreateStory(selectedImage, storyText.trim() || undefined);
+      await onCreateStory(selectedImage || undefined, selectedVideo || undefined, storyText.trim() || undefined);
       // Reset state
       setSelectedImage(null);
+      setSelectedVideo(null);
       setStoryText("");
       onClose();
     } catch (error) {
@@ -80,9 +127,12 @@ export default function CreateStoryModal({
 
   const handleClose = () => {
     setSelectedImage(null);
+    setSelectedVideo(null);
     setStoryText("");
     onClose();
   };
+
+  const hasMedia = selectedImage || selectedVideo;
 
   return (
     <Modal
@@ -126,7 +176,7 @@ export default function CreateStoryModal({
                 borderBottomColor: "rgba(126, 63, 228, 0.2)",
               }}
             >
-              <Text className="text-xl font-bold text-white">Create Story</Text>
+              <Text style={{ fontSize: 20, fontWeight: "bold", color: "white" }}>Create Story</Text>
               <TouchableOpacity onPress={handleClose}>
                 <X size={24} color="white" />
               </TouchableOpacity>
@@ -137,33 +187,60 @@ export default function CreateStoryModal({
               contentContainerStyle={{ padding: 20 }}
               keyboardShouldPersistTaps="handled"
             >
-              {/* Image Preview or Upload Options */}
-              {selectedImage ? (
+              {/* Media Preview or Upload Options */}
+              {hasMedia ? (
                 <View>
                   {/* Image Preview */}
-                  <View
-                    style={{
-                      width: "100%",
-                      height: 300,
-                      borderRadius: 16,
-                      overflow: "hidden",
-                      marginBottom: 16,
-                      backgroundColor: "#000",
-                    }}
-                  >
-                    <Image
-                      source={{ uri: selectedImage }}
+                  {selectedImage && (
+                    <View
                       style={{
                         width: "100%",
-                        height: "100%",
-                        resizeMode: "cover",
+                        height: 300,
+                        borderRadius: 16,
+                        overflow: "hidden",
+                        marginBottom: 16,
+                        backgroundColor: "#000",
                       }}
-                    />
-                  </View>
+                    >
+                      <Image
+                        source={{ uri: selectedImage }}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          resizeMode: "cover",
+                        }}
+                      />
+                    </View>
+                  )}
+
+                  {/* Video Preview */}
+                  {selectedVideo && (
+                    <View
+                      style={{
+                        width: "100%",
+                        height: 300,
+                        borderRadius: 16,
+                        overflow: "hidden",
+                        marginBottom: 16,
+                        backgroundColor: "#000",
+                      }}
+                    >
+                      <ExpoVideo
+                        source={{ uri: selectedVideo }}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                        }}
+                        useNativeControls
+                        resizeMode="contain"
+                        isLooping
+                      />
+                    </View>
+                  )}
 
                   {/* Text Input for Caption */}
                   <View style={{ marginBottom: 16 }}>
-                    <Text className="text-sm font-semibold text-white/80 mb-2">
+                    <Text style={{ fontSize: 14, fontWeight: "600", color: "rgba(255, 255, 255, 0.8)", marginBottom: 8 }}>
                       Add text to your story (optional)
                     </Text>
                     <TextInput
@@ -186,7 +263,7 @@ export default function CreateStoryModal({
                         textAlignVertical: "top",
                       }}
                     />
-                    <Text className="text-xs text-white/50 mt-1 text-right">
+                    <Text style={{ fontSize: 12, color: "rgba(255, 255, 255, 0.5)", marginTop: 4, textAlign: "right" }}>
                       {storyText.length}/200
                     </Text>
                   </View>
@@ -194,7 +271,10 @@ export default function CreateStoryModal({
                   {/* Action Buttons */}
                   <View style={{ flexDirection: "row", gap: 12 }}>
                     <TouchableOpacity
-                      onPress={() => setSelectedImage(null)}
+                      onPress={() => {
+                        setSelectedImage(null);
+                        setSelectedVideo(null);
+                      }}
                       style={{
                         flex: 1,
                         backgroundColor: "rgba(255, 255, 255, 0.1)",
@@ -205,7 +285,7 @@ export default function CreateStoryModal({
                         alignItems: "center",
                       }}
                     >
-                      <Text className="text-white font-semibold">Change Photo</Text>
+                      <Text style={{ color: "white", fontWeight: "600" }}>Change Media</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity
@@ -217,12 +297,13 @@ export default function CreateStoryModal({
                         borderRadius: 12,
                         padding: 14,
                         alignItems: "center",
+                        opacity: isLoading ? 0.5 : 1,
                       }}
                     >
                       {isLoading ? (
                         <ActivityIndicator color="white" size="small" />
                       ) : (
-                        <Text className="text-white font-semibold">Share Story</Text>
+                        <Text style={{ color: "white", fontWeight: "600" }}>Share Story</Text>
                       )}
                     </TouchableOpacity>
                   </View>
@@ -230,11 +311,11 @@ export default function CreateStoryModal({
               ) : (
                 /* Upload Options */
                 <View style={{ gap: 12 }}>
-                  <Text className="text-center text-white/80 mb-4">
-                    Choose a photo to share as your story
+                  <Text style={{ fontSize: 16, textAlign: "center", color: "rgba(255, 255, 255, 0.8)", marginBottom: 16 }}>
+                    Choose media to share as your story
                   </Text>
 
-                  {/* Gallery Button */}
+                  {/* Gallery Image Button */}
                   <TouchableOpacity
                     onPress={handlePickImage}
                     style={{
@@ -262,12 +343,45 @@ export default function CreateStoryModal({
                       <ImageIcon size={24} color="#7E3FE4" />
                     </View>
                     <View style={{ flex: 1 }}>
-                      <Text className="text-white font-bold text-base">Choose from Gallery</Text>
-                      <Text className="text-white/60 text-sm">Pick a photo from your device</Text>
+                      <Text style={{ color: "white", fontWeight: "bold", fontSize: 16 }}>Choose from Gallery</Text>
+                      <Text style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: 14 }}>Pick a photo from your device</Text>
                     </View>
                   </TouchableOpacity>
 
-                  {/* Camera Button */}
+                  {/* Gallery Video Button */}
+                  <TouchableOpacity
+                    onPress={handlePickVideo}
+                    style={{
+                      backgroundColor: "rgba(0, 217, 255, 0.2)",
+                      borderWidth: 2,
+                      borderColor: "#00D9FF",
+                      borderRadius: 16,
+                      padding: 20,
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 12,
+                    }}
+                  >
+                    <View
+                      style={{
+                        width: 48,
+                        height: 48,
+                        borderRadius: 24,
+                        backgroundColor: "rgba(0, 217, 255, 0.3)",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Video size={24} color="#00D9FF" />
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ color: "white", fontWeight: "bold", fontSize: 16 }}>Upload Video</Text>
+                      <Text style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: 14 }}>Pick a video from your device</Text>
+                    </View>
+                  </TouchableOpacity>
+
+                  {/* Camera Photo Button */}
                   <TouchableOpacity
                     onPress={handleTakePhoto}
                     style={{
@@ -295,12 +409,45 @@ export default function CreateStoryModal({
                       <Camera size={24} color="#FF6B35" />
                     </View>
                     <View style={{ flex: 1 }}>
-                      <Text className="text-white font-bold text-base">Take Photo</Text>
-                      <Text className="text-white/60 text-sm">Use your camera to take a photo</Text>
+                      <Text style={{ color: "white", fontWeight: "bold", fontSize: 16 }}>Take Photo</Text>
+                      <Text style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: 14 }}>Use your camera to take a photo</Text>
                     </View>
                   </TouchableOpacity>
 
-                  <Text className="text-center text-white/50 text-xs mt-4">
+                  {/* Record Video Button */}
+                  <TouchableOpacity
+                    onPress={handleRecordVideo}
+                    style={{
+                      backgroundColor: "rgba(255, 59, 48, 0.2)",
+                      borderWidth: 2,
+                      borderColor: "#FF3B30",
+                      borderRadius: 16,
+                      padding: 20,
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 12,
+                    }}
+                  >
+                    <View
+                      style={{
+                        width: 48,
+                        height: 48,
+                        borderRadius: 24,
+                        backgroundColor: "rgba(255, 59, 48, 0.3)",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <VideoIcon size={24} color="#FF3B30" />
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ color: "white", fontWeight: "bold", fontSize: 16 }}>Record Video</Text>
+                      <Text style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: 14 }}>Record a video with your camera (max 60s)</Text>
+                    </View>
+                  </TouchableOpacity>
+
+                  <Text style={{ fontSize: 12, textAlign: "center", color: "rgba(255, 255, 255, 0.5)", marginTop: 16 }}>
                     Stories expire after 24 hours
                   </Text>
                 </View>

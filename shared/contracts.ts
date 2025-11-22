@@ -56,7 +56,8 @@ export type UploadImageRequest = z.infer<typeof uploadImageRequestSchema>;
 export const uploadImageResponseSchema = z.object({
   success: z.boolean(),
   message: z.string(),
-  url: z.string(),
+  url: z.string(), // Relative path for backward compatibility
+  fullUrl: z.string().optional(), // Full R2 URL (preferred)
   filename: z.string(),
 });
 export type UploadImageResponse = z.infer<typeof uploadImageResponseSchema>;

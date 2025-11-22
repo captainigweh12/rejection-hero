@@ -216,14 +216,14 @@ export default function ProfileScreen({ navigation }: Props) {
       );
 
       if (response.success && response.avatarUrl) {
-        // The avatar URL should already be a full URL from the backend (e.g., https://api.rejectionhero.com/uploads/avatar-xxx.png)
-        // But ensure it's a complete URL (backend returns full URL, but handle edge cases)
+        // The avatar URL from backend should be the full R2 URL (e.g., https://storage.rejectionhero.com/avatars/avatar-xxx.png)
         let avatarUrl = response.avatarUrl;
+        
+        // Ensure it's a complete URL
         if (!avatarUrl.startsWith("http")) {
-          // If for some reason it's a relative URL, construct full URL
-          // Use the same backend URL that api.ts uses
-          const BACKEND_URL = "https://api.rejectionhero.com";
-          avatarUrl = `${BACKEND_URL}${avatarUrl.startsWith("/") ? "" : "/"}${avatarUrl}`;
+          // If for some reason it's a relative URL, use storage URL
+          const STORAGE_URL = "https://storage.rejectionhero.com";
+          avatarUrl = `${STORAGE_URL}${avatarUrl.startsWith("/") ? "" : "/"}${avatarUrl}`;
         }
 
         console.log("🖼️ [Avatar] Generated avatar URL:", avatarUrl);
@@ -364,6 +364,15 @@ export default function ProfileScreen({ navigation }: Props) {
                       source={{ uri: profileData.avatar }}
                       style={{ width: "100%", height: "100%", borderRadius: 70 }}
                       resizeMode="cover"
+                      onError={(error) => {
+                        console.error("🖼️ [Avatar] Failed to load avatar image:", {
+                          avatarUrl: profileData.avatar,
+                          error: error?.nativeEvent?.error || "Unknown error",
+                        });
+                      }}
+                      onLoad={() => {
+                        console.log("🖼️ [Avatar] Avatar image loaded successfully:", profileData.avatar);
+                      }}
                     />
                   ) : (
                     <Text style={{ fontSize: 64, fontWeight: "bold", color: colors.text }}>

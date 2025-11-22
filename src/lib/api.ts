@@ -287,6 +287,7 @@ const uploadImage = async (imageUri: string, filename?: string): Promise<string>
   const match = /\.(\w+)$/.exec(finalFilename);
   const type = match ? `image/${match[1]}` : "image/jpeg";
 
+  // React Native FormData format - use proper object structure
   formData.append("image", {
     uri: imageUri,
     name: finalFilename,
@@ -299,7 +300,7 @@ const uploadImage = async (imageUri: string, filename?: string): Promise<string>
     method: "POST",
     body: formData,
     headers: {
-      // Don't set Content-Type for FormData - let the browser set it with boundary
+      // Don't set Content-Type for FormData - let React Native set it with boundary
       ...(cookies ? { Cookie: cookies } : {}),
     },
     credentials: "include",
@@ -318,6 +319,13 @@ const uploadImage = async (imageUri: string, filename?: string): Promise<string>
   }
 
   const uploadData = await response.json();
+  
+  // Use fullUrl if available (R2 URL), otherwise construct from relative path
+  if (uploadData.fullUrl) {
+    return uploadData.fullUrl;
+  }
+  
+  // Fallback: construct URL (for backward compatibility)
   return `${BACKEND_URL}${uploadData.url}`;
 };
 

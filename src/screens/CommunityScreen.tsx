@@ -22,6 +22,7 @@ import {
   ChevronRight,
 } from "lucide-react-native";
 import * as ImagePicker from "expo-image-picker";
+import { Video as ExpoVideo, ResizeMode } from "expo-av";
 import type { BottomTabScreenProps } from "@/navigation/types";
 import { api, uploadImage } from "@/lib/api";
 import { useSession } from "@/lib/useSession";
@@ -133,7 +134,7 @@ export default function CommunityScreen({ navigation }: Props) {
 
   // Create moment mutation
   const createMomentMutation = useMutation({
-    mutationFn: (data: { imageUrl?: string; content?: string }) =>
+    mutationFn: (data: { imageUrl?: string; videoUrl?: string; content?: string }) =>
       api.post("/api/moments", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["moments"] });
@@ -147,19 +148,32 @@ export default function CommunityScreen({ navigation }: Props) {
     },
   });
 
-  const handleCreateMoment = async (imageUrl: string, text?: string) => {
+  const handleCreateMoment = async (imageUrl?: string, videoUrl?: string, text?: string) => {
     try {
-      // Upload image to server first using authenticated upload helper
-      const serverImageUrl = await uploadImage(imageUrl);
+      let serverImageUrl: string | undefined;
+      let serverVideoUrl: string | undefined;
 
-      // Now create moment with server URL
+      // Upload image if provided
+      if (imageUrl) {
+        serverImageUrl = await uploadImage(imageUrl);
+      }
+
+      // Upload video if provided (using same upload helper)
+      if (videoUrl) {
+        // For videos, we'll use the same upload endpoint
+        // The backend will handle video files appropriately
+        serverVideoUrl = await uploadImage(videoUrl); // uploadImage handles both images and videos
+      }
+
+      // Now create moment with server URL(s)
       createMomentMutation.mutate({
         imageUrl: serverImageUrl,
+        videoUrl: serverVideoUrl,
         content: text,
       });
     } catch (error: any) {
       console.error("Upload error:", error);
-      Alert.alert("Error", error?.message || "Failed to upload image. Please try again.");
+      Alert.alert("Error", error?.message || "Failed to upload media. Please try again.");
       throw error;
     }
   };
@@ -486,6 +500,7 @@ export default function CommunityScreen({ navigation }: Props) {
         {/* Content */}
         {activeTab === "feed" ? (
           <FeedScreen
+            navigation={navigation}
             onCreatePostPress={() => {
               // Store the handler for the + button to use
               setFeedCreatePostHandler(() => () => {
@@ -511,7 +526,7 @@ export default function CommunityScreen({ navigation }: Props) {
               >
                 {/* Your Story Button */}
                 <TouchableOpacity
-                  onPress={() => setShowCreateMoment(true)}
+                  onPress={() => navigation.navigate("CreateStory")}
                   style={{
                     alignItems: "center",
                     marginRight: 8,
@@ -1296,7 +1311,8 @@ export default function CommunityScreen({ navigation }: Props) {
           onRequestClose={() => setSelectedMoment(null)}
         >
           <View style={{ flex: 1, backgroundColor: "black" }}>
-            <SafeAreaView style={{ flex: 1 }} edges={["top", "bottom"]}>
+            <SafeAreaView style={{ flex: 1 }} edges={["top", "bottom", "left", "right"]}>
+              <View style={{ flex: 1, overflow: "hidden" }}>
               {/* Progress Bars */}
               <View
                 style={{
@@ -1391,7 +1407,7 @@ export default function CommunityScreen({ navigation }: Props) {
               </View>
 
               {/* Story Content with Swipe Navigation */}
-              <View style={{ flex: 1, position: "relative" }}>
+              <View style={{ flex: 1, position: "relative", overflow: "hidden" }}>
                 <TouchableOpacity
                   activeOpacity={1}
                   onPress={(e) => {
@@ -1411,13 +1427,29 @@ export default function CommunityScreen({ navigation }: Props) {
                       }
                     }
                   }}
-                  style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+                  style={{ flex: 1, justifyContent: "center", alignItems: "center", overflow: "hidden" }}
                 >
                   {selectedMoment.moments[momentIndex]?.imageUrl && (
                     <Image
-                      source={{ uri: selectedMoment.moments[momentIndex].imageUrl }}
+                      source={{ uri: String(selectedMoment.moments[momentIndex].imageUrl) }}
                       style={{ width: "100%", height: "100%" }}
                       resizeMode="contain"
+                      onError={(error) => {
+                        const imageUrl = selectedMoment.moments[momentIndex]?.imageUrl;
+                        console.error("Failed to load story image:", {
+                          imageUrl: typeof imageUrl === "string" ? imageUrl : "Invalid URL type",
+                          error: error?.nativeEvent?.error || "Unknown error",
+                        });
+                      }}
+                    />
+                  )}
+                  {selectedMoment.moments[momentIndex]?.videoUrl && (
+                    <ExpoVideo
+                      source={{ uri: selectedMoment.moments[momentIndex].videoUrl }}
+                      style={{ width: "100%", height: "100%" }}
+                      useNativeControls
+                      resizeMode={ResizeMode.CONTAIN}
+                      isLooping
                     />
                   )}
                 </TouchableOpacity>
@@ -1475,6 +1507,7 @@ export default function CommunityScreen({ navigation }: Props) {
                     </Text>
                   </View>
                 )}
+              </View>
               </View>
             </SafeAreaView>
           </View>

@@ -327,6 +327,56 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
     shareToCommunityMutation.mutate();
   };
 
+  // Share quest completion to story
+  const shareToStoryMutation = useMutation({
+    mutationFn: async () => {
+      if (!savedQuestData || !completionData) {
+        throw new Error("No quest data available");
+      }
+
+      const questTitle = savedQuestData.quest.title;
+      const category = savedQuestData.quest.category;
+      const difficulty = savedQuestData.quest.difficulty;
+      const xpReward = savedQuestData.quest.xpReward;
+      const pointsReward = savedQuestData.quest.pointsReward;
+      const noCount = completionData.noCount || 0;
+      const yesCount = completionData.yesCount || 0;
+      const actionsCompleted = completionData.actionsCompleted || 0;
+
+      let storyContent = `🎯 Quest Complete!\n\n"${questTitle}"\n\n`;
+
+      if (noCount > 0) {
+        storyContent += `✅ Collected ${noCount} NO${noCount > 1 ? 's' : ''}\n`;
+      }
+      if (yesCount > 0) {
+        storyContent += `✅ Collected ${yesCount} YES${yesCount > 1 ? 'es' : ''}\n`;
+      }
+      if (actionsCompleted > 0) {
+        storyContent += `✅ Completed ${actionsCompleted} action${actionsCompleted > 1 ? 's' : ''}\n`;
+      }
+
+      storyContent += `\n📊 Category: ${category}\n`;
+      storyContent += `⚡ Difficulty: ${difficulty}\n`;
+      storyContent += `🏆 Earned: ${xpReward} XP + ${pointsReward} Points\n\n`;
+      storyContent += `#QuestComplete #${category}`;
+
+      return api.post("/api/moments", {
+        content: storyContent,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["moments"] });
+      Alert.alert("Success", "Your quest achievement has been shared as a story!");
+    },
+    onError: () => {
+      Alert.alert("Error", "Failed to share to story. Please try again.");
+    },
+  });
+
+  const handleShareToStory = () => {
+    shareToStoryMutation.mutate();
+  };
+
   // Regenerate quest with new category/difficulty
   const regenerateQuestMutation = useMutation({
     mutationFn: async (params: { category: string; difficulty: string }) => {
@@ -1570,14 +1620,16 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                   </View>
                 </Animated.View>
 
-                {/* Share to Community Button */}
+                {/* Share Options */}
                 <Animated.View
                   style={{
                     marginTop: 32,
                     width: "100%",
                     opacity: celebrationAnim,
+                    gap: 12,
                   }}
                 >
+                  {/* Share to Post Button */}
                   <Pressable
                     onPress={handleShareToCommunity}
                     disabled={shareToCommunityMutation.isPending}
@@ -1610,7 +1662,46 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
                             fontWeight: "700",
                           }}
                         >
-                          Share to Community
+                          Share as Post
+                        </Text>
+                      </>
+                    )}
+                  </Pressable>
+
+                  {/* Share to Story Button */}
+                  <Pressable
+                    onPress={handleShareToStory}
+                    disabled={shareToStoryMutation.isPending}
+                    style={{
+                      backgroundColor: colors.info,
+                      paddingVertical: 16,
+                      paddingHorizontal: 32,
+                      borderRadius: 24,
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 12,
+                      shadowColor: colors.info,
+                      shadowOffset: { width: 0, height: 4 },
+                      shadowOpacity: 0.4,
+                      shadowRadius: 12,
+                      elevation: 8,
+                      opacity: shareToStoryMutation.isPending ? 0.6 : 1,
+                    }}
+                  >
+                    {shareToStoryMutation.isPending ? (
+                      <ActivityIndicator size="small" color={colors.text} />
+                    ) : (
+                      <>
+                        <Video size={22} color={colors.text} />
+                        <Text
+                          style={{
+                            color: colors.text,
+                            fontSize: 18,
+                            fontWeight: "700",
+                          }}
+                        >
+                          Share as Story
                         </Text>
                       </>
                     )}

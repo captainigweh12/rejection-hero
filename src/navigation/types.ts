@@ -42,6 +42,7 @@ export type RootStackParamList = {
   ParentalGuidanceSettings: undefined;
   ReportBug: undefined;
   FriendQuestView: { userQuestId: string; userId: string };
+  CreateStory: undefined;
 };
 
 export type BottomTabParamList = {
