@@ -266,20 +266,23 @@ const uploadImage = async (mediaUri: string, filename?: string): Promise<string>
   }
 
   // Extract filename from URI if not provided
-  const fileName = finalFilename.includes("/") 
+  const fileName = finalFilename.includes("/")
     ? finalFilename.split("/").pop() || `media.${fileExtension}`
     : finalFilename;
 
-  // Use "file" field name as per backend expectation (backend supports both "file" and "image")
-  // React Native FormData requires uri, name, and type as object properties
-  formData.append("file", {
-    uri: mediaUri,
+  // Fetch the file as a blob first (required for proper FormData handling in React Native)
+  const fileResponse = await expoFetch(mediaUri);
+  const blob = await fileResponse.blob();
+
+  // Append the blob to FormData with proper metadata
+  // @ts-ignore - React Native FormData accepts blob with metadata
+  formData.append("file", blob, {
     name: fileName,
     type,
-  } as any);
+  });
 
   const cookies = authClient.getCookie();
-  
+
   const response = await expoFetch(`${BACKEND_URL}/api/upload/image`, {
     method: "POST",
     body: formData,
@@ -298,7 +301,7 @@ const uploadImage = async (mediaUri: string, filename?: string): Promise<string>
       errorData = { message: response.statusText };
     }
     throw new Error(
-      `Upload Error: ${response.status} ${response.statusText} - ${JSON.stringify(errorData)}`,
+      errorData.message || `Upload failed: ${response.status} ${response.statusText}`,
     );
   }
 

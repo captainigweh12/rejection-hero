@@ -26,7 +26,29 @@
 
 ## 🔧 Recent Updates
 
-### ✅ Fixed Notification Settings Black Screen (Latest)
+### ✅ Fixed Story Upload & Friend Request Errors (Latest)
+- **Issues Fixed**:
+  1. **expo-image-picker Deprecation Warning** - Console warning about deprecated `MediaTypeOptions`
+  2. **Story Upload Error** - "Unsupported FormDataPart implementation" when uploading images/videos
+  3. **Friend Request Internal Server Error** - 500 error when sending friend requests
+
+- **Root Causes**:
+  1. Using deprecated `ImagePicker.MediaTypeOptions.Images/Videos` instead of new string literal API
+  2. React Native FormData doesn't support `{uri, name, type}` object format - requires Blob
+  3. Missing `crypto` import in friends.ts, causing `crypto.randomUUID()` to fail at runtime
+
+- **Fixes Applied**:
+  - ✅ **CreateStoryScreen.tsx:62,111,146** - Replaced `ImagePicker.MediaTypeOptions.Images/Videos` with string literals `"images"` and `"videos"`
+  - ✅ **api.ts:273-282** - Convert media URI to Blob before appending to FormData using `fetch().blob()`
+  - ✅ **backend/routes/friends.ts:4,173,240** - Added `import { randomUUID } from "node:crypto"` and replaced `crypto.randomUUID()` calls
+
+- **Result**:
+  - ✅ No more deprecation warnings in console
+  - ✅ Story images and videos upload successfully to Cloudflare R2
+  - ✅ Friend requests send successfully with notifications
+  - ✅ All three features working end-to-end
+
+### ✅ Fixed Notification Settings Black Screen
 - **Issue**: Black screen when navigating from Profile → Settings → Manage Notifications
 - **Root Cause**: NotificationSettingsScreen was using Nativewind classes on `LinearGradient` component, which doesn't support Nativewind styling
 - **Problem**:

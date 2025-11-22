@@ -58,11 +58,8 @@ export default function CreateStoryScreen({ route, navigation }: Props) {
         return;
       }
 
-      // 2. Use MediaTypeOptions API (correct for expo-image-picker)
-      const mediaTypes =
-        mediaType === "image"
-          ? ImagePicker.MediaTypeOptions.Images
-          : ImagePicker.MediaTypeOptions.Videos;
+      // 2. Use MediaType API (new non-deprecated API) - use string literals
+      const mediaTypes = mediaType === "image" ? "images" : "videos";
 
       // 3. Launch picker
       const result = await ImagePicker.launchImageLibraryAsync({
@@ -111,7 +108,7 @@ export default function CreateStoryScreen({ route, navigation }: Props) {
       }
 
       const result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: "images",
         quality: 0.8,
         allowsEditing: true,
         aspect: [9, 16],
@@ -146,7 +143,7 @@ export default function CreateStoryScreen({ route, navigation }: Props) {
       }
 
       const result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Videos,
+        mediaTypes: "videos",
         quality: 0.8,
         allowsEditing: true,
         aspect: [9, 16],
