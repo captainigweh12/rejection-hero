@@ -56,7 +56,8 @@ export type UploadImageRequest = z.infer<typeof uploadImageRequestSchema>;
 export const uploadImageResponseSchema = z.object({
   success: z.boolean(),
   message: z.string(),
-  url: z.string(),
+  url: z.string(), // Relative path for backward compatibility
+  fullUrl: z.string().optional(), // Full R2 URL (preferred)
   filename: z.string(),
 });
 export type UploadImageResponse = z.infer<typeof uploadImageResponseSchema>;
@@ -321,6 +322,9 @@ export const recordQuestActionResponseSchema = z.object({
   noCount: z.number(),
   yesCount: z.number(),
   actionCount: z.number(),
+  currentNos: z.number().optional(), // Current count based on goal type (for UI display)
+  targetNos: z.number().optional(),   // Target count (for UI display)
+  status: z.enum(["ACTIVE", "COMPLETED", "QUEUED", "EXPIRED"]).optional(), // Updated quest status
   suspicious: z.boolean().optional(),
   flagged: z.boolean().optional(),
   warning: z.string().optional(),

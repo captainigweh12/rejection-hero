@@ -38,7 +38,7 @@ import {
   Plus,
 } from "lucide-react-native";
 import type { RootStackScreenProps } from "@/navigation/types";
-import { api } from "@/lib/api";
+import { api, BACKEND_URL } from "@/lib/api";
 import { useSession } from "@/lib/useSession";
 import PostCard from "@/components/PostCard";
 import CreateStoryModal from "@/components/CreateStoryModal";
@@ -227,7 +227,7 @@ export default function GroupDetailScreen({ navigation, route }: Props) {
         type,
       } as any);
 
-      const uploadResponse = await fetch(`${process.env.EXPO_PUBLIC_VIBECODE_BACKEND_URL}/api/upload/image`, {
+      const uploadResponse = await fetch(`${BACKEND_URL}/api/upload/image`, {
         method: "POST",
         body: formData,
         headers: {
@@ -240,7 +240,7 @@ export default function GroupDetailScreen({ navigation, route }: Props) {
       }
 
       const uploadData = await uploadResponse.json();
-      const serverImageUrl = `${process.env.EXPO_PUBLIC_VIBECODE_BACKEND_URL}${uploadData.url}`;
+      const serverImageUrl = `${BACKEND_URL}${uploadData.url}`;
 
       // Create moment with groupId
       return api.post("/api/moments", {
@@ -369,7 +369,7 @@ export default function GroupDetailScreen({ navigation, route }: Props) {
         type,
       } as any);
 
-      const uploadResponse = await fetch(`${process.env.EXPO_PUBLIC_VIBECODE_BACKEND_URL}/api/upload/image`, {
+      const uploadResponse = await fetch(`${BACKEND_URL}/api/upload/image`, {
         method: "POST",
         body: formData,
         headers: {
@@ -382,7 +382,7 @@ export default function GroupDetailScreen({ navigation, route }: Props) {
       }
 
       const uploadData = await uploadResponse.json();
-      const serverImageUrl = `${process.env.EXPO_PUBLIC_VIBECODE_BACKEND_URL}${uploadData.url}`;
+      const serverImageUrl = `${BACKEND_URL}${uploadData.url}`;
 
       updateAvatarMutation.mutate(serverImageUrl);
     } catch (error) {
@@ -406,7 +406,7 @@ export default function GroupDetailScreen({ navigation, route }: Props) {
       if (response.success && response.avatarUrl) {
         const serverImageUrl = response.avatarUrl.startsWith("http")
           ? response.avatarUrl
-          : `${process.env.EXPO_PUBLIC_VIBECODE_BACKEND_URL}${response.avatarUrl}`;
+          : `${BACKEND_URL}${response.avatarUrl}`;
         updateAvatarMutation.mutate(serverImageUrl);
       } else {
         Alert.alert("Error", response.message || "Failed to generate avatar");

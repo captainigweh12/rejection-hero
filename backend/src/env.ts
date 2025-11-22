@@ -25,6 +25,12 @@ const envSchema = z.object({
   // Storage URL (for file uploads - R2 public URL)
   STORAGE_URL: z.string().url("STORAGE_URL must be a valid URL").optional().default("https://storage.rejectionhero.com"),
 
+  // R2 Configuration (Cloudflare R2 - S3 compatible)
+  R2_ENDPOINT: z.string().url("R2_ENDPOINT must be a valid URL").optional(),
+  R2_ACCESS_KEY_ID: z.string().optional(),
+  R2_SECRET_ACCESS_KEY: z.string().optional(),
+  R2_BUCKET: z.string().optional(),
+
   // Google OAuth Configuration
   GOOGLE_CLIENT_ID: z.string().optional(),
   GOOGLE_CLIENT_SECRET: z.string().optional(),

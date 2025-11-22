@@ -6,7 +6,7 @@ import { db } from "../db";
 import {
   forgotPasswordRequestSchema,
   resetPasswordRequestSchema,
-} from "@/shared/contracts";
+} from "../../../shared/contracts";
 import { createOrUpdateContact, sendEmail } from "../services/gohighlevel";
 
 const app = new Hono<AppType>();

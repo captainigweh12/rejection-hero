@@ -62,9 +62,17 @@ export default function ProfileScreen({ navigation }: Props) {
   const { data: profileData, isLoading: profileLoading } = useQuery<GetProfileResponse>({
     queryKey: ["profile"],
     queryFn: async () => {
-      return api.get<GetProfileResponse>("/api/profile");
+      const data = await api.get<GetProfileResponse>("/api/profile");
+      console.log("🖼️ [Profile] Profile data fetched:", {
+        hasAvatar: !!data.avatar,
+        avatarUrl: data.avatar,
+        avatarType: typeof data.avatar,
+      });
+      return data;
     },
     enabled: !!sessionData?.user,
+    staleTime: 0, // Always fetch fresh data
+    gcTime: 0, // Don't cache to ensure we get latest avatar (gcTime replaces cacheTime in React Query v5)
   });
 
   const { data: statsData } = useQuery<GetUserStatsResponse>({
@@ -186,7 +194,10 @@ export default function ProfileScreen({ navigation }: Props) {
       }
 
       const uploadData = await uploadResponse.json();
-      const serverImageUrl = `${process.env.EXPO_PUBLIC_VIBECODE_BACKEND_URL}${uploadData.url}`;
+      // Use fullUrl if available (R2 URL), otherwise construct from relative path
+      const serverImageUrl = uploadData.fullUrl || `${process.env.EXPO_PUBLIC_VIBECODE_BACKEND_URL || "https://api.rejectionhero.com"}${uploadData.url}`;
+
+      console.log("🖼️ [Avatar Upload] Server image URL:", serverImageUrl);
 
       // Save the avatar URL to the profile
       await api.post("/api/profile", {
@@ -216,10 +227,18 @@ export default function ProfileScreen({ navigation }: Props) {
       );
 
       if (response.success && response.avatarUrl) {
-        // The avatar URL is already a server URL, so we can use it directly
-        const avatarUrl = response.avatarUrl.startsWith("http")
-          ? response.avatarUrl
-          : `${process.env.EXPO_PUBLIC_VIBECODE_BACKEND_URL}${response.avatarUrl}`;
+        // The avatar URL from backend should be the full R2 URL (e.g., https://storage.rejectionhero.com/avatars/avatar-xxx.png)
+        let avatarUrl = response.avatarUrl;
+        
+        // Ensure it's a complete URL
+        if (!avatarUrl.startsWith("http")) {
+          // If for some reason it's a relative URL, use storage URL
+          const STORAGE_URL = "https://storage.rejectionhero.com";
+          avatarUrl = `${STORAGE_URL}${avatarUrl.startsWith("/") ? "" : "/"}${avatarUrl}`;
+        }
+
+        console.log("🖼️ [Avatar] Generated avatar URL:", avatarUrl);
+        console.log("🖼️ [Avatar] Saving avatar URL to profile...");
 
         // Save the avatar to the profile
         await api.post("/api/profile", {
@@ -229,6 +248,9 @@ export default function ProfileScreen({ navigation }: Props) {
 
         // Refetch profile to show new avatar
         queryClient.invalidateQueries({ queryKey: ["profile"] });
+        
+        // Also wait a bit for the profile to update before showing success
+        await new Promise((resolve) => setTimeout(resolve, 500));
 
         Alert.alert("Success!", "Your AI avatar has been generated and saved!");
       } else {
@@ -348,11 +370,34 @@ export default function ProfileScreen({ navigation }: Props) {
                     overflow: "hidden",
                   }}
                 >
-                  {profileData?.avatar ? (
+                  {profileData?.avatar && typeof profileData.avatar === "string" && profileData.avatar.trim() !== "" ? (
                     <Image
-                      source={{ uri: profileData.avatar }}
+                      source={{ 
+                        uri: profileData.avatar.trim(),
+                        cache: "reload" // Force reload to ensure fresh image
+                      }}
                       style={{ width: "100%", height: "100%", borderRadius: 70 }}
                       resizeMode="cover"
+                      onError={(error) => {
+                        const avatarUrl = profileData.avatar;
+                        console.error("🖼️ [Avatar] ❌ Failed to load avatar image:", {
+                          avatarUrl: typeof avatarUrl === "string" ? avatarUrl : "Invalid URL type",
+                          urlType: typeof avatarUrl,
+                          urlLength: typeof avatarUrl === "string" ? avatarUrl.length : 0,
+                          error: error?.nativeEvent?.error || (error?.nativeEvent as any)?.message || "Unknown error",
+                          fullError: JSON.stringify(error?.nativeEvent || {}),
+                        });
+                        // Try to reload after a short delay
+                        setTimeout(() => {
+                          queryClient.invalidateQueries({ queryKey: ["profile"] });
+                        }, 2000);
+                      }}
+                      onLoad={() => {
+                        console.log("🖼️ [Avatar] ✅ Avatar image loaded successfully:", profileData.avatar);
+                      }}
+                      onLoadStart={() => {
+                        console.log("🖼️ [Avatar] 🔄 Starting to load avatar:", profileData.avatar);
+                      }}
                     />
                   ) : (
                     <Text style={{ fontSize: 64, fontWeight: "bold", color: colors.text }}>

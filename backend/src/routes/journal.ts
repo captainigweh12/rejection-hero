@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
+import { randomUUID } from "node:crypto";
 import { type AppType } from "../types";
 import { db } from "../db";
 import {
@@ -58,7 +59,7 @@ journalRouter.post("/transcribe", zValidator("json", transcribeAudioRequestSchem
         return c.json({ message: "Failed to transcribe audio" }, 500);
       }
 
-      const transcriptionData = await transcriptionResponse.json();
+      const transcriptionData = (await transcriptionResponse.json()) as { text: string };
       transcript = transcriptionData.text;
     } else {
       return c.json({ message: "Either audioBase64 or text must be provided" }, 400);
@@ -95,7 +96,9 @@ journalRouter.post("/transcribe", zValidator("json", transcribeAudioRequestSchem
       return c.json({ message: "Failed to generate summary" }, 500);
     }
 
-    const summaryData = await summaryResponse.json();
+    const summaryData = (await summaryResponse.json()) as {
+      choices: Array<{ message: { content: string } }>;
+    };
     const summary = summaryData.choices[0].message.content.trim();
 
     return c.json({
@@ -124,6 +127,7 @@ journalRouter.post("/", zValidator("json", createJournalEntryRequestSchema), asy
     // Create journal entry
     const journalEntry = await db.journal_entry.create({
       data: {
+        id: randomUUID(), // Generate unique ID for journal entry
         userId: user.id,
         audioUrl,
         audioTranscript,
@@ -132,6 +136,7 @@ journalRouter.post("/", zValidator("json", createJournalEntryRequestSchema), asy
         outcome,
         imageUrls: imageUrls ? JSON.stringify(imageUrls) : null,
         location,
+        updatedAt: new Date(), // Set updatedAt timestamp
       },
     });
 
@@ -157,6 +162,7 @@ journalRouter.post("/", zValidator("json", createJournalEntryRequestSchema), asy
     // Create growth achievement
     const achievement = await db.growth_achievement.create({
       data: {
+        id: randomUUID(), // Generate unique ID for achievement
         userId: user.id,
         journalEntryId: journalEntry.id,
         type: achievementType,
@@ -195,7 +201,7 @@ journalRouter.get("/", async (c) => {
         userId: user.id,
       },
       include: {
-        achievements: true,
+        growth_achievement: true,
       },
       orderBy: {
         createdAt: "desc",
@@ -228,7 +234,7 @@ journalRouter.get("/", async (c) => {
           location: entry.location,
           createdAt: entry.createdAt.toISOString(),
           updatedAt: entry.updatedAt.toISOString(),
-          achievements: entry.achievements.map((ach) => ({
+          achievements: entry.growth_achievement.map((ach) => ({
             id: ach.id,
             type: ach.type,
             description: ach.description,
@@ -331,7 +337,7 @@ journalRouter.get("/achievements", async (c) => {
         userId: user.id,
       },
       include: {
-        journalEntry: true,
+        journal_entry: true,
       },
       orderBy: {
         earnedAt: "desc",
@@ -353,11 +359,11 @@ journalRouter.get("/achievements", async (c) => {
         description: ach.description,
         earnedAt: ach.earnedAt.toISOString(),
         journalEntry: {
-          id: ach.journalEntry.id,
-          aiSummary: ach.journalEntry.aiSummary,
-          userEditedSummary: ach.journalEntry.userEditedSummary,
-          outcome: ach.journalEntry.outcome,
-          createdAt: ach.journalEntry.createdAt.toISOString(),
+          id: ach.journal_entry.id,
+          aiSummary: ach.journal_entry.aiSummary,
+          userEditedSummary: ach.journal_entry.userEditedSummary,
+          outcome: ach.journal_entry.outcome,
+          createdAt: ach.journal_entry.createdAt.toISOString(),
         },
       })),
       stats,

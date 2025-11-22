@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
+import { randomUUID } from "node:crypto";
 import { type AppType } from "../types";
 import { db } from "../db";
 import { createMomentRequestSchema } from "../../../shared/contracts";
@@ -46,6 +47,7 @@ momentsRouter.post("/", zValidator("json", createMomentRequestSchema), async (c)
 
     const moment = await db.moment.create({
       data: {
+        id: randomUUID(), // Generate unique ID for moment
         userId: user.id,
         groupId: groupId || null,
         imageUrl: imageUrl || null,

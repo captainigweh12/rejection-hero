@@ -802,7 +802,41 @@ questsRouter.post("/:id/record", zValidator("json", recordQuestActionRequestSche
     return c.json({ message: "Quest not found" }, 404);
   }
 
-  // No blocking - all actions are allowed (transparent system)
+  // ✅ CRITICAL: Only ACTIVE quests can record actions
+  if (userQuest.status !== "ACTIVE") {
+    return c.json(
+      {
+        code: "QUEST_NOT_ACTIVE",
+        message: "This quest is not active. Please activate it first before recording actions.",
+      },
+      400
+    );
+  }
+
+  // ✅ Rate limiting for NO submissions (anti-cheat)
+  if (action === "NO") {
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+    const recentNoCount = await db.quest_action_log.count({
+      where: {
+        userQuestId: userQuestId, // Count NOs for this specific quest
+        action: "NO",
+        recordedAt: {
+          gte: fiveMinutesAgo,
+        },
+      },
+    });
+
+    // Allow max 3 NOs in 5 minutes
+    if (recentNoCount >= 3) {
+      return c.json(
+        {
+          code: "TOO_FREQUENT_SUBMISSIONS",
+          message: "You're submitting NOs too frequently. Slow down and actually attempt the quest before logging another NO.",
+        },
+        429
+      );
+    }
+  }
 
   // Calculate new counts
   const newNoCount = action === "NO" ? userQuest.noCount + 1 : userQuest.noCount;
@@ -1061,12 +1095,24 @@ questsRouter.post("/:id/record", zValidator("json", recordQuestActionRequestSche
     }
   }
 
+  // Determine current count and target based on goal type
+  let currentNos = newNoCount;
+  let targetNos = userQuest.quest.goalCount;
+  if (userQuest.quest.goalType === "COLLECT_YES") {
+    currentNos = newYesCount;
+  } else if (userQuest.quest.goalType === "TAKE_ACTION") {
+    currentNos = newActionCount;
+  }
+
   return c.json({
     success: true,
     completed: isCompleted,
     noCount: newNoCount,
     yesCount: newYesCount,
     actionCount: newActionCount,
+    currentNos, // Current count based on goal type
+    targetNos,  // Target count
+    status: isCompleted ? "COMPLETED" : "ACTIVE", // Updated status
     suspicious: detectionResult.isSuspicious,
     flagged: detectionResult.shouldFlag,
     ...(detectionResult.isSuspicious && {

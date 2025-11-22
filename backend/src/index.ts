@@ -86,11 +86,17 @@ app.on(["GET", "POST"], "/api/auth/*", async (c) => {
     const url = c.req.url;
     const headers = Object.fromEntries(c.req.raw.headers.entries());
     
-    // Log ALL auth requests (not just sign-up) for debugging
-    console.log(`🔐 [Auth Request] ${method} ${path}`);
-    console.log(`   Full URL: ${url}`);
-    console.log(`   Origin: ${headers.origin || "none"}`);
-    console.log(`   User-Agent: ${headers["user-agent"]?.substring(0, 50) || "none"}...`);
+    // Log auth requests (but reduce verbosity for frequent get-session calls)
+    if (path.includes("/get-session")) {
+      // Only log get-session requests if they're errors or in debug mode
+      // These are called frequently by Better Auth for session polling
+    } else {
+      // Log other auth requests for debugging
+      console.log(`🔐 [Auth Request] ${method} ${path}`);
+      console.log(`   Full URL: ${url}`);
+      console.log(`   Origin: ${headers.origin || "none"}`);
+      console.log(`   User-Agent: ${headers["user-agent"]?.substring(0, 50) || "none"}...`);
+    }
     
     // Log sign-up requests with more detail
     if (path.includes("/sign-up/email")) {
@@ -108,10 +114,11 @@ app.on(["GET", "POST"], "/api/auth/*", async (c) => {
         // Clone request to read body without consuming it
         const clonedRequest = c.req.raw.clone();
         const body = await clonedRequest.json().catch(() => null);
-        if (body) {
-          console.log(`   Email: ${body.email || "not provided"}`);
-          console.log(`   Name: ${body.name || "not provided"}`);
-          console.log(`   Password: ${body.password ? "***" : "not provided"}`);
+        if (body && typeof body === "object") {
+          const bodyObj = body as Record<string, unknown>;
+          console.log(`   Email: ${bodyObj.email || "not provided"}`);
+          console.log(`   Name: ${bodyObj.name || "not provided"}`);
+          console.log(`   Password: ${bodyObj.password ? "***" : "not provided"}`);
         } else {
           console.log(`   Body: Unable to parse (might be FormData or already consumed)`);
         }
@@ -408,8 +415,12 @@ app.get("/", (c) => {
 });
 
 // Handle favicon requests silently (reduce log noise from browser requests)
-app.get("/favicon.ico", (c) => c.status(204));
-app.get("/favicon.png", (c) => c.status(204));
+app.get("/favicon.ico", async (c) => {
+  return c.status(204);
+});
+app.get("/favicon.png", async (c) => {
+  return c.status(204);
+});
 
 // Health check endpoint
 // Used by load balancers and monitoring tools to verify service is running

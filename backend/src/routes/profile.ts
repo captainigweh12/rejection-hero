@@ -15,6 +15,7 @@ import { type AppType } from "../types";
 import { db } from "../db";
 import { env } from "../env";
 import { syncNewUserToGoHighLevel } from "../services/gohighlevel";
+import { uploadToR2 } from "../services/r2";
 
 const profileRouter = new Hono<AppType>();
 
@@ -65,6 +66,7 @@ profileRouter.get("/", async (c) => {
 
       profile = await db.profile.create({
         data: {
+          id: randomUUID(),
           userId: user.id,
           displayName: displayName,
           bio: null,
@@ -81,6 +83,7 @@ profileRouter.get("/", async (c) => {
           userContext: null,
           userGoals: null,
           onboardingCompleted: false,
+          updatedAt: new Date(),
         },
       });
 
@@ -98,7 +101,23 @@ profileRouter.get("/", async (c) => {
     const photos = profile.photos ? JSON.parse(profile.photos) : [];
     const interests = profile.interests ? JSON.parse(profile.interests) : [];
 
+    // Normalize avatar URL to ensure it uses storage domain
+    let normalizedAvatar = profile.avatar;
+    if (normalizedAvatar && typeof normalizedAvatar === "string") {
+      const storageUrl = env.STORAGE_URL || process.env.STORAGE_URL || "https://storage.rejectionhero.com";
+      
+      // Replace api.rejectionhero.com with storage.rejectionhero.com for uploads
+      if (normalizedAvatar.includes("api.rejectionhero.com")) {
+        normalizedAvatar = normalizedAvatar.replace(/https?:\/\/api\.rejectionhero\.com/, storageUrl);
+      }
+      // If it's a relative path, convert to absolute using storage URL
+      if (normalizedAvatar.startsWith("/")) {
+        normalizedAvatar = `${storageUrl}${normalizedAvatar}`;
+      }
+    }
+
     console.log(`✅ [Profile] Successfully fetched profile for user ${user.id}`);
+    console.log(`🖼️ [Profile] Avatar URL: ${normalizedAvatar || "null"}`);
     return c.json({
       id: profile.id,
       userId: profile.userId,
@@ -107,7 +126,7 @@ profileRouter.get("/", async (c) => {
       bio: profile.bio,
       age: profile.age,
       photos,
-      avatar: profile.avatar,
+      avatar: normalizedAvatar,
       interests,
       location: profile.location,
       latitude: profile.latitude,
@@ -347,25 +366,13 @@ profileRouter.post("/generate-avatar", zValidator("json", generateAvatarRequestS
 
       const imageBuffer = Buffer.from(await imageResponse.arrayBuffer());
 
-      // Get uploads directory
-      const UPLOADS_DIR = process.env.UPLOADS_DIR || path.join(process.cwd(), "uploads");
-      
-      // Ensure uploads directory exists
-      if (!fs.existsSync(UPLOADS_DIR)) {
-        fs.mkdirSync(UPLOADS_DIR, { recursive: true });
-      }
-
-      // Generate unique filename
+      // Generate unique filename for R2
       const uniqueFilename = `avatar-${randomUUID()}.png`;
-      const filePath = path.join(UPLOADS_DIR, uniqueFilename);
+      const r2Key = `avatars/${uniqueFilename}`;
 
-      // Save file to disk (temporary - will be moved to R2 if configured)
-      fs.writeFileSync(filePath, imageBuffer);
-      console.log("💾 Avatar saved to server:", filePath);
-
-      // Use storage URL (storage.rejectionhero.com) for all file URLs
-      const storageUrl = env.STORAGE_URL || process.env.STORAGE_URL || "https://storage.rejectionhero.com";
-      const serverAvatarUrl = `${storageUrl}/uploads/${uniqueFilename}`;
+      // Upload to R2 (Cloudflare R2 storage)
+      console.log("📤 [R2] Uploading avatar to R2...");
+      const serverAvatarUrl = await uploadToR2(imageBuffer, r2Key, "image/png");
       console.log("✅ Avatar URL saved:", serverAvatarUrl);
 
       return c.json({

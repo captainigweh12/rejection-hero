@@ -135,7 +135,9 @@ export const auth = betterAuth({
     google: {
       clientId: env.GOOGLE_CLIENT_ID,
       clientSecret: env.GOOGLE_CLIENT_SECRET,
-      redirectURI: `${env.BACKEND_URL}/api/auth/callback/google`,
+      // Always use production URL for OAuth redirect URI to match Google Console configuration
+      // This prevents redirect_uri_mismatch errors when BACKEND_URL is set to sandbox
+      redirectURI: "https://api.rejectionhero.com/api/auth/callback/google",
       scope: ["openid", "profile", "email"], // Explicitly request these scopes for better compatibility
     },
   } : undefined,
@@ -153,18 +155,17 @@ console.log(`🔗 [Auth] Base URL: ${env.BACKEND_URL}`);
 console.log(`🌐 [Auth] Trusted origins: ${auth.options.trustedOrigins?.join(", ")}`);
 console.log(`🔑 [Auth] Google OAuth: ${env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET ? "Enabled ✅" : "Disabled ⚠️"}`);
 if (env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET) {
-  const redirectURI = `${env.BACKEND_URL}/api/auth/callback/google`;
+  // Always use production URL for OAuth redirect URI to avoid mismatch errors
+  // This ensures the redirect URI matches what's configured in Google Console
+  const PRODUCTION_REDIRECT_URI = "https://api.rejectionhero.com/api/auth/callback/google";
+  
+  // Use production URL for redirect URI regardless of BACKEND_URL
+  // This prevents redirect_uri_mismatch errors when BACKEND_URL is set to sandbox
+  const redirectURI = PRODUCTION_REDIRECT_URI;
+  
   console.log(`🔗 [Auth] Google OAuth Redirect URI: ${redirectURI}`);
-  
-  // Verify production URL is being used
-  if (!redirectURI.includes("api.rejectionhero.com")) {
-    console.error(`❌ [Auth] ERROR: OAuth redirect URI is not using production URL: ${redirectURI}`);
-    console.error(`❌ [Auth] Expected: https://api.rejectionhero.com/api/auth/callback/google`);
-    console.error(`❌ [Auth] Please ensure BACKEND_URL is set to production domain: https://api.rejectionhero.com`);
-  } else {
-    console.log(`✅ [Auth] OAuth redirect URI is using production URL: ${redirectURI}`);
-  }
-  
+  console.log(`✅ [Auth] Using production redirect URI (required for Google OAuth)`);
+  console.log(`⚠️  [Auth] Note: BACKEND_URL is ${env.BACKEND_URL} but OAuth uses production URL`);
   console.log(`⚠️  [Auth] IMPORTANT: Make sure this URL is added to Google Cloud Console OAuth credentials!`);
   console.log(`⚠️  [Auth] Go to: https://console.cloud.google.com/apis/credentials`);
   console.log(`⚠️  [Auth] Add to "Authorized redirect URIs": ${redirectURI}`);

@@ -26,6 +26,12 @@ export function setupAPIErrorInterceptor() {
           return false;
         }
 
+        // Retry 502 (bad gateway) errors more aggressively - backend might be temporarily down
+        if (error?.status === 502 || error?.isGatewayError || error?.message?.includes("bad gateway")) {
+          // Retry up to 3 times for gateway errors with exponential backoff
+          return failureCount < 3;
+        }
+
         // For other errors, use default retry logic (max 2 retries)
         return failureCount < 2;
       },
@@ -41,6 +47,12 @@ export function setupAPIErrorInterceptor() {
           console.warn("🔐 [API] Detected 401 in mutation - clearing session");
           handleUnauthorized();
           return false;
+        }
+
+        // Retry 502 (bad gateway) errors - backend might be temporarily down
+        if (error?.status === 502 || error?.isGatewayError || error?.message?.includes("bad gateway")) {
+          // Retry up to 2 times for gateway errors
+          return failureCount < 2;
         }
 
         // For other errors, retry once
