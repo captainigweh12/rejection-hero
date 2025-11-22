@@ -3,3 +3,7 @@ baseUrl = "."
 
 [compilerOptions.paths]
 "@/shared/*" = ["./shared/*"]
+
+# Runtime aliases for Bun - these are resolved at runtime when running bun run
+[alias]
+"@/shared/*" = "./shared/*"
