@@ -49,15 +49,17 @@ export const postSampleResponseSchema = z.object({
 export type PostSampleResponse = z.infer<typeof postSampleResponseSchema>;
 
 // POST /api/upload/image
+// Accepts either "file" or "image" field for backward compatibility
 export const uploadImageRequestSchema = z.object({
-  image: z.instanceof(File),
+  file: z.instanceof(File).optional(),
+  image: z.instanceof(File).optional(), // Keep for backward compatibility
 });
 export type UploadImageRequest = z.infer<typeof uploadImageRequestSchema>;
 export const uploadImageResponseSchema = z.object({
   success: z.boolean(),
   message: z.string(),
   url: z.string(), // Relative path for backward compatibility
-  fullUrl: z.string().optional(), // Full R2 URL (preferred)
+  fullUrl: z.string(), // Full R2 public URL (preferred - always returned)
   filename: z.string(),
 });
 export type UploadImageResponse = z.infer<typeof uploadImageResponseSchema>;

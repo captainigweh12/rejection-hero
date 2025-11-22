@@ -8,68 +8,75 @@ import { uploadToR2 } from "../services/r2";
 const uploadRouter = new Hono<AppType>();
 
 // ============================================
-// POST /api/upload/image - Upload an image
+// POST /api/upload/image - Upload an image or video
 // ============================================
-// Accepts multipart/form-data with "image" field
+// Accepts multipart/form-data with "file" or "image" field (both supported)
 // Validates file type and size before saving
-// Returns URL to access the uploaded image
+// Uploads to R2 and returns public URL (https://storage.rejectionhero.com/stories/...)
 uploadRouter.post("/image", zValidator("form", uploadImageRequestSchema), async (c) => {
-  const { image } = c.req.valid("form");
-  console.log("📤 [Upload] Image upload request received");
+  const { file, image } = c.req.valid("form");
+  // Support both "file" and "image" field names for backward compatibility
+  const uploadedFile = file || image;
+  console.log("📤 [Upload] File upload request received");
 
   try {
     // Check if file exists in request
-    if (!image) {
-      console.log("❌ [Upload] No image file provided in request");
-      return c.json({ error: "No image file provided" }, 400);
+    if (!uploadedFile) {
+      console.log("❌ [Upload] No file provided in request");
+      return c.json({ error: "No file provided" }, 400);
     }
     console.log(
-      `📄 [Upload] File received: ${image.name} (${image.type}, ${(image.size / 1024).toFixed(2)} KB)`,
+      `📄 [Upload] File received: ${uploadedFile.name} (${uploadedFile.type}, ${(uploadedFile.size / 1024).toFixed(2)} KB)`,
     );
 
-    // Validate file type
-    const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"];
-    if (!allowedTypes.includes(image.type)) {
-      console.log(`❌ [Upload] Invalid file type: ${image.type}`);
+    // Validate file type - support both images and videos
+    const allowedImageTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"];
+    const allowedVideoTypes = ["video/mp4", "video/quicktime", "video/x-msvideo", "video/x-matroska", "video/webm"];
+    const allowedTypes = [...allowedImageTypes, ...allowedVideoTypes];
+    
+    if (!allowedTypes.includes(uploadedFile.type)) {
+      console.log(`❌ [Upload] Invalid file type: ${uploadedFile.type}`);
       return c.json(
-        { error: "Invalid file type. Only JPEG, PNG, GIF, and WebP images are allowed" },
+        { error: "Invalid file type. Only images (JPEG, PNG, GIF, WebP) and videos (MP4, MOV, AVI, MKV, WebM) are allowed" },
         400,
       );
     }
-    console.log(`✅ [Upload] File type validated: ${image.type}`);
+    console.log(`✅ [Upload] File type validated: ${uploadedFile.type}`);
 
-    // Validate file size (10MB limit)
-    const maxSize = 10 * 1024 * 1024; // 10MB
-    if (image.size > maxSize) {
+    // Validate file size (50MB limit for videos, 10MB for images)
+    const isVideo = allowedVideoTypes.includes(uploadedFile.type);
+    const maxSize = isVideo ? 50 * 1024 * 1024 : 10 * 1024 * 1024; // 50MB for videos, 10MB for images
+    if (uploadedFile.size > maxSize) {
       console.log(
-        `❌ [Upload] File too large: ${(image.size / 1024 / 1024).toFixed(2)} MB (max: 10 MB)`,
+        `❌ [Upload] File too large: ${(uploadedFile.size / 1024 / 1024).toFixed(2)} MB (max: ${maxSize / 1024 / 1024} MB)`,
       );
-      return c.json({ error: "File too large. Maximum size is 10MB" }, 400);
+      return c.json({ error: `File too large. Maximum size is ${maxSize / 1024 / 1024}MB` }, 400);
     }
-    console.log(`✅ [Upload] File size validated: ${(image.size / 1024).toFixed(2)} KB`);
+    console.log(`✅ [Upload] File size validated: ${(uploadedFile.size / 1024).toFixed(2)} KB`);
 
     // Generate unique filename for R2
-    const fileExtension = image.name.split(".").pop() || "jpg";
+    const fileExtension = uploadedFile.name.split(".").pop() || (isVideo ? "mp4" : "jpg");
     const uniqueFilename = `${randomUUID()}.${fileExtension}`;
-    const r2Key = `uploads/${uniqueFilename}`;
+    // Use "stories" folder for story uploads, "uploads" for general uploads
+    const r2Key = `stories/${uniqueFilename}`;
     console.log(`🔑 [Upload] Generated unique filename: ${uniqueFilename}`);
 
     // Convert to buffer
-    const arrayBuffer = await image.arrayBuffer();
+    const arrayBuffer = await uploadedFile.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
     // Upload to R2 (Cloudflare R2 storage)
     console.log(`📤 [Upload] Uploading to R2: ${r2Key}`);
-    const imageUrl = await uploadToR2(buffer, r2Key, image.type);
-    console.log(`🎉 [Upload] Upload complete! Image URL: ${imageUrl}`);
+    const fileUrl = await uploadToR2(buffer, r2Key, uploadedFile.type);
+    console.log(`🎉 [Upload] Upload complete! File URL: ${fileUrl}`);
 
     // Return relative path for backward compatibility, but the full URL is what should be used
-    const relativePath = imageUrl.replace(/^https?:\/\/[^\/]+/, "");
+    const relativePath = fileUrl.replace(/^https?:\/\/[^\/]+/, "");
     return c.json({
       success: true,
-      message: "Image uploaded successfully",
+      message: "File uploaded successfully",
       url: relativePath, // Relative path for backward compatibility
-      fullUrl: imageUrl, // Full R2 URL (use this in the app)
+      fullUrl: fileUrl, // Full R2 URL (use this in the app)
       filename: uniqueFilename,
     } satisfies UploadImageResponse);
   } catch (error) {

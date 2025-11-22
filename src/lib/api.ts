@@ -270,7 +270,9 @@ const uploadImage = async (mediaUri: string, filename?: string): Promise<string>
     ? finalFilename.split("/").pop() || `media.${fileExtension}`
     : finalFilename;
 
-  formData.append("image", {
+  // Use "file" field name as per backend expectation (backend supports both "file" and "image")
+  // React Native FormData requires uri, name, and type as object properties
+  formData.append("file", {
     uri: mediaUri,
     name: fileName,
     type,
@@ -301,7 +303,8 @@ const uploadImage = async (mediaUri: string, filename?: string): Promise<string>
   }
 
   const uploadData = await response.json();
-  return `${BACKEND_URL}${uploadData.url}`;
+  // Use fullUrl if available (R2 public URL), otherwise fall back to relative path
+  return uploadData.fullUrl || `${BACKEND_URL}${uploadData.url}`;
 };
 
 // Export the API client, upload helper, and backend URL to be used in other modules

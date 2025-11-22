@@ -16,8 +16,7 @@
     "preview": {
       "distribution": "internal",
       "android": {
-        "buildType": "apk",
-        "newArchEnabled": false
+        "buildType": "apk"
       },
       "ios": {
         "simulator": false
@@ -27,12 +26,10 @@
       "developmentClient": false,
       "distribution": "internal",
       "android": {
-        "buildType": "apk",
-        "newArchEnabled": false
+        "buildType": "apk"
       },
       "ios": {
-        "simulator": true,
-        "newArchEnabled": false
+        "simulator": true
       },
       "env": {
         "EXPO_PUBLIC_ENABLE_EXPO_GO": "true"
@@ -44,7 +41,8 @@
         "credentialsSource": "remote"
       },
       "ios": {
-        "simulator": false
+        "simulator": false,
+        "credentialsSource": "remote"
       }
     }
   },

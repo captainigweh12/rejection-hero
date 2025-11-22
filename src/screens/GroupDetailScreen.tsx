@@ -344,7 +344,7 @@ export default function GroupDetailScreen({ navigation, route }: Props) {
       }
 
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: [ImagePicker.MediaType.Image],
         allowsEditing: true,
         aspect: [1, 1],
         quality: 0.8,

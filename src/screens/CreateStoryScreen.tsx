@@ -58,11 +58,11 @@ export default function CreateStoryScreen({ route, navigation }: Props) {
         return;
       }
 
-      // 2. Use MediaTypeOptions API (correct for expo-image-picker ~16.1.4)
+      // 2. Use MediaType API (correct for expo-image-picker latest)
       const mediaTypes =
         mediaType === "image"
-          ? ImagePicker.MediaTypeOptions.Images
-          : ImagePicker.MediaTypeOptions.Videos;
+          ? [ImagePicker.MediaType.Image]
+          : [ImagePicker.MediaType.Video];
 
       // 3. Launch picker
       const result = await ImagePicker.launchImageLibraryAsync({
@@ -111,7 +111,7 @@ export default function CreateStoryScreen({ route, navigation }: Props) {
       }
 
       const result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: [ImagePicker.MediaType.Image],
         quality: 0.8,
         allowsEditing: true,
         aspect: [9, 16],
@@ -146,7 +146,7 @@ export default function CreateStoryScreen({ route, navigation }: Props) {
       }
 
       const result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Videos,
+        mediaTypes: [ImagePicker.MediaType.Video],
         quality: 0.8,
         allowsEditing: true,
         aspect: [9, 16],
@@ -308,9 +308,12 @@ export default function CreateStoryScreen({ route, navigation }: Props) {
           keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
         >
           {selectedMedia ? (
-            <View style={{ flex: 1 }}>
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{ flexGrow: 1, paddingBottom: 40 }}
+            >
               {/* Media Preview */}
-              <View style={{ flex: 1, backgroundColor: "black", position: "relative" }}>
+              <View style={{ width: "100%", aspectRatio: 9/16, backgroundColor: "black", position: "relative", marginTop: 12, borderRadius: 12, overflow: "hidden" }}>
                 {selectedMedia.type === "image" ? (
                   <Image
                     source={{ uri: selectedMedia.uri }}
@@ -389,7 +392,7 @@ export default function CreateStoryScreen({ route, navigation }: Props) {
                   </Text>
                 </TouchableOpacity>
               </View>
-            </View>
+            </ScrollView>
           ) : (
             /* Media Selection Options */
             <ScrollView

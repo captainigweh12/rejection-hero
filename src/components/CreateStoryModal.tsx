@@ -35,7 +35,7 @@ export default function CreateStoryModal({
 
   const handlePickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: [ImagePicker.MediaType.Image],
       quality: 0.8,
       allowsEditing: true,
     });
@@ -48,7 +48,7 @@ export default function CreateStoryModal({
 
   const handlePickVideo = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Videos,
+      mediaTypes: [ImagePicker.MediaType.Video],
       quality: 0.8,
       allowsEditing: true,
       videoMaxDuration: 60, // 60 seconds max
@@ -68,7 +68,7 @@ export default function CreateStoryModal({
     }
 
     const result = await ImagePicker.launchCameraAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: [ImagePicker.MediaType.Image],
       quality: 0.8,
       allowsEditing: true,
     });
@@ -92,7 +92,7 @@ export default function CreateStoryModal({
     // For now, camera permission is sufficient for video recording
 
     const result = await ImagePicker.launchCameraAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Videos,
+      mediaTypes: [ImagePicker.MediaType.Video],
       quality: 0.8,
       allowsEditing: true,
       videoMaxDuration: 60, // 60 seconds max
