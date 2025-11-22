@@ -343,6 +343,15 @@ groupQuestsRouter.post("/:groupQuestId/start", async (c) => {
     return c.json({ message: "Quest already completed" }, 400);
   }
 
+  // Get group quest info for notification
+  const groupQuest = await db.group_quest.findUnique({
+    where: { id: groupQuestId },
+    include: {
+      quest: true,
+      group: true,
+    },
+  });
+
   // Start the quest
   await db.group_quest_participant.update({
     where: {
@@ -356,6 +365,20 @@ groupQuestsRouter.post("/:groupQuestId/start", async (c) => {
       startedAt: new Date(),
     },
   });
+
+  // Notify group members
+  if (groupQuest) {
+    try {
+      const { notifyGroupMembers } = await import("../services/groupNotifications");
+      await notifyGroupMembers(groupQuest.groupId, user.id, "GROUP_QUEST_STARTED", {
+        questId: groupQuest.questId,
+        questTitle: groupQuest.quest.title,
+      });
+    } catch (error) {
+      console.error("Error notifying group about quest start:", error);
+      // Continue even if notification fails
+    }
+  }
 
   return c.json({ success: true, message: "Started group quest" });
 });

@@ -886,4 +886,495 @@ groupsRouter.post("/generate-avatar", zValidator("json", generateGroupAvatarSche
   }
 });
 
+// ============================================
+// GROUP CHAT ENDPOINTS
+// ============================================
+
+// POST /api/groups/:groupId/chat/message - Send a message to group chat
+groupsRouter.post("/:groupId/chat/message", zValidator("json", z.object({ content: z.string().min(1).max(1000) })), async (c) => {
+  const user = c.get("user");
+
+  if (!user) {
+    return c.json({ message: "Unauthorized" }, 401);
+  }
+
+  const groupId = c.req.param("groupId");
+  const { content } = c.req.valid("json");
+
+  try {
+    // Check if user is a member
+    const membership = await db.group_member.findUnique({
+      where: {
+        groupId_userId: {
+          groupId,
+          userId: user.id,
+        },
+      },
+    });
+
+    if (!membership) {
+      return c.json({ message: "You must be a member of this group to send messages" }, 403);
+    }
+
+    // Create group chat message
+    const message = await db.group_chat_message.create({
+      data: {
+        groupId,
+        senderId: user.id,
+        content,
+      },
+      include: {
+        sender: {
+          include: {
+            profile: true,
+          },
+        },
+      },
+    });
+
+    return c.json({
+      success: true,
+      message: {
+        id: message.id,
+        content: message.content,
+        senderId: message.senderId,
+        senderName: message.sender.profile?.displayName || message.sender.email?.split("@")[0] || "User",
+        senderAvatar: message.sender.profile?.avatar || null,
+        createdAt: message.createdAt.toISOString(),
+      },
+    });
+  } catch (error) {
+    console.error("Send group chat message error:", error);
+    return c.json({ message: "Failed to send message" }, 500);
+  }
+});
+
+// GET /api/groups/:groupId/chat/messages - Get group chat messages
+groupsRouter.get("/:groupId/chat/messages", async (c) => {
+  const user = c.get("user");
+
+  if (!user) {
+    return c.json({ message: "Unauthorized" }, 401);
+  }
+
+  const groupId = c.req.param("groupId");
+  const limit = parseInt(c.req.query("limit") || "50");
+  const offset = parseInt(c.req.query("offset") || "0");
+
+  try {
+    // Check if user is a member
+    const membership = await db.group_member.findUnique({
+      where: {
+        groupId_userId: {
+          groupId,
+          userId: user.id,
+        },
+      },
+    });
+
+    if (!membership) {
+      return c.json({ message: "You must be a member of this group to view messages" }, 403);
+    }
+
+    // Get messages
+    const messages = await db.group_chat_message.findMany({
+      where: { groupId },
+      include: {
+        sender: {
+          include: {
+            profile: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      take: limit,
+      skip: offset,
+    });
+
+    const formattedMessages = messages.reverse().map((msg) => ({
+      id: msg.id,
+      content: msg.content,
+      senderId: msg.senderId,
+      senderName: msg.sender.profile?.displayName || msg.sender.email?.split("@")[0] || "User",
+      senderAvatar: msg.sender.profile?.avatar || null,
+      createdAt: msg.createdAt.toISOString(),
+    }));
+
+    return c.json({ messages: formattedMessages });
+  } catch (error) {
+    console.error("Get group chat messages error:", error);
+    return c.json({ message: "Failed to get messages" }, 500);
+  }
+});
+
+// ============================================
+// GROUP FEED ENDPOINTS
+// ============================================
+
+// GET /api/groups/:groupId/feed - Get group feed posts
+groupsRouter.get("/:groupId/feed", async (c) => {
+  const user = c.get("user");
+
+  if (!user) {
+    return c.json({ message: "Unauthorized" }, 401);
+  }
+
+  const groupId = c.req.param("groupId");
+
+  try {
+    // Check if user is a member
+    const membership = await db.group_member.findUnique({
+      where: {
+        groupId_userId: {
+          groupId,
+          userId: user.id,
+        },
+      },
+    });
+
+    if (!membership) {
+      return c.json({ message: "You must be a member of this group to view the feed" }, 403);
+    }
+
+    // Get posts
+    const posts = await db.group_post.findMany({
+      where: { groupId },
+      include: {
+        author: {
+          include: {
+            profile: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    const formattedPosts = posts.map((post) => ({
+      id: post.id,
+      content: post.content,
+      authorId: post.authorId,
+      authorName: post.author.profile?.displayName || post.author.email?.split("@")[0] || "User",
+      authorAvatar: post.author.profile?.avatar || null,
+      createdAt: post.createdAt.toISOString(),
+      updatedAt: post.updatedAt.toISOString(),
+    }));
+
+    return c.json({ posts: formattedPosts });
+  } catch (error) {
+    console.error("Get group feed error:", error);
+    return c.json({ message: "Failed to get feed" }, 500);
+  }
+});
+
+// POST /api/groups/:groupId/feed - Create a group post
+groupsRouter.post("/:groupId/feed", zValidator("json", z.object({ content: z.string().min(1).max(2000) })), async (c) => {
+  const user = c.get("user");
+
+  if (!user) {
+    return c.json({ message: "Unauthorized" }, 401);
+  }
+
+  const groupId = c.req.param("groupId");
+  const { content } = c.req.valid("json");
+
+  try {
+    // Check if user is a member
+    const membership = await db.group_member.findUnique({
+      where: {
+        groupId_userId: {
+          groupId,
+          userId: user.id,
+        },
+      },
+    });
+
+    if (!membership) {
+      return c.json({ message: "You must be a member of this group to post" }, 403);
+    }
+
+    // Create post
+    const post = await db.group_post.create({
+      data: {
+        groupId,
+        authorId: user.id,
+        content,
+      },
+      include: {
+        author: {
+          include: {
+            profile: true,
+          },
+        },
+      },
+    });
+
+    // Notify group members (except the author)
+    const { notifyGroupMembers } = await import("../services/groupNotifications");
+    await notifyGroupMembers(groupId, user.id, "GROUP_POST_CREATED", {
+      postId: post.id,
+      postContent: content.substring(0, 100),
+    });
+
+    return c.json({
+      success: true,
+      post: {
+        id: post.id,
+        content: post.content,
+        authorId: post.authorId,
+        authorName: post.author.profile?.displayName || post.author.email?.split("@")[0] || "User",
+        authorAvatar: post.author.profile?.avatar || null,
+        createdAt: post.createdAt.toISOString(),
+      },
+    });
+  } catch (error) {
+    console.error("Create group post error:", error);
+    return c.json({ message: "Failed to create post" }, 500);
+  }
+});
+
+// ============================================
+// GROUP LEADERBOARD ENDPOINTS
+// ============================================
+
+// GET /api/groups/:groupId/leaderboards - Get all leaderboards for a group
+groupsRouter.get("/:groupId/leaderboards", async (c) => {
+  const user = c.get("user");
+
+  if (!user) {
+    return c.json({ message: "Unauthorized" }, 401);
+  }
+
+  const groupId = c.req.param("groupId");
+
+  try {
+    // Check if user is a member
+    const membership = await db.group_member.findUnique({
+      where: {
+        groupId_userId: {
+          groupId,
+          userId: user.id,
+        },
+      },
+    });
+
+    if (!membership) {
+      return c.json({ message: "You must be a member of this group to view leaderboards" }, 403);
+    }
+
+    // Get leaderboards
+    const leaderboards = await db.group_leaderboard.findMany({
+      where: { groupId },
+      include: {
+        entries: {
+          include: {
+            user: {
+              include: {
+                profile: true,
+              },
+            },
+          },
+          orderBy: {
+            score: "desc",
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    const formatted = leaderboards.map((lb) => ({
+      id: lb.id,
+      name: lb.name,
+      entries: lb.entries.map((entry, index) => ({
+        userId: entry.userId,
+        displayName: entry.user.profile?.displayName || entry.user.email?.split("@")[0] || "User",
+        avatar: entry.user.profile?.avatar || null,
+        score: entry.score,
+        rank: entry.rank || index + 1,
+      })),
+      createdAt: lb.createdAt.toISOString(),
+    }));
+
+    return c.json({ leaderboards: formatted });
+  } catch (error) {
+    console.error("Get group leaderboards error:", error);
+    return c.json({ message: "Failed to get leaderboards" }, 500);
+  }
+});
+
+// POST /api/groups/:groupId/leaderboards - Create a new leaderboard (admin only)
+groupsRouter.post("/:groupId/leaderboards", zValidator("json", z.object({ name: z.string().min(1).max(100) })), async (c) => {
+  const user = c.get("user");
+
+  if (!user) {
+    return c.json({ message: "Unauthorized" }, 401);
+  }
+
+  const groupId = c.req.param("groupId");
+  const { name } = c.req.valid("json");
+
+  try {
+    // Check if user is admin
+    const membership = await db.group_member.findUnique({
+      where: {
+        groupId_userId: {
+          groupId,
+          userId: user.id,
+        },
+      },
+    });
+
+    if (!membership) {
+      return c.json({ message: "You must be a member of this group" }, 403);
+    }
+
+    if (membership.role !== "admin" && membership.role !== "moderator") {
+      return c.json({ message: "Only admins and moderators can create leaderboards" }, 403);
+    }
+
+    // Create leaderboard
+    const leaderboard = await db.group_leaderboard.create({
+      data: {
+        groupId,
+        name,
+      },
+    });
+
+    return c.json({ success: true, leaderboardId: leaderboard.id });
+  } catch (error) {
+    console.error("Create leaderboard error:", error);
+    return c.json({ message: "Failed to create leaderboard" }, 500);
+  }
+});
+
+// GET /api/groups/:groupId/leaderboards/:leaderboardId - Get specific leaderboard entries
+groupsRouter.get("/:groupId/leaderboards/:leaderboardId", async (c) => {
+  const user = c.get("user");
+
+  if (!user) {
+    return c.json({ message: "Unauthorized" }, 401);
+  }
+
+  const groupId = c.req.param("groupId");
+  const leaderboardId = c.req.param("leaderboardId");
+
+  try {
+    // Check if user is a member
+    const membership = await db.group_member.findUnique({
+      where: {
+        groupId_userId: {
+          groupId,
+          userId: user.id,
+        },
+      },
+    });
+
+    if (!membership) {
+      return c.json({ message: "You must be a member of this group to view leaderboards" }, 403);
+    }
+
+    // Get leaderboard
+    const leaderboard = await db.group_leaderboard.findUnique({
+      where: { id: leaderboardId },
+      include: {
+        entries: {
+          include: {
+            user: {
+              include: {
+                profile: true,
+              },
+            },
+          },
+          orderBy: {
+            score: "desc",
+          },
+        },
+      },
+    });
+
+    if (!leaderboard) {
+      return c.json({ message: "Leaderboard not found" }, 404);
+    }
+
+    if (leaderboard.groupId !== groupId) {
+      return c.json({ message: "Leaderboard does not belong to this group" }, 403);
+    }
+
+    // Calculate ranks
+    const entries = leaderboard.entries.map((entry, index) => ({
+      userId: entry.userId,
+      displayName: entry.user.profile?.displayName || entry.user.email?.split("@")[0] || "User",
+      avatar: entry.user.profile?.avatar || null,
+      score: entry.score,
+      rank: index + 1,
+    }));
+
+    return c.json({
+      id: leaderboard.id,
+      name: leaderboard.name,
+      entries,
+    });
+  } catch (error) {
+    console.error("Get leaderboard error:", error);
+    return c.json({ message: "Failed to get leaderboard" }, 500);
+  }
+});
+
+// POST /api/groups/:groupId/leaderboards/:leaderboardId/update-score - Update user's score (admin only)
+groupsRouter.post("/:groupId/leaderboards/:leaderboardId/update-score", zValidator("json", z.object({ userId: z.string(), score: z.number().int() })), async (c) => {
+  const user = c.get("user");
+
+  if (!user) {
+    return c.json({ message: "Unauthorized" }, 401);
+  }
+
+  const groupId = c.req.param("groupId");
+  const leaderboardId = c.req.param("leaderboardId");
+  const { userId: targetUserId, score } = c.req.valid("json");
+
+  try {
+    // Check if user is admin
+    const membership = await db.group_member.findUnique({
+      where: {
+        groupId_userId: {
+          groupId,
+          userId: user.id,
+        },
+      },
+    });
+
+    if (!membership || (membership.role !== "admin" && membership.role !== "moderator")) {
+      return c.json({ message: "Only admins and moderators can update scores" }, 403);
+    }
+
+    // Upsert entry
+    await db.group_leaderboard_entry.upsert({
+      where: {
+        leaderboardId_userId: {
+          leaderboardId,
+          userId: targetUserId,
+        },
+      },
+      update: {
+        score,
+      },
+      create: {
+        leaderboardId,
+        userId: targetUserId,
+        score,
+      },
+    });
+
+    return c.json({ success: true });
+  } catch (error) {
+    console.error("Update score error:", error);
+    return c.json({ message: "Failed to update score" }, 500);
+  }
+});
+
 export { groupsRouter };

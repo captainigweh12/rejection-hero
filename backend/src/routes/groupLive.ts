@@ -153,6 +153,18 @@ groupLiveRouter.post("/start", zValidator("json", startGroupLiveSchema), async (
 
   console.log(`✅ [Group Live] Stream created with ID: ${liveStream.id}`);
 
+  // Notify group members
+  try {
+    const { notifyGroupMembers } = await import("../services/groupNotifications");
+    await notifyGroupMembers(groupId, user.id, "GROUP_LIVE_STARTED", {
+      liveId: liveStream.id,
+      liveTitle: "Group Live Stream",
+    });
+  } catch (error) {
+    console.error("Error notifying group about live stream:", error);
+    // Continue even if notification fails
+  }
+
   return c.json({
     success: true,
     liveStreamId: liveStream.id,

@@ -13,7 +13,7 @@ import {
   Image,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Plus, X, Image as ImageIcon, Globe, Users, Lock, Camera, ChevronLeft, ChevronRight } from "lucide-react-native";
+import { Plus, X, Image as ImageIcon, Globe, Users, Lock, Camera, ChevronLeft, ChevronRight, Heart, MessageCircle, Target, Eye } from "lucide-react-native";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
 import { Video as ExpoVideo, ResizeMode } from "expo-av";
@@ -101,6 +101,11 @@ export default function FeedScreen({ onCreatePostPress, navigation }: FeedScreen
   const [showCreateMoment, setShowCreateMoment] = useState(false);
   const [selectedMoment, setSelectedMoment] = useState<MomentsUser | null>(null);
   const [momentIndex, setMomentIndex] = useState(0);
+  const [momentLikes, setMomentLikes] = useState<Record<string, { liked: boolean; likeCount: number }>>({});
+  const [showViewers, setShowViewers] = useState(false);
+  const [viewers, setViewers] = useState<Array<{ userId: string; displayName: string; avatar: string | null; viewedAt: string }>>([]);
+  const [replyMessage, setReplyMessage] = useState("");
+  const [showReplyInput, setShowReplyInput] = useState(false);
 
   // Fetch profile data for current user
   const { data: profileData } = useQuery<GetProfileResponse>({
@@ -163,6 +168,83 @@ export default function FeedScreen({ onCreatePostPress, navigation }: FeedScreen
     },
     onError: () => {
       Alert.alert("Error", "Failed to create moment. Please try again.");
+    },
+  });
+
+  // Get current moment ID
+  const currentMomentId = selectedMoment?.moments[momentIndex]?.id;
+
+  // Fetch moment likes when moment is selected
+  const { data: likesData } = useQuery({
+    queryKey: ["moment-likes", currentMomentId],
+    queryFn: async () => {
+      if (!currentMomentId) return null;
+      const response = await api.get<{ likeCount: number; liked: boolean }>(`/api/moments/${currentMomentId}/likes`);
+      return response;
+    },
+    enabled: !!currentMomentId,
+  });
+
+  // Update likes state when data changes
+  React.useEffect(() => {
+    if (likesData && currentMomentId) {
+      setMomentLikes((prev) => ({
+        ...prev,
+        [currentMomentId]: { liked: likesData.liked, likeCount: likesData.likeCount },
+      }));
+    }
+  }, [likesData, currentMomentId]);
+
+  // Record view when moment is opened
+  React.useEffect(() => {
+    if (currentMomentId && selectedMoment) {
+      api.post(`/api/moments/${currentMomentId}/view`).catch(console.error);
+    }
+  }, [currentMomentId, selectedMoment]);
+
+  // Like/unlike mutation
+  const likeMomentMutation = useMutation({
+    mutationFn: async (momentId: string) => {
+      return api.post<{ liked: boolean; likeCount: number }>(`/api/moments/${momentId}/like`);
+    },
+    onSuccess: (data, momentId) => {
+      setMomentLikes((prev) => ({
+        ...prev,
+        [momentId]: { liked: data.liked, likeCount: data.likeCount },
+      }));
+    },
+  });
+
+  // Send message mutation
+  const sendMessageMutation = useMutation({
+    mutationFn: async ({ momentId, message }: { momentId: string; message: string }) => {
+      return api.post(`/api/moments/${momentId}/message`, { message });
+    },
+    onSuccess: () => {
+      setReplyMessage("");
+      setShowReplyInput(false);
+      Alert.alert("Success", "Message sent!");
+      if (navigation) {
+        navigation.navigate("Chat", {
+          userId: selectedMoment?.userId || "",
+          userName: selectedMoment?.userName || "User",
+          userAvatar: selectedMoment?.userAvatar || undefined,
+        });
+      }
+    },
+    onError: (error: any) => {
+      Alert.alert("Error", error?.message || "Failed to send message");
+    },
+  });
+
+  // Fetch viewers mutation
+  const fetchViewersMutation = useMutation({
+    mutationFn: async (momentId: string) => {
+      return api.get<{ viewers: Array<{ userId: string; displayName: string; avatar: string | null; viewedAt: string }> }>(`/api/moments/${momentId}/viewers`);
+    },
+    onSuccess: (data) => {
+      setViewers(data.viewers);
+      setShowViewers(true);
     },
   });
 
@@ -938,7 +1020,7 @@ export default function FeedScreen({ onCreatePostPress, navigation }: FeedScreen
                   <View
                     style={{
                       position: "absolute",
-                      bottom: 40,
+                      bottom: 100,
                       left: 20,
                       right: 20,
                       backgroundColor: "rgba(0, 0, 0, 0.6)",
@@ -952,6 +1034,151 @@ export default function FeedScreen({ onCreatePostPress, navigation }: FeedScreen
                     </Text>
                   </View>
                 )}
+
+                {/* Interaction Buttons */}
+                <View
+                  style={{
+                    position: "absolute",
+                    bottom: 20,
+                    left: 20,
+                    right: 20,
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: 12,
+                  }}
+                >
+                  {/* Left side - Like and Viewers */}
+                  <View style={{ flexDirection: "row", alignItems: "center", gap: 16 }}>
+                    <TouchableOpacity
+                      onPress={() => {
+                        if (currentMomentId) {
+                          likeMomentMutation.mutate(currentMomentId);
+                        }
+                      }}
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        gap: 6,
+                        backgroundColor: "rgba(0, 0, 0, 0.6)",
+                        paddingHorizontal: 12,
+                        paddingVertical: 8,
+                        borderRadius: 20,
+                      }}
+                    >
+                      <Heart
+                        size={20}
+                        color={currentMomentId && momentLikes[currentMomentId]?.liked ? "#FF3B30" : "white"}
+                        fill={currentMomentId && momentLikes[currentMomentId]?.liked ? "#FF3B30" : "none"}
+                      />
+                      {currentMomentId && momentLikes[currentMomentId] && (
+                        <Text style={{ color: "white", fontSize: 14, fontWeight: "600" }}>
+                          {momentLikes[currentMomentId].likeCount}
+                        </Text>
+                      )}
+                    </TouchableOpacity>
+
+                    {/* Viewers button (only for story owner) */}
+                    {selectedMoment.userId === sessionData?.user?.id && (
+                      <TouchableOpacity
+                        onPress={() => {
+                          if (currentMomentId) {
+                            fetchViewersMutation.mutate(currentMomentId);
+                          }
+                        }}
+                        style={{
+                          backgroundColor: "rgba(0, 0, 0, 0.6)",
+                          paddingHorizontal: 12,
+                          paddingVertical: 8,
+                          borderRadius: 20,
+                        }}
+                      >
+                        <Eye size={20} color="white" />
+                      </TouchableOpacity>
+                    )}
+                  </View>
+
+                  {/* Right side - Reply and Send Quest */}
+                  <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+                    <TouchableOpacity
+                      onPress={() => setShowReplyInput(!showReplyInput)}
+                      style={{
+                        backgroundColor: "rgba(0, 0, 0, 0.6)",
+                        paddingHorizontal: 12,
+                        paddingVertical: 8,
+                        borderRadius: 20,
+                      }}
+                    >
+                      <MessageCircle size={20} color="white" />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => {
+                        // Navigate to quest selection or show quest picker
+                        Alert.alert("Send Quest", "Quest selection coming soon", [
+                          { text: "OK" },
+                        ]);
+                      }}
+                      style={{
+                        backgroundColor: "rgba(0, 0, 0, 0.6)",
+                        paddingHorizontal: 12,
+                        paddingVertical: 8,
+                        borderRadius: 20,
+                      }}
+                    >
+                      <Target size={20} color="white" />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+
+                {/* Reply Input */}
+                {showReplyInput && (
+                  <View
+                    style={{
+                      position: "absolute",
+                      bottom: 80,
+                      left: 20,
+                      right: 20,
+                      backgroundColor: "rgba(0, 0, 0, 0.8)",
+                      padding: 12,
+                      borderRadius: 12,
+                      flexDirection: "row",
+                      gap: 8,
+                    }}
+                  >
+                    <TextInput
+                      style={{
+                        flex: 1,
+                        color: "white",
+                        backgroundColor: "rgba(255, 255, 255, 0.1)",
+                        borderRadius: 8,
+                        paddingHorizontal: 12,
+                        paddingVertical: 8,
+                      }}
+                      placeholder="Type a message..."
+                      placeholderTextColor="rgba(255, 255, 255, 0.5)"
+                      value={replyMessage}
+                      onChangeText={setReplyMessage}
+                      multiline
+                    />
+                    <TouchableOpacity
+                      onPress={() => {
+                        if (currentMomentId && replyMessage.trim()) {
+                          sendMessageMutation.mutate({ momentId: currentMomentId, message: replyMessage.trim() });
+                        }
+                      }}
+                      disabled={!replyMessage.trim() || sendMessageMutation.isPending}
+                      style={{
+                        backgroundColor: colors.primary,
+                        paddingHorizontal: 16,
+                        paddingVertical: 8,
+                        borderRadius: 8,
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Text style={{ color: "white", fontWeight: "600" }}>Send</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
               </TouchableOpacity>
               </View>
               </View>
@@ -959,6 +1186,45 @@ export default function FeedScreen({ onCreatePostPress, navigation }: FeedScreen
           </View>
         </Modal>
       )}
+
+      {/* Viewers Modal */}
+      <Modal visible={showViewers} transparent animationType="slide" onRequestClose={() => setShowViewers(false)}>
+        <View style={{ flex: 1, backgroundColor: "rgba(0, 0, 0, 0.9)", justifyContent: "flex-end" }}>
+          <SafeAreaView edges={["top", "bottom"]}>
+            <View style={{ backgroundColor: colors.backgroundSolid, borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: "80%" }}>
+              <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", padding: 16, borderBottomWidth: 1, borderBottomColor: colors.border }}>
+                <Text style={{ fontSize: 20, fontWeight: "bold", color: colors.text }}>Viewers</Text>
+                <TouchableOpacity onPress={() => setShowViewers(false)}>
+                  <X size={24} color={colors.text} />
+                </TouchableOpacity>
+              </View>
+              <ScrollView style={{ padding: 16 }}>
+                {viewers.length === 0 ? (
+                  <Text style={{ color: colors.textSecondary, textAlign: "center", marginTop: 20 }}>No viewers yet</Text>
+                ) : (
+                  viewers.map((viewer) => (
+                    <View key={viewer.userId} style={{ flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 16 }}>
+                      {viewer.avatar ? (
+                        <Image source={{ uri: viewer.avatar }} style={{ width: 48, height: 48, borderRadius: 24 }} />
+                      ) : (
+                        <View style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: colors.primary, alignItems: "center", justifyContent: "center" }}>
+                          <Text style={{ color: "white", fontSize: 20, fontWeight: "bold" }}>{viewer.displayName.charAt(0).toUpperCase()}</Text>
+                        </View>
+                      )}
+                      <View style={{ flex: 1 }}>
+                        <Text style={{ fontSize: 16, fontWeight: "600", color: colors.text }}>{viewer.displayName}</Text>
+                        <Text style={{ fontSize: 12, color: colors.textSecondary }}>
+                          {new Date(viewer.viewedAt).toLocaleString()}
+                        </Text>
+                      </View>
+                    </View>
+                  ))
+                )}
+              </ScrollView>
+            </View>
+          </SafeAreaView>
+        </View>
+      </Modal>
     </View>
   );
 }

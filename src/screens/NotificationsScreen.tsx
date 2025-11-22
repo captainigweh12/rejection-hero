@@ -137,6 +137,28 @@ export default function NotificationsScreen({ navigation }: Props) {
       } else {
         navigation.navigate("Tabs", { screen: "CommunityTab" });
       }
+    } else if (notification.type === "GROUP_POST_CREATED" && notification.data?.groupId) {
+      navigation.navigate("GroupDetail", { groupId: notification.data.groupId });
+    } else if (notification.type === "GROUP_QUEST_STARTED" && notification.data?.groupId) {
+      navigation.navigate("GroupQuests", {
+        groupId: notification.data.groupId,
+        groupName: notification.data.groupName || "Group",
+      });
+    } else if (notification.type === "GROUP_QUEST_COMPLETED" && notification.data?.groupId) {
+      navigation.navigate("GroupQuests", {
+        groupId: notification.data.groupId,
+        groupName: notification.data.groupName || "Group",
+      });
+    } else if (notification.type === "GROUP_LIVE_STARTED" && notification.data?.groupId) {
+      navigation.navigate("GroupLive", {
+        groupId: notification.data.groupId,
+        groupName: notification.data.groupName || "Group",
+      });
+    } else if (notification.type === "GROUP_CALL_STARTED" && notification.data?.groupId) {
+      navigation.navigate("GroupLive", {
+        groupId: notification.data.groupId,
+        groupName: notification.data.groupName || "Group",
+      });
     } else if (notification.type === "CONFIDENCE_LOW") {
       // Navigate to home to see quests
       navigation.navigate("Tabs", { screen: "HomeTab" });
