@@ -28,11 +28,14 @@ COPY backend ./
 # Generate Prisma Client
 RUN bun run postinstall
 
-# Verify shared directory and tsconfig are in place
-RUN echo "🔍 Verifying project structure..." && \
+# Create symlink from backend/shared to /app/shared so path alias resolves at runtime
+# This ensures @/shared/* works even if Bun doesn't resolve ../shared/* correctly
+RUN ln -s /app/shared /app/backend/shared && \
+    echo "🔍 Verifying project structure..." && \
     ls -la /app/shared/contracts.ts && \
+    ls -la /app/backend/shared/contracts.ts && \
     cat /app/backend/tsconfig.json | grep -A 2 '"paths"' && \
-    echo "✅ Project structure verified"
+    echo "✅ Project structure verified (shared directory accessible from both locations)"
 
 # Ensure startup script is executable
 RUN chmod +x /app/backend/start.sh
