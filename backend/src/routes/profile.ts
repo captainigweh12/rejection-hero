@@ -142,16 +142,30 @@ profileRouter.post("/", zValidator("json", updateProfileRequestSchema), async (c
   const photosJson = data.photos ? JSON.stringify(data.photos) : undefined;
   const interestsJson = data.interests ? JSON.stringify(data.interests) : undefined;
 
+  // Normalize avatar URL - remove sandbox.dev if present, use production URL
+  let normalizedAvatar = data.avatar;
+  if (normalizedAvatar && typeof normalizedAvatar === "string") {
+    // Replace sandbox.dev URLs with production URL
+    if (normalizedAvatar.includes("sandbox.dev")) {
+      normalizedAvatar = normalizedAvatar.replace(/https?:\/\/[^\/]+\.sandbox\.dev/, env.BACKEND_URL || "https://api.rejectionhero.com");
+    }
+    // If it's a relative path, convert to absolute using production URL
+    if (normalizedAvatar.startsWith("/")) {
+      normalizedAvatar = `${env.BACKEND_URL || "https://api.rejectionhero.com"}${normalizedAvatar}`;
+    }
+  }
+
   const profile = await db.profile.upsert({
     where: { userId: user.id },
     create: {
+      id: randomUUID(), // Explicitly generate ID for profile
       userId: user.id,
       username: data.username,
       displayName: data.displayName,
       bio: data.bio,
       age: data.age,
       photos: photosJson,
-      avatar: data.avatar,
+      avatar: normalizedAvatar,
       interests: interestsJson,
       location: data.location,
       latitude: data.latitude,
@@ -168,7 +182,7 @@ profileRouter.post("/", zValidator("json", updateProfileRequestSchema), async (c
       bio: data.bio,
       age: data.age,
       photos: photosJson,
-      avatar: data.avatar,
+      avatar: normalizedAvatar,
       interests: interestsJson,
       location: data.location,
       latitude: data.latitude,
