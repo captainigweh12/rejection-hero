@@ -62,9 +62,17 @@ export default function ProfileScreen({ navigation }: Props) {
   const { data: profileData, isLoading: profileLoading } = useQuery<GetProfileResponse>({
     queryKey: ["profile"],
     queryFn: async () => {
-      return api.get<GetProfileResponse>("/api/profile");
+      const data = await api.get<GetProfileResponse>("/api/profile");
+      console.log("🖼️ [Profile] Profile data fetched:", {
+        hasAvatar: !!data.avatar,
+        avatarUrl: data.avatar,
+        avatarType: typeof data.avatar,
+      });
+      return data;
     },
     enabled: !!sessionData?.user,
+    staleTime: 0, // Always fetch fresh data
+    gcTime: 0, // Don't cache to ensure we get latest avatar (gcTime replaces cacheTime in React Query v5)
   });
 
   const { data: statsData } = useQuery<GetUserStatsResponse>({
@@ -362,29 +370,33 @@ export default function ProfileScreen({ navigation }: Props) {
                     overflow: "hidden",
                   }}
                 >
-                  {profileData?.avatar ? (
+                  {profileData?.avatar && typeof profileData.avatar === "string" && profileData.avatar.trim() !== "" ? (
                     <Image
                       source={{ 
-                        uri: profileData.avatar,
-                        cache: "force-cache" // Cache the image for better performance
+                        uri: profileData.avatar.trim(),
+                        cache: "reload" // Force reload to ensure fresh image
                       }}
                       style={{ width: "100%", height: "100%", borderRadius: 70 }}
                       resizeMode="cover"
                       onError={(error) => {
-                        console.error("🖼️ [Avatar] Failed to load avatar image:", {
-                          avatarUrl: profileData.avatar,
-                          error: error?.nativeEvent?.error || "Unknown error",
+                        const avatarUrl = profileData.avatar;
+                        console.error("🖼️ [Avatar] ❌ Failed to load avatar image:", {
+                          avatarUrl: typeof avatarUrl === "string" ? avatarUrl : "Invalid URL type",
+                          urlType: typeof avatarUrl,
+                          urlLength: typeof avatarUrl === "string" ? avatarUrl.length : 0,
+                          error: error?.nativeEvent?.error || (error?.nativeEvent as any)?.message || "Unknown error",
+                          fullError: JSON.stringify(error?.nativeEvent || {}),
                         });
                         // Try to reload after a short delay
                         setTimeout(() => {
                           queryClient.invalidateQueries({ queryKey: ["profile"] });
-                        }, 1000);
+                        }, 2000);
                       }}
                       onLoad={() => {
-                        console.log("🖼️ [Avatar] Avatar image loaded successfully:", profileData.avatar);
+                        console.log("🖼️ [Avatar] ✅ Avatar image loaded successfully:", profileData.avatar);
                       }}
                       onLoadStart={() => {
-                        console.log("🖼️ [Avatar] Starting to load avatar:", profileData.avatar);
+                        console.log("🖼️ [Avatar] 🔄 Starting to load avatar:", profileData.avatar);
                       }}
                     />
                   ) : (

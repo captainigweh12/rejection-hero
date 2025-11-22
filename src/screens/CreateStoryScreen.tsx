@@ -47,7 +47,7 @@ export default function CreateStoryScreen({ navigation }: Props) {
   }, []);
 
   const handlePickFromGallery = async (mediaType: "image" | "video") => {
-    // Use MediaTypeOptions (MediaType not available in this expo-image-picker version)
+    // Use MediaTypeOptions for expo-image-picker ~16.1.4
     const mediaTypes = mediaType === "image" 
       ? ImagePicker.MediaTypeOptions.Images 
       : ImagePicker.MediaTypeOptions.Videos;
@@ -177,9 +177,8 @@ export default function CreateStoryScreen({ navigation }: Props) {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.backgroundSolid }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.backgroundSolid }} edges={["top", "bottom", "left", "right"]}>
       <StatusBar barStyle="light-content" />
-      <SafeAreaView style={{ flex: 1 }} edges={["top", "bottom", "left", "right"]}>
         {/* Header */}
         <View
           style={{
@@ -494,8 +493,7 @@ export default function CreateStoryScreen({ navigation }: Props) {
             </ScrollView>
           )}
         </KeyboardAvoidingView>
-      </SafeAreaView>
-    </View>
+    </SafeAreaView>
   );
 }
 

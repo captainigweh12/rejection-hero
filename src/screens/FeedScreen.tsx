@@ -263,7 +263,7 @@ export default function FeedScreen({ onCreatePostPress, navigation }: FeedScreen
         style={{
           borderBottomWidth: 1,
           borderBottomColor: colors.cardBorder,
-          marginBottom: 12, // Reduced padding between stories and posts
+          marginBottom: 8, // Reduced padding between stories and posts
           paddingTop: 8, // Add top padding
         }}
         contentContainerStyle={{ paddingHorizontal: 12, paddingVertical: 12, gap: 10, paddingBottom: 16 }}
@@ -433,7 +433,7 @@ export default function FeedScreen({ onCreatePostPress, navigation }: FeedScreen
           renderItem={({ item }) => (
             <PostCard post={item} currentUserId={sessionData?.user?.id || ""} />
           )}
-          contentContainerStyle={{ paddingHorizontal: 12, paddingTop: 8, paddingBottom: 100 }}
+          contentContainerStyle={{ paddingHorizontal: 12, paddingTop: 4, paddingBottom: 100 }}
           refreshControl={
             <RefreshControl
               refreshing={false}
