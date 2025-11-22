@@ -265,6 +265,111 @@ export default function FeedScreen({ onCreatePostPress }: FeedScreenProps = {}) 
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.backgroundSolid }}>
+      {/* Stories/Moments Bar */}
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={{
+          borderBottomWidth: 1,
+          borderBottomColor: colors.cardBorder,
+          marginBottom: 12,
+        }}
+        contentContainerStyle={{ paddingHorizontal: 12, paddingVertical: 12, gap: 10, paddingBottom: 16 }}
+      >
+        {/* Your Story Button */}
+        <TouchableOpacity
+          onPress={() => setShowCreateMoment(true)}
+          style={{
+            alignItems: "center",
+            marginRight: 8,
+          }}
+        >
+          <View
+            style={{
+              width: 70,
+              height: 70,
+              borderRadius: 35,
+              borderWidth: 2,
+              borderStyle: "dashed",
+              borderColor: colors.primary,
+              backgroundColor: colors.surface,
+              justifyContent: "center",
+              alignItems: "center",
+              marginBottom: 6,
+            }}
+          >
+            <Plus size={24} color={colors.primary} />
+          </View>
+          <Text style={{ color: colors.text, fontSize: 12, fontWeight: "600" }}>
+            Your Story
+          </Text>
+        </TouchableOpacity>
+
+        {/* Friends' Stories */}
+        {momentsData?.moments?.map((momentUser) => (
+          <TouchableOpacity
+            key={momentUser.userId}
+            onPress={() => {
+              setSelectedMoment(momentUser);
+              setMomentIndex(0);
+            }}
+            style={{
+              alignItems: "center",
+              marginRight: 8,
+            }}
+          >
+            <View
+              style={{
+                width: 70,
+                height: 70,
+                borderRadius: 35,
+                borderWidth: 2,
+                borderColor: colors.primary,
+                padding: 2,
+                marginBottom: 6,
+              }}
+            >
+              {momentUser.userAvatar ? (
+                <Image
+                  source={{ uri: momentUser.userAvatar }}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    borderRadius: 33,
+                  }}
+                />
+              ) : (
+                <View
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    borderRadius: 33,
+                    backgroundColor: colors.primary,
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <Text style={{ color: colors.text, fontSize: 20, fontWeight: "bold" }}>
+                    {momentUser.userName?.charAt(0).toUpperCase() || "?"}
+                  </Text>
+                </View>
+              )}
+            </View>
+            <Text
+              style={{
+                color: colors.text,
+                fontSize: 12,
+                maxWidth: 70,
+                textAlign: "center",
+              }}
+              numberOfLines={1}
+            >
+              {momentUser.userName || "Friend"}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+
       {/* What's on your mind - Facebook Style */}
       <View style={{ paddingHorizontal: 16, paddingTop: 8 }}>
         <TouchableOpacity
