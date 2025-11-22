@@ -391,6 +391,26 @@ app.route("/api/bug-reports", bugReportRouter);
 console.log("🌐 Mounting web redirect routes");
 app.route("/", webRedirectRouter);
 
+// Root endpoint - API info (handles GET / for bots/scrapers)
+// This is registered after other root-level routers so it serves as a fallback
+app.get("/", (c) => {
+  // Skip logging root requests to reduce noise (they're mostly bots/scrapers)
+  return c.json({
+    name: "Rejection Hero API",
+    version: "1.0.0",
+    status: "ok",
+    endpoints: {
+      health: "/health",
+      api: "/api/*",
+      docs: "https://api.rejectionhero.com/health"
+    }
+  });
+});
+
+// Handle favicon requests silently (reduce log noise from browser requests)
+app.get("/favicon.ico", (c) => c.status(204));
+app.get("/favicon.png", (c) => c.status(204));
+
 // Health check endpoint
 // Used by load balancers and monitoring tools to verify service is running
 app.get("/health", (c) => {
