@@ -4,26 +4,16 @@ import { createAuthClient } from "better-auth/react";
 import * as SecureStore from "expo-secure-store";
 
 // Ensure the backend URL has the protocol prefix
+// IMPORTANT: Always use production URL for authClient to prevent OAuth redirect_uri_mismatch errors
+// OAuth redirect URI must match what's configured in Google Console (production URL)
 const getBackendURL = () => {
   const PRODUCTION_URL = "https://api.rejectionhero.com";
 
-  let url = process.env.EXPO_PUBLIC_VIBECODE_BACKEND_URL as string;
-
-  // Use the configured URL directly (don't override sandbox URLs)
-  // Sandbox URLs are valid for preview/staging environments
-  if (url) {
-    // If URL doesn't start with http:// or https://, add https://
-    if (!url.startsWith("http://") && !url.startsWith("https://")) {
-      console.warn(`⚠️ [Auth Client] Backend URL missing protocol: ${url}`);
-      url = `https://${url}`;
-      console.log(`✅ [Auth Client] Added https:// prefix: ${url}`);
-    }
-    console.log(`🔐 [Auth Client] Using backend URL: ${url}`);
-    return url;
-  }
-
-  // Fallback to production URL if no URL is configured
-  console.log(`🔐 [Auth Client] Using default production URL: ${PRODUCTION_URL}`);
+  // Always use production URL for auth client to ensure OAuth works correctly
+  // The redirect URI must match what's configured in Google Cloud Console
+  // Even if API calls use sandbox URL, OAuth must use production
+  console.log(`🔐 [Auth Client] Using production URL for OAuth: ${PRODUCTION_URL}`);
+  console.log(`⚠️  [Auth Client] Note: OAuth requires production URL to match Google Console configuration`);
   return PRODUCTION_URL;
 };
 
