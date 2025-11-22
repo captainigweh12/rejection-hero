@@ -95,12 +95,12 @@ model content_moderation {
 }
 
 model friendship {
-  id                                String   @id
+  id                                String   @id @default(cuid())
   initiatorId                       String
   receiverId                        String
   status                            String
   createdAt                         DateTime @default(now())
-  updatedAt                         DateTime
+  updatedAt                         DateTime @updatedAt
   user_friendship_receiverIdTouser  user     @relation("friendship_receiverIdTouser", fields: [receiverId], references: [id], onDelete: Cascade)
   user_friendship_initiatorIdTouser user     @relation("friendship_initiatorIdTouser", fields: [initiatorId], references: [id], onDelete: Cascade)
 

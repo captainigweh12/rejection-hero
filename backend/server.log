@@ -7,14 +7,14 @@ $ prisma generate
 Environment variables loaded from .env
 Prisma schema loaded from prisma/schema.prisma
 
-✔ Generated Prisma Client (v6.17.1) to ./generated/prisma in 334ms
+✔ Generated Prisma Client (v6.17.1) to ./generated/prisma in 351ms
 
 Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
 
-Tip: Want to turn off tips and other hints? https://pris.ly/tip-4-nohints
+Tip: Need your database queries to be 1000x faster? Accelerate offers you that and more: https://pris.ly/tip-2-accelerate
 
 
-Checked 1003 installs across 915 packages (no changes) [1.94s]
+Checked 1003 installs across 915 packages (no changes) [1.95s]
 Starting server in dev mode with hot reload...
 $ NODE_ENV=development bun run --hot src/index.ts
 Failed to find Response internal state key
@@ -213,107 +213,7 @@ Failed to find Response internal state key
 ⏰ Challenge Scheduler: Active (Daily at 9 AM & 2 PM UTC)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Failed to find Response internal state key
-🚀 [ENV] PRODUCTION MODE: Forcing BACKEND_URL to https://api.rejectionhero.com
-📝 [ENV] Overriding https://preview-bhveolgljyyi.share.sandbox.dev → https://api.rejectionhero.com
-✅ Environment variables validated successfully
-🔍 OPENAI_API_KEY from process.env: EXISTS
-🔍 OPENAI_API_KEY in parsed: EXISTS
-🌐 [ENV] Final BACKEND_URL: https://api.rejectionhero.com
-🔐 [Auth] Initializing Better Auth...
-🔍 [Auth] Testing database connection...
-✅ [Auth] Google OAuth credentials configured
-🔑 [Auth] Google Client ID: 94427138884-cc2db90q...
-📊 [Auth] Database provider: postgresql
-📊 [Auth] DATABASE_URL: postgresql://neondb_owner:npg_...
-✅ [Auth] Better Auth initialized
-🔗 [Auth] Base URL: https://api.rejectionhero.com
-🌐 [Auth] Trusted origins: vibecode://, http://localhost:3000, http://localhost:8081, https://api.rejectionhero.com
-🔑 [Auth] Google OAuth: Enabled ✅
-🔗 [Auth] Google OAuth Redirect URI: https://api.rejectionhero.com/api/auth/callback/google
-✅ [Auth] Using production redirect URI (required for Google OAuth)
-⚠️  [Auth] Note: BACKEND_URL is https://api.rejectionhero.com but OAuth uses production URL
-⚠️  [Auth] IMPORTANT: Make sure this URL is added to Google Cloud Console OAuth credentials!
-⚠️  [Auth] Go to: https://console.cloud.google.com/apis/credentials
-⚠️  [Auth] Add to "Authorized redirect URIs": https://api.rejectionhero.com/api/auth/callback/google
-🔐 [Auth] Session expires in: 7 days
-🔧 [R2] Configuration check:
-  R2_ENDPOINT: ✅ Set
-  R2_ACCESS_KEY_ID: ✅ Set
-  R2_SECRET_ACCESS_KEY: ✅ Set
-  R2_BUCKET: ✅ rejection-hero-uploads
-📜 [Policies] Router initialized. __dirname: /home/user/workspace/backend/src/routes
-🔧 Initializing Hono application...
-🔐 Mounting custom password reset routes at /api/auth
-🔐 Mounting Better Auth handler at /api/auth/*
-📁 Serving static files from uploads/ directory
-📤 Mounting upload routes at /api/upload
-📝 Mounting sample routes at /api/sample
-👤 Mounting profile routes at /api/profile
-🔍 Mounting discover routes at /api/discover
-👆 Mounting swipe routes at /api/swipe
-💕 Mounting matches routes at /api/matches
-🎯 Mounting quests routes at /api/quests
-🏆 Mounting challenges routes at /api/challenges
-📊 Mounting stats routes at /api/stats
-📹 Mounting live routes at /api/live
-👥 Mounting friends routes at /api/friends
-💬 Mounting messages routes at /api/messages
-🏘️  Mounting groups routes at /api/groups
-🎯 Mounting group quests routes at /api/group-quests
-📹 Mounting group live routes at /api/group-live
-🎁 Mounting shared quests routes at /api/shared-quests
-✅ Mounting quest verification routes at /api/quest-verification
-🛡️ Mounting moderation routes at /api/moderation
-📓 Mounting journal routes at /api/journal
-📝 Mounting posts routes at /api/posts
-⏰ Mounting moments routes at /api/moments
-🔔 Mounting notifications routes at /api/notifications
-📧 Mounting GoHighLevel routes at /api/gohighlevel
-🎫 Mounting support routes at /api/support
-📁 Mounting categories routes at /api/categories
-🎤 Mounting audio routes at /api/audio
-💳 Mounting payments routes at /api/payments
-💳 Mounting payment redirect routes at root level
-📜 Mounting policies routes at /api/policies
-👑 Mounting admin routes at /api/admin
-🐛 Mounting bug report routes at /api/bug-reports
-🌐 Mounting web redirect routes
-⚙️  Starting server...
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📍 Environment: development
-🚀 Server is running on port 3000
-🔗 Base URL: https://api.rejectionhero.com
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-📚 Available endpoints:
-  🔐 Auth:         /api/auth/*
-  📤 Upload:       POST /api/upload/image
-  📝 Sample:       GET/POST /api/sample
-  👤 profile:      GET/POST /api/profile
-  🔍 Discover:     GET /api/discover
-  👆 Swipe:        POST /api/swipe
-  💕 Matches:      GET /api/matches
-  🎯 Quests:       GET/POST /api/quests
-  🏆 Challenges:   GET/POST /api/challenges
-  📊 Stats:        GET /api/stats
-  📹 Live:        GET/POST /api/live
-  👥 Friends:      GET/POST /api/friends
-  💬 Messages:     GET/POST /api/messages
-  🏘️  Groups:       GET/POST /api/groups
-  🎁 SharedQuests: GET/POST /api/shared-quests
-  📓 Journal:      GET/POST /api/journal
-  🔔 Notifications: GET /api/notifications
-  💚 Health:       GET /health
-
-⏰ Challenge Scheduler: Active (Daily at 9 AM & 2 PM UTC)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
 ✅ [Auth] Database connection successful
-✅ [Auth] User table accessible
-✅ [Auth] Account table accessible
-✅ [Auth] Database connection successful
-✅ [Auth] Session table accessible
 ✅ [Auth] User table accessible
 ✅ [Auth] Account table accessible
 ✅ [Auth] Session table accessible
@@ -413,6 +313,768 @@ Failed to find Response internal state key
 ⏰ Challenge Scheduler: Active (Daily at 9 AM & 2 PM UTC)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+✅ [Auth] Database connection successful
+✅ [Auth] User table accessible
+✅ [Auth] Account table accessible
+✅ [Auth] Session table accessible
+Failed to find Response internal state key
+🚀 [ENV] PRODUCTION MODE: Forcing BACKEND_URL to https://api.rejectionhero.com
+📝 [ENV] Overriding https://preview-bhveolgljyyi.share.sandbox.dev → https://api.rejectionhero.com
+✅ Environment variables validated successfully
+🔍 OPENAI_API_KEY from process.env: EXISTS
+🔍 OPENAI_API_KEY in parsed: EXISTS
+🌐 [ENV] Final BACKEND_URL: https://api.rejectionhero.com
+🔐 [Auth] Initializing Better Auth...
+🔍 [Auth] Testing database connection...
+✅ [Auth] Google OAuth credentials configured
+🔑 [Auth] Google Client ID: 94427138884-cc2db90q...
+📊 [Auth] Database provider: postgresql
+📊 [Auth] DATABASE_URL: postgresql://neondb_owner:npg_...
+✅ [Auth] Better Auth initialized
+🔗 [Auth] Base URL: https://api.rejectionhero.com
+🌐 [Auth] Trusted origins: vibecode://, http://localhost:3000, http://localhost:8081, https://api.rejectionhero.com
+🔑 [Auth] Google OAuth: Enabled ✅
+🔗 [Auth] Google OAuth Redirect URI: https://api.rejectionhero.com/api/auth/callback/google
+✅ [Auth] Using production redirect URI (required for Google OAuth)
+⚠️  [Auth] Note: BACKEND_URL is https://api.rejectionhero.com but OAuth uses production URL
+⚠️  [Auth] IMPORTANT: Make sure this URL is added to Google Cloud Console OAuth credentials!
+⚠️  [Auth] Go to: https://console.cloud.google.com/apis/credentials
+⚠️  [Auth] Add to "Authorized redirect URIs": https://api.rejectionhero.com/api/auth/callback/google
+🔐 [Auth] Session expires in: 7 days
+🔧 [R2] Configuration check:
+  R2_ENDPOINT: ✅ Set
+  R2_ACCESS_KEY_ID: ✅ Set
+  R2_SECRET_ACCESS_KEY: ✅ Set
+  R2_BUCKET: ✅ rejection-hero-uploads
+📜 [Policies] Router initialized. __dirname: /home/user/workspace/backend/src/routes
+🔧 Initializing Hono application...
+🔐 Mounting custom password reset routes at /api/auth
+🔐 Mounting Better Auth handler at /api/auth/*
+📁 Serving static files from uploads/ directory
+📤 Mounting upload routes at /api/upload
+📝 Mounting sample routes at /api/sample
+👤 Mounting profile routes at /api/profile
+🔍 Mounting discover routes at /api/discover
+👆 Mounting swipe routes at /api/swipe
+💕 Mounting matches routes at /api/matches
+🎯 Mounting quests routes at /api/quests
+🏆 Mounting challenges routes at /api/challenges
+📊 Mounting stats routes at /api/stats
+📹 Mounting live routes at /api/live
+👥 Mounting friends routes at /api/friends
+💬 Mounting messages routes at /api/messages
+🏘️  Mounting groups routes at /api/groups
+🎯 Mounting group quests routes at /api/group-quests
+📹 Mounting group live routes at /api/group-live
+🎁 Mounting shared quests routes at /api/shared-quests
+✅ Mounting quest verification routes at /api/quest-verification
+🛡️ Mounting moderation routes at /api/moderation
+📓 Mounting journal routes at /api/journal
+📝 Mounting posts routes at /api/posts
+⏰ Mounting moments routes at /api/moments
+🔔 Mounting notifications routes at /api/notifications
+📧 Mounting GoHighLevel routes at /api/gohighlevel
+🎫 Mounting support routes at /api/support
+📁 Mounting categories routes at /api/categories
+🎤 Mounting audio routes at /api/audio
+💳 Mounting payments routes at /api/payments
+💳 Mounting payment redirect routes at root level
+📜 Mounting policies routes at /api/policies
+👑 Mounting admin routes at /api/admin
+🐛 Mounting bug report routes at /api/bug-reports
+🌐 Mounting web redirect routes
+⚙️  Starting server...
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📍 Environment: development
+🚀 Server is running on port 3000
+🔗 Base URL: https://api.rejectionhero.com
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📚 Available endpoints:
+  🔐 Auth:         /api/auth/*
+  📤 Upload:       POST /api/upload/image
+  📝 Sample:       GET/POST /api/sample
+  👤 profile:      GET/POST /api/profile
+  🔍 Discover:     GET /api/discover
+  👆 Swipe:        POST /api/swipe
+  💕 Matches:      GET /api/matches
+  🎯 Quests:       GET/POST /api/quests
+  🏆 Challenges:   GET/POST /api/challenges
+  📊 Stats:        GET /api/stats
+  📹 Live:        GET/POST /api/live
+  👥 Friends:      GET/POST /api/friends
+  💬 Messages:     GET/POST /api/messages
+  🏘️  Groups:       GET/POST /api/groups
+  🎁 SharedQuests: GET/POST /api/shared-quests
+  📓 Journal:      GET/POST /api/journal
+  🔔 Notifications: GET /api/notifications
+  💚 Health:       GET /health
+
+⏰ Challenge Scheduler: Active (Daily at 9 AM & 2 PM UTC)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ [Auth] Database connection successful
+✅ [Auth] User table accessible
+✅ [Auth] Account table accessible
+✅ [Auth] Session table accessible
+Failed to find Response internal state key
+🚀 [ENV] PRODUCTION MODE: Forcing BACKEND_URL to https://api.rejectionhero.com
+📝 [ENV] Overriding https://preview-bhveolgljyyi.share.sandbox.dev → https://api.rejectionhero.com
+✅ Environment variables validated successfully
+🔍 OPENAI_API_KEY from process.env: EXISTS
+🔍 OPENAI_API_KEY in parsed: EXISTS
+🌐 [ENV] Final BACKEND_URL: https://api.rejectionhero.com
+🔐 [Auth] Initializing Better Auth...
+🔍 [Auth] Testing database connection...
+✅ [Auth] Google OAuth credentials configured
+🔑 [Auth] Google Client ID: 94427138884-cc2db90q...
+📊 [Auth] Database provider: postgresql
+📊 [Auth] DATABASE_URL: postgresql://neondb_owner:npg_...
+✅ [Auth] Better Auth initialized
+🔗 [Auth] Base URL: https://api.rejectionhero.com
+🌐 [Auth] Trusted origins: vibecode://, http://localhost:3000, http://localhost:8081, https://api.rejectionhero.com
+🔑 [Auth] Google OAuth: Enabled ✅
+🔗 [Auth] Google OAuth Redirect URI: https://api.rejectionhero.com/api/auth/callback/google
+✅ [Auth] Using production redirect URI (required for Google OAuth)
+⚠️  [Auth] Note: BACKEND_URL is https://api.rejectionhero.com but OAuth uses production URL
+⚠️  [Auth] IMPORTANT: Make sure this URL is added to Google Cloud Console OAuth credentials!
+⚠️  [Auth] Go to: https://console.cloud.google.com/apis/credentials
+⚠️  [Auth] Add to "Authorized redirect URIs": https://api.rejectionhero.com/api/auth/callback/google
+🔐 [Auth] Session expires in: 7 days
+🔧 [R2] Configuration check:
+  R2_ENDPOINT: ✅ Set
+  R2_ACCESS_KEY_ID: ✅ Set
+  R2_SECRET_ACCESS_KEY: ✅ Set
+  R2_BUCKET: ✅ rejection-hero-uploads
+📜 [Policies] Router initialized. __dirname: /home/user/workspace/backend/src/routes
+🔧 Initializing Hono application...
+🔐 Mounting custom password reset routes at /api/auth
+🔐 Mounting Better Auth handler at /api/auth/*
+📁 Serving static files from uploads/ directory
+📤 Mounting upload routes at /api/upload
+📝 Mounting sample routes at /api/sample
+👤 Mounting profile routes at /api/profile
+🔍 Mounting discover routes at /api/discover
+👆 Mounting swipe routes at /api/swipe
+💕 Mounting matches routes at /api/matches
+🎯 Mounting quests routes at /api/quests
+🏆 Mounting challenges routes at /api/challenges
+📊 Mounting stats routes at /api/stats
+📹 Mounting live routes at /api/live
+👥 Mounting friends routes at /api/friends
+💬 Mounting messages routes at /api/messages
+🏘️  Mounting groups routes at /api/groups
+🎯 Mounting group quests routes at /api/group-quests
+📹 Mounting group live routes at /api/group-live
+🎁 Mounting shared quests routes at /api/shared-quests
+✅ Mounting quest verification routes at /api/quest-verification
+🛡️ Mounting moderation routes at /api/moderation
+📓 Mounting journal routes at /api/journal
+📝 Mounting posts routes at /api/posts
+⏰ Mounting moments routes at /api/moments
+🔔 Mounting notifications routes at /api/notifications
+📧 Mounting GoHighLevel routes at /api/gohighlevel
+🎫 Mounting support routes at /api/support
+📁 Mounting categories routes at /api/categories
+🎤 Mounting audio routes at /api/audio
+💳 Mounting payments routes at /api/payments
+💳 Mounting payment redirect routes at root level
+📜 Mounting policies routes at /api/policies
+👑 Mounting admin routes at /api/admin
+🐛 Mounting bug report routes at /api/bug-reports
+🌐 Mounting web redirect routes
+⚙️  Starting server...
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📍 Environment: development
+🚀 Server is running on port 3000
+🔗 Base URL: https://api.rejectionhero.com
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📚 Available endpoints:
+  🔐 Auth:         /api/auth/*
+  📤 Upload:       POST /api/upload/image
+  📝 Sample:       GET/POST /api/sample
+  👤 profile:      GET/POST /api/profile
+  🔍 Discover:     GET /api/discover
+  👆 Swipe:        POST /api/swipe
+  💕 Matches:      GET /api/matches
+  🎯 Quests:       GET/POST /api/quests
+  🏆 Challenges:   GET/POST /api/challenges
+  📊 Stats:        GET /api/stats
+  📹 Live:        GET/POST /api/live
+  👥 Friends:      GET/POST /api/friends
+  💬 Messages:     GET/POST /api/messages
+  🏘️  Groups:       GET/POST /api/groups
+  🎁 SharedQuests: GET/POST /api/shared-quests
+  📓 Journal:      GET/POST /api/journal
+  🔔 Notifications: GET /api/notifications
+  💚 Health:       GET /health
+
+⏰ Challenge Scheduler: Active (Daily at 9 AM & 2 PM UTC)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ [Auth] Database connection successful
+✅ [Auth] User table accessible
+✅ [Auth] Account table accessible
+✅ [Auth] Session table accessible
+Failed to find Response internal state key
+🚀 [ENV] PRODUCTION MODE: Forcing BACKEND_URL to https://api.rejectionhero.com
+📝 [ENV] Overriding https://preview-bhveolgljyyi.share.sandbox.dev → https://api.rejectionhero.com
+✅ Environment variables validated successfully
+🔍 OPENAI_API_KEY from process.env: EXISTS
+🔍 OPENAI_API_KEY in parsed: EXISTS
+🌐 [ENV] Final BACKEND_URL: https://api.rejectionhero.com
+🔐 [Auth] Initializing Better Auth...
+🔍 [Auth] Testing database connection...
+✅ [Auth] Google OAuth credentials configured
+🔑 [Auth] Google Client ID: 94427138884-cc2db90q...
+📊 [Auth] Database provider: postgresql
+📊 [Auth] DATABASE_URL: postgresql://neondb_owner:npg_...
+✅ [Auth] Better Auth initialized
+🔗 [Auth] Base URL: https://api.rejectionhero.com
+🌐 [Auth] Trusted origins: vibecode://, http://localhost:3000, http://localhost:8081, https://api.rejectionhero.com
+🔑 [Auth] Google OAuth: Enabled ✅
+🔗 [Auth] Google OAuth Redirect URI: https://api.rejectionhero.com/api/auth/callback/google
+✅ [Auth] Using production redirect URI (required for Google OAuth)
+⚠️  [Auth] Note: BACKEND_URL is https://api.rejectionhero.com but OAuth uses production URL
+⚠️  [Auth] IMPORTANT: Make sure this URL is added to Google Cloud Console OAuth credentials!
+⚠️  [Auth] Go to: https://console.cloud.google.com/apis/credentials
+⚠️  [Auth] Add to "Authorized redirect URIs": https://api.rejectionhero.com/api/auth/callback/google
+🔐 [Auth] Session expires in: 7 days
+🔧 [R2] Configuration check:
+  R2_ENDPOINT: ✅ Set
+  R2_ACCESS_KEY_ID: ✅ Set
+  R2_SECRET_ACCESS_KEY: ✅ Set
+  R2_BUCKET: ✅ rejection-hero-uploads
+📜 [Policies] Router initialized. __dirname: /home/user/workspace/backend/src/routes
+🔧 Initializing Hono application...
+🔐 Mounting custom password reset routes at /api/auth
+🔐 Mounting Better Auth handler at /api/auth/*
+📁 Serving static files from uploads/ directory
+📤 Mounting upload routes at /api/upload
+📝 Mounting sample routes at /api/sample
+👤 Mounting profile routes at /api/profile
+🔍 Mounting discover routes at /api/discover
+👆 Mounting swipe routes at /api/swipe
+💕 Mounting matches routes at /api/matches
+🎯 Mounting quests routes at /api/quests
+🏆 Mounting challenges routes at /api/challenges
+📊 Mounting stats routes at /api/stats
+📹 Mounting live routes at /api/live
+👥 Mounting friends routes at /api/friends
+💬 Mounting messages routes at /api/messages
+🏘️  Mounting groups routes at /api/groups
+🎯 Mounting group quests routes at /api/group-quests
+📹 Mounting group live routes at /api/group-live
+🎁 Mounting shared quests routes at /api/shared-quests
+✅ Mounting quest verification routes at /api/quest-verification
+🛡️ Mounting moderation routes at /api/moderation
+📓 Mounting journal routes at /api/journal
+📝 Mounting posts routes at /api/posts
+⏰ Mounting moments routes at /api/moments
+🔔 Mounting notifications routes at /api/notifications
+📧 Mounting GoHighLevel routes at /api/gohighlevel
+🎫 Mounting support routes at /api/support
+📁 Mounting categories routes at /api/categories
+🎤 Mounting audio routes at /api/audio
+💳 Mounting payments routes at /api/payments
+💳 Mounting payment redirect routes at root level
+📜 Mounting policies routes at /api/policies
+👑 Mounting admin routes at /api/admin
+🐛 Mounting bug report routes at /api/bug-reports
+🌐 Mounting web redirect routes
+⚙️  Starting server...
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📍 Environment: development
+🚀 Server is running on port 3000
+🔗 Base URL: https://api.rejectionhero.com
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📚 Available endpoints:
+  🔐 Auth:         /api/auth/*
+  📤 Upload:       POST /api/upload/image
+  📝 Sample:       GET/POST /api/sample
+  👤 profile:      GET/POST /api/profile
+  🔍 Discover:     GET /api/discover
+  👆 Swipe:        POST /api/swipe
+  💕 Matches:      GET /api/matches
+  🎯 Quests:       GET/POST /api/quests
+  🏆 Challenges:   GET/POST /api/challenges
+  📊 Stats:        GET /api/stats
+  📹 Live:        GET/POST /api/live
+  👥 Friends:      GET/POST /api/friends
+  💬 Messages:     GET/POST /api/messages
+  🏘️  Groups:       GET/POST /api/groups
+  🎁 SharedQuests: GET/POST /api/shared-quests
+  📓 Journal:      GET/POST /api/journal
+  🔔 Notifications: GET /api/notifications
+  💚 Health:       GET /health
+
+⏰ Challenge Scheduler: Active (Daily at 9 AM & 2 PM UTC)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ [Auth] Database connection successful
+✅ [Auth] User table accessible
+✅ [Auth] Account table accessible
+✅ [Auth] Session table accessible
+Failed to find Response internal state key
+🚀 [ENV] PRODUCTION MODE: Forcing BACKEND_URL to https://api.rejectionhero.com
+📝 [ENV] Overriding https://preview-bhveolgljyyi.share.sandbox.dev → https://api.rejectionhero.com
+✅ Environment variables validated successfully
+🔍 OPENAI_API_KEY from process.env: EXISTS
+🔍 OPENAI_API_KEY in parsed: EXISTS
+🌐 [ENV] Final BACKEND_URL: https://api.rejectionhero.com
+🔐 [Auth] Initializing Better Auth...
+🔍 [Auth] Testing database connection...
+✅ [Auth] Google OAuth credentials configured
+🔑 [Auth] Google Client ID: 94427138884-cc2db90q...
+📊 [Auth] Database provider: postgresql
+📊 [Auth] DATABASE_URL: postgresql://neondb_owner:npg_...
+✅ [Auth] Better Auth initialized
+🔗 [Auth] Base URL: https://api.rejectionhero.com
+🌐 [Auth] Trusted origins: vibecode://, http://localhost:3000, http://localhost:8081, https://api.rejectionhero.com
+🔑 [Auth] Google OAuth: Enabled ✅
+🔗 [Auth] Google OAuth Redirect URI: https://api.rejectionhero.com/api/auth/callback/google
+✅ [Auth] Using production redirect URI (required for Google OAuth)
+⚠️  [Auth] Note: BACKEND_URL is https://api.rejectionhero.com but OAuth uses production URL
+⚠️  [Auth] IMPORTANT: Make sure this URL is added to Google Cloud Console OAuth credentials!
+⚠️  [Auth] Go to: https://console.cloud.google.com/apis/credentials
+⚠️  [Auth] Add to "Authorized redirect URIs": https://api.rejectionhero.com/api/auth/callback/google
+🔐 [Auth] Session expires in: 7 days
+🔧 [R2] Configuration check:
+  R2_ENDPOINT: ✅ Set
+  R2_ACCESS_KEY_ID: ✅ Set
+  R2_SECRET_ACCESS_KEY: ✅ Set
+  R2_BUCKET: ✅ rejection-hero-uploads
+📜 [Policies] Router initialized. __dirname: /home/user/workspace/backend/src/routes
+🔧 Initializing Hono application...
+🔐 Mounting custom password reset routes at /api/auth
+🔐 Mounting Better Auth handler at /api/auth/*
+📁 Serving static files from uploads/ directory
+📤 Mounting upload routes at /api/upload
+📝 Mounting sample routes at /api/sample
+👤 Mounting profile routes at /api/profile
+🔍 Mounting discover routes at /api/discover
+👆 Mounting swipe routes at /api/swipe
+💕 Mounting matches routes at /api/matches
+🎯 Mounting quests routes at /api/quests
+🏆 Mounting challenges routes at /api/challenges
+📊 Mounting stats routes at /api/stats
+📹 Mounting live routes at /api/live
+👥 Mounting friends routes at /api/friends
+💬 Mounting messages routes at /api/messages
+🏘️  Mounting groups routes at /api/groups
+🎯 Mounting group quests routes at /api/group-quests
+📹 Mounting group live routes at /api/group-live
+🎁 Mounting shared quests routes at /api/shared-quests
+✅ Mounting quest verification routes at /api/quest-verification
+🛡️ Mounting moderation routes at /api/moderation
+📓 Mounting journal routes at /api/journal
+📝 Mounting posts routes at /api/posts
+⏰ Mounting moments routes at /api/moments
+🔔 Mounting notifications routes at /api/notifications
+📧 Mounting GoHighLevel routes at /api/gohighlevel
+🎫 Mounting support routes at /api/support
+📁 Mounting categories routes at /api/categories
+🎤 Mounting audio routes at /api/audio
+💳 Mounting payments routes at /api/payments
+💳 Mounting payment redirect routes at root level
+📜 Mounting policies routes at /api/policies
+👑 Mounting admin routes at /api/admin
+🐛 Mounting bug report routes at /api/bug-reports
+🌐 Mounting web redirect routes
+⚙️  Starting server...
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📍 Environment: development
+🚀 Server is running on port 3000
+🔗 Base URL: https://api.rejectionhero.com
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📚 Available endpoints:
+  🔐 Auth:         /api/auth/*
+  📤 Upload:       POST /api/upload/image
+  📝 Sample:       GET/POST /api/sample
+  👤 profile:      GET/POST /api/profile
+  🔍 Discover:     GET /api/discover
+  👆 Swipe:        POST /api/swipe
+  💕 Matches:      GET /api/matches
+  🎯 Quests:       GET/POST /api/quests
+  🏆 Challenges:   GET/POST /api/challenges
+  📊 Stats:        GET /api/stats
+  📹 Live:        GET/POST /api/live
+  👥 Friends:      GET/POST /api/friends
+  💬 Messages:     GET/POST /api/messages
+  🏘️  Groups:       GET/POST /api/groups
+  🎁 SharedQuests: GET/POST /api/shared-quests
+  📓 Journal:      GET/POST /api/journal
+  🔔 Notifications: GET /api/notifications
+  💚 Health:       GET /health
+
+⏰ Challenge Scheduler: Active (Daily at 9 AM & 2 PM UTC)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ [Auth] Database connection successful
+✅ [Auth] User table accessible
+✅ [Auth] Account table accessible
+✅ [Auth] Session table accessible
+error: Cannot find module '../generated/prisma' from '/home/user/workspace/backend/src/routes/friends.ts'
+Failed to find Response internal state key
+🚀 [ENV] PRODUCTION MODE: Forcing BACKEND_URL to https://api.rejectionhero.com
+📝 [ENV] Overriding https://preview-bhveolgljyyi.share.sandbox.dev → https://api.rejectionhero.com
+✅ Environment variables validated successfully
+🔍 OPENAI_API_KEY from process.env: EXISTS
+🔍 OPENAI_API_KEY in parsed: EXISTS
+🌐 [ENV] Final BACKEND_URL: https://api.rejectionhero.com
+🔐 [Auth] Initializing Better Auth...
+🔍 [Auth] Testing database connection...
+✅ [Auth] Google OAuth credentials configured
+🔑 [Auth] Google Client ID: 94427138884-cc2db90q...
+📊 [Auth] Database provider: postgresql
+📊 [Auth] DATABASE_URL: postgresql://neondb_owner:npg_...
+✅ [Auth] Better Auth initialized
+🔗 [Auth] Base URL: https://api.rejectionhero.com
+🌐 [Auth] Trusted origins: vibecode://, http://localhost:3000, http://localhost:8081, https://api.rejectionhero.com
+🔑 [Auth] Google OAuth: Enabled ✅
+🔗 [Auth] Google OAuth Redirect URI: https://api.rejectionhero.com/api/auth/callback/google
+✅ [Auth] Using production redirect URI (required for Google OAuth)
+⚠️  [Auth] Note: BACKEND_URL is https://api.rejectionhero.com but OAuth uses production URL
+⚠️  [Auth] IMPORTANT: Make sure this URL is added to Google Cloud Console OAuth credentials!
+⚠️  [Auth] Go to: https://console.cloud.google.com/apis/credentials
+⚠️  [Auth] Add to "Authorized redirect URIs": https://api.rejectionhero.com/api/auth/callback/google
+🔐 [Auth] Session expires in: 7 days
+🔧 [R2] Configuration check:
+  R2_ENDPOINT: ✅ Set
+  R2_ACCESS_KEY_ID: ✅ Set
+  R2_SECRET_ACCESS_KEY: ✅ Set
+  R2_BUCKET: ✅ rejection-hero-uploads
+📜 [Policies] Router initialized. __dirname: /home/user/workspace/backend/src/routes
+🔧 Initializing Hono application...
+🔐 Mounting custom password reset routes at /api/auth
+🔐 Mounting Better Auth handler at /api/auth/*
+📁 Serving static files from uploads/ directory
+📤 Mounting upload routes at /api/upload
+📝 Mounting sample routes at /api/sample
+👤 Mounting profile routes at /api/profile
+🔍 Mounting discover routes at /api/discover
+👆 Mounting swipe routes at /api/swipe
+💕 Mounting matches routes at /api/matches
+🎯 Mounting quests routes at /api/quests
+🏆 Mounting challenges routes at /api/challenges
+📊 Mounting stats routes at /api/stats
+📹 Mounting live routes at /api/live
+👥 Mounting friends routes at /api/friends
+💬 Mounting messages routes at /api/messages
+🏘️  Mounting groups routes at /api/groups
+🎯 Mounting group quests routes at /api/group-quests
+📹 Mounting group live routes at /api/group-live
+🎁 Mounting shared quests routes at /api/shared-quests
+✅ Mounting quest verification routes at /api/quest-verification
+🛡️ Mounting moderation routes at /api/moderation
+📓 Mounting journal routes at /api/journal
+📝 Mounting posts routes at /api/posts
+⏰ Mounting moments routes at /api/moments
+🔔 Mounting notifications routes at /api/notifications
+📧 Mounting GoHighLevel routes at /api/gohighlevel
+🎫 Mounting support routes at /api/support
+📁 Mounting categories routes at /api/categories
+🎤 Mounting audio routes at /api/audio
+💳 Mounting payments routes at /api/payments
+💳 Mounting payment redirect routes at root level
+📜 Mounting policies routes at /api/policies
+👑 Mounting admin routes at /api/admin
+🐛 Mounting bug report routes at /api/bug-reports
+🌐 Mounting web redirect routes
+⚙️  Starting server...
+✅ [Auth] Database connection successful
+✅ [Auth] User table accessible
+✅ [Auth] Account table accessible
+✅ [Auth] Session table accessible
+error: Cannot find module '../generated/prisma' from '/home/user/workspace/backend/src/routes/friends.ts'
+error: Cannot find module '../generated/prisma' from '/home/user/workspace/backend/src/routes/friends.ts'
+error: Cannot find module '../generated/prisma' from '/home/user/workspace/backend/src/routes/friends.ts'
+error: Cannot find module '../generated/prisma' from '/home/user/workspace/backend/src/routes/friends.ts'
+Failed to find Response internal state key
+🚀 [ENV] PRODUCTION MODE: Forcing BACKEND_URL to https://api.rejectionhero.com
+📝 [ENV] Overriding https://preview-bhveolgljyyi.share.sandbox.dev → https://api.rejectionhero.com
+✅ Environment variables validated successfully
+🔍 OPENAI_API_KEY from process.env: EXISTS
+🔍 OPENAI_API_KEY in parsed: EXISTS
+🌐 [ENV] Final BACKEND_URL: https://api.rejectionhero.com
+🔐 [Auth] Initializing Better Auth...
+🔍 [Auth] Testing database connection...
+✅ [Auth] Google OAuth credentials configured
+🔑 [Auth] Google Client ID: 94427138884-cc2db90q...
+📊 [Auth] Database provider: postgresql
+📊 [Auth] DATABASE_URL: postgresql://neondb_owner:npg_...
+✅ [Auth] Better Auth initialized
+🔗 [Auth] Base URL: https://api.rejectionhero.com
+🌐 [Auth] Trusted origins: vibecode://, http://localhost:3000, http://localhost:8081, https://api.rejectionhero.com
+🔑 [Auth] Google OAuth: Enabled ✅
+🔗 [Auth] Google OAuth Redirect URI: https://api.rejectionhero.com/api/auth/callback/google
+✅ [Auth] Using production redirect URI (required for Google OAuth)
+⚠️  [Auth] Note: BACKEND_URL is https://api.rejectionhero.com but OAuth uses production URL
+⚠️  [Auth] IMPORTANT: Make sure this URL is added to Google Cloud Console OAuth credentials!
+⚠️  [Auth] Go to: https://console.cloud.google.com/apis/credentials
+⚠️  [Auth] Add to "Authorized redirect URIs": https://api.rejectionhero.com/api/auth/callback/google
+🔐 [Auth] Session expires in: 7 days
+🔧 [R2] Configuration check:
+  R2_ENDPOINT: ✅ Set
+  R2_ACCESS_KEY_ID: ✅ Set
+  R2_SECRET_ACCESS_KEY: ✅ Set
+  R2_BUCKET: ✅ rejection-hero-uploads
+📜 [Policies] Router initialized. __dirname: /home/user/workspace/backend/src/routes
+🔧 Initializing Hono application...
+🔐 Mounting custom password reset routes at /api/auth
+🔐 Mounting Better Auth handler at /api/auth/*
+📁 Serving static files from uploads/ directory
+📤 Mounting upload routes at /api/upload
+📝 Mounting sample routes at /api/sample
+👤 Mounting profile routes at /api/profile
+🔍 Mounting discover routes at /api/discover
+👆 Mounting swipe routes at /api/swipe
+💕 Mounting matches routes at /api/matches
+🎯 Mounting quests routes at /api/quests
+🏆 Mounting challenges routes at /api/challenges
+📊 Mounting stats routes at /api/stats
+📹 Mounting live routes at /api/live
+👥 Mounting friends routes at /api/friends
+💬 Mounting messages routes at /api/messages
+🏘️  Mounting groups routes at /api/groups
+🎯 Mounting group quests routes at /api/group-quests
+📹 Mounting group live routes at /api/group-live
+🎁 Mounting shared quests routes at /api/shared-quests
+✅ Mounting quest verification routes at /api/quest-verification
+🛡️ Mounting moderation routes at /api/moderation
+📓 Mounting journal routes at /api/journal
+📝 Mounting posts routes at /api/posts
+⏰ Mounting moments routes at /api/moments
+🔔 Mounting notifications routes at /api/notifications
+📧 Mounting GoHighLevel routes at /api/gohighlevel
+🎫 Mounting support routes at /api/support
+📁 Mounting categories routes at /api/categories
+🎤 Mounting audio routes at /api/audio
+💳 Mounting payments routes at /api/payments
+💳 Mounting payment redirect routes at root level
+📜 Mounting policies routes at /api/policies
+👑 Mounting admin routes at /api/admin
+🐛 Mounting bug report routes at /api/bug-reports
+🌐 Mounting web redirect routes
+⚙️  Starting server...
+✅ [Auth] Database connection successful
+✅ [Auth] User table accessible
+✅ [Auth] Account table accessible
+✅ [Auth] Session table accessible
+error: Cannot find module '../generated/prisma' from '/home/user/workspace/backend/src/routes/friends.ts'
+Failed to find Response internal state key
+🚀 [ENV] PRODUCTION MODE: Forcing BACKEND_URL to https://api.rejectionhero.com
+📝 [ENV] Overriding https://preview-bhveolgljyyi.share.sandbox.dev → https://api.rejectionhero.com
+✅ Environment variables validated successfully
+🔍 OPENAI_API_KEY from process.env: EXISTS
+🔍 OPENAI_API_KEY in parsed: EXISTS
+🌐 [ENV] Final BACKEND_URL: https://api.rejectionhero.com
+🔐 [Auth] Initializing Better Auth...
+🔍 [Auth] Testing database connection...
+✅ [Auth] Google OAuth credentials configured
+🔑 [Auth] Google Client ID: 94427138884-cc2db90q...
+📊 [Auth] Database provider: postgresql
+📊 [Auth] DATABASE_URL: postgresql://neondb_owner:npg_...
+✅ [Auth] Better Auth initialized
+🔗 [Auth] Base URL: https://api.rejectionhero.com
+🌐 [Auth] Trusted origins: vibecode://, http://localhost:3000, http://localhost:8081, https://api.rejectionhero.com
+🔑 [Auth] Google OAuth: Enabled ✅
+🔗 [Auth] Google OAuth Redirect URI: https://api.rejectionhero.com/api/auth/callback/google
+✅ [Auth] Using production redirect URI (required for Google OAuth)
+⚠️  [Auth] Note: BACKEND_URL is https://api.rejectionhero.com but OAuth uses production URL
+⚠️  [Auth] IMPORTANT: Make sure this URL is added to Google Cloud Console OAuth credentials!
+⚠️  [Auth] Go to: https://console.cloud.google.com/apis/credentials
+⚠️  [Auth] Add to "Authorized redirect URIs": https://api.rejectionhero.com/api/auth/callback/google
+🔐 [Auth] Session expires in: 7 days
+🔧 [R2] Configuration check:
+  R2_ENDPOINT: ✅ Set
+  R2_ACCESS_KEY_ID: ✅ Set
+  R2_SECRET_ACCESS_KEY: ✅ Set
+  R2_BUCKET: ✅ rejection-hero-uploads
+📜 [Policies] Router initialized. __dirname: /home/user/workspace/backend/src/routes
+🔧 Initializing Hono application...
+🔐 Mounting custom password reset routes at /api/auth
+🔐 Mounting Better Auth handler at /api/auth/*
+📁 Serving static files from uploads/ directory
+📤 Mounting upload routes at /api/upload
+📝 Mounting sample routes at /api/sample
+👤 Mounting profile routes at /api/profile
+🔍 Mounting discover routes at /api/discover
+👆 Mounting swipe routes at /api/swipe
+💕 Mounting matches routes at /api/matches
+🎯 Mounting quests routes at /api/quests
+🏆 Mounting challenges routes at /api/challenges
+📊 Mounting stats routes at /api/stats
+📹 Mounting live routes at /api/live
+👥 Mounting friends routes at /api/friends
+💬 Mounting messages routes at /api/messages
+🏘️  Mounting groups routes at /api/groups
+🎯 Mounting group quests routes at /api/group-quests
+📹 Mounting group live routes at /api/group-live
+🎁 Mounting shared quests routes at /api/shared-quests
+✅ Mounting quest verification routes at /api/quest-verification
+🛡️ Mounting moderation routes at /api/moderation
+📓 Mounting journal routes at /api/journal
+📝 Mounting posts routes at /api/posts
+⏰ Mounting moments routes at /api/moments
+🔔 Mounting notifications routes at /api/notifications
+📧 Mounting GoHighLevel routes at /api/gohighlevel
+🎫 Mounting support routes at /api/support
+📁 Mounting categories routes at /api/categories
+🎤 Mounting audio routes at /api/audio
+💳 Mounting payments routes at /api/payments
+💳 Mounting payment redirect routes at root level
+📜 Mounting policies routes at /api/policies
+👑 Mounting admin routes at /api/admin
+🐛 Mounting bug report routes at /api/bug-reports
+🌐 Mounting web redirect routes
+⚙️  Starting server...
+✅ [Auth] Database connection successful
+✅ [Auth] User table accessible
+✅ [Auth] Account table accessible
+✅ [Auth] Session table accessible
+error: Cannot find module '../generated/prisma' from '/home/user/workspace/backend/src/routes/friends.ts'
+Failed to find Response internal state key
+🚀 [ENV] PRODUCTION MODE: Forcing BACKEND_URL to https://api.rejectionhero.com
+📝 [ENV] Overriding https://preview-bhveolgljyyi.share.sandbox.dev → https://api.rejectionhero.com
+✅ Environment variables validated successfully
+🔍 OPENAI_API_KEY from process.env: EXISTS
+🔍 OPENAI_API_KEY in parsed: EXISTS
+🌐 [ENV] Final BACKEND_URL: https://api.rejectionhero.com
+🔐 [Auth] Initializing Better Auth...
+🔍 [Auth] Testing database connection...
+✅ [Auth] Google OAuth credentials configured
+🔑 [Auth] Google Client ID: 94427138884-cc2db90q...
+📊 [Auth] Database provider: postgresql
+📊 [Auth] DATABASE_URL: postgresql://neondb_owner:npg_...
+✅ [Auth] Better Auth initialized
+🔗 [Auth] Base URL: https://api.rejectionhero.com
+🌐 [Auth] Trusted origins: vibecode://, http://localhost:3000, http://localhost:8081, https://api.rejectionhero.com
+🔑 [Auth] Google OAuth: Enabled ✅
+🔗 [Auth] Google OAuth Redirect URI: https://api.rejectionhero.com/api/auth/callback/google
+✅ [Auth] Using production redirect URI (required for Google OAuth)
+⚠️  [Auth] Note: BACKEND_URL is https://api.rejectionhero.com but OAuth uses production URL
+⚠️  [Auth] IMPORTANT: Make sure this URL is added to Google Cloud Console OAuth credentials!
+⚠️  [Auth] Go to: https://console.cloud.google.com/apis/credentials
+⚠️  [Auth] Add to "Authorized redirect URIs": https://api.rejectionhero.com/api/auth/callback/google
+🔐 [Auth] Session expires in: 7 days
+🔧 [R2] Configuration check:
+  R2_ENDPOINT: ✅ Set
+  R2_ACCESS_KEY_ID: ✅ Set
+  R2_SECRET_ACCESS_KEY: ✅ Set
+  R2_BUCKET: ✅ rejection-hero-uploads
+📜 [Policies] Router initialized. __dirname: /home/user/workspace/backend/src/routes
+🔧 Initializing Hono application...
+🔐 Mounting custom password reset routes at /api/auth
+🔐 Mounting Better Auth handler at /api/auth/*
+📁 Serving static files from uploads/ directory
+📤 Mounting upload routes at /api/upload
+📝 Mounting sample routes at /api/sample
+👤 Mounting profile routes at /api/profile
+🔍 Mounting discover routes at /api/discover
+👆 Mounting swipe routes at /api/swipe
+💕 Mounting matches routes at /api/matches
+🎯 Mounting quests routes at /api/quests
+🏆 Mounting challenges routes at /api/challenges
+📊 Mounting stats routes at /api/stats
+📹 Mounting live routes at /api/live
+👥 Mounting friends routes at /api/friends
+💬 Mounting messages routes at /api/messages
+🏘️  Mounting groups routes at /api/groups
+🎯 Mounting group quests routes at /api/group-quests
+📹 Mounting group live routes at /api/group-live
+🎁 Mounting shared quests routes at /api/shared-quests
+✅ Mounting quest verification routes at /api/quest-verification
+🛡️ Mounting moderation routes at /api/moderation
+📓 Mounting journal routes at /api/journal
+📝 Mounting posts routes at /api/posts
+⏰ Mounting moments routes at /api/moments
+🔔 Mounting notifications routes at /api/notifications
+📧 Mounting GoHighLevel routes at /api/gohighlevel
+🎫 Mounting support routes at /api/support
+📁 Mounting categories routes at /api/categories
+🎤 Mounting audio routes at /api/audio
+💳 Mounting payments routes at /api/payments
+💳 Mounting payment redirect routes at root level
+📜 Mounting policies routes at /api/policies
+👑 Mounting admin routes at /api/admin
+🐛 Mounting bug report routes at /api/bug-reports
+🌐 Mounting web redirect routes
+⚙️  Starting server...
+✅ [Auth] Database connection successful
+✅ [Auth] User table accessible
+✅ [Auth] Account table accessible
+✅ [Auth] Session table accessible
+Failed to find Response internal state key
+🚀 [ENV] PRODUCTION MODE: Forcing BACKEND_URL to https://api.rejectionhero.com
+📝 [ENV] Overriding https://preview-bhveolgljyyi.share.sandbox.dev → https://api.rejectionhero.com
+✅ Environment variables validated successfully
+🔍 OPENAI_API_KEY from process.env: EXISTS
+🔍 OPENAI_API_KEY in parsed: EXISTS
+🌐 [ENV] Final BACKEND_URL: https://api.rejectionhero.com
+🔐 [Auth] Initializing Better Auth...
+🔍 [Auth] Testing database connection...
+✅ [Auth] Google OAuth credentials configured
+🔑 [Auth] Google Client ID: 94427138884-cc2db90q...
+📊 [Auth] Database provider: postgresql
+📊 [Auth] DATABASE_URL: postgresql://neondb_owner:npg_...
+✅ [Auth] Better Auth initialized
+🔗 [Auth] Base URL: https://api.rejectionhero.com
+🌐 [Auth] Trusted origins: vibecode://, http://localhost:3000, http://localhost:8081, https://api.rejectionhero.com
+🔑 [Auth] Google OAuth: Enabled ✅
+🔗 [Auth] Google OAuth Redirect URI: https://api.rejectionhero.com/api/auth/callback/google
+✅ [Auth] Using production redirect URI (required for Google OAuth)
+⚠️  [Auth] Note: BACKEND_URL is https://api.rejectionhero.com but OAuth uses production URL
+⚠️  [Auth] IMPORTANT: Make sure this URL is added to Google Cloud Console OAuth credentials!
+⚠️  [Auth] Go to: https://console.cloud.google.com/apis/credentials
+⚠️  [Auth] Add to "Authorized redirect URIs": https://api.rejectionhero.com/api/auth/callback/google
+🔐 [Auth] Session expires in: 7 days
+🔧 [R2] Configuration check:
+  R2_ENDPOINT: ✅ Set
+  R2_ACCESS_KEY_ID: ✅ Set
+  R2_SECRET_ACCESS_KEY: ✅ Set
+  R2_BUCKET: ✅ rejection-hero-uploads
+📜 [Policies] Router initialized. __dirname: /home/user/workspace/backend/src/routes
+🔧 Initializing Hono application...
+🔐 Mounting custom password reset routes at /api/auth
+🔐 Mounting Better Auth handler at /api/auth/*
+📁 Serving static files from uploads/ directory
+📤 Mounting upload routes at /api/upload
+📝 Mounting sample routes at /api/sample
+👤 Mounting profile routes at /api/profile
+🔍 Mounting discover routes at /api/discover
+👆 Mounting swipe routes at /api/swipe
+💕 Mounting matches routes at /api/matches
+🎯 Mounting quests routes at /api/quests
+🏆 Mounting challenges routes at /api/challenges
+📊 Mounting stats routes at /api/stats
+📹 Mounting live routes at /api/live
+👥 Mounting friends routes at /api/friends
+💬 Mounting messages routes at /api/messages
+🏘️  Mounting groups routes at /api/groups
+🎯 Mounting group quests routes at /api/group-quests
+📹 Mounting group live routes at /api/group-live
+🎁 Mounting shared quests routes at /api/shared-quests
+✅ Mounting quest verification routes at /api/quest-verification
+🛡️ Mounting moderation routes at /api/moderation
+📓 Mounting journal routes at /api/journal
+📝 Mounting posts routes at /api/posts
+⏰ Mounting moments routes at /api/moments
+🔔 Mounting notifications routes at /api/notifications
+📧 Mounting GoHighLevel routes at /api/gohighlevel
+🎫 Mounting support routes at /api/support
+📁 Mounting categories routes at /api/categories
+🎤 Mounting audio routes at /api/audio
+💳 Mounting payments routes at /api/payments
+💳 Mounting payment redirect routes at root level
+📜 Mounting policies routes at /api/policies
+👑 Mounting admin routes at /api/admin
+🐛 Mounting bug report routes at /api/bug-reports
+🌐 Mounting web redirect routes
+⚙️  Starting server...
 ✅ [Auth] Database connection successful
 ✅ [Auth] User table accessible
 ✅ [Auth] Account table accessible
