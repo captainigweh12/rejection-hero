@@ -363,10 +363,12 @@ profileRouter.post("/generate-avatar", zValidator("json", generateAvatarRequestS
       fs.writeFileSync(filePath, imageBuffer);
       console.log("💾 Avatar saved to server:", filePath);
 
-      // Use storage URL (storage.rejectionhero.com) for all file URLs
-      const storageUrl = env.STORAGE_URL || process.env.STORAGE_URL || "https://storage.rejectionhero.com";
-      const serverAvatarUrl = `${storageUrl}/uploads/${uniqueFilename}`;
+      // Return URL that points to the backend server where the file is actually served
+      // Files are served from /uploads/* endpoint on the backend
+      const backendUrl = env.BACKEND_URL || process.env.BACKEND_URL || "https://api.rejectionhero.com";
+      const serverAvatarUrl = `${backendUrl}/uploads/${uniqueFilename}`;
       console.log("✅ Avatar URL saved:", serverAvatarUrl);
+      console.log("📁 File is served from backend at:", serverAvatarUrl);
 
       return c.json({
         success: true,

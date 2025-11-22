@@ -216,10 +216,18 @@ export default function ProfileScreen({ navigation }: Props) {
       );
 
       if (response.success && response.avatarUrl) {
-        // The avatar URL is already a server URL, so we can use it directly
-        const avatarUrl = response.avatarUrl.startsWith("http")
-          ? response.avatarUrl
-          : `${process.env.EXPO_PUBLIC_VIBECODE_BACKEND_URL}${response.avatarUrl}`;
+        // The avatar URL should already be a full URL from the backend (e.g., https://api.rejectionhero.com/uploads/avatar-xxx.png)
+        // But ensure it's a complete URL (backend returns full URL, but handle edge cases)
+        let avatarUrl = response.avatarUrl;
+        if (!avatarUrl.startsWith("http")) {
+          // If for some reason it's a relative URL, construct full URL
+          // Use the same backend URL that api.ts uses
+          const BACKEND_URL = "https://api.rejectionhero.com";
+          avatarUrl = `${BACKEND_URL}${avatarUrl.startsWith("/") ? "" : "/"}${avatarUrl}`;
+        }
+
+        console.log("🖼️ [Avatar] Generated avatar URL:", avatarUrl);
+        console.log("🖼️ [Avatar] Saving avatar URL to profile...");
 
         // Save the avatar to the profile
         await api.post("/api/profile", {
@@ -229,6 +237,9 @@ export default function ProfileScreen({ navigation }: Props) {
 
         // Refetch profile to show new avatar
         queryClient.invalidateQueries({ queryKey: ["profile"] });
+        
+        // Also wait a bit for the profile to update before showing success
+        await new Promise((resolve) => setTimeout(resolve, 500));
 
         Alert.alert("Success!", "Your AI avatar has been generated and saved!");
       } else {
