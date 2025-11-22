@@ -20,17 +20,24 @@ import { authClient } from "./authClient";
  * Development: http://localhost:3000 (fallback)
  */
 // Get backend URL with fallback for development/Expo Go
+// IMPORTANT: Must match authClient baseURL to ensure cookies work correctly
+// If authClient uses production, api.ts must also use production
 const getBackendURL = () => {
   const PRODUCTION_URL = "https://api.rejectionhero.com";
-  let url = process.env.EXPO_PUBLIC_VIBECODE_BACKEND_URL;
-
-  // Use the configured URL directly (don't override sandbox URLs)
-  // Sandbox URLs are valid for preview/staging environments
-  if (url) {
-    return url;
-  }
-
-  return __DEV__ ? "http://localhost:3000" : PRODUCTION_URL;
+  
+  // Always use production URL to match authClient
+  // This ensures cookies set by authClient are sent with API requests
+  // If we use different URLs, cookies won't be sent (cross-domain issue)
+  console.log(`🌐 [API Client] Using production URL: ${PRODUCTION_URL}`);
+  console.log(`⚠️  [API Client] This must match authClient baseURL for cookies to work`);
+  return PRODUCTION_URL;
+  
+  // OLD CODE (commented out - caused cookie mismatch):
+  // let url = process.env.EXPO_PUBLIC_VIBECODE_BACKEND_URL;
+  // if (url) {
+  //   return url;
+  // }
+  // return __DEV__ ? "http://localhost:3000" : PRODUCTION_URL;
 };
 
 const BACKEND_URL = getBackendURL();
@@ -80,6 +87,14 @@ const fetchFn = async <T>(path: string, options: FetchOptions): Promise<T> => {
   const cookies = authClient.getCookie();
   if (cookies) {
     headers.set("Cookie", cookies);
+    // Debug: Log cookie presence (but not the value for security)
+    if (__DEV__) {
+      console.log(`🔐 [API] Sending cookies: YES (${cookies.length} chars) to ${BACKEND_URL}${path}`);
+    }
+  } else {
+    console.warn(`⚠️ [API] No cookies available for request to ${BACKEND_URL}${path}`);
+    console.warn(`⚠️ [API] This will likely result in a 401 Unauthorized error`);
+    console.warn(`⚠️ [API] Check if user is logged in and session is valid`);
   }
 
   // Detect if body is FormData
@@ -95,6 +110,8 @@ const fetchFn = async <T>(path: string, options: FetchOptions): Promise<T> => {
         ...(!isFormData ? { "Content-Type": "application/json" } : {}),
         // Include authentication cookies if available
         ...(cookies ? { Cookie: cookies } : {}),
+        // Ensure cookies are sent with cross-origin requests
+        ...(cookies ? { "X-Requested-With": "XMLHttpRequest" } : {}),
       },
       // Stringify the body if it's JSON, or send FormData as-is
       body: body
