@@ -288,6 +288,7 @@ const uploadImage = async (imageUri: string, filename?: string): Promise<string>
   const type = match ? `image/${match[1]}` : "image/jpeg";
 
   // React Native FormData format - use proper object structure
+  // Note: Using native fetch instead of expo/fetch for FormData compatibility
   formData.append("image", {
     uri: imageUri,
     name: finalFilename,
@@ -296,7 +297,8 @@ const uploadImage = async (imageUri: string, filename?: string): Promise<string>
 
   const cookies = authClient.getCookie();
   
-  const response = await expoFetch(`${BACKEND_URL}/api/upload/image`, {
+  // Use native fetch for FormData (expo/fetch has issues with React Native FormData format)
+  const response = await fetch(`${BACKEND_URL}/api/upload/image`, {
     method: "POST",
     body: formData,
     headers: {

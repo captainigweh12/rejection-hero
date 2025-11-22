@@ -47,10 +47,10 @@ export default function CreateStoryScreen({ navigation }: Props) {
   }, []);
 
   const handlePickFromGallery = async (mediaType: "image" | "video") => {
-    // Use MediaTypeOptions for expo-image-picker ~16.1.4
+    // Use MediaType (replaces deprecated MediaTypeOptions in expo-image-picker ~16.1.4)
     const mediaTypes = mediaType === "image" 
-      ? ImagePicker.MediaTypeOptions.Images 
-      : ImagePicker.MediaTypeOptions.Videos;
+      ? ImagePicker.MediaType.Images 
+      : ImagePicker.MediaType.Videos;
     
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes,
@@ -72,7 +72,7 @@ export default function CreateStoryScreen({ navigation }: Props) {
     }
 
     const result = await ImagePicker.launchCameraAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ImagePicker.MediaType.Images,
       quality: 0.8,
       allowsEditing: true,
       aspect: [9, 16],
@@ -91,7 +91,7 @@ export default function CreateStoryScreen({ navigation }: Props) {
     }
 
     const result = await ImagePicker.launchCameraAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Videos,
+      mediaTypes: ImagePicker.MediaType.Videos,
       quality: 0.8,
       allowsEditing: true,
       aspect: [9, 16],
