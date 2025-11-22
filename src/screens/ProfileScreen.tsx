@@ -186,7 +186,10 @@ export default function ProfileScreen({ navigation }: Props) {
       }
 
       const uploadData = await uploadResponse.json();
-      const serverImageUrl = `${process.env.EXPO_PUBLIC_VIBECODE_BACKEND_URL}${uploadData.url}`;
+      // Use fullUrl if available (R2 URL), otherwise construct from relative path
+      const serverImageUrl = uploadData.fullUrl || `${process.env.EXPO_PUBLIC_VIBECODE_BACKEND_URL || "https://api.rejectionhero.com"}${uploadData.url}`;
+
+      console.log("🖼️ [Avatar Upload] Server image URL:", serverImageUrl);
 
       // Save the avatar URL to the profile
       await api.post("/api/profile", {
@@ -361,7 +364,10 @@ export default function ProfileScreen({ navigation }: Props) {
                 >
                   {profileData?.avatar ? (
                     <Image
-                      source={{ uri: profileData.avatar }}
+                      source={{ 
+                        uri: profileData.avatar,
+                        cache: "force-cache" // Cache the image for better performance
+                      }}
                       style={{ width: "100%", height: "100%", borderRadius: 70 }}
                       resizeMode="cover"
                       onError={(error) => {
@@ -369,9 +375,16 @@ export default function ProfileScreen({ navigation }: Props) {
                           avatarUrl: profileData.avatar,
                           error: error?.nativeEvent?.error || "Unknown error",
                         });
+                        // Try to reload after a short delay
+                        setTimeout(() => {
+                          queryClient.invalidateQueries({ queryKey: ["profile"] });
+                        }, 1000);
                       }}
                       onLoad={() => {
                         console.log("🖼️ [Avatar] Avatar image loaded successfully:", profileData.avatar);
+                      }}
+                      onLoadStart={() => {
+                        console.log("🖼️ [Avatar] Starting to load avatar:", profileData.avatar);
                       }}
                     />
                   ) : (

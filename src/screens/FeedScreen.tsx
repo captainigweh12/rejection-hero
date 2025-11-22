@@ -263,7 +263,7 @@ export default function FeedScreen({ onCreatePostPress, navigation }: FeedScreen
         style={{
           borderBottomWidth: 1,
           borderBottomColor: colors.cardBorder,
-          marginBottom: 24, // Increased padding between stories and posts
+          marginBottom: 12, // Reduced padding between stories and posts
           paddingTop: 8, // Add top padding
         }}
         contentContainerStyle={{ paddingHorizontal: 12, paddingVertical: 12, gap: 10, paddingBottom: 16 }}

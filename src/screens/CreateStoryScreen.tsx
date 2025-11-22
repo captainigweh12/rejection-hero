@@ -47,10 +47,10 @@ export default function CreateStoryScreen({ navigation }: Props) {
   }, []);
 
   const handlePickFromGallery = async (mediaType: "image" | "video") => {
-    // Use MediaType instead of deprecated MediaTypeOptions
+    // Use MediaTypeOptions (MediaType not available in this expo-image-picker version)
     const mediaTypes = mediaType === "image" 
-      ? ImagePicker.MediaType.Images 
-      : ImagePicker.MediaType.Videos;
+      ? ImagePicker.MediaTypeOptions.Images 
+      : ImagePicker.MediaTypeOptions.Videos;
     
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes,
@@ -72,7 +72,7 @@ export default function CreateStoryScreen({ navigation }: Props) {
     }
 
     const result = await ImagePicker.launchCameraAsync({
-      mediaTypes: ImagePicker.MediaType.Images,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       quality: 0.8,
       allowsEditing: true,
       aspect: [9, 16],
@@ -91,7 +91,7 @@ export default function CreateStoryScreen({ navigation }: Props) {
     }
 
     const result = await ImagePicker.launchCameraAsync({
-      mediaTypes: ImagePicker.MediaType.Videos,
+      mediaTypes: ImagePicker.MediaTypeOptions.Videos,
       quality: 0.8,
       allowsEditing: true,
       aspect: [9, 16],
@@ -179,7 +179,7 @@ export default function CreateStoryScreen({ navigation }: Props) {
   return (
     <View style={{ flex: 1, backgroundColor: colors.backgroundSolid }}>
       <StatusBar barStyle="light-content" />
-      <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
+      <SafeAreaView style={{ flex: 1 }} edges={["top", "bottom", "left", "right"]}>
         {/* Header */}
         <View
           style={{
