@@ -157,6 +157,7 @@ friendsRouter.post("/request", zValidator("json", sendRequestSchema), async (c) 
     // Create new friend request
     const friendship = await db.friendship.create({
       data: {
+        id: randomUUID(),
         initiatorId: user.id,
         receiverId: userId,
         status: "PENDING",

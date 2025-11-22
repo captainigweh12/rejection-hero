@@ -33,7 +33,7 @@
 
 - **Root Causes**:
   1. `SafeAreaView` with `edges={["top", "bottom"]}` rendered header buttons under status bar/notch, making them unclickable
-  2. Friend request endpoint lacked error handling and proper logging to identify issues
+  2. Friend request creation missing required `id` field for Prisma schema - `PrismaClientValidationError: Argument 'id' is missing`
 
 - **Fixes Applied**:
   - ✅ **CreateStoryScreen.tsx:1-310** - Changed to use `Pressable` component instead of `TouchableOpacity` for better touch handling
@@ -41,13 +41,14 @@
   - ✅ **CreateStoryScreen.tsx:277-307** - Added `hitSlop` to Close and Share buttons to expand touch targets by 8dp
   - ✅ **CreateStoryScreen.tsx:6** - Added `Pressable` import from React Native
   - ✅ **backend/routes/friends.ts:120-206** - Wrapped friend request handler in try-catch with detailed error logging and messaging
+  - ✅ **backend/routes/friends.ts:160** - Added `id: randomUUID()` to friendship.create() data to satisfy Prisma schema requirement
   - ✅ **backend/src/db.ts** - Verified Prisma client generation and PostgreSQL connection
 
 - **Result**:
   - ✅ Create Story header buttons (X and Share) now fully clickable with expanded touch targets
   - ✅ Buttons properly positioned below status bar on all devices (iPhone X notch, Android, etc.)
-  - ✅ Friend request endpoint returns detailed error messages instead of generic 500 errors
-  - ✅ Backend logs now show exactly where friend request failures occur
+  - ✅ Friend request creation now includes required UUID `id` field
+  - ✅ Friend request endpoint returns detailed error messages with comprehensive logging
   - ✅ PostgreSQL database properly synchronized with Prisma schema
   - ✅ All dependencies and Prisma client regenerated
 
