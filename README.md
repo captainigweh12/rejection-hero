@@ -26,7 +26,26 @@
 
 ## 🔧 Recent Updates
 
-### ✅ Fixed Story Upload & Friend Request Errors (Latest)
+### ✅ Fixed Create Story Screen SafeArea Issues (Latest)
+- **Issue**: X button and Share button unclickable on Create Story screen
+- **Root Cause**: Header buttons positioned outside safe area (under status bar/notch)
+- **Problem**:
+  - `SafeAreaView` had `edges={["top", "bottom"]}` but header View had no top padding
+  - Header buttons (X close and Share) were rendered under the status bar/notch area
+  - Made buttons completely unclickable on devices with notches (iPhone X and newer)
+- **Fix Applied**:
+  - ✅ **CreateStoryScreen.tsx:258-261** - Added outer `<View>` wrapper with background color
+  - ✅ Changed `SafeAreaView` to use `edges={["top"]}` only (following project SafeArea rules)
+  - ✅ Added `backgroundColor: colors.backgroundSolid` to header View for consistency
+  - ✅ Proper View hierarchy: `View → SafeAreaView → Header → Content`
+- **Result**:
+  - ✅ X button and Share button now properly positioned below status bar
+  - ✅ All header buttons fully clickable on all devices
+  - ✅ Follows project SafeArea guidelines from CLAUDE.md
+  - ✅ No white gaps or visual glitches
+- **Location**: `src/screens/CreateStoryScreen.tsx:257-586`
+
+### ✅ Fixed Story Upload & Friend Request Errors
 - **Issues Fixed**:
   1. **expo-image-picker Deprecation Warning** - Console warning about deprecated `MediaTypeOptions`
   2. **Story Upload Error** - "Unsupported FormDataPart implementation" when uploading images/videos

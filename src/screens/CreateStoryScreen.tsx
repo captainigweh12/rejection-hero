@@ -255,23 +255,25 @@ export default function CreateStoryScreen({ route, navigation }: Props) {
   };
 
   return (
-    <SafeAreaView 
-      style={{ flex: 1, backgroundColor: colors.backgroundSolid }} 
-      edges={["top", "bottom"]}
-    >
-      <StatusBar barStyle="light-content" />
-        {/* Header */}
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-            paddingHorizontal: 16,
-            paddingVertical: 12,
-            borderBottomWidth: 1,
-            borderBottomColor: colors.cardBorder,
-          }}
-        >
+    <View style={{ flex: 1, backgroundColor: colors.backgroundSolid }}>
+      <SafeAreaView
+        style={{ flex: 1 }}
+        edges={["top"]}
+      >
+        <StatusBar barStyle="light-content" />
+          {/* Header */}
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+              paddingHorizontal: 16,
+              paddingVertical: 12,
+              borderBottomWidth: 1,
+              borderBottomColor: colors.cardBorder,
+              backgroundColor: colors.backgroundSolid,
+            }}
+          >
           <TouchableOpacity onPress={handleClose}>
             <X size={24} color={colors.text} />
           </TouchableOpacity>
@@ -580,7 +582,8 @@ export default function CreateStoryScreen({ route, navigation }: Props) {
             </ScrollView>
           )}
         </KeyboardAvoidingView>
-    </SafeAreaView>
+      </SafeAreaView>
+    </View>
   );
 }
 
