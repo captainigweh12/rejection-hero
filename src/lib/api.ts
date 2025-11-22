@@ -153,23 +153,16 @@ const fetchFn = async <T>(path: string, options: FetchOptions): Promise<T> => {
       // 401 errors are handled by the API interceptor (clears session, redirects to login)
       // Don't log as error - they're expected when users aren't authenticated
       // The interceptor will handle the session clearing and navigation
+      // Log quietly for debugging
+      console.log(`[API 401] ${method} ${path}: Unauthorized (session will be cleared by interceptor)`);
       throw error; // Re-throw so interceptor can handle it
     }
     
-    // Don't log 401 errors as errors - they're expected when users aren't authenticated
-    // The API interceptor handles them by clearing the session
-    const is401Error = error.status === 401 || error.message?.includes('Unauthorized');
-    
-    if (!is400Error && !is401Error && !is403Error && !is500Error) {
+    if (!is400Error && !is403Error && !is500Error) {
       console.error(`[API Error] ${method} ${path}:`, error);
     } else {
-      // Log non-disruptively for debugging (including 401s)
-      if (is401Error) {
-        // 401s are handled by the interceptor, just log quietly
-        console.log(`[API 401] ${method} ${path}: Unauthorized (session will be cleared by interceptor)`);
-      } else {
-        console.log(`[API ${error.status}] ${method} ${path}:`, error.message);
-      }
+      // Log non-disruptively for debugging
+      console.log(`[API ${error.status}] ${method} ${path}:`, error.message);
     }
 
     // Check for network-specific errors
