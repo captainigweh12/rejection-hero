@@ -1024,8 +1024,13 @@ export default function GroupQuestsScreen({ navigation, route }: Props) {
                 <Pressable
                   key={gq.id}
                   onPress={() => {
-                    // Navigate to quest detail screen
-                    navigation.navigate("QuestDetail", { userQuestId: gq.userQuestId });
+                    // Group quests don't have userQuestId - show group quest details
+                    // TODO: Create GroupQuestDetailScreen for viewing group quest details
+                    Alert.alert(
+                      "Group Quest Details",
+                      `"${gq.quest.title}"\n\n${gq.quest.description}\n\nThis is a group quest. Individual quest detail view coming soon!`,
+                      [{ text: "OK" }]
+                    );
                   }}
                   style={{
                     backgroundColor: colors.card,

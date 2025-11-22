@@ -15,8 +15,11 @@ const getBackendURL = () => {
   // to ensure consistent API behavior and avoid sandbox environment issues.
   // This override is intentional and prevents the app from connecting to preview/sandbox URLs.
   if (url?.includes("sandbox.dev")) {
-    console.warn(`⚠️ [Auth Client] Detected sandbox.dev URL: ${url}`);
-    console.log(`✅ [Auth Client] Overriding with production URL: ${PRODUCTION_URL}`);
+    // Only log once in development to avoid console spam
+    if (typeof __DEV__ !== "undefined" && __DEV__) {
+      console.warn(`⚠️ [Auth Client] Detected sandbox.dev URL: ${url}`);
+      console.log(`✅ [Auth Client] Overriding with production URL: ${PRODUCTION_URL}`);
+    }
     return PRODUCTION_URL;
   }
 

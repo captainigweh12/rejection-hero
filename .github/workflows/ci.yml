@@ -18,19 +18,25 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
+          # Note: Project uses bun, not npm. Cache disabled to avoid lockfile requirement.
+          # bun.lockb is used for dependency locking instead of package-lock.json
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
 
       - name: Install dependencies
-        run: npm ci
+        run: bun install --frozen-lockfile
 
       - name: Run linting
-        run: npm run lint
+        run: bun run lint
 
       - name: Run type checking
-        run: npm run typecheck
+        run: bun run typecheck
 
       - name: Run tests
-        run: npm run test:ci
+        run: bun run test:ci
 
   build-android:
     name: Build Android
@@ -44,10 +50,15 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
+          # Note: Project uses bun, not npm. Cache disabled to avoid lockfile requirement.
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
 
       - name: Install dependencies
-        run: npm ci
+        run: bun install --frozen-lockfile
 
       - name: Setup EAS
         uses: expo/expo-github-action@v8
@@ -56,7 +67,7 @@ jobs:
           token: ${{ secrets.EAS_TOKEN }}
 
       - name: Build Android
-        run: npm run ci:build:android
+        run: bun run ci:build:android
 
   build-ios:
     name: Build iOS
@@ -70,10 +81,15 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
+          # Note: Project uses bun, not npm. Cache disabled to avoid lockfile requirement.
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
 
       - name: Install dependencies
-        run: npm ci
+        run: bun install --frozen-lockfile
 
       - name: Setup EAS
         uses: expo/expo-github-action@v8
@@ -82,5 +98,5 @@ jobs:
           token: ${{ secrets.EAS_TOKEN }}
 
       - name: Build iOS
-        run: npm run ci:build:ios
+        run: bun run ci:build:ios
 

@@ -281,7 +281,7 @@ export default function NotificationsScreen({ navigation }: Props) {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.backgroundSolid }}>
-      <LinearGradient colors={colors.backgroundGradient} style={{ flex: 1 }}>
+      <LinearGradient colors={colors.background} style={{ flex: 1 }}>
         <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
           {/* Header */}
           <View

@@ -46,6 +46,11 @@ import ParentalGuidanceSettingsScreen from "@/screens/ParentalGuidanceSettingsSc
 import ReportBugScreen from "@/screens/ReportBugScreen";
 import FriendQuestViewScreen from "@/screens/FriendQuestViewScreen";
 import CreateStoryScreen from "@/screens/CreateStoryScreen";
+import QuestCompleteScreen from "@/screens/QuestCompleteScreen";
+import QuestStreakScreen from "@/screens/QuestStreakScreen";
+import QuestWeeklyAchievementsScreen from "@/screens/QuestWeeklyAchievementsScreen";
+import QuestLeaderboardPositionScreen from "@/screens/QuestLeaderboardPositionScreen";
+import QuestCelebrationFinalScreen from "@/screens/QuestCelebrationFinalScreen";
 import { useSession } from "@/lib/useSession";
 import { api } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
