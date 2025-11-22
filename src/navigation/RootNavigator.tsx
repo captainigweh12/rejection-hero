@@ -85,7 +85,12 @@ const RootNavigator = () => {
   return (
     <>
       <AuthWrapper />
-      <RootStack.Navigator>
+      <RootStack.Navigator
+        screenOptions={{
+          // Prevent black screen flash during navigation transitions
+          animation: "fade",
+        }}
+      >
         <RootStack.Screen
           name="Tabs"
           component={BottomTabNavigator}
@@ -260,6 +265,7 @@ function AuthWrapper() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { data: sessionData, isPending } = useSession();
   const [hasChecked, setHasChecked] = useState(false);
+  const [isInitializing, setIsInitializing] = useState(true);
 
   // Register push token when user logs in
   useEffect(() => {
@@ -305,6 +311,13 @@ function AuthWrapper() {
     retry: 2,
     retryDelay: 1000,
   });
+
+  useEffect(() => {
+    // Wait for session to be ready
+    if (!isPending) {
+      setIsInitializing(false);
+    }
+  }, [isPending]);
 
   useEffect(() => {
     // Wait for session to be ready and profile to load (or fail)
@@ -373,14 +386,42 @@ function AuthWrapper() {
             navigation.navigate("AgeVerification");
           }, 100);
         }
-      } else if (!profile) {
-        // Profile doesn't exist yet - will be auto-created with ageVerified: false
-        // Wait for profile to be created, then redirect will happen on next effect run
-        console.log("🔐 [AuthWrapper] Profile doesn't exist yet, waiting for auto-creation...");
-        // Profile will be auto-created on next profile fetch with ageVerified: false
+      } else if (!profile && !profileLoading) {
+        // Profile doesn't exist yet - new user, redirect to age verification
+        // This handles the case where a new user logs in and profile hasn't been created yet
+        if (currentRouteName !== "AgeVerification" && currentRouteName !== "Onboarding" && !hasChecked) {
+          console.log("🔐 [AuthWrapper] New user detected (no profile), redirecting to age verification");
+          setHasChecked(true);
+          setTimeout(() => {
+            navigation.navigate("AgeVerification");
+          }, 100);
+        }
       }
+    } else if (!isPending && !sessionData?.user) {
+      // User is not authenticated - ensure they can see login screen
+      // Don't block navigation if user is not logged in
+      setIsInitializing(false);
     }
   }, [sessionData, isPending, hasChecked, navigation, profile, profileLoading, profileError]);
+
+  // Show loading screen while determining navigation state
+  // This prevents black screen for new users
+  if (isInitializing || (isPending && !sessionData?.user)) {
+    return (
+      <View style={[StyleSheet.absoluteFillObject, { backgroundColor: "#000000", alignItems: "center", justifyContent: "center" }]}>
+        <ActivityIndicator size="large" color="#7E3FE4" />
+      </View>
+    );
+  }
+
+  // Show loading screen while profile is being fetched for authenticated users
+  if (sessionData?.user && profileLoading && !profile && !profileError) {
+    return (
+      <View style={[StyleSheet.absoluteFillObject, { backgroundColor: "#000000", alignItems: "center", justifyContent: "center" }]}>
+        <ActivityIndicator size="large" color="#7E3FE4" />
+      </View>
+    );
+  }
 
   return null;
 }

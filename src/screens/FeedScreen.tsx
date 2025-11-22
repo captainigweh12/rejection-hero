@@ -254,8 +254,9 @@ export default function FeedScreen({ onCreatePostPress, navigation }: FeedScreen
     }
   };
 
-  return (
-    <View style={{ flex: 1, backgroundColor: colors.backgroundSolid }}>
+  // Render stories header component (used in ListHeaderComponent)
+  const renderStoriesHeader = () => (
+    <View>
       {/* Stories/Moments Bar */}
       <ScrollView
         horizontal
@@ -263,8 +264,8 @@ export default function FeedScreen({ onCreatePostPress, navigation }: FeedScreen
         style={{
           borderBottomWidth: 1,
           borderBottomColor: colors.cardBorder,
-          marginBottom: 8, // Reduced padding between stories and posts
-          paddingTop: 8, // Add top padding
+          marginBottom: 8,
+          paddingTop: 8,
         }}
         contentContainerStyle={{ paddingHorizontal: 12, paddingVertical: 12, gap: 10, paddingBottom: 16 }}
       >
@@ -371,7 +372,7 @@ export default function FeedScreen({ onCreatePostPress, navigation }: FeedScreen
       </ScrollView>
 
       {/* What's on your mind - Facebook Style */}
-      <View style={{ paddingHorizontal: 16, paddingTop: 8 }}>
+      <View style={{ paddingHorizontal: 16, paddingTop: 8, paddingBottom: 12 }}>
         <TouchableOpacity
           onPress={() => {
             if (onCreatePostPress) {
@@ -420,7 +421,11 @@ export default function FeedScreen({ onCreatePostPress, navigation }: FeedScreen
           </View>
         </TouchableOpacity>
       </View>
+    </View>
+  );
 
+  return (
+    <View style={{ flex: 1, backgroundColor: colors.backgroundSolid }}>
       {/* Posts Feed - Scrollable with infinite scroll */}
       {feedLoading ? (
         <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
@@ -433,6 +438,7 @@ export default function FeedScreen({ onCreatePostPress, navigation }: FeedScreen
           renderItem={({ item }) => (
             <PostCard post={item} currentUserId={sessionData?.user?.id || ""} />
           )}
+          ListHeaderComponent={renderStoriesHeader}
           contentContainerStyle={{ paddingHorizontal: 12, paddingTop: 4, paddingBottom: 100 }}
           refreshControl={
             <RefreshControl

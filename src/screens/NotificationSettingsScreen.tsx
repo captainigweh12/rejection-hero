@@ -100,12 +100,87 @@ export default function NotificationSettingsScreen({ navigation }: Props) {
   // Use default preferences if loading fails or data is not available
   const currentPreferences = preferences || defaultPreferences;
 
+  // Show loading state
   if (isLoading && !preferences) {
     return (
       <LinearGradient colors={colors.background} className="flex-1">
         <SafeAreaView edges={["top"]} className="flex-1">
+          {/* Header */}
+          <View
+            className="flex-row items-center px-6 py-4 border-b"
+            style={{ borderBottomColor: "rgba(255, 255, 255, 0.1)" }}
+          >
+            <Pressable
+              onPress={() => navigation.goBack()}
+              className="w-10 h-10 items-center justify-center rounded-full mr-3"
+              style={{ backgroundColor: "rgba(255, 255, 255, 0.1)" }}
+            >
+              <ArrowLeft size={20} color={colors.text} />
+            </Pressable>
+            <View className="flex-1 flex-row items-center">
+              <Bell size={24} color={colors.text} className="mr-3" />
+              <Text className="text-xl font-bold" style={{ color: colors.text }}>
+                Notification Settings
+              </Text>
+            </View>
+          </View>
           <View className="flex-1 items-center justify-center">
             <ActivityIndicator size="large" color="#7E3FE4" />
+            <Text style={{ color: colors.textSecondary, marginTop: 16 }}>
+              Loading preferences...
+            </Text>
+          </View>
+        </SafeAreaView>
+      </LinearGradient>
+    );
+  }
+
+  // Show error state with retry option
+  if (error && !preferences) {
+    return (
+      <LinearGradient colors={colors.background} className="flex-1">
+        <SafeAreaView edges={["top"]} className="flex-1">
+          {/* Header */}
+          <View
+            className="flex-row items-center px-6 py-4 border-b"
+            style={{ borderBottomColor: "rgba(255, 255, 255, 0.1)" }}
+          >
+            <Pressable
+              onPress={() => navigation.goBack()}
+              className="w-10 h-10 items-center justify-center rounded-full mr-3"
+              style={{ backgroundColor: "rgba(255, 255, 255, 0.1)" }}
+            >
+              <ArrowLeft size={20} color={colors.text} />
+            </Pressable>
+            <View className="flex-1 flex-row items-center">
+              <Bell size={24} color={colors.text} className="mr-3" />
+              <Text className="text-xl font-bold" style={{ color: colors.text }}>
+                Notification Settings
+              </Text>
+            </View>
+          </View>
+          <View className="flex-1 items-center justify-center px-6">
+            <Text style={{ color: colors.text, fontSize: 18, fontWeight: "600", marginBottom: 8, textAlign: "center" }}>
+              Failed to load notification preferences
+            </Text>
+            <Text style={{ color: colors.textSecondary, fontSize: 14, marginBottom: 24, textAlign: "center" }}>
+              {error instanceof Error ? error.message : "An error occurred while loading your preferences."}
+            </Text>
+            <Pressable
+              onPress={() => {
+                queryClient.invalidateQueries({ queryKey: ["notification-preferences"] });
+              }}
+              style={{
+                backgroundColor: "#7E3FE4",
+                paddingHorizontal: 24,
+                paddingVertical: 12,
+                borderRadius: 12,
+              }}
+            >
+              <Text style={{ color: "#FFFFFF", fontSize: 16, fontWeight: "600" }}>
+                Retry
+              </Text>
+            </Pressable>
           </View>
         </SafeAreaView>
       </LinearGradient>
