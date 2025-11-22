@@ -415,10 +415,10 @@ app.get("/", (c) => {
 });
 
 // Handle favicon requests silently (reduce log noise from browser requests)
-app.get("/favicon.ico", (c) => {
+app.get("/favicon.ico", async (c) => {
   return c.status(204);
 });
-app.get("/favicon.png", (c) => {
+app.get("/favicon.png", async (c) => {
   return c.status(204);
 });
 
