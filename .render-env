@@ -1,0 +1,8 @@
+# Render API Configuration
+export RENDER_API_KEY='rnd_5En3T02nYH74oVfvyyxaAYt2v6aW'
+export RENDER_SERVICE_ID='srv-d4gd5onpm1nc73f8r010'  # rejection-hero
+
+# Quick aliases (add to ~/.bashrc if needed)
+# alias render-logs='source ~/.render-env && /home/user/workspace/render-logs.sh'
+# alias render-service='source ~/.render-env && /home/user/workspace/get-render-logs.sh'
+
