@@ -812,7 +812,7 @@ export default function ProfileScreen({ navigation }: Props) {
                     </Text>
                   </Pressable>
                   <Pressable
-                    onPress={() => Alert.alert("Coming Soon", "Achievements feature is being developed!")}
+                    onPress={() => navigation.navigate("GrowthAchievements")}
                     style={{
                       flexDirection: "row",
                       alignItems: "center",

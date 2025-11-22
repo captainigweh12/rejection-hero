@@ -1,0 +1,105 @@
+appId: com.rejectionhero.app
+name: Rejection Hero E2E Tests
+
+flows:
+  - name: "Launch App and Login"
+    description: "Test app launch and basic navigation"
+    tags:
+      - smoke
+      - login
+    steps:
+      - launchApp
+      - assertVisible: "Login"
+      - tapOn: "Login"
+      - assertVisible: "Email"
+      - inputText: "test@example.com"
+      - tapOn: "Password"
+      - inputText: "testpassword123"
+      - tapOn: "Sign In"
+      - assertVisible: "Home"
+
+  - name: "Quest Completion Flow"
+    description: "Complete a quest and verify celebration screens"
+    tags:
+      - quest
+      - celebration
+    steps:
+      - launchApp
+      - assertVisible: "Home"
+      - tapOn: 
+          id: "active-quest-card"
+          index: 0
+      - assertVisible: "Quest Detail"
+      - tapOn:
+          id: "record-yes-button"
+      - tapOn:
+          id: "record-no-button"
+      - tapOn:
+          id: "complete-quest-button"
+      - assertVisible: "Quest Complete"
+      - assertVisible: "Continue Celebration"
+      - tapOn:
+          id: "quest-complete-continue-button"
+      - assertVisible: "Streak"
+      - tapOn:
+          id: "streak-continue-button"
+      - assertVisible: "Weekly Achievements"
+      - tapOn:
+          id: "weekly-continue-button"
+      - assertVisible: "Leaderboard"
+      - tapOn:
+          id: "leaderboard-continue-button"
+      - assertVisible: "Share to Story"
+      - assertVisible: "Share as Post"
+
+  - name: "Create Story with Image"
+    description: "Create a story with an image upload"
+    tags:
+      - story
+      - upload
+    steps:
+      - launchApp
+      - assertVisible: "Home"
+      - tapOn:
+          id: "create-story-button"
+      - assertVisible: "Create Story"
+      - tapOn:
+          id: "select-image-button"
+      - assertVisible: "Image Picker"
+      - tapOn: "Camera Roll"
+      - tapOn:
+          index: 0
+      - assertVisible: "Selected Image"
+      - inputText:
+          id: "story-caption-input"
+          text: "Test story caption"
+      - tapOn:
+          id: "share-story-button"
+      - assertVisible: "Story created"
+
+  - name: "Share Accomplishment to Story"
+    description: "Share quest completion to story"
+    tags:
+      - share
+      - story
+    steps:
+      - launchApp
+      - assertVisible: "Home"
+      # Complete quest first (simplified)
+      - tapOn:
+          id: "active-quest-card"
+      - tapOn:
+          id: "complete-quest-button"
+      - tapOn:
+          id: "quest-complete-continue-button"
+      - tapOn:
+          id: "streak-continue-button"
+      - tapOn:
+          id: "weekly-continue-button"
+      - tapOn:
+          id: "leaderboard-continue-button"
+      - tapOn:
+          id: "share-to-story-button"
+      - assertVisible: "Create Story"
+      - assertVisible: "Test story caption" # Pre-filled caption
+

@@ -400,22 +400,11 @@ export default function QuestDetailScreen({ route, navigation }: Props) {
           rank: summary.rank,
           rankChange: summary.rankChange,
         });
-        // Navigate to feed/community screen to create post
-        // For now, we'll show an alert - this can be enhanced to navigate to post creation
-        Alert.alert(
-          "Share as Post",
-          "Post creation will open with your achievement details pre-filled.",
-          [
-            { text: "Cancel", style: "cancel" },
-            {
-              text: "Continue",
-              onPress: () => {
-                navigation.navigate("Tabs", { screen: "HomeTab" });
-                // TODO: Open post creation modal with pre-filled content
-              },
-            },
-          ]
-        );
+        // Navigate to SwipeTab (Community) with pre-filled post content
+        navigation.navigate("Tabs", { 
+          screen: "SwipeTab",
+          params: { initialPostContent: content }
+        });
       },
     });
   };

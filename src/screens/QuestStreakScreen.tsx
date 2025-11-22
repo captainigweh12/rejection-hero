@@ -276,6 +276,7 @@ export default function QuestStreakScreen({ route, navigation }: Props) {
 
               {/* Continue Button */}
               <Pressable
+                testID="streak-continue-button"
                 onPress={() => {
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                   onContinue();

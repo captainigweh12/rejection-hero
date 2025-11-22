@@ -324,6 +324,7 @@ export default function QuestCompleteScreen({ route, navigation }: Props) {
 
               {/* Continue Button */}
               <Pressable
+                testID="quest-complete-continue-button"
                 onPress={() => {
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                   onContinue();

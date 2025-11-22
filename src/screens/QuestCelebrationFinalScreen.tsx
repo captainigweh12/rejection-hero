@@ -169,6 +169,7 @@ export default function QuestCelebrationFinalScreen({ route, navigation }: Props
                   }}
                 >
                   <Pressable
+                    testID="share-to-story-button"
                     onPress={handleShareToStory}
                     style={{
                       backgroundColor: "rgba(0, 217, 255, 0.15)",
@@ -213,6 +214,7 @@ export default function QuestCelebrationFinalScreen({ route, navigation }: Props
                   }}
                 >
                   <Pressable
+                    testID="share-as-post-button"
                     onPress={handleShareAsPost}
                     style={{
                       backgroundColor: "rgba(126, 63, 228, 0.15)",

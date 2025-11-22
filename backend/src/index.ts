@@ -519,7 +519,7 @@ serve({ fetch: app.fetch, port: Number(env.PORT) }, () => {
   console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
   console.log(`📍 Environment: ${env.NODE_ENV}`);
   console.log(`🚀 Server is running on port ${env.PORT}`);
-  console.log(`🔗 Base URL: http://localhost:${env.PORT}`);
+  console.log(`🔗 Base URL: ${env.BACKEND_URL || `http://localhost:${env.PORT}`}`);
   console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
   console.log("\n📚 Available endpoints:");
   console.log("  🔐 Auth:         /api/auth/*");

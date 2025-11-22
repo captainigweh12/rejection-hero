@@ -266,6 +266,7 @@ export default function CreateStoryScreen({ route, navigation }: Props) {
           </TouchableOpacity>
           <Text style={{ fontSize: 18, fontWeight: "700", color: colors.text }}>Create Story</Text>
           <TouchableOpacity
+            testID="share-story-button"
             onPress={handleShareStory}
             disabled={!selectedMedia || isUploading || createStoryMutation.isPending}
             style={{
@@ -326,6 +327,7 @@ export default function CreateStoryScreen({ route, navigation }: Props) {
                   <TextInput
                     value={storyText}
                     onChangeText={setStoryText}
+                    testID="story-caption-input"
                     placeholder="Add text to your story..."
                     placeholderTextColor="rgba(255, 255, 255, 0.5)"
                     multiline
@@ -408,6 +410,7 @@ export default function CreateStoryScreen({ route, navigation }: Props) {
 
               {/* Image from Gallery */}
               <TouchableOpacity
+                testID="select-image-button"
                 onPress={() => handlePickFromGallery("image")}
                 style={{
                   backgroundColor: colors.card,

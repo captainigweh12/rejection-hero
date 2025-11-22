@@ -271,6 +271,7 @@ export default function QuestWeeklyAchievementsScreen({ route, navigation }: Pro
             }}
           >
             <Pressable
+              testID="weekly-continue-button"
               onPress={() => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                 onContinue();

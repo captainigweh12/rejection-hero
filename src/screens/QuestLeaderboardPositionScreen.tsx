@@ -305,6 +305,7 @@ export default function QuestLeaderboardPositionScreen({ route, navigation }: Pr
 
               {/* Continue Button */}
               <Pressable
+                testID="leaderboard-continue-button"
                 onPress={() => {
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                   onContinue();

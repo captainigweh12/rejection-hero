@@ -9,6 +9,7 @@ import type { RootStackParamList } from "@/navigation/types";
 import { api } from "@/lib/api";
 import * as Haptics from "expo-haptics";
 import { playSound } from "@/services/soundService";
+import { useTheme } from "@/contexts/ThemeContext";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Notifications">;
 
@@ -28,6 +29,7 @@ interface Notification {
 }
 
 export default function NotificationsScreen({ navigation }: Props) {
+  const { colors } = useTheme();
   const queryClient = useQueryClient();
 
   // Fetch notifications
@@ -171,12 +173,12 @@ export default function NotificationsScreen({ navigation }: Props) {
         key={notification.id}
         onPress={() => handleNotificationPress(notification)}
         style={{
-          backgroundColor: notification.read ? "rgba(255, 255, 255, 0.03)" : "rgba(126, 63, 228, 0.1)",
+          backgroundColor: notification.read ? colors.surface : colors.primary + "1A",
           borderRadius: 16,
           padding: 16,
           marginBottom: 12,
           borderWidth: 1,
-          borderColor: notification.read ? "rgba(255, 255, 255, 0.05)" : "rgba(126, 63, 228, 0.3)",
+          borderColor: notification.read ? colors.cardBorder : colors.primary + "4D",
         }}
       >
         <View style={{ flexDirection: "row", gap: 12 }}>
@@ -192,7 +194,7 @@ export default function NotificationsScreen({ navigation }: Props) {
                 width: 48,
                 height: 48,
                 borderRadius: 24,
-                backgroundColor: "rgba(126, 63, 228, 0.2)",
+                backgroundColor: colors.primary + "33",
                 alignItems: "center",
                 justifyContent: "center",
               }}
@@ -203,13 +205,13 @@ export default function NotificationsScreen({ navigation }: Props) {
 
           {/* Content */}
           <View style={{ flex: 1 }}>
-            <Text style={{ fontSize: 15, fontWeight: "600", color: "white", marginBottom: 4 }}>
+            <Text style={{ fontSize: 15, fontWeight: "600", color: colors.text, marginBottom: 4 }}>
               {notification.title}
             </Text>
-            <Text style={{ fontSize: 14, color: "rgba(255, 255, 255, 0.7)", marginBottom: 6 }}>
+            <Text style={{ fontSize: 14, color: colors.textSecondary, marginBottom: 6 }}>
               {notification.message}
             </Text>
-            <Text style={{ fontSize: 12, color: "rgba(255, 255, 255, 0.4)" }}>
+            <Text style={{ fontSize: 12, color: colors.textTertiary }}>
               {formatTime(notification.createdAt)}
             </Text>
 
@@ -223,12 +225,12 @@ export default function NotificationsScreen({ navigation }: Props) {
                   }}
                   style={{
                     flex: 1,
-                    backgroundColor: "rgba(0, 217, 255, 0.2)",
+                    backgroundColor: "#00D9FF" + "33",
                     borderRadius: 12,
                     paddingVertical: 10,
                     alignItems: "center",
                     borderWidth: 1,
-                    borderColor: "rgba(0, 217, 255, 0.3)",
+                    borderColor: "#00D9FF" + "4D",
                   }}
                 >
                   <Text style={{ color: "#00D9FF", fontWeight: "600", fontSize: 14 }}>Accept</Text>
@@ -241,12 +243,12 @@ export default function NotificationsScreen({ navigation }: Props) {
                   }}
                   style={{
                     flex: 1,
-                    backgroundColor: "rgba(255, 107, 53, 0.2)",
+                    backgroundColor: "#FF6B35" + "33",
                     borderRadius: 12,
                     paddingVertical: 10,
                     alignItems: "center",
                     borderWidth: 1,
-                    borderColor: "rgba(255, 107, 53, 0.3)",
+                    borderColor: "#FF6B35" + "4D",
                   }}
                 >
                   <Text style={{ color: "#FF6B35", fontWeight: "600", fontSize: 14 }}>Decline</Text>
@@ -265,12 +267,12 @@ export default function NotificationsScreen({ navigation }: Props) {
               width: 32,
               height: 32,
               borderRadius: 16,
-              backgroundColor: "rgba(255, 255, 255, 0.05)",
+              backgroundColor: colors.surface,
               alignItems: "center",
               justifyContent: "center",
             }}
           >
-            <X size={16} color="rgba(255, 255, 255, 0.5)" />
+            <X size={16} color={colors.textSecondary} />
           </Pressable>
         </View>
       </Pressable>
@@ -278,8 +280,8 @@ export default function NotificationsScreen({ navigation }: Props) {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#0A0A0F" }}>
-      <LinearGradient colors={["#0A0A0F", "#1A1A24", "#2A1A34"]} style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: colors.backgroundSolid }}>
+      <LinearGradient colors={colors.backgroundGradient} style={{ flex: 1 }}>
         <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
           {/* Header */}
           <View
@@ -293,9 +295,9 @@ export default function NotificationsScreen({ navigation }: Props) {
           >
             <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
               <Pressable onPress={() => navigation.goBack()}>
-                <ChevronLeft size={28} color="white" />
+                <ChevronLeft size={28} color={colors.text} />
               </Pressable>
-              <Text style={{ fontSize: 20, fontWeight: "bold", color: "white" }}>
+              <Text style={{ fontSize: 20, fontWeight: "bold", color: colors.text }}>
                 Notifications {unreadCount > 0 && `(${unreadCount})`}
               </Text>
             </View>
@@ -307,12 +309,12 @@ export default function NotificationsScreen({ navigation }: Props) {
                   paddingHorizontal: 12,
                   paddingVertical: 6,
                   borderRadius: 12,
-                  backgroundColor: "rgba(126, 63, 228, 0.2)",
+                  backgroundColor: colors.primary + "33",
                   borderWidth: 1,
-                  borderColor: "rgba(126, 63, 228, 0.3)",
+                  borderColor: colors.primary + "4D",
                 }}
               >
-                <Text style={{ color: "#A78BFA", fontSize: 12, fontWeight: "600" }}>Mark all read</Text>
+                <Text style={{ color: colors.primary, fontSize: 12, fontWeight: "600" }}>Mark all read</Text>
               </Pressable>
             )}
           </View>
@@ -321,22 +323,22 @@ export default function NotificationsScreen({ navigation }: Props) {
           <ScrollView
             style={{ flex: 1 }}
             contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40 }}
-            refreshControl={<RefreshControl refreshing={false} onRefresh={refetch} tintColor="#A78BFA" />}
+            refreshControl={<RefreshControl refreshing={false} onRefresh={refetch} tintColor={colors.primary} />}
           >
             {isLoading ? (
               <View style={{ paddingVertical: 40, alignItems: "center" }}>
-                <ActivityIndicator size="large" color="#A78BFA" />
+                <ActivityIndicator size="large" color={colors.primary} />
               </View>
             ) : notifications.length === 0 ? (
               <View style={{ paddingVertical: 60, alignItems: "center" }}>
-                <Bell size={64} color="rgba(255, 255, 255, 0.3)" />
+                <Bell size={64} color={colors.textSecondary} />
                 <Text
-                  style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: 16, marginTop: 16, textAlign: "center" }}
+                  style={{ color: colors.textSecondary, fontSize: 16, marginTop: 16, textAlign: "center" }}
                 >
                   No notifications yet
                 </Text>
                 <Text
-                  style={{ color: "rgba(255, 255, 255, 0.4)", fontSize: 14, marginTop: 8, textAlign: "center" }}
+                  style={{ color: colors.textTertiary, fontSize: 14, marginTop: 8, textAlign: "center" }}
                 >
                   You&apos;ll see notifications here when you get friend requests or other updates
                 </Text>
