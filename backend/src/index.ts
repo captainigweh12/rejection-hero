@@ -16,6 +16,7 @@ import { questsRouter } from "./routes/quests";
 import { statsRouter } from "./routes/stats";
 import liveRouter from "./routes/live";
 import { friendsRouter } from "./routes/friends";
+import followRouter from "./routes/follow";
 import { messagesRouter } from "./routes/messages";
 import { groupsRouter } from "./routes/groups";
 import { groupQuestsRouter } from "./routes/groupQuests";
@@ -333,6 +334,7 @@ app.route("/api/live", liveRouter);
 
 console.log("👥 Mounting friends routes at /api/friends");
 app.route("/api/friends", friendsRouter);
+app.route("/api/follow", followRouter);
 
 console.log("💬 Mounting messages routes at /api/messages");
 app.route("/api/messages", messagesRouter);

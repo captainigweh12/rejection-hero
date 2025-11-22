@@ -1,9 +1,12 @@
 import React, { useState } from "react";
 import { View, Text, TouchableOpacity, Image, TextInput, Alert, Modal, ActivityIndicator } from "react-native";
-import { Heart, MessageCircle, Send, MoreVertical, Edit2, Trash2, Globe, Users, Lock, X } from "lucide-react-native";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Heart, MessageCircle, Send, MoreVertical, Edit2, Trash2, Globe, Users, Lock, X, UserPlus, Check } from "lucide-react-native";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useSession } from "@/lib/useSession";
+
+type RelationshipState = "SELF" | "FRIEND" | "FOLLOWING" | "NONE";
 
 interface PostCardProps {
   post: {
@@ -38,6 +41,7 @@ interface PostCardProps {
         avatar: string | null;
       };
     }>;
+    relationshipStatus?: RelationshipState; // Optional, will be fetched if not provided
   };
   currentUserId: string;
 }
@@ -45,11 +49,16 @@ interface PostCardProps {
 export default function PostCard({ post, currentUserId }: PostCardProps) {
   const { colors } = useTheme();
   const queryClient = useQueryClient();
+  const { data: sessionData } = useSession();
   const [showComments, setShowComments] = useState(false);
   const [commentText, setCommentText] = useState("");
   const [showMenu, setShowMenu] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editContent, setEditContent] = useState(post.content);
+  const [relationshipState, setRelationshipState] = useState<RelationshipState>(
+    post.relationshipStatus || (post.user.id === currentUserId ? "SELF" : "NONE")
+  );
+  const [showFriendMenu, setShowFriendMenu] = useState(false);
 
   // Like mutation
   const likeMutation = useMutation({
@@ -95,6 +104,65 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
     },
     onError: () => {
       Alert.alert("Error", "Failed to update post. Please try again.");
+    },
+  });
+
+  // Fetch relationship status if not provided
+  const { data: relationshipData } = useQuery({
+    queryKey: ["follow-status", post.user.id],
+    queryFn: async () => {
+      const response = await api.get<{ isFollowing: boolean; isFriend: boolean }>(
+        `/api/follow/status?userId=${post.user.id}`
+      );
+      return response;
+    },
+    enabled: !post.relationshipStatus && post.user.id !== currentUserId && !!sessionData?.user,
+    onSuccess: (data) => {
+      if (data.isFriend) {
+        setRelationshipState("FRIEND");
+      } else if (data.isFollowing) {
+        setRelationshipState("FOLLOWING");
+      } else {
+        setRelationshipState("NONE");
+      }
+    },
+  });
+
+  // Follow mutation
+  const followMutation = useMutation({
+    mutationFn: () => api.post(`/api/follow/${post.user.id}`, {}),
+    onSuccess: () => {
+      setRelationshipState("FOLLOWING");
+      queryClient.invalidateQueries({ queryKey: ["follow-status", post.user.id] });
+    },
+    onError: (error: any) => {
+      Alert.alert("Error", error?.message || "Failed to follow user");
+    },
+  });
+
+  // Unfollow mutation
+  const unfollowMutation = useMutation({
+    mutationFn: () => api.delete(`/api/follow/${post.user.id}`),
+    onSuccess: () => {
+      setRelationshipState("NONE");
+      queryClient.invalidateQueries({ queryKey: ["follow-status", post.user.id] });
+    },
+    onError: (error: any) => {
+      Alert.alert("Error", error?.message || "Failed to unfollow user");
+    },
+  });
+
+  // Send friend request mutation
+  const sendFriendRequestMutation = useMutation({
+    mutationFn: () => api.post("/api/friends/request", { receiverId: post.user.id }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["follow-status", post.user.id] });
+      queryClient.invalidateQueries({ queryKey: ["friends"] });
+      queryClient.invalidateQueries({ queryKey: ["friend-requests"] });
+      Alert.alert("Success", "Friend request sent!");
+    },
+    onError: (error: any) => {
+      Alert.alert("Error", error?.message || "Failed to send friend request");
     },
   });
 
@@ -216,39 +284,155 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
 
           {/* User info */}
           <View style={{ flex: 1 }}>
-            <Text style={{ color: colors.text, fontSize: 17, fontWeight: "700", marginBottom: 2 }}>
-              {post.user.name || "Anonymous"}
-            </Text>
-            <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-              <Text style={{ color: colors.textSecondary, fontSize: 13 }}>
-                {timeAgo(post.createdAt)}
-              </Text>
-              <Text style={{ color: colors.textSecondary, fontSize: 13 }}>•</Text>
-              {privacyIcon()}
-              <Text style={{ color: colors.textSecondary, fontSize: 13 }}>
-                {privacyLabel()}
-              </Text>
-              {post.group && (
-                <>
-                  <Text style={{ color: colors.textSecondary, fontSize: 13 }}>•</Text>
-                  <Text style={{ color: colors.primary, fontSize: 13, fontWeight: "600" }}>
-                    {post.group.name}
+            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+              <View style={{ flex: 1 }}>
+                <Text style={{ color: colors.text, fontSize: 17, fontWeight: "700", marginBottom: 2 }}>
+                  {post.user.name || "Anonymous"}
+                </Text>
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+                  <Text style={{ color: colors.textSecondary, fontSize: 13 }}>
+                    {timeAgo(post.createdAt)}
                   </Text>
-                </>
+                  <Text style={{ color: colors.textSecondary, fontSize: 13 }}>•</Text>
+                  {privacyIcon()}
+                  <Text style={{ color: colors.textSecondary, fontSize: 13 }}>
+                    {privacyLabel()}
+                  </Text>
+                  {post.group && (
+                    <>
+                      <Text style={{ color: colors.textSecondary, fontSize: 13 }}>•</Text>
+                      <Text style={{ color: colors.primary, fontSize: 13, fontWeight: "600" }}>
+                        {post.group.name}
+                      </Text>
+                    </>
+                  )}
+                </View>
+              </View>
+
+              {/* Follow/Add Friend Button */}
+              {post.user.id !== currentUserId && (
+                <View style={{ marginLeft: 8 }}>
+                  {relationshipState === "FRIEND" ? (
+                    <TouchableOpacity
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        paddingHorizontal: 12,
+                        paddingVertical: 6,
+                        borderRadius: 16,
+                        backgroundColor: colors.surface,
+                        borderWidth: 1,
+                        borderColor: colors.border,
+                      }}
+                    >
+                      <Check size={14} color={colors.textSecondary} />
+                      <Text style={{ color: colors.textSecondary, fontSize: 13, fontWeight: "600", marginLeft: 4 }}>
+                        Friends
+                      </Text>
+                    </TouchableOpacity>
+                  ) : relationshipState === "FOLLOWING" ? (
+                    <TouchableOpacity
+                      onPress={() => unfollowMutation.mutate()}
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        paddingHorizontal: 12,
+                        paddingVertical: 6,
+                        borderRadius: 16,
+                        backgroundColor: colors.surface,
+                        borderWidth: 1,
+                        borderColor: colors.border,
+                      }}
+                    >
+                      <Text style={{ color: colors.textSecondary, fontSize: 13, fontWeight: "600" }}>
+                        Following
+                      </Text>
+                    </TouchableOpacity>
+                  ) : (
+                    <TouchableOpacity
+                      onPress={() => followMutation.mutate()}
+                      disabled={followMutation.isPending}
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        paddingHorizontal: 12,
+                        paddingVertical: 6,
+                        borderRadius: 16,
+                        backgroundColor: colors.primary + "1A",
+                        borderWidth: 1,
+                        borderColor: colors.primary + "4D",
+                      }}
+                    >
+                      <UserPlus size={14} color={colors.primary} />
+                      <Text style={{ color: colors.primary, fontSize: 13, fontWeight: "600", marginLeft: 4 }}>
+                        {followMutation.isPending ? "..." : "Follow"}
+                      </Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
               )}
             </View>
           </View>
         </View>
 
         {/* More options */}
-        {post.user.id === currentUserId && (
-          <View>
+        <View style={{ position: "relative" }}>
+          {post.user.id === currentUserId ? (
             <TouchableOpacity onPress={() => setShowMenu(!showMenu)} style={{ padding: 4 }}>
               <MoreVertical size={22} color={colors.textSecondary} />
             </TouchableOpacity>
+          ) : (
+            <TouchableOpacity onPress={() => setShowFriendMenu(!showFriendMenu)} style={{ padding: 4 }}>
+              <MoreVertical size={22} color={colors.textSecondary} />
+            </TouchableOpacity>
+          )}
 
-            {/* Dropdown Menu */}
-            {showMenu && (
+          {/* Friend Menu for other users */}
+          {post.user.id !== currentUserId && showFriendMenu && (
+            <View
+              style={{
+                position: "absolute",
+                right: 0,
+                top: 35,
+                backgroundColor: colors.card,
+                borderRadius: 12,
+                borderWidth: 1,
+                borderColor: colors.cardBorder,
+                paddingVertical: 8,
+                minWidth: 150,
+                shadowColor: colors.shadow,
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.3,
+                shadowRadius: 8,
+                elevation: 5,
+                zIndex: 1000,
+              }}
+            >
+              {relationshipState !== "FRIEND" && (
+                <TouchableOpacity
+                  onPress={() => {
+                    setShowFriendMenu(false);
+                    sendFriendRequestMutation.mutate();
+                  }}
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    paddingHorizontal: 16,
+                    paddingVertical: 12,
+                    gap: 12,
+                  }}
+                >
+                  <UserPlus size={18} color={colors.primary} />
+                  <Text style={{ color: colors.text, fontSize: 15, fontWeight: "600" }}>
+                    Add Friend
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          )}
+
+            {/* Dropdown Menu for own posts */}
+            {post.user.id === currentUserId && showMenu && (
               <View
                 style={{
                   position: "absolute",

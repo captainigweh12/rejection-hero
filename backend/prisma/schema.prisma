@@ -604,6 +604,17 @@ model token_transaction {
   user                  user     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+model follow {
+  id          String   @id @default(cuid())
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
+  follower    user     @relation("UserFollows", fields: [followerId], references: [id], onDelete: Cascade)
+  following   user     @relation("UserFollowedBy", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+}
+
 model user {
   id                                                                     String                       @id
   email                                                                  String                       @unique
@@ -637,6 +648,8 @@ model user {
   moment_view_user                                                      moment_view[]                @relation("moment_view_user")
   notification_notification_senderIdTouser                               notification[]               @relation("notification_senderIdTouser")
   notification_notification_userIdTouser                                 notification[]               @relation("notification_userIdTouser")
+  follow_follower                                                        follow[]                     @relation("UserFollows")
+  follow_following                                                       follow[]                     @relation("UserFollowedBy")
   group_post_author                                                      group_post[]                 @relation("group_post_author")
   group_leaderboard_entry_user                                           group_leaderboard_entry[]    @relation("group_leaderboard_entry_user")
   group_chat_message_sender                                              group_chat_message[]         @relation("group_chat_message_sender")
