@@ -58,7 +58,17 @@ export default function CreateStoryScreen({ route, navigation }: Props) {
         return;
       }
 
-      // 2. Use new MediaType API (array format)
+      // 2. Use MediaType API with defensive checks
+      // Ensure MediaType exists before accessing properties
+      if (!ImagePicker.MediaType) {
+        console.error("ImagePicker.MediaType is undefined. Check expo-image-picker version.");
+        Alert.alert(
+          "Error",
+          "Media picker is not available. Please update the app."
+        );
+        return;
+      }
+
       const mediaTypes =
         mediaType === "image"
           ? ImagePicker.MediaType.Images
@@ -72,24 +82,30 @@ export default function CreateStoryScreen({ route, navigation }: Props) {
         aspect: [9, 16], // Story aspect ratio
       });
 
-      // 4. User cancelled
-      if (result.canceled) {
+      // 4. User cancelled or no assets
+      if (result.canceled || !result.assets || result.assets.length === 0) {
         return;
       }
 
-      // 5. Use first asset
+      // 5. Use first asset with validation
       const asset = result.assets[0];
-      if (asset) {
+      if (asset && asset.uri) {
         setSelectedMedia({
           uri: asset.uri,
           type: mediaType,
         });
+      } else {
+        Alert.alert(
+          "Error",
+          "Could not load the selected media. Please try again."
+        );
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("handlePickFromGallery error", err);
+      const errorMessage = err?.message || "Unknown error";
       Alert.alert(
         "Upload error",
-        "Something went wrong while picking media. Please try again."
+        `Something went wrong while picking media: ${errorMessage}. Please try again.`
       );
     }
   };
@@ -99,6 +115,12 @@ export default function CreateStoryScreen({ route, navigation }: Props) {
       const { status } = await ImagePicker.requestCameraPermissionsAsync();
       if (status !== "granted") {
         Alert.alert("Permission Required", "Camera permission is required to take photos.");
+        return;
+      }
+
+      // Defensive check for MediaType
+      if (!ImagePicker.MediaType || !ImagePicker.MediaType.Images) {
+        Alert.alert("Error", "Camera is not available. Please update the app.");
         return;
       }
 
@@ -131,6 +153,12 @@ export default function CreateStoryScreen({ route, navigation }: Props) {
       const { status } = await ImagePicker.requestCameraPermissionsAsync();
       if (status !== "granted") {
         Alert.alert("Permission Required", "Camera permission is required to record videos.");
+        return;
+      }
+
+      // Defensive check for MediaType
+      if (!ImagePicker.MediaType || !ImagePicker.MediaType.Videos) {
+        Alert.alert("Error", "Camera is not available. Please update the app.");
         return;
       }
 
@@ -247,7 +275,10 @@ export default function CreateStoryScreen({ route, navigation }: Props) {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.backgroundSolid }} edges={["top", "bottom", "left", "right"]}>
+    <SafeAreaView 
+      style={{ flex: 1, backgroundColor: colors.backgroundSolid }} 
+      edges={["top", "bottom", "left", "right"]}
+    >
       <StatusBar barStyle="light-content" />
         {/* Header */}
         <View

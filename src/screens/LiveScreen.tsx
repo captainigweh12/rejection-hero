@@ -22,7 +22,10 @@ import {
   Sparkles,
   Plus,
   Share2,
+  Target,
 } from "lucide-react-native";
+import * as Haptics from "expo-haptics";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { BottomTabScreenProps } from "@/navigation/types";
 import { api } from "@/lib/api";
 import { useSession } from "@/lib/useSession";
@@ -47,6 +50,7 @@ export default function LiveScreen({ navigation }: Props) {
   const queryClient = useQueryClient();
   const { colors } = useTheme();
   const { canAccessFeature, isEnforcingRestrictions } = useParentalGuidance();
+  const insets = useSafeAreaInsets();
   const [isStreaming, setIsStreaming] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [isVideoOff, setIsVideoOff] = useState(false);
@@ -238,19 +242,39 @@ export default function LiveScreen({ navigation }: Props) {
   });
 
   // Record streamer's own quest action
+  // Uses the same logic as QuestDetailScreen to ensure streaks, counters, weeklies, and leaderboards all update
   const recordStreamerQuestMutation = useMutation({
     mutationFn: async (data: { action: "YES" | "NO" | "ACTION" }) => {
-      if (!activeQuest) return;
-      return api.post(`/api/quests/${activeQuest.id}/record`, {
-        action: data.action,
-      });
+      if (!activeQuest) {
+        throw new Error("No active quest");
+      }
+      return api.post<{ completed: boolean; noCount: number; yesCount: number; actionCount: number }>(
+        `/api/quests/${activeQuest.id}/record`,
+        {
+          action: data.action,
+        }
+      );
     },
-    onSuccess: () => {
+    onSuccess: async (data) => {
+      // Invalidate all relevant queries to sync with global state (same as QuestDetailScreen)
       queryClient.invalidateQueries({ queryKey: ["quests"] });
+      queryClient.invalidateQueries({ queryKey: ["stats"] });
+      queryClient.invalidateQueries({ queryKey: ["leaderboard"] });
       refetchStreams();
+
+      // Trigger haptic feedback for successful action
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+
+      // Show brief success feedback (subtle, non-intrusive)
+      // The quest overlay will update automatically via query invalidation
     },
     onError: (error: any) => {
-      Alert.alert("Error", error.message || "Failed to record action");
+      // Trigger error haptic feedback
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      
+      // Show user-friendly error message
+      const errorMessage = error?.response?.data?.message || error?.message || "Failed to record action";
+      Alert.alert("Error", errorMessage);
     },
   });
 
@@ -1039,10 +1063,13 @@ export default function LiveScreen({ navigation }: Props) {
             {isVideoOff ? <VideoOff size={24} color="white" /> : <VideoIcon size={24} color="white" />}
           </Pressable>
 
-          {/* Quest Card Toggle Button - Always show when streaming */}
+          {/* Active Quest Toggle Button - Always show when streaming */}
           <Pressable
             onPress={() => {
-              if (!activeQuest) {
+              // Trigger haptic feedback
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              
+              if (!isValidActiveQuest) {
                 setShowCreateQuestModal(true);
               } else {
                 setShowQuestCardOnStream(!showQuestCardOnStream);
@@ -1052,27 +1079,25 @@ export default function LiveScreen({ navigation }: Props) {
               width: 48,
               height: 48,
               borderRadius: 24,
-              backgroundColor: activeQuest && showQuestCardOnStream ? "rgba(255, 107, 53, 0.8)" : "rgba(255, 255, 255, 0.2)",
+              backgroundColor: isValidActiveQuest && showQuestCardOnStream ? "rgba(255, 107, 53, 0.9)" : "rgba(255, 255, 255, 0.2)",
               alignItems: "center",
               justifyContent: "center",
+              borderWidth: isValidActiveQuest && showQuestCardOnStream ? 2 : 0,
+              borderColor: "#FFD700",
             }}
           >
-            <Sparkles size={24} color="white" />
+            <Target size={24} color="white" />
           </Pressable>
         </View>
 
-        {/* Modern Quest Card Overlay - Interactive & Expandable */}
-        {activeQuest && showQuestCardOnStream && (
-          <Pressable
-            onPress={() => {
-              // Expand/collapse on tap - for now just toggle visibility
-              setShowQuestCardOnStream(!showQuestCardOnStream);
-            }}
+        {/* Active Quest Overlay - Interactive with YES/NO buttons */}
+        {isValidActiveQuest && showQuestCardOnStream && (
+          <View
             style={{
               position: "absolute",
-              bottom: 240,
-              left: 20,
-              right: 20,
+              bottom: Math.max(insets.bottom + 240, 240), // Respect safe area
+              left: Math.max(insets.left + 20, 20),
+              right: Math.max(insets.right + 20, 20),
               backgroundColor: "rgba(255, 107, 53, 0.95)",
               borderRadius: 16,
               padding: 16,
@@ -1082,20 +1107,45 @@ export default function LiveScreen({ navigation }: Props) {
               shadowOffset: { width: 0, height: 4 },
               shadowOpacity: 0.4,
               shadowRadius: 12,
+              elevation: 8, // Android shadow
             }}
+            pointerEvents="box-none" // Allow touches to pass through to buttons
           >
-            <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 8 }}>
+            {/* Close button */}
+            <Pressable
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                setShowQuestCardOnStream(false);
+              }}
+              style={{
+                position: "absolute",
+                top: 8,
+                right: 8,
+                width: 28,
+                height: 28,
+                borderRadius: 14,
+                backgroundColor: "rgba(0, 0, 0, 0.3)",
+                alignItems: "center",
+                justifyContent: "center",
+                zIndex: 10,
+              }}
+            >
+              <X size={16} color="white" />
+            </Pressable>
+
+            {/* Quest Info */}
+            <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 8, paddingRight: 32 }}>
               <Text style={{ color: colors.text, fontSize: 11, fontWeight: "700", textTransform: "uppercase", letterSpacing: 1 }}>
-                {activeQuest.quest.category}
+                {activeQuest.quest.category || "Quest"}
               </Text>
               <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
                 <Text style={{ color: "white", fontSize: 10, fontWeight: "600" }}>
-                  {activeQuest.noCount} / {activeQuest.quest.goalCount}
+                  {activeQuest.noCount || 0} / {activeQuest.quest.goalCount || 0}
                 </Text>
                 <View style={{ width: 40, height: 6, backgroundColor: "rgba(255, 255, 255, 0.3)", borderRadius: 3 }}>
                   <View
                     style={{
-                      width: `${(activeQuest.noCount / activeQuest.quest.goalCount) * 100}%`,
+                      width: `${Math.min(((activeQuest.noCount || 0) / (activeQuest.quest.goalCount || 1)) * 100, 100)}%`,
                       height: "100%",
                       backgroundColor: "#FFD700",
                       borderRadius: 3,
@@ -1104,59 +1154,87 @@ export default function LiveScreen({ navigation }: Props) {
                 </View>
               </View>
             </View>
-            <Text style={{ color: "white", fontSize: 16, fontWeight: "bold", marginBottom: 6 }}>
-              {activeQuest.quest.title}
+            
+            <Text style={{ color: "white", fontSize: 16, fontWeight: "bold", marginBottom: 6 }} numberOfLines={1}>
+              {activeQuest.quest.title || "Active Quest"}
             </Text>
+            
             <Text style={{ color: "rgba(255, 255, 255, 0.9)", fontSize: 13, lineHeight: 18 }} numberOfLines={2}>
-              {activeQuest.quest.description}
+              {activeQuest.quest.description || "Complete this quest to earn rewards!"}
             </Text>
 
-            {/* Interactive Yes/No Buttons */}
-            <View style={{ flexDirection: "row", gap: 8, marginTop: 12 }}>
-              <Pressable
-                onPress={(e) => {
-                  e.stopPropagation();
-                  recordStreamerQuestMutation.mutate({ action: "NO" });
-                }}
-                disabled={recordStreamerQuestMutation.isPending}
-                style={{
-                  flex: 1,
-                  backgroundColor: "rgba(220, 38, 38, 0.8)",
-                  paddingVertical: 10,
-                  borderRadius: 8,
-                  alignItems: "center",
-                  opacity: recordStreamerQuestMutation.isPending ? 0.6 : 1,
-                }}
-              >
-                <Text style={{ color: "white", fontSize: 14, fontWeight: "bold" }}>
-                  {recordStreamerQuestMutation.isPending ? "Recording..." : "NO"}
-                </Text>
-              </Pressable>
-              <Pressable
-                onPress={(e) => {
-                  e.stopPropagation();
-                  recordStreamerQuestMutation.mutate({ action: "YES" });
-                }}
-                disabled={recordStreamerQuestMutation.isPending}
-                style={{
-                  flex: 1,
-                  backgroundColor: "rgba(34, 197, 94, 0.8)",
-                  paddingVertical: 10,
-                  borderRadius: 8,
-                  alignItems: "center",
-                  opacity: recordStreamerQuestMutation.isPending ? 0.6 : 1,
-                }}
-              >
-                <Text style={{ color: "white", fontSize: 14, fontWeight: "bold" }}>
-                  {recordStreamerQuestMutation.isPending ? "Recording..." : "YES"}
-                </Text>
-              </Pressable>
-            </View>
+            {/* Interactive Yes/No Buttons - Only show for COLLECT_NOS or COLLECT_YES quests */}
+            {(activeQuest.quest.goalType === "COLLECT_NOS" || activeQuest.quest.goalType === "COLLECT_YES") && (
+              <View style={{ flexDirection: "row", gap: 8, marginTop: 12 }}>
+                <Pressable
+                  onPress={() => {
+                    // Prevent event bubbling
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                    if (!recordStreamerQuestMutation.isPending && activeQuest) {
+                      recordStreamerQuestMutation.mutate({ action: "NO" });
+                    }
+                  }}
+                  disabled={recordStreamerQuestMutation.isPending || !activeQuest}
+                  style={{
+                    flex: 1,
+                    backgroundColor: recordStreamerQuestMutation.isPending ? "rgba(220, 38, 38, 0.5)" : "rgba(220, 38, 38, 0.9)",
+                    paddingVertical: 12,
+                    borderRadius: 10,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    opacity: recordStreamerQuestMutation.isPending ? 0.6 : 1,
+                    shadowColor: "#DC2626",
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.3,
+                    shadowRadius: 4,
+                    elevation: 4,
+                  }}
+                >
+                  {recordStreamerQuestMutation.isPending ? (
+                    <ActivityIndicator size="small" color="white" />
+                  ) : (
+                    <Text style={{ color: "white", fontSize: 16, fontWeight: "bold" }}>NO</Text>
+                  )}
+                </Pressable>
+                
+                <Pressable
+                  onPress={() => {
+                    // Prevent event bubbling
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                    if (!recordStreamerQuestMutation.isPending && activeQuest) {
+                      recordStreamerQuestMutation.mutate({ action: "YES" });
+                    }
+                  }}
+                  disabled={recordStreamerQuestMutation.isPending || !activeQuest}
+                  style={{
+                    flex: 1,
+                    backgroundColor: recordStreamerQuestMutation.isPending ? "rgba(34, 197, 94, 0.5)" : "rgba(34, 197, 94, 0.9)",
+                    paddingVertical: 12,
+                    borderRadius: 10,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    opacity: recordStreamerQuestMutation.isPending ? 0.6 : 1,
+                    shadowColor: "#22C55E",
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.3,
+                    shadowRadius: 4,
+                    elevation: 4,
+                  }}
+                >
+                  {recordStreamerQuestMutation.isPending ? (
+                    <ActivityIndicator size="small" color="white" />
+                  ) : (
+                    <Text style={{ color: "white", fontSize: 16, fontWeight: "bold" }}>YES</Text>
+                  )}
+                </Pressable>
+              </View>
+            )}
 
+            {/* Helper text */}
             <Text style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: 11, marginTop: 8, textAlign: "center" }}>
-              Tap card to hide • Tap sparkles to show
+              Tap target icon to toggle
             </Text>
-          </Pressable>
+          </View>
         )}
 
         {/* Create Quest Button - Show when streaming without active quest */}

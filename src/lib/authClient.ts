@@ -5,33 +5,22 @@ import * as SecureStore from "expo-secure-store";
 
 // Ensure the backend URL has the protocol prefix
 const getBackendURL = () => {
-  // PRODUCTION: Always use production URL to prevent sandbox.dev override
+  // PRODUCTION: Always use production URL
   const PRODUCTION_URL = "https://api.rejectionhero.com";
+  const url = process.env.EXPO_PUBLIC_VIBECODE_BACKEND_URL as string;
 
-  let url = process.env.EXPO_PUBLIC_VIBECODE_BACKEND_URL as string;
-
-  // Check if we're in sandbox environment (sandbox.dev URL)
-  // NOTE: For the mobile app, we always want to use the production backend URL
-  // to ensure consistent API behavior and avoid sandbox environment issues.
-  // This override is intentional and prevents the app from connecting to preview/sandbox URLs.
-  if (url?.includes("sandbox.dev")) {
-    // Only log once in development to avoid console spam
-    if (typeof __DEV__ !== "undefined" && __DEV__) {
-      console.warn(`⚠️ [Auth Client] Detected sandbox.dev URL: ${url}`);
-      console.log(`✅ [Auth Client] Overriding with production URL: ${PRODUCTION_URL}`);
+  // Always use production URL in production builds
+  // In development, allow localhost fallback if env var is not set
+  if (__DEV__ && url && !url.includes("sandbox.dev") && url.startsWith("http")) {
+    // If URL doesn't start with http:// or https://, add https://
+    if (!url.startsWith("http://") && !url.startsWith("https://")) {
+      return `https://${url}`;
     }
-    return PRODUCTION_URL;
+    return url;
   }
 
-  // If URL doesn't start with http:// or https://, add https://
-  if (url && !url.startsWith("http://") && !url.startsWith("https://")) {
-    console.warn(`⚠️ [Auth Client] Backend URL missing protocol: ${url}`);
-    url = `https://${url}`;
-    console.log(`✅ [Auth Client] Added https:// prefix: ${url}`);
-  }
-
-  console.log(`🔐 [Auth Client] Using backend URL: ${url || PRODUCTION_URL}`);
-  return url || PRODUCTION_URL;
+  // Production: always use production URL
+  return PRODUCTION_URL;
 };
 
 const backendURL = getBackendURL();
